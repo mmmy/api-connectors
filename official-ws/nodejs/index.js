@@ -9,6 +9,8 @@ const getStreams = require('./lib/getStreams');
 
 const DEFAULT_MAX_TABLE_LEN = 10000;
 
+const RAW_DATA = true
+
 const endpoints = {
   production: 'wss://www.bitmex.com/realtime',
   testnet: 'wss://testnet.bitmex.com/realtime'
@@ -192,7 +194,6 @@ function addStreamHelper(client, symbol, tableName, callback) {
     // Normal sub
     toSubscribe = [tableName];
   }
-  console.log(toSubscribe, 8888888)
   // For each subscription,
   toSubscribe.forEach(function(table) {
     // Create a subscription topic.
@@ -207,12 +208,14 @@ function addStreamHelper(client, symbol, tableName, callback) {
     // The emitter emits 'partial', 'update', 'insert', and 'delete' events, listen to them all.
     client.on(subscription, function(data) {
       const [table, action, symbol] = this.event.split(':');
-
       try {
-        const newData = deltaParser.onAction(action, table, symbol, client, data);
-        // Shift oldest elements out of the table (FIFO queue) to prevent unbounded memory growth
-        if (newData.length > client._maxTableLen) {
-          newData.splice(0, newData.length - client._maxTableLen);
+        const newData = data
+        if (!RAW_DATA) {
+          const newData = deltaParser.onAction(action, table, symbol, client, data);
+          // Shift oldest elements out of the table (FIFO queue) to prevent unbounded memory growth
+          if (newData.length > client._maxTableLen) {
+            newData.splice(0, newData.length - client._maxTableLen);
+          }
         }
         callback(newData, symbol, table);
       } catch(e) {
