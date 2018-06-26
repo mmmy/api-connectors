@@ -26,6 +26,7 @@ module.exports = function createSocket(options, bmexClient) {
   };
 
   wsClient.onclose = function() {
+    console.log('ws closed...')
     wsClient.opened = false;
     //debug('Connection to BitMEX at', wsClient.url, 'closed.');
     bmexClient.emit('close');
@@ -67,7 +68,8 @@ module.exports = function createSocket(options, bmexClient) {
   wsClient.onend = function(code) {
     const listeners = bmexClient.listeners('end');
     // If no end listeners are attached, throw.
-    if (!listeners.length) throw new Error('WebSocket closed. Please check errors above.');
+    // if (!listeners.length) throw new Error('WebSocket closed. Please check errors above.');
+    if (!listeners.length) console.log('WebSocket closed. Please check errors above.');
     else bmexClient.emit('end', code);
   };
 

@@ -115,7 +115,12 @@ WebSocketClient.prototype.send = function(data, option) {
   } catch (e){
     this.instance.emit('error',e);
   }
-};
+}
+
+WebSocketClient.prototype.close = function() {
+  this.instance.close(CLOSE_NORMAL)
+}
+
 WebSocketClient.prototype.reconnect = function(_code) {
   this.log('Retry in ' + this.autoReconnectInterval + ' ms');
   clearTimeout(this.reconnectTimeout);

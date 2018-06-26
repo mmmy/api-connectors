@@ -180,6 +180,10 @@ BitMEXClient.prototype.sendSubscribeRequest = function(table, symbol) {
   this.socket.send(JSON.stringify({op: 'subscribe', args: `${table}:${symbol}`}));
 };
 
+BitMEXClient.prototype.close = function() {
+  this.socket.close()
+}
+
 function addStreamHelper(client, symbol, tableName, callback) {
   const tableUsesSymbol = noSymbolTables.indexOf(tableName) === -1;
   if (!tableUsesSymbol) symbol = '*';
