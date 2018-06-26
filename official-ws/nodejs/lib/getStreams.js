@@ -1,7 +1,7 @@
 'use strict';
 const superagent = require('superagent');
 const url = require('url');
-const debug = require('debug')('BitMEX:realtime-api:getStreams');
+// const debug = require('debug')('BitMEX:realtime-api:getStreams');
 
 module.exports = function(wsEndpoint, callback) {
   const parsed = url.parse(wsEndpoint);
@@ -15,7 +15,7 @@ module.exports = function(wsEndpoint, callback) {
   .end(function(err, res) {
     if (err) return callback(err);
     const streams = res.body.subscriptionSubjects;
-    debug('Got streams from server: %j', streams);
+    //debug('Got streams from server: %j', streams);
     callback(null, {
       public: streams.public,
       private: streams.authenticationRequired,

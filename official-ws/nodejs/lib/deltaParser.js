@@ -1,7 +1,7 @@
 'use strict';
 /*eslint no-unused-vars:0*/
 const _ = require('lodash');
-const debug = require('debug')('BitMEX:realtime-api:deltaParser');
+// const debug = require('debug')('BitMEX:realtime-api:deltaParser');
 
 /**
  * A mixin that binds a store's data to a websocket.

@@ -1,6 +1,8 @@
 'use strict';
 const WebSocket = require('ws');
-const debug = require('debug')('BitMEX:realtime-api:socket:internal');
+var SocksProxyAgent = require('socks-proxy-agent');
+var agent = new SocksProxyAgent('socks://127.0.0.1:1080');
+// const debug = require('debug')('BitMEX:realtime-api:socket:internal');
 
 const CLOSE_NORMAL = 1000;
 const CLOSE_UNEXPECTED = 1011;
@@ -14,7 +16,7 @@ function WebSocketClient(){
 }
 WebSocketClient.prototype.open = function(url){
   this.url = url;
-  this.instance = new WebSocket(this.url);
+  this.instance = new WebSocket(this.url, { agent });
   this.instance.on('open', () => {
     this.autoReconnectInterval = this.initialAutoReconnectInterval; // reset delay
     this.log("Connected.");
@@ -28,7 +30,7 @@ WebSocketClient.prototype.open = function(url){
 
     switch (code){
       case CLOSE_NORMAL:
-        debug(`WebSocket closed normally.`);
+        //debug(`WebSocket closed normally.`);
         break;
       case CLOSE_UNEXPECTED:
         this.logError("WebSocket closed unexpectedly.");
@@ -108,7 +110,7 @@ WebSocketClient.prototype.logError = function() {
 
 WebSocketClient.prototype.send = function(data, option) {
   try{
-    debug(data);
+    //debug(data);
     this.instance.send(data, option);
   } catch (e){
     this.instance.emit('error',e);

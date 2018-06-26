@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <script type="text/javascript" src="./bundle.js"></script>
+</head>
+<body>
+  <script type="text/javascript">
+    const client = new BitMEXClient({testnet: false});
+    client.on('error', console.error);
+    client.on('open', () => console.log('Connection opened.'));
+    client.on('close', () => console.log('Connection closed.'));
+    client.on('initialize', () => console.log('Client initialized, data is flowing.'));
+    client.addStream('XBTUSD', 'instrument', function(data, symbol, tableName) {
+      console.log(`Got update for ${tableName}:${symbol}. Current state:\n${JSON.stringify(data).slice(0, 100)}...`);
+      // Do something with the table data...
+    });
+  </script>
+</body>
+</html>

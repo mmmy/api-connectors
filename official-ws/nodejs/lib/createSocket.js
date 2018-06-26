@@ -1,6 +1,6 @@
 'use strict';
 const _ = require('lodash');
-const debug = require('debug')('BitMEX:realtime-api:socket');
+// const debug = require('debug')('BitMEX:realtime-api:socket');
 const signMessage = require('./signMessage');
 const WebSocketClient = require('./ReconnectingSocket');
 
@@ -8,26 +8,26 @@ module.exports = function createSocket(options, bmexClient) {
   'use strict';
 
   const endpoint = makeEndpoint(options);
-  debug('connecting to %s', endpoint);
+  //debug('connecting to %s', endpoint);
 
   // Create client and bind listeners.
   const wsClient = new WebSocketClient();
 
   wsClient.onopen = function() {
     wsClient.opened = true;
-    debug('Connection to BitMEX at', wsClient.url, 'opened.');
+    //debug('Connection to BitMEX at', wsClient.url, 'opened.');
     bmexClient.emit('open');
 
     // Have to regenerate endpoint on reconnection so we have a new nonce.
     wsClient.addListener('reconnect', function() {
       wsClient.url = makeEndpoint(options);
-      debug('Reconnecting to BitMEX at ', wsClient.url);
+      //debug('Reconnecting to BitMEX at ', wsClient.url);
     });
   };
 
   wsClient.onclose = function() {
     wsClient.opened = false;
-    debug('Connection to BitMEX at', wsClient.url, 'closed.');
+    //debug('Connection to BitMEX at', wsClient.url, 'closed.');
     bmexClient.emit('close');
   };
 
@@ -94,7 +94,7 @@ function emitSplitData(emitter, data) {
 
   Object.keys(symbolData).forEach((symbol) => {
     const key = `${table}:${action}:${symbol}`;
-    debug('emitting %s with data %j', key, symbolData[symbol]);
+    //debug('emitting %s with data %j', key, symbolData[symbol]);
     emitter.emit(key, _.extend({}, data, {data: symbolData[symbol]}));
   });
 }
@@ -103,7 +103,7 @@ function emitFullData(emitter, data) {
   const {table, action} = data;
 
   const key = `${table}:${action}:*`;
-  debug('emitting %s with data %j', key, data.data);
+  //debug('emitting %s with data %j', key, data.data);
   emitter.emit(key, data);
 }
 

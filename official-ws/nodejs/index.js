@@ -2,7 +2,7 @@
 const _ = require('lodash');
 const EventEmitter = require('eventemitter2').EventEmitter2;
 const util = require('util');
-const debug = require('debug')('BitMEX:realtime-api');
+// const debug = require('debug')('BitMEX:realtime-api');
 const createSocket = require('./lib/createSocket');
 const deltaParser = require('./lib/deltaParser');
 const getStreams = require('./lib/getStreams');
@@ -30,6 +30,10 @@ const noSymbolTables = BitMEXClient.noSymbolTables = [
 
 module.exports = BitMEXClient;
 
+if(typeof window != 'undefined') {
+  window.BitMEXClient = BitMEXClient
+}
+
 function BitMEXClient(options) {
   const emitter = this;
   // We inherit from EventEmitter2, which supports wildcards.
@@ -47,7 +51,7 @@ function BitMEXClient(options) {
     options.endpoint = options.testnet ? endpoints.testnet : endpoints.production;
   }
   if (process.env.BITMEX_ENDPOINT) options.endpoint = process.env.BITMEX_ENDPOINT;
-  debug(options)
+  //debug(options)
 
   this._setupListenerTracking();
 
@@ -59,7 +63,7 @@ function BitMEXClient(options) {
 
   // Get valid streams so we can validate our subscriptions.
   getStreams(options.endpoint, function(err, streams) {
-    if (err) throw err;
+    // if (err) throw err;
     emitter.initialized = true;
     emitter.streams = streams;
     emitter.emit('initialize');
@@ -137,10 +141,10 @@ BitMEXClient.prototype.addStream = function(symbol, tableName, callback) {
   // Massage arguments.
   if (typeof callback !== 'function') throw new Error('A callback must be passed to BitMEXClient#addStream.');
 
-  else if (client.streams.all.indexOf(tableName) === -1) {
-    throw new Error('Unknown table for BitMEX subscription: ' + tableName +
-      '. Available tables are ' + client.streams.all + '.');
-  }
+  // else if (client.streams.all.indexOf(tableName) === -1) {
+  //   throw new Error('Unknown table for BitMEX subscription: ' + tableName +
+  //     '. Available tables are ' + client.streams.all + '.');
+  // }
 
   addStreamHelper(client, symbol, tableName, callback);
 };
@@ -188,13 +192,13 @@ function addStreamHelper(client, symbol, tableName, callback) {
     // Normal sub
     toSubscribe = [tableName];
   }
-
+  console.log(toSubscribe, 8888888)
   // For each subscription,
   toSubscribe.forEach(function(table) {
     // Create a subscription topic.
     const subscription = `${table}:*:${symbol}`;
 
-    debug('Opening listener to %s.', subscription);
+    //debug('Opening listener to %s.', subscription);
 
     // Add the listener for deltas before subscribing at BitMEX.
     // These events come from createSocket, which does minimal data parsing
