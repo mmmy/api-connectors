@@ -35,7 +35,7 @@
               var fontFamily = 'Helvetica Neue';
               ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
 
-              var x = chart.data.labels[i]
+              var x = chart.data.labels[index]
               // Just naively convert to string for now
               var dataString = dataset.data[index];
               var isMiddle = dataString && dataset.data[index + 1] === null
