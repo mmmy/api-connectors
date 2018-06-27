@@ -73,20 +73,33 @@ function calcDepthLeft(list) {
 }
 
 function coverDepthDataForChart(data) {
-  const x = []
-  const y = []
+  var len = data.length
+  let x = []
+  let y = []
   let yRed = []
   let yGreen = []
-  data.forEach(item => {
+  let middleIndex = -1
+  data.forEach((item, i) => {
     var isB = item.side == 'Buy'
     x.push(item.price)
     y.push(item.size)
     yRed.push(isB ? null : item.size)
     yGreen.push(isB ? item.size : null)
+    if (middleIndex === -1 && isB && yGreen[i-1] === null) {
+      middleIndex = i
+    }
   })
   if (CONFIG.depth) {
     yRed = calcDepthLeft(yRed)
     yGreen = calcDepthRight(yGreen)
+  }
+  if(middleIndex > -1) {
+    var startIndex = Math.max(middleIndex - 20, 0)
+    var l = startIndex + 40
+    x = x.slice(startIndex, l)
+    y = y.slice(startIndex, l)
+    yRed = yRed.slice(startIndex, l)
+    yGreen = yGreen.slice(startIndex, l)
   }
   return { x, y, yRed, yGreen }
 }

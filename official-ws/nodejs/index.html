@@ -19,6 +19,11 @@
     }
 
     Chart.plugins.register({
+      beforeDraw: function(chart) {
+        var ctx = chart.ctx
+        ctx.fillStyle = 'white'
+        ctx.fillRect(0, 0, chart.width, chart.height)
+      },
       afterDatasetsDraw: function(chart) {
         var ctx = chart.ctx;
         if (window.CONFIG.depth) {
@@ -120,7 +125,7 @@
       window._autoSaveInterval = setInterval(function() {
         var $download = window._DOM.$download
         var canvas = window._DOM.canvas
-        $download[0].href = canvas.toDataURL()
+        $download[0].href = canvas.toDataURL("image/jpeg", 0.5)
         $download[0].download = new Date().toLocaleString().replace(' ', '-')
         $download[0].click()
       }, window.CONFIG.autoSaveMinutes * 60 * 1000)
@@ -133,8 +138,8 @@
     $( function() {
       var $range = $("#slider-range" ).slider({
         range: true,
-        min: 0,
-        max: 10000,
+        min: 2000,
+        max: 5000,
         values: [CONFIG.s0, CONFIG.s1],
         slide: function( event, ui ) {
           var v0 = ui.values[ 0 ],
