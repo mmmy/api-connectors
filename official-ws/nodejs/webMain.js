@@ -19,6 +19,9 @@ window.onload = function() {
     console.log("Connection closed.");
   };
 
+  window._DOM = {
+    $download: $('#download')
+  }
 }
 
 var CLIENT = {
@@ -35,7 +38,7 @@ function handleData(json) {
     newData = newData.slice(CONFIG.s0, CONFIG.s1)
   }
   // HC.drawChart(newData)
-  // drawDepthChart(newData)
+  drawDepthChart(newData)
 }
 
 // Chart.js
@@ -80,9 +83,17 @@ function coverDepthDataForChart(data) {
     yRed.push(isB ? null : item.size)
     yGreen.push(isB ? item.size : null)
   })
-  yRed = calcDepthLeft(yRed)
-  yGreen = calcDepthRight(yGreen)
+  if (CONFIG.depth) {
+    yRed = calcDepthLeft(yRed)
+    yGreen = calcDepthRight(yGreen)
+  }
   return { x, y, yRed, yGreen }
+}
+
+function drawDateTime(ctx) {
+  var oldStyle = ctx.strokeStyle
+  ctx.strokeStyle= 'red'
+  ctx.strokeText('nihao', 0, 20)
 }
 
 function drawDepthChart(newData) {
@@ -90,19 +101,21 @@ function drawDepthChart(newData) {
   if (data.x.length === 0) {
     return
   }
+  var canvas = document.getElementById("myChart")
   if (!depthChart) {
-    var ctx = document.getElementById("myChart")
-    depthChart = new Chart(ctx, {
+    depthChart = new Chart(canvas, {
       type: 'line',
       data: {
         labels: data.x,
         datasets: [{
           // borderColor: "rgb(255, 99, 132)",
           borderColor: "rgb(50, 50, 50)",
-          data: data.yRed
+          data: data.yRed,
+          steppedLine: CONFIG.step
         }, {
           borderColor: "rgb(54, 162, 235)",
-          data: data.yGreen
+          data: data.yGreen,
+          steppedLine: CONFIG.step
         }]
       },
       options: {
@@ -128,12 +141,21 @@ function drawDepthChart(newData) {
             }
           }]
         }
-      }
+      },
+      plugins: [{
+        afterUpdate: function(chart, options) {
+          // drawDateTime(canvas.getContext('2d'))
+          window._DOM.$download[0].href = canvas.toDataURL()
+          window._DOM.$download[0].download = new Date().toLocaleString().replace(' ', '-')
+        }
+      }]
     })
   } else {
     depthChart.data.labels = data.x
     depthChart.data.datasets[0].data = data.yRed
+    depthChart.data.datasets[0].steppedLine = CONFIG.step
     depthChart.data.datasets[1].data = data.yGreen
+    depthChart.data.datasets[1].steppedLine = CONFIG.step
     depthChart.update()
   }
 }

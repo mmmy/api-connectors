@@ -27,12 +27,19 @@
   </div>
   <div>
     <p>
+      <div>
+        <a id="download" download>download</a>
+        <label for="auto-save-image">every</label>
+        <input type="checkbox" id="auto-save-image">
+        <input type="number" id="auto-save-minutes">
+      </div>
       <label for="amount">range:</label>
       <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
       <label for="depth-checkbox">D</label>
       <input type="checkbox" id="depth-checkbox">
+      <label for="step-checkbox">S</label>
+      <input type="checkbox" id="step-checkbox">
     </p>
-     
     <div id="slider-range"></div>
   </div>
   <div id="highchart-container">
@@ -47,7 +54,9 @@
         s1: 3828,
         space: 300,
         depth: false,
-        step: false
+        step: true,
+        autoSaveImage: true,
+        autoSaveMinutes: 2,
       }, cache)
     }
 
@@ -56,6 +65,16 @@
     }
 
     var CONFIG = _initConfig()
+    // 开始自动下载图片
+    function startAutoSave() {
+      window._autoSaveInterval = setInterval(function() {
+         window._DOM.$download[0].click()
+      }, window.CONFIG.autoSaveMinutes * 60 * 1000)
+    }
+    // 关闭自动
+    function stopAutoSave() {
+      clearInterval(window._autoSaveInterval)
+    }
 
     $( function() {
       var $range = $("#slider-range" ).slider({
@@ -82,12 +101,36 @@
       });
       $( "#amount" ).val($( "#slider-range" ).slider( "values", 0 ) +
         " - " + $( "#slider-range" ).slider( "values", 1 ) );
+
+      $('#auto-save-minutes').val(CONFIG.autoSaveMinutes).on('input', function(e) {
+        CONFIG.autoSaveMinutes = e.target.value
+        _saveConfig()
+      })
+
+      $('#auto-save-image').attr('checked', CONFIG.autoSaveImage).on('click', function() {
+        CONFIG.autoSaveImage = !CONFIG.autoSaveImage
+        _saveConfig()
+        if (CONFIG.autoSaveImage) {
+          startAutoSave()
+        } else {
+          stopAutoSave()
+        }
+      })
+
+      $('#depth-checkbox').attr('checked', CONFIG.depth).on('click', function() {
+        CONFIG.depth = !CONFIG.depth
+        _saveConfig()
+      })
+
+      $('#step-checkbox').attr('checked', CONFIG.step).on('click', function() {
+        CONFIG.step = !CONFIG.step
+        _saveConfig()
+      })
+      
+      startAutoSave()
     } );
 
-    $('#depth-checkbox').attr('checked', CONFIG.depth).on('click', function() {
-      CONFIG.depth = !CONFIG.depth
-      _saveConfig()
-    })
+
   </script>
   <script type="text/javascript" src="./drawHightChart.js"></script>
   <script type="text/javascript" src="./webMain.js"></script>
