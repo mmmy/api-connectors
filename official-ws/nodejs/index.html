@@ -138,8 +138,8 @@
     $( function() {
       var $range = $("#slider-range" ).slider({
         range: true,
-        min: 2000,
-        max: 5000,
+        min: 0,
+        max: 1000,
         values: [CONFIG.s0, CONFIG.s1],
         slide: function( event, ui ) {
           var v0 = ui.values[ 0 ],

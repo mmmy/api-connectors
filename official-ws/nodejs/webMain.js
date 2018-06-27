@@ -78,7 +78,7 @@ function coverDepthDataForChart(data) {
   let y = []
   let yRed = []
   let yGreen = []
-  let middleIndex = -1
+  let middleIndex = -2
   data.forEach((item, i) => {
     var isB = item.side == 'Buy'
     x.push(item.price)
