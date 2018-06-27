@@ -35,7 +35,7 @@ function handleData(json) {
     newData = newData.slice(CONFIG.s0, CONFIG.s1)
   }
   // HC.drawChart(newData)
-  drawDepthChart(newData)
+  // drawDepthChart(newData)
 }
 
 // Chart.js

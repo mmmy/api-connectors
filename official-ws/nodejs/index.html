@@ -25,21 +25,38 @@
   <div class="chart-wrapper">
     <canvas id="myChart"></canvas>
   </div>
-  <p>
-  <label for="amount">range:</label>
-    <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
-  </p>
-   
-  <div id="slider-range"></div>
+  <div>
+    <p>
+      <label for="amount">range:</label>
+      <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+      <label for="depth-checkbox">D</label>
+      <input type="checkbox" id="depth-checkbox">
+    </p>
+     
+    <div id="slider-range"></div>
+  </div>
   <div id="highchart-container">
     
   </div>
   <script>
-    var CONFIG = {
-      s0: 3385,
-      s1: 3828,
-      space: 300
+    var _initConfig = function() {
+      var cache = localStorage['_depth_config_']
+      cache = cache && JSON.parse(cache)
+      return Object.assign({
+        s0: 3385,
+        s1: 3828,
+        space: 300,
+        depth: false,
+        step: false
+      }, cache)
     }
+
+    var _saveConfig = function() {
+      localStorage['_depth_config_'] = JSON.stringify(window.CONFIG)
+    }
+
+    var CONFIG = _initConfig()
+
     $( function() {
       var $range = $("#slider-range" ).slider({
         range: true,
@@ -59,12 +76,18 @@
           if (CONFIG.s0 !== v0 || CONFIG.s1 !== v1) {
             $range.slider( "values", [CONFIG.s0, CONFIG.s1])
           }
+          _saveConfig()
           $( "#amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
         }
       });
       $( "#amount" ).val($( "#slider-range" ).slider( "values", 0 ) +
         " - " + $( "#slider-range" ).slider( "values", 1 ) );
     } );
+
+    $('#depth-checkbox').attr('checked', CONFIG.depth).on('click', function() {
+      CONFIG.depth = !CONFIG.depth
+      _saveConfig()
+    })
   </script>
   <script type="text/javascript" src="./drawHightChart.js"></script>
   <script type="text/javascript" src="./webMain.js"></script>
