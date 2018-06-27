@@ -20,7 +20,8 @@ window.onload = function() {
   };
 
   window._DOM = {
-    $download: $('#download')
+    $download: $('#download'),
+    canvas: document.getElementById("myChart"),
   }
 }
 
@@ -90,18 +91,12 @@ function coverDepthDataForChart(data) {
   return { x, y, yRed, yGreen }
 }
 
-function drawDateTime(ctx) {
-  var oldStyle = ctx.strokeStyle
-  ctx.strokeStyle= 'red'
-  ctx.strokeText('nihao', 0, 20)
-}
-
 function drawDepthChart(newData) {
   var data = coverDepthDataForChart(newData)
   if (data.x.length === 0) {
     return
   }
-  var canvas = document.getElementById("myChart")
+  var canvas = window._DOM.canvas
   if (!depthChart) {
     depthChart = new Chart(canvas, {
       type: 'line',
@@ -138,15 +133,21 @@ function drawDepthChart(newData) {
 
               // the data maximum used for determining the ticks is Math.max(dataMax, suggestedMax)
               // max: 5000
+              callback: function(value, index, values) {
+                return value / 1E6 + 'M'
+              }
             }
           }]
+        },
+        _config: {
+          showLabel: true
         }
       },
       plugins: [{
         afterUpdate: function(chart, options) {
           // drawDateTime(canvas.getContext('2d'))
-          window._DOM.$download[0].href = canvas.toDataURL()
-          window._DOM.$download[0].download = new Date().toLocaleString().replace(' ', '-')
+          // window._DOM.$download[0].href = canvas.toDataURL()
+          // window._DOM.$download[0].download = new Date().toLocaleString().replace(' ', '-')
         }
       }]
     })
@@ -156,6 +157,6 @@ function drawDepthChart(newData) {
     depthChart.data.datasets[0].steppedLine = CONFIG.step
     depthChart.data.datasets[1].data = data.yGreen
     depthChart.data.datasets[1].steppedLine = CONFIG.step
-    depthChart.update()
+    depthChart.update({ duration: 800, lazy: true })
   }
 }

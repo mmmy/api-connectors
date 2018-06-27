@@ -10,6 +10,56 @@
   <script type="text/javascript" src="./libForBrowser.js"></script>
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+  <script type="text/javascript">
+    function drawDateTime(ctx) {
+      var oldStyle = ctx.strokeStyle
+      ctx.textAlign = 'left';
+      ctx.fillStyle= 'black'
+      ctx.fillText(new Date().toLocaleString(), 0, 10)
+    }
+
+    Chart.plugins.register({
+      afterDatasetsDraw: function(chart) {
+        var ctx = chart.ctx;
+        if (window.CONFIG.depth) {
+          return
+        }
+        chart.data.datasets.forEach(function(dataset, i) {
+          var meta = chart.getDatasetMeta(i);
+          if (!meta.hidden) {
+            meta.data.forEach(function(element, index) {
+              // Draw the text in black, with the specified font
+
+              var fontSize = 12;
+              var fontStyle = 'normal';
+              var fontFamily = 'Helvetica Neue';
+              ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
+
+              var x = chart.data.labels[i]
+              // Just naively convert to string for now
+              var dataString = dataset.data[index];
+              var isMiddle = dataString && dataset.data[index + 1] === null
+              if (!isMiddle && (dataString === null || dataString < 800000)) {
+                return
+              }
+
+              ctx.fillStyle = isMiddle ? 'rgb(255, 99, 132)' : 'rgb(0, 0, 0)';
+              dataString = (dataString / 1E6).toFixed(3) + 'M'
+
+              // Make sure alignment settings are correct
+              ctx.textAlign = 'center';
+              ctx.textBaseline = 'middle';
+
+              var padding = 5;
+              var position = element.tooltipPosition();
+              ctx.fillText(x + ':\n' + dataString, position.x, position.y - (fontSize / 2) - padding);
+            });
+          }
+        });
+        drawDateTime(ctx)
+      }
+    });
+  </script>
   <style type="text/css">
     .chart-wrapper {
       /*width: 400px;*/
@@ -68,7 +118,11 @@
     // 开始自动下载图片
     function startAutoSave() {
       window._autoSaveInterval = setInterval(function() {
-         window._DOM.$download[0].click()
+        var $download = window._DOM.$download
+        var canvas = window._DOM.canvas
+        $download[0].href = canvas.toDataURL()
+        $download[0].download = new Date().toLocaleString().replace(' ', '-')
+        $download[0].click()
       }, window.CONFIG.autoSaveMinutes * 60 * 1000)
     }
     // 关闭自动

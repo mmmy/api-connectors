@@ -15,7 +15,7 @@ wss.on('connection', function connection(ws) {
   client.addStream('XBTUSD', 'orderBookL2', function(data, symbol, tableName) {
     // console.log(`Got update for ${tableName}:${symbol}. Current state:\n${JSON.stringify(data).slice(0, 100)}...`);
     // Do something with the table data...
-    ws && ws.send(JSON.stringify(data));
+    ws.readyState == WebSocket.OPEN && ws.send(JSON.stringify(data));
   });
 
   ws.on('message', function incoming(message) {
