@@ -42,11 +42,37 @@ function handleData(json) {
 
 var depthChart = null
 
+function calcDepthRight(list) {
+  var sum = 0
+  var l = list.length
+  for (var i=0; i<l; i++) {
+    var v = list[i]
+    if (v !== null) {
+      sum += v
+      list[i] = sum
+    }
+  }
+  return list
+}
+
+function calcDepthLeft(list) {
+  var sum = 0
+  var l = list.length
+  for (var i=l-1; i>=0; i--) {
+    var v = list[i]
+    if (v !== null) {
+      sum += v
+      list[i] = sum
+    }
+  }
+  return list
+}
+
 function coverDepthDataForChart(data) {
   const x = []
   const y = []
-  const yRed = []
-  const yGreen = []
+  let yRed = []
+  let yGreen = []
   data.forEach(item => {
     var isB = item.side == 'Buy'
     x.push(item.price)
@@ -54,6 +80,8 @@ function coverDepthDataForChart(data) {
     yRed.push(isB ? null : item.size)
     yGreen.push(isB ? item.size : null)
   })
+  yRed = calcDepthLeft(yRed)
+  yGreen = calcDepthRight(yGreen)
   return { x, y, yRed, yGreen }
 }
 
