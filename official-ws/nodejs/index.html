@@ -94,6 +94,8 @@
       <input type="checkbox" id="depth-checkbox">
       <label for="step-checkbox">S</label>
       <input type="checkbox" id="step-checkbox">
+      <label for="center-checkbox">Center</label>
+      <input type="checkbox" id="center-checkbox">
     </p>
     <div id="slider-range"></div>
   </div>
@@ -105,13 +107,14 @@
       var cache = localStorage['_depth_config_']
       cache = cache && JSON.parse(cache)
       return Object.assign({
-        s0: 3385,
-        s1: 3828,
+        s0: 2350,
+        s1: 2700,
         space: 300,
         depth: false,
         step: true,
         autoSaveImage: true,
         autoSaveMinutes: 2,
+        center: false
       }, cache)
     }
 
@@ -139,7 +142,7 @@
       var $range = $("#slider-range" ).slider({
         range: true,
         min: 0,
-        max: 1000,
+        max: 6000,
         values: [CONFIG.s0, CONFIG.s1],
         slide: function( event, ui ) {
           var v0 = ui.values[ 0 ],
@@ -185,8 +188,13 @@
         CONFIG.step = !CONFIG.step
         _saveConfig()
       })
+
+      $('#center-checkbox').attr('checked', CONFIG.center).on('click', function() {
+        CONFIG.center = !CONFIG.center
+        _saveConfig()
+      })
       
-      startAutoSave()
+      CONFIG.autoSaveImage && startAutoSave()
     } );
 
 

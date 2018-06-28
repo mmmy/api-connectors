@@ -6,6 +6,11 @@
  * Accepts multiple socket descriptors.
  * @param  {Object|Array} socketDescriptors Description of a socket connection.
  */
+
+/*
+  gouge99修改:
+  orderBookL2 返回的数据, id 是升序的, 价格是降序的, 所以需要reserse()
+ */
 var DeltaParser = {
 
   /**
@@ -58,7 +63,9 @@ var DeltaParser = {
 
   _partial(tableName, symbol, client, data) {
     if (!client._data[tableName]) client._data[tableName] = {};
-    const dataArr = data.data || [];
+    var dataArr = data.data || [];
+    // price 升序, id 降序
+    dataArr = dataArr.reverse()
     // Intitialize data.
     // FIXME: we need to echo back `filter` with each partial, otherwise we can't tell the difference
     // between no data for a symbol and a partial for a different symbol.
@@ -80,6 +87,35 @@ function isInitialized(tableName, symbol, client) {
   return client._data[tableName] && client._data[tableName][symbol];
 }
 
+function findIdIndexLeft(store, id) {
+  if (store.length === 0) {
+    return 0
+  }
+  var len = store.length
+  for (var i=0; i<len; i++) {
+    var item = store[i]
+    if (id > item.id) {
+      return i
+    }
+  }
+  console.warn('findIdIndexLeft to end?')
+  return len
+}
+
+function findIdIndexRight(store, id) {
+  if (store.length === 0) {
+    return 0
+  }
+  var len = store.length
+  for (var i=len-1; i>=0; i--) {
+    var item = store[i]
+    if (id < item.id) {
+      return i + 1
+    }
+  }
+  console.warn('findIdIndexRight to end?')
+  return 0
+}
 /**
  * Add items  to a store.
  * @param  {Object} context Context.
@@ -91,7 +127,15 @@ function insertIntoStore(context, key, newData) {
   const store = context[key] || [];
 
   // Create a new working object.
-  const storeData = [].concat(store).concat(newData);
+  const storeData = [].concat(store);
+  for (let i=0; i < newData.length; i++) {
+    let newItem = newData[i]
+    var isBuy = newItem.side == 'Buy'
+    // 解决遍历效率问题
+    var index = isBuy ? findIdIndexLeft(storeData, newItem.id) : findIdIndexRight(storeData, newItem.id)
+    // insert
+    storeData.splice(index, 0, newItem)
+  }
 
   return replaceStore(context, key, storeData);
 }
@@ -115,15 +159,14 @@ function updateStore(context, key, newData, keys) {
 
     // Find the item we're updating, if it exists.
     const criteria = _.pick(newDatum, keys);
-    const itemToUpdate = _.find(storeData, criteria);
-
+    const index = _.findIndex(storeData, criteria)
     // If the item exists, replace it with an updated item.
     // This will actually replace the existing store with a new array
     // containing a completely new updated object. A little more GC work
     // but unique object references, for better shouldComponentUpdate.
-    if (itemToUpdate) {
-      newDatum = updateItem(itemToUpdate, newDatum);
-      storeData[storeData.indexOf(itemToUpdate)] = newDatum;
+    if (index > -1) {
+      newDatum = updateItem(storeData[index], newDatum);
+      storeData[index] = newDatum;
     }
     // This is bad - the item didn't exist and we're trying to update it.
     // A lot of bad things can happen here since we basically have an incomplete

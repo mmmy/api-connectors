@@ -34,12 +34,20 @@ var CLIENT = {
 function handleData(json) {
   // console.log(json)
   var newData = DeltaParser.onAction(json.action, json.table, 'XBTUSD', CLIENT, json);
-  // newData = newData.reverse()
-  if (newData.length > 5000) {
-    newData = newData.slice(CONFIG.s0, CONFIG.s1)
+  for (var i=1; i<newData.length; i++) {
+    if (newData[i - 1].side === 'Sell' && newData[i].side === 'Buy') {
+      console.log('wrong sort')
+      console.log(newData)
+    }
   }
+  // newData = newData.reverse()
+  // if (newData.length > 5000) {
+    newData = newData.slice(CONFIG.s0, CONFIG.s1)
+  // }
   // HC.drawChart(newData)
-  drawDepthChart(newData)
+  setTimeout(() => {
+    drawDepthChart(newData)
+  })
 }
 
 // Chart.js
@@ -78,24 +86,24 @@ function coverDepthDataForChart(data) {
   let y = []
   let yRed = []
   let yGreen = []
-  let middleIndex = -2
+  let middleIndex = -1
   data.forEach((item, i) => {
     var isB = item.side == 'Buy'
     x.push(item.price)
     y.push(item.size)
     yRed.push(isB ? null : item.size)
     yGreen.push(isB ? item.size : null)
-    if (middleIndex === -1 && isB && yGreen[i-1] === null) {
+    if (window.CONFIG.center && middleIndex === -1 && !isB && yRed[i-1] === null) {
       middleIndex = i
     }
   })
   if (CONFIG.depth) {
-    yRed = calcDepthLeft(yRed)
-    yGreen = calcDepthRight(yGreen)
+    yRed = calcDepthRight(yRed)
+    yGreen = calcDepthLeft(yGreen)
   }
   if(middleIndex > -1) {
-    var startIndex = Math.max(middleIndex - 20, 0)
-    var l = startIndex + 40
+    var startIndex = Math.max(middleIndex - 28, 0)
+    var l = startIndex + 55
     x = x.slice(startIndex, l)
     y = y.slice(startIndex, l)
     yRed = yRed.slice(startIndex, l)
@@ -117,12 +125,12 @@ function drawDepthChart(newData) {
         labels: data.x,
         datasets: [{
           // borderColor: "rgb(255, 99, 132)",
-          borderColor: "rgb(50, 50, 50)",
-          data: data.yRed,
-          steppedLine: CONFIG.step
-        }, {
           borderColor: "rgb(54, 162, 235)",
           data: data.yGreen,
+          steppedLine: CONFIG.step
+        }, {
+          borderColor: "rgb(50, 50, 50)",
+          data: data.yRed,
           steppedLine: CONFIG.step
         }]
       },
@@ -166,10 +174,10 @@ function drawDepthChart(newData) {
     })
   } else {
     depthChart.data.labels = data.x
-    depthChart.data.datasets[0].data = data.yRed
+    depthChart.data.datasets[0].data = data.yGreen
     depthChart.data.datasets[0].steppedLine = CONFIG.step
-    depthChart.data.datasets[1].data = data.yGreen
+    depthChart.data.datasets[1].data = data.yRed
     depthChart.data.datasets[1].steppedLine = CONFIG.step
-    depthChart.update({ duration: 800, lazy: true })
+    depthChart.update({ duration: 0, lazy: true })
   }
 }
