@@ -29,6 +29,7 @@
         if (window.CONFIG.depth) {
           return
         }
+        var bfxDepth = chart.options._config && chart.options._config.bfxDepth
         chart.data.datasets.forEach(function(dataset, i) {
           var meta = chart.getDatasetMeta(i);
           if (!meta.hidden) {
@@ -49,7 +50,9 @@
               }
 
               ctx.fillStyle = isMiddle ? 'rgb(255, 99, 132)' : 'rgb(0, 0, 0)';
-              dataString = (dataString / 1E6).toFixed(3) + 'M'
+              if (!bfxDepth) {
+                dataString =  (dataString / 1E6).toFixed(3) + 'M'
+              }
 
               // Make sure alignment settings are correct
               ctx.textAlign = 'center';
@@ -99,8 +102,14 @@
     </p>
     <div id="slider-range"></div>
   </div>
-  <div id="highchart-container">
-    
+
+  <div>
+    <div class="chart-wrapper">
+      <canvas id="bfx-chart"></canvas>
+    </div>
+    <p id="bfx-control">
+      
+    </p>
   </div>
   <script>
     var _initConfig = function() {
@@ -201,5 +210,6 @@
   </script>
   <script type="text/javascript" src="./drawHightChart.js"></script>
   <script type="text/javascript" src="./webMain.js"></script>
+  <script type="text/javascript" src="./bfx.js"></script>
 </body>
 </html>

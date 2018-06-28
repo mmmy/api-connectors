@@ -30,24 +30,38 @@ var CLIENT = {
   _keys: {}
 }
 
+function _slow(func, wait) {
+  var lastCall = 0
+  return function() {
+    var now = +new Date()
+    if (now - lastCall > wait) {
+      func.apply(null, arguments)
+      lastCall = now
+    }
+  }
+}
 
 function handleData(json) {
   // console.log(json)
   var newData = DeltaParser.onAction(json.action, json.table, 'XBTUSD', CLIENT, json);
+  /*
   for (var i=1; i<newData.length; i++) {
     if (newData[i - 1].side === 'Sell' && newData[i].side === 'Buy') {
       console.log('wrong sort')
       console.log(newData)
     }
   }
+  */
   // newData = newData.reverse()
   // if (newData.length > 5000) {
-    newData = newData.slice(CONFIG.s0, CONFIG.s1)
   // }
   // HC.drawChart(newData)
-  setTimeout(() => {
-    drawDepthChart(newData)
-  })
+  _slow(function() {
+    newData = newData.slice(CONFIG.s0, CONFIG.s1)
+    setTimeout(() => {
+      drawDepthChart(newData)
+    })
+  }, 1500)()
 }
 
 // Chart.js
@@ -98,8 +112,8 @@ function coverDepthDataForChart(data) {
     }
   })
   if (CONFIG.depth) {
-    yRed = calcDepthRight(yRed)
     yGreen = calcDepthLeft(yGreen)
+    yRed = calcDepthRight(yRed)
   }
   if(middleIndex > -1) {
     var startIndex = Math.max(middleIndex - 28, 0)
