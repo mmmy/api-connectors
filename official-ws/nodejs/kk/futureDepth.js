@@ -1,17 +1,22 @@
-function BFX() {
-  this._ws = null
+
+function FD(canvasId, options) {
+	this._ws = null
   this._depthChart = null
   this._dom = {
-    canvas: document.getElementById('bfx-chart')
+    canvas: document.getElementById(canvasId)
   }
   this._config = {
+  	isFuture: options && options.isFuture
   }
-
+  this._state = {
+  	connecting: false
+  }
+  this._orderBook = new OrderBook()
   this._initChart()
 }
 
-BFX.prototype._initChart = function() {
-  this._depthChart = new Chart(this._dom.canvas, {
+FD.prototype._initChart = function() {
+	 this._depthChart = new Chart(this._dom.canvas, {
     type: 'line',
     data: {
       lables: [],
@@ -53,25 +58,25 @@ BFX.prototype._initChart = function() {
       },
       */
       _config: {
-        bfxDepth: true
+        isFuture: this._config.isFuture
       }
     },
   })
 }
 
-BFX.prototype.start = function() {
+FD.prototype.start = function(uri) {
   var that = this
-  var ws = new WebSocket("ws://127.0.0.1:8098");
+  var ws = new WebSocket(uri || "ws://127.0.0.1:8090");
 
   ws.onopen = function(evt) { 
     console.log("Connection open ..."); 
-    ws.send("Hello WebSockets!");
+    ws.send("Hello Future depth!");
   };
 
   ws.onmessage = function(evt) {
     //{midPrice, asks:[], bids:[]}
     var json = JSON.parse(evt.data)
-    that._updateChart(json)
+    that._update(json)
     // console.log( "Received Message: " + evt.data);
     // ws.close();
   };
@@ -83,34 +88,20 @@ BFX.prototype.start = function() {
   this._ws = ws
 }
 
-BFX.prototype.stop = function() {
+FD.prototype.stop = function() {
   this._ws.close()
 }
 
-BFX.prototype._updateChart = function(data) {
-  var asks = data.asks,
-      bids = data.bids,
-      alls = bids.reverse().concat(asks)
+FD.prototype._update = function(json) {
+	this._orderBook.update(json[0])
+	this._updateChart()
+}
 
-  var bidsLen = bids.length,
-      asksLen = asks.length,
-      x = [],
-      yGreen = [],
-      yRed = []
-
-  alls.forEach((item, i) => {
-    x.push(item[0])
-    var isGreen = i < bidsLen
-    yGreen.push(isGreen ? item[2] : null)
-    yRed.push(!isGreen ? -item[2] : null)
-  })
-
-  if (x.length === 0) {
-    return
-  }
-
-  yGreen = window.calcDepthLeft(yGreen)
-  yRed = window.calcDepthRight(yRed)
+FD.prototype._updateChart = function() {
+	var data = this._orderBook.calcData(window.CONFIG.depth)
+  var x = data.x,
+  		yGreen = data.yGreen,
+  		yRed = data.yRed
 
   var chart = this._depthChart
   chart.data.labels = x
@@ -118,22 +109,26 @@ BFX.prototype._updateChart = function(data) {
   // chart.data.datasets[0].steppedLine = CONFIG.step
   chart.data.datasets[1].data = yRed
   // chart.data.datasets[1].steppedLine = CONFIG.step
-  chart.update({ duration: 500, lazy: true })
+  chart.update({ duration: 0, lazy: true })
 }
 
-BFX.prototype.getCanvas = function() {
+FD.prototype.getCanvas = function() {
   return this._dom.canvas
 }
 
-BFX.prototype.saveImage = function() {
-  var bfxDownload = document.getElementById('bfx-download')
-  bfxDownload.href = this._dom.canvas.toDataURL("image/jpeg", 0.5)
-  bfxDownload.download = 'BFX-' + (new Date().toLocaleString().replace(' ', '-'))
-  bfxDownload.click()
+FD.prototype.saveImage = function(domId, prefix) {
+  var downloadLink = document.getElementById(domId)
+  downloadLink.href = this._dom.canvas.toDataURL("image/jpeg", 0.5)
+  downloadLink.download = prefix + '-' + (new Date().toLocaleString().replace(' ', '-'))
+  downloadLink.click()
 }
 
 $(function() {
-  var bfx = new BFX()
-  window._bfx = bfx
-  bfx.start()
+	var fd = new FD('future-chart', { isFuture: true })
+	window._fd = fd
+	fd.start("ws://127.0.0.1:8090")
+
+	var sd = new FD('spot-chart')
+	window._sd = sd
+	sd.start("ws://127.0.0.1:8091")
 })

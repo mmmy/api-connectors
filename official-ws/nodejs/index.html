@@ -108,7 +108,7 @@
       <canvas id="bfx-chart"></canvas>
     </div>
     <p id="bfx-control">
-      
+      <a id="bfx-download" download>download</a>
     </p>
   </div>
   <script>
@@ -140,6 +140,9 @@
         $download[0].href = canvas.toDataURL("image/jpeg", 0.5)
         $download[0].download = new Date().toLocaleString().replace(' ', '-')
         $download[0].click()
+
+        window._bfx.saveImage()
+        
       }, window.CONFIG.autoSaveMinutes * 60 * 1000)
     }
     // 关闭自动

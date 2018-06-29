@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+  <script src="https://cdn.bootcss.com/lodash.js/4.17.10/lodash.min.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+  <script type="text/javascript">
+    function drawDateTime(ctx) {
+      var oldStyle = ctx.strokeStyle
+      ctx.textAlign = 'left';
+      ctx.fillStyle= 'black'
+      ctx.fillText(new Date().toLocaleString(), 0, 10)
+    }
+
+    Chart.plugins.register({
+      beforeDraw: function(chart) {
+        var ctx = chart.ctx
+        ctx.fillStyle = 'white'
+        ctx.fillRect(0, 0, chart.width, chart.height)
+      },
+      afterDatasetsDraw: function(chart) {
+        var ctx = chart.ctx;
+        var isDepth = window.CONFIG.depth
+        var isFuture = chart.options._config && chart.options._config.isFuture
+        chart.data.datasets.forEach(function(dataset, i) {
+          var meta = chart.getDatasetMeta(i);
+          if (!meta.hidden) {
+            meta.data.forEach(function(element, index) {
+              // Draw the text in black, with the specified font
+
+              var fontSize = 12;
+              var fontStyle = 'normal';
+              var fontFamily = 'Helvetica Neue';
+              ctx.font = Chart.helpers.fontString(fontSize, fontStyle, fontFamily);
+
+              var x = chart.data.labels[index]
+              // Just naively convert to string for now
+              var dataString = dataset.data[index];
+              var isMiddle = dataString !== null && dataset.data[index + 1] === null
+              var largeAmount = isFuture ? 100000 : 4000
+              if (isMiddle || (dataString !== null && dataString > largeAmount && !isDepth)) {
+                ctx.fillStyle = isMiddle ? 'rgb(255, 99, 132)' : 'rgb(0, 0, 0)';
+                // if (!isFuture) {
+                  dataString =  (dataString / 1E3).toFixed(3) + 'K'
+                // }
+
+                // Make sure alignment settings are correct
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                var padding = 8;
+                var position = element.tooltipPosition();
+                ctx.fillText(x + ':\n' + dataString, position.x, position.y - (fontSize / 2) - padding);
+              }
+
+            });
+          }
+        });
+        drawDateTime(ctx)
+      }
+    });
+  </script>
+  <style type="text/css">
+    .chart-wrapper {
+      /*width: 400px;*/
+      /*height: 400px;*/
+    }
+    #highchart-container {
+      width: 400px;
+      height: 400px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chart-wrapper">
+    <canvas id="future-chart"></canvas>
+  </div>
+  <div>
+    <p>
+      <div>
+        <a id="future-download" download>download</a>
+        <label for="auto-save-image">every</label>
+        <input type="checkbox" id="auto-save-image">
+        <input type="number" id="auto-save-minutes">
+      </div>
+      <label for="amount">range:</label>
+      <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+      <label for="depth-checkbox">D</label>
+      <input type="checkbox" id="depth-checkbox">
+      <label for="step-checkbox">S</label>
+      <input type="checkbox" id="step-checkbox">
+      <label for="center-checkbox">Center</label>
+      <input type="checkbox" id="center-checkbox">
+    </p>
+    <div id="slider-range"></div>
+  </div>
+
+  <div>
+    <div class="chart-wrapper">
+      <canvas id="spot-chart"></canvas>
+    </div>
+    <p id="bfx-control">
+      <a id="spot-download" download>download</a>
+    </p>
+  </div>
+  <script>
+    var _initConfig = function() {
+      var cache = localStorage['_depth_config_']
+      cache = cache && JSON.parse(cache)
+      return Object.assign({
+        s0: 2350,
+        s1: 2700,
+        space: 300,
+        depth: false,
+        step: true,
+        autoSaveImage: true,
+        autoSaveMinutes: 2,
+        center: false
+      }, cache)
+    }
+
+    var _saveConfig = function() {
+      localStorage['_depth_config_'] = JSON.stringify(window.CONFIG)
+    }
+
+    var CONFIG = _initConfig()
+    // 开始自动下载图片
+    function startAutoSave() {
+      window._autoSaveInterval = setInterval(() => {
+        window._fd.saveImage('future-download', 'future')
+        window._sd.saveImage('spot-download', 'spot')
+      }, window.CONFIG.autoSaveMinutes * 60 * 1000)
+    }
+    // 关闭自动
+    function stopAutoSave() {
+      clearInterval(window._autoSaveInterval)
+    }
+
+    $( function() {
+      var $range = $("#slider-range" ).slider({
+        range: true,
+        min: 0,
+        max: 6000,
+        values: [CONFIG.s0, CONFIG.s1],
+        slide: function( event, ui ) {
+          var v0 = ui.values[ 0 ],
+              v1 = ui.values[ 1 ]
+          if (v0 !== CONFIG.s0) {
+            CONFIG.s0 = v0
+            // CONFIG.s1 = v0 + CONFIG.space
+          } else if (v1 !== CONFIG.s1) {
+            CONFIG.s1 = v1
+            // CONFIG.s0 = v1 - CONFIG.space
+          }
+          if (CONFIG.s0 !== v0 || CONFIG.s1 !== v1) {
+            $range.slider( "values", [CONFIG.s0, CONFIG.s1])
+          }
+          _saveConfig()
+          $( "#amount" ).val( ui.values[ 0 ] + " - " + ui.values[ 1 ] );
+        }
+      });
+      $( "#amount" ).val($( "#slider-range" ).slider( "values", 0 ) +
+        " - " + $( "#slider-range" ).slider( "values", 1 ) );
+
+      $('#auto-save-minutes').val(CONFIG.autoSaveMinutes).on('input', function(e) {
+        CONFIG.autoSaveMinutes = e.target.value
+        _saveConfig()
+      })
+
+      $('#auto-save-image').attr('checked', CONFIG.autoSaveImage).on('click', function() {
+        CONFIG.autoSaveImage = !CONFIG.autoSaveImage
+        _saveConfig()
+        if (CONFIG.autoSaveImage) {
+          startAutoSave()
+        } else {
+          stopAutoSave()
+        }
+      })
+
+      $('#depth-checkbox').attr('checked', CONFIG.depth).on('click', function() {
+        CONFIG.depth = !CONFIG.depth
+        _saveConfig()
+      })
+
+      $('#step-checkbox').attr('checked', CONFIG.step).on('click', function() {
+        CONFIG.step = !CONFIG.step
+        _saveConfig()
+      })
+
+      $('#center-checkbox').attr('checked', CONFIG.center).on('click', function() {
+        CONFIG.center = !CONFIG.center
+        _saveConfig()
+      })
+      
+      CONFIG.autoSaveImage && startAutoSave()
+    } );
+
+
+  </script>
+  <script type="text/javascript" src="./OrderBook.js"></script>
+  <script type="text/javascript" src="./futureDepth.js"></script>
+  <script type="text/javascript" src="./spotDepth.js"></script>
+</body>
+</html>
