@@ -26,9 +26,8 @@
       },
       afterDatasetsDraw: function(chart) {
         var ctx = chart.ctx;
-        if (window.CONFIG.depth) {
-          return
-        }
+
+        var isDepth = window.CONFIG.depth
         var bfxDepth = chart.options._config && chart.options._config.bfxDepth
         chart.data.datasets.forEach(function(dataset, i) {
           var meta = chart.getDatasetMeta(i);
@@ -45,22 +44,22 @@
               // Just naively convert to string for now
               var dataString = dataset.data[index];
               var isMiddle = dataString && dataset.data[index + 1] === null
-              if (!isMiddle && (dataString === null || dataString < 800000)) {
-                return
+              var largeAmount = bfxDepth ? 20 : 1E6
+              if (isMiddle || (!isDepth && dataString !== null && dataString > largeAmount)) {
+                ctx.fillStyle = isMiddle ? 'rgb(255, 99, 132)' : 'rgb(0, 0, 0)';
+                if (!bfxDepth) {
+                  dataString =  (dataString / 1E6).toFixed(3) + 'M'
+                }
+
+                // Make sure alignment settings are correct
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                var padding = 5;
+                var position = element.tooltipPosition();
+                ctx.fillText(x + ':\n' + dataString, position.x, position.y - (fontSize / 2) - padding);
               }
 
-              ctx.fillStyle = isMiddle ? 'rgb(255, 99, 132)' : 'rgb(0, 0, 0)';
-              if (!bfxDepth) {
-                dataString =  (dataString / 1E6).toFixed(3) + 'M'
-              }
-
-              // Make sure alignment settings are correct
-              ctx.textAlign = 'center';
-              ctx.textBaseline = 'middle';
-
-              var padding = 5;
-              var position = element.tooltipPosition();
-              ctx.fillText(x + ':\n' + dataString, position.x, position.y - (fontSize / 2) - padding);
             });
           }
         });

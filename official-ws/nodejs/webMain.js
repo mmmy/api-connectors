@@ -61,7 +61,7 @@ function handleData(json) {
     setTimeout(() => {
       drawDepthChart(newData)
     })
-  }, 1500)()
+  }, 3000)()
 }
 
 // Chart.js

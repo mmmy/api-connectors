@@ -41,7 +41,7 @@
               // Just naively convert to string for now
               var dataString = dataset.data[index];
               var isMiddle = dataString !== null && dataset.data[index + 1] === null
-              var largeAmount = isFuture ? 100000 : 4000
+              var largeAmount = isFuture ? 40000 : 4000
               if (isMiddle || (dataString !== null && dataString > largeAmount && !isDepth)) {
                 ctx.fillStyle = isMiddle ? 'rgb(255, 99, 132)' : 'rgb(0, 0, 0)';
                 // if (!isFuture) {

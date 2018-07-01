@@ -88,12 +88,23 @@ BFX.prototype.stop = function() {
 }
 
 BFX.prototype._updateChart = function(data) {
+  // asks price 从小到大， bids 从大到小
+  // 后台返回的数据书聚合的
   var asks = data.asks,
-      bids = data.bids,
-      alls = bids.reverse().concat(asks)
+      bids = data.bids.reverse(),
+      bidsLen = bids.length,
+      asksLen = asks.length
+  // 反聚合
+  if (!window.CONFIG.depth) {
+    for (var i=0; i<bidsLen-1; i++) {
+      bids[i][2] = bids[i][2] - bids[i+1][2]
+    }
+    for (var i=asksLen-1; i>0; i--) {
+      asks[i][2] = asks[i][2] - asks[i - 1][2]
+    }
+  }
 
-  var bidsLen = bids.length,
-      asksLen = asks.length,
+  var alls = bids.concat(asks),
       x = [],
       yGreen = [],
       yRed = []
@@ -118,7 +129,7 @@ BFX.prototype._updateChart = function(data) {
   // chart.data.datasets[0].steppedLine = CONFIG.step
   chart.data.datasets[1].data = yRed
   // chart.data.datasets[1].steppedLine = CONFIG.step
-  chart.update({ duration: 500, lazy: true })
+  chart.update({ duration: 0, lazy: false })
 }
 
 BFX.prototype.getCanvas = function() {
