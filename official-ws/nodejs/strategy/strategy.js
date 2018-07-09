@@ -2,13 +2,14 @@ const WebSocket = require('ws');
 const bitmextSdk = require('./bitmexSdk')
 const BitMEXClient = require('../index')
 const notifyPhone = require('./notifyPhone').notifyPhone
+const Account = require('./Account')
 
 const RealtimeTradeDataManager = require('./RealtimeTradeDataManager')
 const Candles = require('./Candles')
 
 const candleManager = new Candles()
 const tradeHistoryManager = new RealtimeTradeDataManager()
-
+const accout = new Account()
 
 const client = new BitMEXClient({testnet: false});
 client.on('error', console.error);
@@ -51,22 +52,28 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
   candleManager.updateRealTimeCandle(lastData)
   tradeHistoryManager.appendData(data.data)
 
-  // TODO: 处理getMayTrendSignal后再处理 tradeSignal
-  var mayTrendSignal = candleManager.getMayTrendSignal()
-  if (mayTrendSignal.long) {
-    var reverseSignal = candleManager.isReversed()
-    if (reverseSignal.long) {
+  if (accout.isReadyToOrder()) {
+    var mayTrendSignal = candleManager.getMayTrendSignal()
+  
+    if (mayTrendSignal.long) {
+      var reverseSignal = candleManager.isReversed(mayTrendSignal)
+      if (reverseSignal.long) {
+        var tradeSignal = tradeHistoryManager.trendSignal()
+        if (tradeSignal.log) {
+          notifyPhone('long at ', lastData.price)
+          accout.trade(lastData.price, true)
+        }
+      }
+    } else if (mayTrendSignal.short && candleManager.isReversed(mayTrendSignal).short) {
       var tradeSignal = tradeHistoryManager.trendSignal()
-      if (tradeSignal.log) {
-        notifyPhone('long at ', lastData.price)
+      if (tradeSignal.short) {
+        notifyPhone('short at ', lastData.price)
+        accout.trade(lastData.price, false)
       }
     }
-  } else if (mayTrendSignal.short && candleManager.isReversed().short) {
-    var tradeSignal = tradeHistoryManager.trendSignal()
-    if (tradeSignal.short) {
-      notifyPhone('short at ', lastData.price)
-    }
   }
+
+  accout.shouldLiquidation(lastData.price)
 
   return
   var tradeSignal = tradeHistoryManager.trendSignal()
