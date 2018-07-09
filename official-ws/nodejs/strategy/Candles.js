@@ -33,6 +33,7 @@ function Candles() {
   this._histories = []  // 官方格式的json schema, 最新的需要是数组的最后一个
   this._latestCandle = null
   this._maxLength = 200
+  this._mayTrendSignal = { long: false, short: false }
 }
 
 Candles.prototype.setHistoryData = function(list) {
@@ -55,6 +56,8 @@ Candles.prototype.updateLastHistory = function(data) {
   if (this._histories.length > this._maxLength) {
     this._histories.shift()
   }
+  // 计算缓存 信号
+  this._mayTrendSignal = this.mayTrendReverseSignal()
   // 开始新的candle
   this._latestCandle && this._latestCandle.reset()
 }
@@ -142,6 +145,10 @@ Candles.prototype.isReversed = function(maySignal) {
 
 Candles.prototype.getCandles = function(realTime) {
   return realTime ? this._histories.concat([this._latestCandle.getCandle()]) : this._histories
+}
+
+Candles.prototype.getMayTrendSignal = function() {
+  return this._mayTrendSignal
 }
 
 module.exports = Candles
