@@ -13,6 +13,16 @@ var cc = new Candles()
 var startData = candles.slice(0, 200)
 cc.setHistoryData(startData)
 
+for (var i=0; i<50; i++) {
+  cc.updateRealTimeCandle({price: 6700 - i })
+  // cc._latestCandle.reset()
+  // console.log(cc._latestCandle.getCandle())
+  rsi = cc.rsiSignal(true)
+  console.log(rsi)
+}
+
+return
+
 var newDatas = candles.slice(200)
 newDatas.forEach(data => {
   cc.updateLastHistory(data)
