@@ -62,7 +62,7 @@ exports.post = function(url, postdata, options) {
                 if (res.statusCode == 200) {
                     resolve(body);
                 } else {
-                    reject(res.statusCode);
+                    reject(body);
                 }
             }
         }).on('error', logger.error);
@@ -80,7 +80,8 @@ exports.form_post = function(url, postdata, options) {
             timeout: options.timeout || 3000,
             headers: options.headers || default_post_headers,
             proxy: options.proxy || '',
-            agentOptions: agentOptions
+            agentOptions: agentOptions,
+            agent,
         };
         request(httpOptions, function(err, res, body) {
             if (err) {
@@ -89,7 +90,7 @@ exports.form_post = function(url, postdata, options) {
                 if (res.statusCode == 200) {
                     resolve(body);
                 } else {
-                    reject(res.statusCode);
+                    reject(body);
                 }
             }
         }).on('error', logger.error);

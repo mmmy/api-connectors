@@ -1,0 +1,1 @@
+var secret = require('./secret.json')

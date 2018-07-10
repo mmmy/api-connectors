@@ -56,19 +56,23 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
     var mayTrendSignal = candleManager.getMayTrendSignal()
   
     if (mayTrendSignal.long) {
-      console.log('trade may long ========', new Date().toLocaleString())
+      // console.log('trade may long ========', new Date().toLocaleString(), lastData.price)
 
       var reverseSignal = candleManager.isReversed(mayTrendSignal)
       
       if (reverseSignal.long) {
+        // console.log('trade long +++++++++', new Date().toLocaleString(), candleManager._latestCandle.getCandle())
+
         var tradeSignal = tradeHistoryManager.trendSignal()
-        if (tradeSignal.log) {
+        if (tradeSignal.long) {
           console.log('do long ', new Date().toLocaleString(), lastData.price)
           notifyPhone('long at ', lastData.price)
           accout.trade(lastData.price, true)
         }
       }
     } else if (mayTrendSignal.short && candleManager.isReversed(mayTrendSignal).short) {
+      console.log('trade short ---------', new Date().toLocaleString(), lastData.price)
+
       var tradeSignal = tradeHistoryManager.trendSignal()
       if (tradeSignal.short) {
         console.log('do short ', new Date().toLocaleString(), lastData.price)
