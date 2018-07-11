@@ -5,3 +5,4 @@ dist/
 *.pyc
 npm-debug.log
 secret.json
+.vscode
