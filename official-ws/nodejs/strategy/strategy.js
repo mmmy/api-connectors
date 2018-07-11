@@ -9,7 +9,7 @@ const Candles = require('./Candles')
 
 const candleManager = new Candles()
 const tradeHistoryManager = new RealtimeTradeDataManager()
-const accout = new Account()
+const accout = new Account(true)
 
 const client = new BitMEXClient({testnet: false});
 client.on('error', console.error);
@@ -61,7 +61,7 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
       var reverseSignal = candleManager.isReversed(mayTrendSignal)
       
       if (reverseSignal.long) {
-        // console.log('trade long +++++++++', new Date().toLocaleString(), candleManager._latestCandle.getCandle())
+        console.log('trade long +++++++++', new Date().toLocaleString(), candleManager._latestCandle.getCandle())
 
         var tradeSignal = tradeHistoryManager.trendSignal()
         if (tradeSignal.long) {
