@@ -28,7 +28,7 @@ Account.prototype.liquidation = function(price) {
     setTimeout(()=>{
       this._hasPosition = false
       this._inTrading = false
-      isWin = this._long ? (price > this._price) : (this._price < price)
+      isWin = this._long ? (price > this._price) : (price < this._price)
       resolve()
       this.notify(`win: ${isWin}, ${this._price} -> ${price}`)
     }, 1000)
