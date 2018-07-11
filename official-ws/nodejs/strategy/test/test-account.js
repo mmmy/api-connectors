@@ -3,7 +3,7 @@ var Account = require('../Account')
 var assert = require('assert')
 var should = require('should')
 
-var account = new Account(false)
+var account = new Account(false, true)
 describe('Account', function() {
   describe('isReadyToOrder', function() {
     it('should false when inited', function() {
