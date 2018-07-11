@@ -1,7 +1,7 @@
 'use strict';
 const WebSocket = require('ws');
 var SocksProxyAgent = require('socks-proxy-agent');
-var agent = new SocksProxyAgent('socks://127.0.0.1:1080');
+// var agent = new SocksProxyAgent('socks://127.0.0.1:1080');
 // const debug = require('debug')('BitMEX:realtime-api:socket:internal');
 
 const CLOSE_NORMAL = 1000;
@@ -16,7 +16,7 @@ function WebSocketClient(){
 }
 WebSocketClient.prototype.open = function(url){
   this.url = url;
-  this.instance = new WebSocket(this.url, { agent });
+  this.instance = new WebSocket(this.url);
   this.instance.on('open', () => {
     this.autoReconnectInterval = this.initialAutoReconnectInterval; // reset delay
     this.log("Connected.");
