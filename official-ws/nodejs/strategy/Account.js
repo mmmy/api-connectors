@@ -59,12 +59,13 @@ Account.prototype.orderMarket = function(price, long, amount) {
       this.orderStop()
       this.orderMarketTouched()
       this.notify(`orderMarket OK  ${json.avgPx}(${price})`)
-
+      console.log('Account.prototype.orderMarket 成功了')
       resolve(json)
     }).catch(err => {
       this._inTrading = false
       this._hasPosition = false
       this.notify('orderMarket fail ' + err)
+      console.log('Account.prototype.orderMarket 失败了')
       reject(err)
     })
   })
@@ -86,6 +87,7 @@ Account.prototype.orderStop = function() {
       }, 2000)
     } else {
       this.notify('OrderStop 失败了, 请手动执行')
+      console.log('Account.prototype.orderMarketTouched 失败了')
     }
   })
 }
@@ -106,6 +108,7 @@ Account.prototype.orderMarketTouched = function() {
       }, 2000)
     } else {
       this.notify('OrderTouched 失败了, 请手动执行')
+      console.log('Account.prototype.orderMarketTouched 失败了')
     }
   })
 }
@@ -113,6 +116,7 @@ Account.prototype.orderMarketTouched = function() {
 Account.prototype.deleteOrder = function(orderID) {
   signatureSDK.deleteOrder(orderID).then(json => {
     this._deleteUselessOrderTimes = 0
+    console.log('Account.prototype.deleteOrder OK')
   }).catch(err => {
     if (this._deleteUselessOrderTimes < 4) {
       this._deleteUselessOrderTimes += 1

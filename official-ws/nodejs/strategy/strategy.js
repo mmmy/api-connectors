@@ -11,6 +11,8 @@ const candleManager = new Candles()
 const tradeHistoryManager = new RealtimeTradeDataManager()
 const accout = new Account(true)
 
+const AMOUNT = 1000
+
 const client = new BitMEXClient({testnet: false});
 client.on('error', console.error);
 client.on('close', () => console.log('Connection closed.'));
@@ -34,11 +36,11 @@ client.on('open', () => {
         candleManager.checkData()
         var mayTrendSignal = candleManager.getMayTrendSignal()
         if (mayTrendSignal.long) {
-          console.log('mayTrendSignal long', new Date().toLocaleString())
-          console.log('data time: ', new Date(data.data[0].timestamp).toLocaleString())
+          // console.log('mayTrendSignal long', new Date().toLocaleString())
+          // console.log('data time: ', new Date(data.data[0].timestamp).toLocaleString())
         } else if (mayTrendSignal.short) {
-          console.log('mayTrendSignal short', new Date().toLocaleString())
-          console.log('data time: ', new Date(data.data[0].timestamp).toLocaleString())
+          // console.log('mayTrendSignal short', new Date().toLocaleString())
+          // console.log('data time: ', new Date(data.data[0].timestamp).toLocaleString())
         }
         // console.log('candleManager._histories.length ', candleManager._histories.length)
         // console.log('\n')
@@ -68,8 +70,8 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
         var tradeSignal = tradeHistoryManager.trendSignal()
         if (tradeSignal.long) {
           console.log('do long ', new Date().toLocaleString(), lastData.price)
-          notifyPhone('long at ', lastData.price)
-          accout.trade(lastData.price, true)
+          notifyPhone('long at ' + lastData.price)
+          accout.trade(lastData.price, true, AMOUNT)
         }
       }
     } else if (mayTrendSignal.short && candleManager.isReversed(mayTrendSignal).short) {
@@ -78,8 +80,8 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
       var tradeSignal = tradeHistoryManager.trendSignal()
       if (tradeSignal.short) {
         console.log('do short ', new Date().toLocaleString(), lastData.price)
-        notifyPhone('short at ', lastData.price)
-        accout.trade(lastData.price, false)
+        notifyPhone('short at ' + lastData.price)
+        accout.trade(lastData.price, false, AMOUNT)
       }
     }
   }
