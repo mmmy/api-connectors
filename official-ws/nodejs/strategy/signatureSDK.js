@@ -26,11 +26,11 @@ function getHeaders(verb, path, data) {
   }
 }
 
-function postRequest(url, params, headers) {
+function requestWidthHeader(url, params, headers, method) {
   return new Promise((resolve, reject) => {
     console.log(url, params, headers)
-    httpClient.post(url, params, {
-          timeout: 3000,
+    httpClient[method](url, params, {
+          timeout: 10000,
           headers: headers
       }).then(data => {
           let json = JSON.parse(data)
@@ -45,7 +45,7 @@ function order(params) {
   var path = '/api/v1/order'
   const url = getUrl(path)
   const headers = getHeaders('POST', path, params)
-  return postRequest(url, params, headers)
+  return requestWidthHeader(url, params, headers, 'post')
 }
 
 exports.orderMarket = function(orderQty, side="Buy") {
@@ -63,4 +63,12 @@ exports.orderStop = function(orderQty, stopPx, side) {
 exports.orderMarketTouched = function(orderQty, stopPx, side) {
   const data = {symbol: SYMBOL, orderQty, stopPx, side, ordType:"MarketIfTouched", execInst:"Close,LastPrice"}
   return order(data)
+}
+
+exports.deleteOrder = function(orderID) {
+  const data = { orderID }
+  const path = '/api/v1/order'
+  const url = getUrl(path)
+  const headers = getHeaders('DELETE', path, data)
+  return requestWidthHeader(url, data, headers, 'delete')
 }
