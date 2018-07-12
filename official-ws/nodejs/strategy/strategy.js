@@ -18,6 +18,7 @@ client.on('initialize', () => console.log('Client initialized, data is flowing.'
 
 client.on('open', () => {
     console.log('client open ^v^ EVERY THING IS OK~~~~~~~~~~~~~~~~~~ ')
+    notifyPhone('client open ^v^ EVERY THING IS OK~~~~~~~~~~~~~~~~~~ ')
     bitmextSdk.getTradeHistory({ symbol: 'XBTUSD', binSize: '5m', count: 200 }).then((json) => {
       json = JSON.parse(json)
       candleManager.setHistoryData(json.reverse())
