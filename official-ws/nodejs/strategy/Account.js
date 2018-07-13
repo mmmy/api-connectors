@@ -36,6 +36,8 @@ Account.prototype.resetStops = function() {
 Account.prototype.orderMarket = function(price, long, amount) {
   this._inTrading = true
   this._long = long
+  // 这点很重要, 万一没有一次性成功, 那么直接放弃这次机会, 以防, 重复下订单!!!
+  this._lastTradeTime = new Date()
   this.resetStops()
   if (this._test) {
     return new Promise((resolve, reject) => {
@@ -55,7 +57,6 @@ Account.prototype.orderMarket = function(price, long, amount) {
       this._hasPosition = true
       this._price = +json.avgPx
       this._amount = amount
-      this._lastTradeTime = new Date()
       this.orderStop()
       this.orderMarketTouched()
       this.notify(`orderMarket OK  ${json.avgPx}(${price})`)

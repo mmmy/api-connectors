@@ -4,7 +4,7 @@ var winston = require('winston')
 const logger = winston.createLogger({
   level: 'error',
   transports: [
-    new winston.transports.File({ filename: './bitemx-strategy-error.log', level: 'error' })
+    new winston.transports.File({ filename: './bitmex-strategy-error.log', level: 'error' })
   ]
 })
 

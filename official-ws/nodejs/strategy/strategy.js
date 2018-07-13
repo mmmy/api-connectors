@@ -13,7 +13,7 @@ const candleManager = new Candles()
 const tradeHistoryManager = new RealtimeTradeDataManager()
 const accout = new Account(true)
 
-const AMOUNT = 10000
+const AMOUNT = 4000
 
 const client = new BitMEXClient({testnet: false});
 client.on('error', console.error);
@@ -82,7 +82,7 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
       var tradeSignal = tradeHistoryManager.trendSignal()
       if (tradeSignal.short) {
         console.log('do short ', new Date().toLocaleString(), lastData.price)
-        notifyPhone('short at ' + lastData.price)
+        // notifyPhone('short at ' + lastData.price) //ok
         accout.orderMarket(lastData.price, false, AMOUNT)
       }
     }
