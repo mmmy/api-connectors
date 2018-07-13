@@ -1,3 +1,5 @@
+
+require('./logger')
 const WebSocket = require('ws');
 const bitmextSdk = require('./bitmexSdk')
 const BitMEXClient = require('../index')
