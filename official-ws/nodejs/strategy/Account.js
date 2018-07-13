@@ -137,8 +137,8 @@ Account.prototype.liquidation = function(price, mock) {
       this._hasPosition = false
       this._inTrading = false
       isWin = this._long ? (price > this._price) : (price < this._price)
-      resolve()
       this.notify(`win: ${isWin}, ${this._price} -> ${price} ${mock ? '模拟': '真实'}`)
+      resolve()
     }, 100)
   })
 }
