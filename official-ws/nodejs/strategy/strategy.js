@@ -11,7 +11,7 @@ const candleManager = new Candles()
 const tradeHistoryManager = new RealtimeTradeDataManager()
 const accout = new Account(true)
 
-const AMOUNT = 1000
+const AMOUNT = 10000
 
 const client = new BitMEXClient({testnet: false});
 client.on('error', console.error);
@@ -65,23 +65,23 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
       var reverseSignal = candleManager.isReversed(mayTrendSignal)
       
       if (reverseSignal.long) {
-        console.log('trade long +++++++++', new Date().toLocaleString(), candleManager._latestCandle.getCandle())
+        console.log('try trade long +++++++++', new Date().toLocaleString(), candleManager._latestCandle.getCandle())
 
         var tradeSignal = tradeHistoryManager.trendSignal()
         if (tradeSignal.long) {
           console.log('do long ', new Date().toLocaleString(), lastData.price)
-          notifyPhone('long at ' + lastData.price)
-          accout.trade(lastData.price, true, AMOUNT)
+          // notifyPhone('long at ' + lastData.price) // ok
+          accout.orderMarket(lastData.price, true, AMOUNT)
         }
       }
     } else if (mayTrendSignal.short && candleManager.isReversed(mayTrendSignal).short) {
-      console.log('trade short ---------', new Date().toLocaleString(), lastData.price)
+      console.log('try trade short ---------', new Date().toLocaleString(), lastData.price)
 
       var tradeSignal = tradeHistoryManager.trendSignal()
       if (tradeSignal.short) {
         console.log('do short ', new Date().toLocaleString(), lastData.price)
         notifyPhone('short at ' + lastData.price)
-        accout.trade(lastData.price, false, AMOUNT)
+        accout.orderMarket(lastData.price, false, AMOUNT)
       }
     }
   }
