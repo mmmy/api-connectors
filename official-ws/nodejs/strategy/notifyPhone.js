@@ -6,7 +6,7 @@ const now = function() {
 }
 
 exports.notifyPhone = function(msg, sound) {
-    msg = `${now()}  ${msg}`
+    // msg = `${now()}  ${msg}`
     sound = sound || 'pushover'
     exec(`curl -s \
         --form-string "html=1" \
