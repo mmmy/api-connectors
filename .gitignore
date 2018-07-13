@@ -7,3 +7,4 @@ npm-debug.log
 secret.json
 .vscode
 *.log
+**/package-lock.json
