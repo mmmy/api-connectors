@@ -2,6 +2,17 @@
 var signatureSDK = require('./signatureSDK')
 const notifyPhone = require('./notifyPhone').notifyPhone
 
+
+var winston = require('winston')
+
+const logger = winston.createLogger({
+  level: 'error',
+  transports: [
+    new winston.transports.File({ filename: './bitmex-account-error.log', level: 'error' })
+  ]
+})
+
+
 const STOP = -0.002
 const PROFIT = 0.003
 
@@ -31,6 +42,7 @@ Account.prototype.resetStops = function() {
   this._stopLoss.response = {}
   this._stopProfit.retryTimes = 0
   this._stopProfit.response = {}
+  this._deleteUselessOrderTimes = 0
 }
 
 Account.prototype.orderMarket = function(price, long, amount) {
@@ -65,8 +77,10 @@ Account.prototype.orderMarket = function(price, long, amount) {
     }).catch(err => {
       this._inTrading = false
       this._hasPosition = false
-      this.notify('orderMarket fail ' + err)
-      console.log('Account.prototype.orderMarket 失败了')
+      var msg = 'orderMarket fail ' + err
+      this.notify(msg)
+      console.log(msg)
+      logger.error(msg)
       reject(err)
     })
   })
@@ -81,14 +95,16 @@ Account.prototype.orderStop = function() {
     this._stopLoss.response = json
   }).catch(err => {
     if (this._stopLoss.retryTimes < 4) {
-      this.notify('OrderStop err ' + err)
+      // this.notify('OrderStop err ' + err)
       this._stopLoss.retryTimes += 1
       setTimeout(() => {
         this.orderStop()
       }, 2000)
     } else {
-      this.notify('OrderStop 失败了, 请手动执行')
-      console.log('Account.prototype.orderMarketTouched 失败了')
+      var msg = 'OrderStop 失败了, 请手动执行' + err
+      this.notify(msg)
+      console.log(msg)
+      logger.error(msg)
     }
   })
 }
@@ -102,14 +118,16 @@ Account.prototype.orderMarketTouched = function() {
     this._stopProfit.response = json
   }).catch(err => {
     if (this._stopProfit.retryTimes < 4) {
-      this.notify('orderTouched err ' + err)
+      // this.notify('orderTouched err ' + err)
       this._stopProfit.retryTimes += 1
       setTimeout(() => {
         this.orderMarketTouched()
       }, 2000)
     } else {
-      this.notify('OrderTouched 失败了, 请手动执行')
-      console.log('Account.prototype.orderMarketTouched 失败了')
+      var msg = 'OrderTouched 失败了, 请手动执行' + err
+      this.notify(msg)
+      console.log(msg)
+      logger.error(msg)
     }
   })
 }
@@ -120,12 +138,16 @@ Account.prototype.deleteOrder = function(orderID) {
     console.log('Account.prototype.deleteOrder OK')
   }).catch(err => {
     if (this._deleteUselessOrderTimes < 4) {
+      console.log(err)
       this._deleteUselessOrderTimes += 1
       setTimeout(() => {
         this.deleteOrder(orderID)
       }, 2000)
     } else {
-      this.notify('delete stop order 失败,请手动')
+      var msg = 'delete stop order 失败,请手动' + err
+      this.notify(msg)
+      console.log(msg)
+      logger.error(msg)
     }
   })
 }
