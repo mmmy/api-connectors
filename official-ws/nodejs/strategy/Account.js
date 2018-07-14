@@ -45,7 +45,7 @@ Account.prototype.resetStops = function() {
   this._deleteUselessOrderTimes = 0
 }
 
-Account.prototype.orderMarket = function(price, long, amount) {
+Account.prototype.orderLimit = function(price, long, amount) {
   this._inTrading = true
   this._long = long
   // 这点很重要, 万一没有一次性成功, 那么直接放弃这次机会, 以防, 重复下订单!!!
@@ -64,20 +64,20 @@ Account.prototype.orderMarket = function(price, long, amount) {
   }
 
   return new Promise((resolve, reject) => {
-    signatureSDK.orderMarket(amount, long ? 'Buy' : 'Sell').then((json) => {
+    signatureSDK.orderLimit(amount, long ? 'Buy' : 'Sell').then((json) => {
       this._inTrading = false
       this._hasPosition = true
       this._price = +json.avgPx
       this._amount = amount
       this.orderStop()
-      this.orderMarketTouched()
-      this.notify(`orderMarket OK  ${json.avgPx}(${price})`)
-      console.log('Account.prototype.orderMarket 成功了')
+      this.profitLimitTouched()
+      this.notify(`orderLimit OK  ${json.avgPx}(${price})`)
+      console.log('Account.prototype.orderLimit 成功了')
       resolve(json)
     }).catch(err => {
       this._inTrading = false
       this._hasPosition = false
-      var msg = 'orderMarket fail ' + err
+      var msg = 'orderLimit fail ' + err
       this.notify(msg)
       console.log(msg)
       logger.error(msg)
@@ -85,7 +85,7 @@ Account.prototype.orderMarket = function(price, long, amount) {
     })
   })
 }
-// when orderMarket success
+// when orderLimit success
 Account.prototype.orderStop = function() {
   var price = this._price + this._price * (this._long ? STOP : -STOP)
   price = Math.round(price * 2) / 2
@@ -109,10 +109,10 @@ Account.prototype.orderStop = function() {
   })
 }
 
-Account.prototype.orderMarketTouched = function() {
+Account.prototype.profitLimitTouched = function() {
   var price = this._price + this._price * (this._long ? PROFIT : -PROFIT)
   price = Math.round(price * 2) / 2
-  signatureSDK.orderMarketTouched(this._amount, price, this._long ? 'Sell' : 'Buy').then((json) => {
+  signatureSDK.profitLimitTouched(this._amount, price, this._long ? 'Sell' : 'Buy').then((json) => {
     this._stopProfit.retryTimes = 0
     // test ok
     this._stopProfit.response = json
@@ -121,7 +121,7 @@ Account.prototype.orderMarketTouched = function() {
       // this.notify('orderTouched err ' + err)
       this._stopProfit.retryTimes += 1
       setTimeout(() => {
-        this.orderMarketTouched()
+        this.profitLimitTouched()
       }, 2000)
     } else {
       var msg = 'OrderTouched 失败了, 请手动执行' + err
