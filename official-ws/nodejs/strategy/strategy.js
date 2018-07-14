@@ -5,6 +5,7 @@ const bitmextSdk = require('./bitmexSdk')
 const BitMEXClient = require('../index')
 const notifyPhone = require('./notifyPhone').notifyPhone
 const Account = require('./Account')
+const OrderBook = require('./OrderBook')
 
 const RealtimeTradeDataManager = require('./RealtimeTradeDataManager')
 const Candles = require('./Candles')
@@ -12,13 +13,44 @@ const Candles = require('./Candles')
 const candleManager = new Candles()
 const tradeHistoryManager = new RealtimeTradeDataManager()
 const accout = new Account(true)
+var orderbook = new OrderBook()
 
 const AMOUNT = 3000
+
+function slow(func, wait) {
+	var lastCall = 0
+	return function() {
+		var now = +new Date()
+		if (now - lastCall > wait) {
+			func.apply(null, arguments)
+			lastCall = now
+		}
+	}
+}
 
 const client = new BitMEXClient({testnet: false});
 client.on('error', console.error);
 client.on('close', () => console.log('Connection closed.'));
 client.on('initialize', () => console.log('Client initialized, data is flowing.'));
+
+var logLong = slow(function() { console.log('orderLimitSignal long ' + new Date().toLocaleString()) }, 5000)
+var logShort = slow(function() { console.log('orderLimitSignal short ' + new Date().toLocaleString()) }, 5000)
+
+var notify5min = slow(function(msg) { notifyPhone(msg) }, 5 * 60 * 1000)
+
+client.addStream('XBTUSD', 'orderBookL2_25', function(data, symbol, tableName) {
+  orderbook.update(data)
+  // orderbook.checData()  // test Ok
+  // console.log(orderbook.getSumSizeTest()) // test OK
+  // var orderLimitSignal = orderbook.orderLimitSignal()
+  // if (orderLimitSignal.long) {
+  //   logLong()
+  // } else if (orderLimitSignal.short) {
+  //   logShort()
+  // }
+})
+
+// return
 
 client.on('open', () => {
     console.log('client open ^v^ EVERY THING IS OK~~~~~~~~~~~~~~~~~~ ')
@@ -68,22 +100,32 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
       
       if (reverseSignal.long) {
         console.log('try trade long +++++++++', new Date().toLocaleString(), candleManager._latestCandle.getCandle())
-
+        /*
         var tradeSignal = tradeHistoryManager.trendSignal()
         if (tradeSignal.long) {
           console.log('do long ', new Date().toLocaleString(), lastData.price)
           // notifyPhone('long at ' + lastData.price) // ok
-          accout.orderMarket(lastData.price, true, AMOUNT)
+          accout.orderLimit(lastData.price, true, AMOUNT)
+        }
+        */
+        var stableSignal = tradeHistoryManager.stableSignal()
+        if (stableSignal) {
+          notify5min('long at' + lastData.price)
         }
       }
     } else if (mayTrendSignal.short && candleManager.isReversed(mayTrendSignal).short) {
       console.log('try trade short ---------', new Date().toLocaleString(), lastData.price)
-
+      /*
       var tradeSignal = tradeHistoryManager.trendSignal()
       if (tradeSignal.short) {
         console.log('do short ', new Date().toLocaleString(), lastData.price)
         // notifyPhone('short at ' + lastData.price) //ok
-        accout.orderMarket(lastData.price, false, AMOUNT)
+        accout.orderLimit(lastData.price, false, AMOUNT)
+      }
+      */
+      var stableSignal = tradeHistoryManager.stableSignal()
+      if (stableSignal) {
+        notify5min('short at' + lastData.price)
       }
     }
   }

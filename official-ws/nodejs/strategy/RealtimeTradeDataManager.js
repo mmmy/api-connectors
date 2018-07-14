@@ -46,4 +46,29 @@ RealtimeTradeDataManager.prototype.trendSignal = function() {
   return { long, short }
 }
 
+RealtimeTradeDataManager.prototype.stableSignal = function() {
+  var len = 30
+  var data = this._data
+  var dataLen = this._data.length
+  // var long = false
+  // var short = false
+  if (dataLen >= len) {
+    var prices = []
+    var price0Count = 0
+    for (var i=dataLen - len; i<dataLen; i++) {
+      var price = data[i].price
+      if (prices.indexOf(price) == -1) {
+        prices.push(price)
+      }
+      if (price === prices[0]) {
+        price0Count ++
+      }
+    }
+    if (prices.length === 2 && Math.abs(price0Count - len / 2) < 4) {
+      return true
+    }
+  }
+  return false
+}
+
 module.exports = RealtimeTradeDataManager

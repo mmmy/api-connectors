@@ -10,6 +10,7 @@ const logger = winston.createLogger({
 
 process.on('uncaughtException', function(err) {
   // debug(err)
+  console.error(err)
   var info = err.message + '\n  ' + err.stack
   logger.error(info)
   // console.error('uncaughtException event99:', err);

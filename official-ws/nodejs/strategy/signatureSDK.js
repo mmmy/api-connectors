@@ -52,7 +52,7 @@ exports.orderMarket = function(orderQty, side="Buy") {
   const data = {symbol: SYMBOL, orderQty, side, ordType:"Market"}
   return order(data)
 }
-// 市价止损
+// 市价止损 , 所有市价 手续费太高0.075%
 //{"ordType":"Stop","stopPx":6520,"orderQty":1000,"side":"Buy","execInst":"Close,LastPrice","symbol":"XBTUSD","text":"Submission from testnet.bitmex.com"}
 exports.orderStop = function(orderQty, stopPx, side) {
   const data = {symbol: SYMBOL, orderQty, stopPx, side, ordType:"Stop", execInst:"Close,LastPrice"}
@@ -64,6 +64,21 @@ exports.orderMarketTouched = function(orderQty, stopPx, side) {
   const data = {symbol: SYMBOL, orderQty, stopPx, side, ordType:"MarketIfTouched", execInst:"Close,LastPrice"}
   return order(data)
 }
+// 限价手续费是-0.025%, 所以最好买入用orderLimit
+exports.orderLimit = function(orderQty, side, price) {
+  const data = {symbol: SYMBOL, orderQty, side, price, ordType: 'Limit'}
+  return order(data)
+}
+// 限价止损, 手续费是负数, 你懂的
+exports.stopLimit = function(orderQty, stopPx, price) {
+  const data = {symbol: SYMBOL, orderQty, stopPx, price, ordType: 'StopLimit'}
+  return order(data)
+}
+// 限价止盈, 手续费是负数
+exports.profitLimitTouched = function(orderQty, stopPx, price) {
+  const data = {symbol: SYMBOL, orderQty, stopPx, price}
+  return order(data)
+}
 
 exports.deleteOrder = function(orderID) {
   const data = { orderID }
@@ -71,4 +86,12 @@ exports.deleteOrder = function(orderID) {
   const url = getUrl(path)
   const headers = getHeaders('DELETE', path, data)
   return requestWidthHeader(url, data, headers, 'delete')
+}
+
+exports.getPosition = function() {
+  const path = '/api/vi/position'
+  const url = getUrl(path)
+  const data = {}
+  const headers = getHeaders('GET', path, data)
+  return requestWidthHeader(url, data, headers, 'get')
 }

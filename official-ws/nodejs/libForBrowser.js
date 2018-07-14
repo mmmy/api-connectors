@@ -6,7 +6,10 @@
  * Accepts multiple socket descriptors.
  * @param  {Object|Array} socketDescriptors Description of a socket connection.
  */
-
+var _ = (typeof window !== 'undefined') && window._
+if (module) {
+  _ = require('lodash')
+}
 /*
   gouge99修改:
   orderBookL2 返回的数据, id 是升序的, 价格是降序的, 所以需要reserse()
@@ -232,4 +235,8 @@ function replaceStore(context, key, newData) {
  */
 function updateItem(item, newData) {
   return _.extend({}, item, newData);
+}
+
+if (module) {
+  module.exports = DeltaParser
 }
