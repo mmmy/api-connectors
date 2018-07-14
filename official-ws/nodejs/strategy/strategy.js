@@ -13,7 +13,7 @@ const candleManager = new Candles()
 const tradeHistoryManager = new RealtimeTradeDataManager()
 const accout = new Account(true)
 
-const AMOUNT = 4000
+const AMOUNT = 3000
 
 const client = new BitMEXClient({testnet: false});
 client.on('error', console.error);
