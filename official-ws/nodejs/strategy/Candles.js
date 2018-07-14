@@ -117,9 +117,9 @@ Candles.prototype.mayTrendReverseSignal = function() {
   const rsi = this.rsiSignal()
   let long = false,
       short = false
-  if (bbSignal.short && rsi < 30) {
+  if (bbSignal.short && rsi < 29) {
     long = true
-  } else if (bbSignal.long && rsi > 70) {
+  } else if (bbSignal.long && rsi > 71) {
     short = true
   }
 
