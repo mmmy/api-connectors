@@ -21,7 +21,7 @@ RealtimeTradeDataManager.prototype.appendData = function(list) {
 }
 
 RealtimeTradeDataManager.prototype.trendSignal = function() {
-  var len = 20
+  var len = 15
   var data = this._data
   var dataLen = this._data.length
   var long = false
