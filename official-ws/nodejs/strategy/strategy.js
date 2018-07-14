@@ -42,7 +42,7 @@ client.addStream('XBTUSD', 'orderBookL2_25', function(data, symbol, tableName) {
   orderbook.update(data)
   // orderbook.checData()  // test Ok
   // console.log(orderbook.getSumSizeTest()) // test OK
-  // var orderLimitSignal = orderbook.orderLimitSignal()
+  var orderLimitSignal = orderbook.orderLimitSignal()
   // if (orderLimitSignal.long) {
   //   logLong()
   // } else if (orderLimitSignal.short) {
@@ -109,8 +109,9 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
         }
         */
         var stableSignal = tradeHistoryManager.stableSignal()
-        if (stableSignal) {
-          notify5min('long at' + lastData.price)
+        var orderbookSignal = orderbook.getSignal()
+        if (stableSignal && orderbookSignal.long) {
+          notify5min('多信号 long at' + lastData.price)
         }
       }
     } else if (mayTrendSignal.short && candleManager.isReversed(mayTrendSignal).short) {
@@ -124,8 +125,10 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
       }
       */
       var stableSignal = tradeHistoryManager.stableSignal()
-      if (stableSignal) {
-        notify5min('short at' + lastData.price)
+      var orderbookSignal = orderbook.getSignal()
+
+      if (stableSignal && orderbookSignal.short) {
+        notify5min('多信号 short at' + lastData.price)
       }
     }
   }

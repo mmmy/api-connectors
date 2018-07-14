@@ -10,6 +10,10 @@ function OrderBook () {
   this._buySellBigCompares = []
   this._buySellSmallCompares = []
   this._compareMaxLenth = 100
+  this._signal = {
+    long: false,
+    short: false
+  }
 }
 
 OrderBook.prototype.removeOldData = function() {
@@ -51,18 +55,18 @@ OrderBook.prototype.orderLimitSignal = function() {
 
   // 数据量需要大点, 平均才有意义, 突然的信号可是反向的一个波动!!, 不能取
   var datalen = this._buySellBigCompares.length
-  if (datalen > 15) {
-    var bigIsLong = bigCompare > 1.3
-    var bigIsShort = bigCompare < (1 / 1.3)
+  if (datalen > 40) {
+    var bigIsLong = bigCompare > 1.1
+    var bigIsShort = bigCompare < (1 / 1.1)
     // 判断该信息是不是稳定信息
     if (bigIsLong || bigIsShort) {
-      var signalLen = 10
+      var signalLen = 30
       for (var i=datalen - signalLen; i<datalen - 1; i++) {
         var sumv = this._buySellBigCompares[i]
-        if (bigIsLong && sumv < 1.3) {
+        if (bigIsLong && sumv < 1.1) {
           bigIsLong = false
           break
-        } else if (bigIsShort && sumv > (1 / 1.3)) {
+        } else if (bigIsShort && sumv > (1 / 1.1)) {
           bigIsShort = false
           break
         }
@@ -71,9 +75,9 @@ OrderBook.prototype.orderLimitSignal = function() {
     var smallIsLong = smallCompare > 1.3
     var smallIsShort = smallCompare < (1 / 1.3)
   
-    if (bigCompare > 2 || bigCompare < 1/2) {
-      console.log(lastBuyIndex, bigCompare)
-    }
+    // if (bigCompare > 2 || bigCompare < 1/2) {
+    //   console.log(lastBuyIndex, bigCompare)
+    // }
     // 背离, 挂单时机
     if (bigIsLong && smallIsShort/*&& sumBuySize0 > 5E5*/) {
       long = true
@@ -81,11 +85,9 @@ OrderBook.prototype.orderLimitSignal = function() {
       short = true
     }
   }
-
-  return {
-    long,
-    short
-  }
+  this._signal.long = long
+  this._signal.short = short
+  return this._signal
 }
 
 OrderBook.prototype.sumSizeRange = function(range) {
@@ -137,6 +139,10 @@ OrderBook.prototype.getSumSizeTest = function() {
   var lastBuyIndex = this.getLastBuyIndex()
   var range = [lastBuyIndex - 24, lastBuyIndex]
   return this.sumSizeRange(range)
+}
+
+OrderBook.prototype.getSignal = function() {
+  return this._signal
 }
 
 module.exports = OrderBook
