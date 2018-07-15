@@ -34,7 +34,7 @@ exports.get = function(url, options) {
                 if (res.statusCode == 200) {
                     resolve(body);
                 } else {
-                    reject(res.statusCode);
+                    reject(body);
                 }
             }
         }).on('error', logger.error);

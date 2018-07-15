@@ -14,7 +14,7 @@ const logger = winston.createLogger({
 
 
 const STOP = -0.002
-const PROFIT = 0.003
+const PROFIT = 0.0027
 
 function Account(notify, test) {
   this._inTrading= false
@@ -34,6 +34,9 @@ function Account(notify, test) {
     retryTimes: 0,
     response: {}
   }
+  this._orderLimit = {
+    response: {}
+  }
   this._deleteUselessOrderTimes = 0
 }
 
@@ -44,7 +47,8 @@ Account.prototype.resetStops = function() {
   this._stopProfit.response = {}
   this._deleteUselessOrderTimes = 0
 }
-
+// 注意这个price, 应该是来源于orderbook, 而不是最新的成交价, 因为需要挂单
+// 注意limit挂单之后, 不一定会成交, 成交的数量也是不定的, 故一定时间后应该取消该订单, 并查询真实的仓位
 Account.prototype.orderLimit = function(price, long, amount) {
   this._inTrading = true
   this._long = long
@@ -64,20 +68,24 @@ Account.prototype.orderLimit = function(price, long, amount) {
   }
 
   return new Promise((resolve, reject) => {
-    signatureSDK.orderLimit(amount, long ? 'Buy' : 'Sell').then((json) => {
+    signatureSDK.orderLimit(amount, long ? 'Buy' : 'Sell', price).then((json) => {
       this._inTrading = false
       this._hasPosition = true
-      this._price = +json.avgPx
+      // this._price = +json.avgPx
+      this._price = price
       this._amount = amount
+      this._orderLimit.response = json
       this.orderStop()
-      this.profitLimitTouched()
-      this.notify(`orderLimit OK  ${json.avgPx}(${price})`)
+      this.orderProfitLimitTouched()
+      this.notify(`orderLimitOK${json.avgPx}(${price})`)
       console.log('Account.prototype.orderLimit 成功了')
+      // 三分钟后取消没有成交的, 所以最终的_amount 是<= amount
+      this.timeCancelOrderLimit(3)
       resolve(json)
     }).catch(err => {
       this._inTrading = false
       this._hasPosition = false
-      var msg = 'orderLimit fail ' + err
+      var msg = 'ordLim败' + err
       this.notify(msg)
       console.log(msg)
       logger.error(msg)
@@ -86,6 +94,7 @@ Account.prototype.orderLimit = function(price, long, amount) {
   })
 }
 // when orderLimit success
+// 注意, 止损要用市价止损, 虽然会损失0.0075的手续费, 如果使用限价, 很有可能爆仓!
 Account.prototype.orderStop = function() {
   var price = this._price + this._price * (this._long ? STOP : -STOP)
   price = Math.round(price * 2) / 2
@@ -108,7 +117,33 @@ Account.prototype.orderStop = function() {
     }
   })
 }
+// 止盈用限价, 虽然不一定会触发, 但是胜率比较高
+Account.prototype.orderProfitLimitTouched = function() {
+  var stopPrice = this._price + this._price * (this._long ? PROFIT : -PROFIT)
+  stopPrice = Math.round(stopPrice * 2) / 2
+  var price = stopPrice + (this._long ? 0.5 : -0.5)
+  var side = this._long ? 'Sell' : 'Buy'
+  signatureSDK.orderProfitLimitTouched(this._amount, stopPrice, side, price).then((json) => {
+    this._stopProfit.retryTimes = 0
+    // test ok
+    this._stopProfit.response = json
+  }).catch(err => {
+    if (this._stopProfit.retryTimes < 4) {
+      // this.notify('orderTouched err ' + err)
+      this._stopProfit.retryTimes += 1
+      setTimeout(() => {
+        this.orderProfitLimitTouched()
+      }, 2000)
+    } else {
+      var msg = 'OrdTouch败请手动' + err
+      this.notify(msg)
+      console.log(msg)
+      logger.error(msg)
+    }
+  })
+}
 
+// 弃用
 Account.prototype.profitLimitTouched = function() {
   var price = this._price + this._price * (this._long ? PROFIT : -PROFIT)
   price = Math.round(price * 2) / 2
@@ -132,7 +167,7 @@ Account.prototype.profitLimitTouched = function() {
   })
 }
 
-Account.prototype.deleteOrder = function(orderID) {
+Account.prototype.deleteStopOrder = function(orderID) {
   signatureSDK.deleteOrder(orderID).then(json => {
     this._deleteUselessOrderTimes = 0
     console.log('Account.prototype.deleteOrder OK')
@@ -144,7 +179,7 @@ Account.prototype.deleteOrder = function(orderID) {
         this.deleteOrder(orderID)
       }, 2000)
     } else {
-      var msg = 'delete stop order 失败,请手动' + err
+      var msg = 'delstopord败请手' + err
       this.notify(msg)
       console.log(msg)
       logger.error(msg)
@@ -170,30 +205,32 @@ Account.prototype.shouldLiquidation = function(price) {
     var long = this._long
     var lossOrderID = this._stopLoss.response.orderID
     var profitOrderID = this._stopProfit.response.orderID
+    // 市价止损的
     if(lossOrderID) {
       var stopLossPrice = this._stopLoss.response.stopPx
       var triggerStopLoss = long ? (price <= stopLossPrice) : (price >= stopLossPrice)
       if (triggerStopLoss) {
         this.liquidation(price, false)
         if (profitOrderID) {
-          this.deleteOrder(profitOrderID)
+          this.deleteStopOrder(profitOrderID)
         }
         // 暂时无用
         return {win: false}
       }
     }
+    // 由于是限价, 所以, 价格要穿过limit价格, 才认为已经止ying平仓
     if (profitOrderID) {
-      var profitPrice = this._stopProfit.response.stopPx
-      var triggerProfit = long ? (price >= profitPrice) : (price <= profitPrice)
+      var profitPrice = this._stopProfit.response.price
+      var triggerProfit = long ? (price > profitPrice) : (price < profitPrice)
       if (triggerProfit) {
         this.liquidation(price, false)
         if (lossOrderID) {
-          this.deleteOrder(lossOrderID)
+          this.deleteStopOrder(lossOrderID)
         }
         return {win: true}
       }
     }
-    // 传统计算
+    // 传统计算, 不准确了.
     var earn = this._long ? (price - this._price) : (this._price - price)
     var earnRate = earn / this._price
     if (earnRate > PROFIT || earnRate < STOP) {
@@ -220,6 +257,37 @@ Account.prototype.notify = function(msg) {
   if (this._notify) {
     notifyPhone(msg)
   }
+}
+// 注意挂单后应该 在 N 分钟内完成, 否则应该取消, minute 不能超过5分钟
+Account.prototype.timeCancelOrderLimit = function(minute = 3) {
+  var cancelTimes = 0
+  var orderID = this._orderLimit.response.orderID
+  var cancelFunc = () => {
+    signatureSDK.deleteOrder(orderID).then(json => {
+      this.notify('取消了orderLimit,请看position')
+    }).catch(err => {
+      if (cancelTimes < 4) {
+        cancelTimes ++
+        setTimeout(() => {
+          cancelFunc()
+        }, 2000)
+      } else {
+        this.notify('取消orderLimit失败,请看position')
+      }
+    })
+  }
+  setTimeout(() => {
+  }, minute * 60 * 1000)
+}
+
+Account.prototype.getRealPosition = function() {
+  return new Promise((resolve, reject) => {
+    signatureSDK.getPosition().then(json => {
+      resolve(json)
+    }).catch(err => {
+      reject(err)
+    })
+  })
 }
 
 module.exports = Account
