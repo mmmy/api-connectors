@@ -2,7 +2,8 @@ var httpClient = require('./httpClient')
 var { apiKey, apiSecret } = require('./secret.json')
 var crypto = require('crypto')
 
-const BASE_URL = 'https://testnet.bitmex.com'
+// const BASE_URL = 'https://testnet.bitmex.com'
+const BASE_URL = 'https://www.bitmex.com'
 const SYMBOL = 'XBTUSD'
 
 function getUrl(path) {
