@@ -15,7 +15,7 @@ const tradeHistoryManager = new RealtimeTradeDataManager()
 const accout = new Account(true)
 var orderbook = new OrderBook()
 
-const AMOUNT = 3000
+const AMOUNT = 2000
 
 function slow(func, wait) {
 	var lastCall = 0
@@ -42,15 +42,17 @@ client.addStream('XBTUSD', 'orderBookL2_25', function(data, symbol, tableName) {
   orderbook.update(data)
   // orderbook.checData()  // test Ok
   // console.log(orderbook.getSumSizeTest()) // test OK
-  var orderLimitSignal = orderbook.orderLimitSignal()
+  // var orderLimitSignal = orderbook.getSignal()
   // if (orderLimitSignal.long) {
   //   logLong()
   // } else if (orderLimitSignal.short) {
   //   logShort()
   // }
-})
 
-// return
+  // var bidPrice = orderbook.getTopBidPrice()
+  // var askPrice = orderbook.getTopAskPrice()
+  // console.log(bidPrice, askPrice)
+})
 
 client.on('open', () => {
     console.log('client open ^v^ EVERY THING IS OK~~~~~~~~~~~~~~~~~~ ')
@@ -60,8 +62,6 @@ client.on('open', () => {
       candleManager.setHistoryData(json.reverse())
 
       client.addStream('XBTUSD', 'tradeBin5m', function(data, symbol, tableName) {
-        // console.log(`Got update for ${tableName}:${symbol}. Current state:\n${JSON.stringify(data).slice(0, 100)}...`);
-        // Do something with the table data...
         // console.log(data, symbol)
         // console.log('local time: ', new Date().toLocaleString())
         // console.log('data time: ', new Date(data.data[0].timestamp).toLocaleString())
@@ -83,9 +83,6 @@ client.on('open', () => {
 });
 
 client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
-  // console.log(`Got update for ${tableName}:${symbol}. Current state:\n${JSON.stringify(data).slice(0, 100)}...`);
-  // Do something with the table data...
-  // console.log(data, symbol)
   var lastData = data.data.slice(-1)[0]
   candleManager.updateRealTimeCandle(lastData)
   tradeHistoryManager.appendData(data.data)
@@ -99,7 +96,7 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
       var reverseSignal = candleManager.isReversed(mayTrendSignal)
       
       if (reverseSignal.long) {
-        console.log('try trade long +++++++++', new Date().toLocaleString(), candleManager._latestCandle.getCandle())
+        // console.log('try trade long +++++++++', new Date().toLocaleString(), candleManager._latestCandle.getCandle())
         /*
         var tradeSignal = tradeHistoryManager.trendSignal()
         if (tradeSignal.long) {
@@ -110,12 +107,15 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
         */
         var stableSignal = tradeHistoryManager.stableSignal()
         var orderbookSignal = orderbook.getSignal()
+        // bid price
+        var price = orderbook.getTopBidPrice()
         if (stableSignal && orderbookSignal.long) {
-          notify5min('多信号 long at' + lastData.price)
+          notify5min('多limit long at' + price)
+          // accout.orderLimit(price, true, AMOUNT)
         }
       }
     } else if (mayTrendSignal.short && candleManager.isReversed(mayTrendSignal).short) {
-      console.log('try trade short ---------', new Date().toLocaleString(), lastData.price)
+      // console.log('try trade short ---------', new Date().toLocaleString(), lastData.price)
       /*
       var tradeSignal = tradeHistoryManager.trendSignal()
       if (tradeSignal.short) {
@@ -126,9 +126,10 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
       */
       var stableSignal = tradeHistoryManager.stableSignal()
       var orderbookSignal = orderbook.getSignal()
-
+      var price = orderbook.getTopAskPrice()
       if (stableSignal && orderbookSignal.short) {
-        notify5min('多信号 short at' + lastData.price)
+        notify5min('空limit short at' + price)
+        // accout.orderLimit(price, false, AMOUNT)
       }
     }
   }

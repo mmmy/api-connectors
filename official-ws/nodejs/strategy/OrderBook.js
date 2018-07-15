@@ -14,6 +14,10 @@ function OrderBook () {
     long: false,
     short: false
   }
+  // 最近的big
+  this._bid = {}
+  // 最近的ask
+  this._ask = {}
 }
 
 OrderBook.prototype.removeOldData = function() {
@@ -28,11 +32,16 @@ OrderBook.prototype.removeOldData = function() {
 OrderBook.prototype.update = function(json) {
   var newData = DeltaParser.onAction(json.action, json.table, 'XBTUSD', this._CLIENT, json)
   this._data = newData
+  this.calcOrderLimitSignal()
 }
 // 为了保准orderlimit, 挂单, 需要确定挂单时机 和 价格, 计算方法需要 以后根据经验后不断调整!!
 // 使用短深度与大深度 背离指标
-OrderBook.prototype.orderLimitSignal = function() {
+OrderBook.prototype.calcOrderLimitSignal = function() {
   const lastBuyIndex = this.getLastBuyIndex()
+  // 缓存成交价格两边的orderbook
+  this._bid = this._data[lastBuyIndex]
+  this._ask = this._data[lastBuyIndex + 1]
+
   var long = false
   var short = false
   var lenSmall = 1
@@ -56,17 +65,18 @@ OrderBook.prototype.orderLimitSignal = function() {
   // 数据量需要大点, 平均才有意义, 突然的信号可是反向的一个波动!!, 不能取
   var datalen = this._buySellBigCompares.length
   if (datalen > 40) {
-    var bigIsLong = bigCompare > 1.1
-    var bigIsShort = bigCompare < (1 / 1.1)
+    var signalRate = 1.2
+    var bigIsLong = bigCompare > signalRate
+    var bigIsShort = bigCompare < (1 / signalRate)
     // 判断该信息是不是稳定信息
     if (bigIsLong || bigIsShort) {
       var signalLen = 30
       for (var i=datalen - signalLen; i<datalen - 1; i++) {
         var sumv = this._buySellBigCompares[i]
-        if (bigIsLong && sumv < 1.1) {
+        if (bigIsLong && sumv < signalRate) {
           bigIsLong = false
           break
-        } else if (bigIsShort && sumv > (1 / 1.1)) {
+        } else if (bigIsShort && sumv > (1 / signalRate)) {
           bigIsShort = false
           break
         }
@@ -85,6 +95,7 @@ OrderBook.prototype.orderLimitSignal = function() {
       short = true
     }
   }
+  // 缓存到本地
   this._signal.long = long
   this._signal.short = short
   return this._signal
@@ -143,6 +154,14 @@ OrderBook.prototype.getSumSizeTest = function() {
 
 OrderBook.prototype.getSignal = function() {
   return this._signal
+}
+
+OrderBook.prototype.getTopBidPrice = function() {
+  return this._bid.price
+}
+
+OrderBook.prototype.getTopAskPrice = function() {
+  return this._ask.price
 }
 
 module.exports = OrderBook

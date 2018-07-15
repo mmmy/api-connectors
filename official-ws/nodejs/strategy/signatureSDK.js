@@ -70,13 +70,13 @@ exports.orderLimit = function(orderQty, side, price) {
   return order(data)
 }
 // 限价止损, 手续费是负数, 你懂的
-exports.stopLimit = function(orderQty, stopPx, price) {
-  const data = {symbol: SYMBOL, orderQty, stopPx, price, ordType: 'StopLimit'}
+exports.orderStopLimit = function(orderQty, stopPx, side, price) {
+  const data = {symbol: SYMBOL, orderQty, stopPx, price, side, ordType: 'StopLimit'}
   return order(data)
 }
 // 限价止盈, 手续费是负数
-exports.profitLimitTouched = function(orderQty, stopPx, price) {
-  const data = {symbol: SYMBOL, orderQty, stopPx, price}
+exports.orderProfitLimitTouched = function(orderQty, stopPx, side, price) {
+  const data = {symbol: SYMBOL, orderQty, side, stopPx, price, ordType: 'LimitIfTouched', execInst:"Close,LastPrice"}
   return order(data)
 }
 
@@ -89,9 +89,13 @@ exports.deleteOrder = function(orderID) {
 }
 
 exports.getPosition = function() {
-  const path = '/api/vi/position'
+  const path = '/api/v1/position'
   const url = getUrl(path)
-  const data = {}
+  const data = {
+    filter: {
+      symbol: 'XBTUSD'
+    }
+  }
   const headers = getHeaders('GET', path, data)
   return requestWidthHeader(url, data, headers, 'get')
 }
