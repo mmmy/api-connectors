@@ -37,6 +37,7 @@ var logLong = slow(function() { console.log('orderLimitSignal long ' + new Date(
 var logShort = slow(function() { console.log('orderLimitSignal short ' + new Date().toLocaleString()) }, 5000)
 
 var notify5min = slow(function(msg) { notifyPhone(msg) }, 5 * 60 * 1000)
+var log2min = slow(function() { console.log.call(null, arguments) }, 2 * 60 * 1000)
 
 client.addStream('XBTUSD', 'orderBookL2_25', function(data, symbol, tableName) {
   orderbook.update(data)
@@ -109,13 +110,13 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
         var orderbookSignal = orderbook.getSignal()
         // bid price
         var price = orderbook.getTopBidPrice()
+        log2min('try long ++++', new Date().toLocaleString(), lastData.price, price)
         if (stableSignal && orderbookSignal.long) {
           notify5min('多limit long at' + price)
-          // accout.orderLimit(price, true, AMOUNT)
+          accout.orderLimit(price, true, AMOUNT)
         }
       }
     } else if (mayTrendSignal.short && candleManager.isReversed(mayTrendSignal).short) {
-      // console.log('try trade short ---------', new Date().toLocaleString(), lastData.price)
       /*
       var tradeSignal = tradeHistoryManager.trendSignal()
       if (tradeSignal.short) {
@@ -127,9 +128,11 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
       var stableSignal = tradeHistoryManager.stableSignal()
       var orderbookSignal = orderbook.getSignal()
       var price = orderbook.getTopAskPrice()
+      log2min('try short -----', new Date().toLocaleString(), lastData.price, price)
+
       if (stableSignal && orderbookSignal.short) {
         notify5min('空limit short at' + price)
-        // accout.orderLimit(price, false, AMOUNT)
+        accout.orderLimit(price, false, AMOUNT)
       }
     }
   }

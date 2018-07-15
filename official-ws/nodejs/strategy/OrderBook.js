@@ -82,8 +82,23 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
         }
       }
     }
-    var smallIsLong = smallCompare > 1.3
-    var smallIsShort = smallCompare < (1 / 1.3)
+    
+    var smallRate = 1.3
+    var smallIsLong = smallCompare > smallRate
+    var smallIsShort = smallCompare < (1 / smallRate)
+    if (smallIsLong || smallIsShort) {
+      var len = 5
+      for (var i=datalen - len; i<datalen - 1; i++) {
+        var ssumv = this._buySellSmallCompares[i]
+        if (smallIsLong && ssumv < smallRate) {
+          smallIsLong = false
+          break
+        } else if (smallIsShort && ssumv > smallRate) {
+          smallIsShort = false
+          break
+        } 
+      }
+    }
   
     // if (bigCompare > 2 || bigCompare < 1/2) {
     //   console.log(lastBuyIndex, bigCompare)
@@ -157,11 +172,11 @@ OrderBook.prototype.getSignal = function() {
 }
 
 OrderBook.prototype.getTopBidPrice = function() {
-  return this._bid.price
+  return this._bid && this._bid.price
 }
 
 OrderBook.prototype.getTopAskPrice = function() {
-  return this._ask.price
+  return this._ask && this._ask.price
 }
 
 module.exports = OrderBook
