@@ -70,7 +70,7 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
     var bigIsShort = bigCompare < (1 / signalRate)
     // 判断该信息是不是稳定信息
     if (bigIsLong || bigIsShort) {
-      var signalLen = 30
+      var signalLen = 20
       for (var i=datalen - signalLen; i<datalen - 1; i++) {
         var sumv = this._buySellBigCompares[i]
         if (bigIsLong && sumv < signalRate) {

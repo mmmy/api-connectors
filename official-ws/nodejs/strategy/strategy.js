@@ -113,7 +113,7 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
         log2min('try long ++++', new Date().toLocaleString(), lastData.price, price)
         if (stableSignal && orderbookSignal.long) {
           notify5min('多limit long at' + price)
-          // accout.orderLimit(price, true, AMOUNT)
+          accout.orderLimit(price, true, AMOUNT)
         }
       }
     } else if (mayTrendSignal.short && candleManager.isReversed(mayTrendSignal).short) {
@@ -132,7 +132,7 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
 
       if (stableSignal && orderbookSignal.short) {
         notify5min('空limit short at' + price)
-        // accout.orderLimit(price, false, AMOUNT)
+        accout.orderLimit(price, false, AMOUNT)
       }
     }
   }
