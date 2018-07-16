@@ -4,7 +4,7 @@ var SockServer = require('./SockServer')
 var server = new SockServer()
 
 server.startServer()
-server.setData('test', [{k:0, v:[Math.random() * 10 + 100, Math.random()*20 + 100]}, {k:0, v:[Math.random() * 10 + 100, Math.random()*20 + 100]}])
+server.setData('book', [{k:+new Date() - 200, v:[Math.random() * 10 + 100, Math.random()*20 + 100]}, {k:new Date() - 100, v:[Math.random() * 10 + 100, Math.random()*20 + 100]}])
 // console.log(server)
 // return
 setTimeout(() => {}, 5000)
@@ -30,7 +30,7 @@ wsClient.onend = function() {
 // wsClient.open('ws://127.0.0.1:8091')
 
 setInterval(() => {
-  server.updateData('test', {k: +new Date(), v: [{k:0, v:[Math.random() * 10 + 100, Math.random()*20 + 100]}]})
+  server.updateData('book', {k: +new Date(), v:[Math.random() * 10 + 100, Math.random()*20 + 100]})
 }, 1000)
 console.log(server._clients)
 setTimeout(() => {
