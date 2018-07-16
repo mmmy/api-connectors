@@ -2,6 +2,8 @@
 function Book(canvasId, options) {
 	this._ws = null
   this._chart = null
+  this._maxLength = 110
+  this._updateRender = true
   this._dom = {
     canvas: document.getElementById(canvasId)
   }
@@ -21,12 +23,16 @@ Book.prototype._initChart = function() {
       lables: [],
       datasets: [{
         borderColor: "rgb(54, 162, 235)",
+        type: 'line',
         data: [],
-        steppedLine: true
+        fill: false,
+        steppedLine: false
       }, {
         borderColor: "rgb(50, 50, 50)",
+        type: 'line',
         data: [],
-        steppedLine: true
+        fill: false,
+        steppedLine: false
       }],
     },
     options: {
@@ -40,22 +46,26 @@ Book.prototype._initChart = function() {
           radius: 0
         }
       },
-      responsive: true,
-      /*
+      responsive: false,
       scales: {
+        xAxes: [{
+          type: 'time',
+          ticks: {
+            // source: 'labels'
+          }
+        }],
         yAxes: [{
           ticks: {
             // the data minimum used for determining the ticks is Math.min(dataMin, suggestedMin)
-            // min: 0,
+            min: 0,
             // the data maximum used for determining the ticks is Math.max(dataMax, suggestedMax)
             // max: 5000
-            callback: function(value, index, values) {
-              return value
-            }
+            // callback: function(value, index, values) {
+            //   return value
+            // }
           }
         }]
       },
-      */
       _config: {
         isFuture: this._config.isFuture
       }
@@ -63,22 +73,39 @@ Book.prototype._initChart = function() {
   })
 }
 
-Book.prototype._update = function(json) {
-	this._orderBook.update(json[0])
-	this._updateChart()
+Book.prototype.setData = function(data) {
+  var keys = []
+  var data0 = []
+  var data1 = []
+  data.forEach(item => {
+    var t = item.k
+    keys.push(t)
+    data0.push({t, y: item.v[0]})
+    data1.push({t, y: item.v[1]})
+  })
+  var chart = this._chart
+  chart.data.lables = keys
+  chart.data.datasets[0].data = data0
+  chart.data.datasets[1].data = data1
+  chart.update({ duration: 0, lazy: true })
 }
 
-Book.prototype._updateChart = function() {
-  /*
-	var data = []
+Book.prototype.appendData = function(data) {
   var chart = this._chart
-  chart.data.labels = x
-  chart.data.datasets[0].data = yGreen
-  // chart.data.datasets[0].steppedLine = CONFIG.step
-  chart.data.datasets[1].data = yRed
-  // chart.data.datasets[1].steppedLine = CONFIG.step
-  chart.update({ duration: 0, lazy: true })
-  */
+  var t = data.k
+  chart.data.lables.push(t)
+  chart.data.datasets[0].data.push({t, y:data.v[0]})
+  chart.data.datasets[1].data.push({t, y:data.v[1]})
+
+  var len = chart.data.lables.length
+  if (len > this._maxLength) {
+    chart.data.lables.shift()
+    chart.data.datasets[0].data.shift()
+    chart.data.datasets[1].data.shift()
+  }
+  if (this._updateRender) {
+    chart.update({ duration: 1000, lazy: true })
+  }
 }
 
 Book.prototype.getCanvas = function() {
