@@ -33,6 +33,7 @@ OrderBook.prototype.update = function(json) {
   var newData = DeltaParser.onAction(json.action, json.table, 'XBTUSD', this._CLIENT, json)
   this._data = newData
   this.calcOrderLimitSignal()
+  return this._buySellBigCompares.slice(-1).concat(this._buySellSmallCompares.slice(-1))
 }
 // 为了保准orderlimit, 挂单, 需要确定挂单时机 和 价格, 计算方法需要 以后根据经验后不断调整!!
 // 使用短深度与大深度 背离指标
@@ -65,12 +66,12 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
   // 数据量需要大点, 平均才有意义, 突然的信号可是反向的一个波动!!, 不能取
   var datalen = this._buySellBigCompares.length
   if (datalen > 40) {
-    var signalRate = 1.2
+    var signalRate = 1.3
     var bigIsLong = bigCompare > signalRate
     var bigIsShort = bigCompare < (1 / signalRate)
     // 判断该信息是不是稳定信息
     if (bigIsLong || bigIsShort) {
-      var signalLen = 20
+      var signalLen = 30
       for (var i=datalen - signalLen; i<datalen - 1; i++) {
         var sumv = this._buySellBigCompares[i]
         if (bigIsLong && sumv < signalRate) {

@@ -9,6 +9,10 @@ const OrderBook = require('./OrderBook')
 
 const RealtimeTradeDataManager = require('./RealtimeTradeDataManager')
 const Candles = require('./Candles')
+const SockServer = require('./mysocks/SockServer')
+
+// const webServer = new SockServer()
+// webServer.startServer()
 
 const candleManager = new Candles()
 const tradeHistoryManager = new RealtimeTradeDataManager()
@@ -40,7 +44,8 @@ var notify5min = slow(function(msg) { notifyPhone(msg) }, 5 * 60 * 1000)
 var log2min = slow(function() { console.log.call(null, arguments) }, 2 * 60 * 1000)
 
 client.addStream('XBTUSD', 'orderBookL2_25', function(data, symbol, tableName) {
-  orderbook.update(data)
+  var compareData = orderbook.update(data)
+  // webServer.updateData('book', {k: +new Date(), v: compareData})
   // orderbook.checData()  // test Ok
   // console.log(orderbook.getSumSizeTest()) // test OK
   // var orderLimitSignal = orderbook.getSignal()

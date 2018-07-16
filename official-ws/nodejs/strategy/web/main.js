@@ -1,6 +1,6 @@
 
 $(function() {
-  // var bookChart = new Book('book-lines-chart')
+  var bookChart = new Book('book-lines-chart')
   // var initData = randomLinesData()
   // bookChart.setData(initData)
   // randomAppendData(data => {
@@ -19,6 +19,16 @@ $(function() {
     var json = JSON.parse(evt.data)
     // that._update(json)
     console.log( "Received Message: " + evt.data);
+    if (json.action == 'init') {
+      var bookInitData = json.data.book
+      if (bookInitData) {
+        bookChart.setData(bookInitData)
+      }
+    } else if (json.action == 'update') {
+      if (json.name == 'book') {
+        bookChart.appendData(json.data[0])
+      }
+    }
     // ws.close();
   };
 
@@ -26,4 +36,7 @@ $(function() {
     console.log("Connection closed.");
   };
 
+  $('#pause-btn').on('click', function() {
+    bookChart._updateRender = !bookChart._updateRender
+  })
 })

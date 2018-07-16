@@ -2,8 +2,9 @@
 function Book(canvasId, options) {
 	this._ws = null
   this._chart = null
-  this._maxLength = 110
+  this._maxLength = 1000
   this._updateRender = true
+  this._yMax = 5
   this._dom = {
     canvas: document.getElementById(canvasId)
   }
@@ -59,7 +60,7 @@ Book.prototype._initChart = function() {
             // the data minimum used for determining the ticks is Math.min(dataMin, suggestedMin)
             min: 0,
             // the data maximum used for determining the ticks is Math.max(dataMax, suggestedMax)
-            // max: 5000
+            max: this._yMax
             // callback: function(value, index, values) {
             //   return value
             // }
@@ -104,7 +105,7 @@ Book.prototype.appendData = function(data) {
     chart.data.datasets[1].data.shift()
   }
   if (this._updateRender) {
-    chart.update({ duration: 1000, lazy: true })
+    chart.update({ duration: 0, lazy: true })
   }
 }
 
