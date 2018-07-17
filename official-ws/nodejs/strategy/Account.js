@@ -30,6 +30,10 @@ function Account(notify, test) {
     // see README
     response: {},  //orderID, stopPx
   }
+  this._stopLossLimit = {
+    retryTimes: 0,
+    response: {}
+  }
   this._stopProfit = {
     retryTimes: 0,
     response: {}
@@ -43,6 +47,10 @@ function Account(notify, test) {
 Account.prototype.resetStops = function() {
   this._stopLoss.retryTimes = 0
   this._stopLoss.response = {}
+
+  this._stopLossLimit.retryTimes = 0
+  this._stopLossLimit.response = {}
+  
   this._stopProfit.retryTimes = 0
   this._stopProfit.response = {}
   this._deleteUselessOrderTimes = 0
@@ -75,7 +83,9 @@ Account.prototype.orderLimit = function(price, long, amount) {
       this._price = price
       this._amount = amount
       this._orderLimit.response = json
+      // 同时设置两个止损, 一个是市价, 一个是限价, 这就看运气了
       this.orderStop()
+      this.orderStopLimit()
       this.orderProfitLimitTouched()
       this.notify(`orderLimitOK${json.avgPx}(${price})`)
       console.log('Account.prototype.orderLimit 成功了')
@@ -94,10 +104,34 @@ Account.prototype.orderLimit = function(price, long, amount) {
   })
 }
 // when orderLimit success
+// 限价止损, 手续费是负数
+Account.prototype.orderStopLimit = function() {
+  var stopPrice = this._price + this._price * (this._long ? STOP : -STOP)
+  stopPrice = Math.round(price * 2) / 2
+  var price = stopPrice + (this._long ? 0.5 : -0.5)
+  signatureSDK.orderStopLimit(this._amount, stopPrice, this._long ? 'Sell' : 'Buy', price).then((json) => {
+    this._stopLossLimit.retryTimes = 0
+    // test ok
+    this._stopLossLimit.response = json
+  }).catch(err => {
+    if (this._stopLossLimit.retryTimes < 4) {
+      // this.notify('OrderStop err ' + err)
+      this._stopLossLimit.retryTimes += 1
+      setTimeout(() => {
+        this.orderStopLimit()
+      }, 2000)
+    } else {
+      var msg = 'ordStLimit败了手执' + err
+      this.notify(msg)
+      console.log(msg)
+      logger.error(msg)
+    }
+  })
+}
 // 注意, 止损要用市价止损, 虽然会损失0.0075的手续费, 如果使用限价, 很有可能爆仓!
 Account.prototype.orderStop = function() {
   var price = this._price + this._price * (this._long ? STOP : -STOP)
-  price = Math.round(price * 2) / 2
+  price = Math.round(price * 2) / 2 + (this._long ? -0.5 : 0.5)
   signatureSDK.orderStop(this._amount, price, this._long ? 'Sell' : 'Buy').then((json) => {
     this._stopLoss.retryTimes = 0
     // test ok
