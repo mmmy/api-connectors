@@ -266,6 +266,8 @@ Account.prototype.shouldLiquidation = function(price) {
         this.liquidation(price, false)
         if (lossOrderID) {
           this.deleteStopOrder(lossOrderID)
+        }
+        if (lossLimitOrderID) {
           this.deleteStopOrder(lossLimitOrderID)
         }
         return {win: true}
