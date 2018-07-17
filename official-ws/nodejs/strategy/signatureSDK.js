@@ -72,7 +72,7 @@ exports.orderLimit = function(orderQty, side, price) {
 }
 // 限价止损, 手续费是负数, 你懂的
 exports.orderStopLimit = function(orderQty, stopPx, side, price) {
-  const data = {symbol: SYMBOL, orderQty, stopPx, price, side, ordType: 'StopLimit'}
+  const data = {symbol: SYMBOL, orderQty, stopPx, price, side, ordType: 'StopLimit', execInst:"Close,LastPrice"}
   return order(data)
 }
 // 限价止盈, 手续费是负数
