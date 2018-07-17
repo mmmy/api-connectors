@@ -107,7 +107,7 @@ Account.prototype.orderLimit = function(price, long, amount) {
 // 限价止损, 手续费是负数
 Account.prototype.orderStopLimit = function() {
   var stopPrice = this._price + this._price * (this._long ? STOP : -STOP)
-  stopPrice = Math.round(price * 2) / 2
+  stopPrice = Math.round(stopPrice * 2) / 2
   var price = stopPrice + (this._long ? 0.5 : -0.5)
   signatureSDK.orderStopLimit(this._amount, stopPrice, this._long ? 'Sell' : 'Buy', price).then((json) => {
     this._stopLossLimit.retryTimes = 0
@@ -238,15 +238,21 @@ Account.prototype.shouldLiquidation = function(price) {
   if (this._price && this._hasPosition && !this._inTrading) {
     var long = this._long
     var lossOrderID = this._stopLoss.response.orderID
+    var lossLimitOrderID = this._stopLossLimit.response.orderID
     var profitOrderID = this._stopProfit.response.orderID
-    // 市价止损的
-    if(lossOrderID) {
-      var stopLossPrice = this._stopLoss.response.stopPx
-      var triggerStopLoss = long ? (price <= stopLossPrice) : (price >= stopLossPrice)
+    // 市价止损的 和限价止损的, 
+    if(lossOrderID || lossLimitOrderID) {
+      var stopLossLimitPrice = this._stopLossLimit.response.stopPx
+      var triggerStopLoss = long ? (price <= stopLossLimitPrice) : (price >= stopLossLimitPrice)
       if (triggerStopLoss) {
         this.liquidation(price, false)
         if (profitOrderID) {
           this.deleteStopOrder(profitOrderID)
+          // 四分钟后取消这两个order, 尴尬了, 因为不知道触发了哪一个.
+          setTimeout(() => {
+            this.deleteStopOrder(lossOrderID)
+            this.deleteStopOrder(lossLimitOrderID)
+          }, 4 * 60 * 1000)
         }
         // 暂时无用
         return {win: false}
@@ -260,6 +266,7 @@ Account.prototype.shouldLiquidation = function(price) {
         this.liquidation(price, false)
         if (lossOrderID) {
           this.deleteStopOrder(lossOrderID)
+          this.deleteStopOrder(lossLimitOrderID)
         }
         return {win: true}
       }
