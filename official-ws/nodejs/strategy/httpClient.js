@@ -79,7 +79,7 @@ exports.delete = function(url, postdata, options) {
             headers: options.headers || default_post_headers,
             proxy: options.proxy || '',
             agentOptions: agentOptions,
-            agent,
+            // agent,
         };
         request(httpOptions, function(err, res, body) {
             if (err) {
