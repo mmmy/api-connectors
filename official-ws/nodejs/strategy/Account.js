@@ -210,7 +210,7 @@ Account.prototype.deleteStopOrder = function(orderID) {
       console.log(err)
       this._deleteUselessOrderTimes += 1
       setTimeout(() => {
-        this.deleteOrder(orderID)
+        this.deleteStopOrder(orderID)
       }, 2000)
     } else {
       var msg = 'delstopord败请手' + err
