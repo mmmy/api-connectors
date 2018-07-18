@@ -245,6 +245,8 @@ Account.prototype.shouldLiquidation = function(price) {
       var stopLossLimitPrice = this._stopLossLimit.response.stopPx
       var triggerStopLoss = long ? (price <= stopLossLimitPrice) : (price >= stopLossLimitPrice)
       if (triggerStopLoss) {
+        // 注意触发止盈止损后, 一定要取消订单, 因为3分钟内可能就已经这里就执行, 而订单可以还在, 导致重大bug
+        this.timeCancelOrderLimit(0)
         this.liquidation(price, false)
         if (profitOrderID) {
           this.deleteStopOrder(profitOrderID)
@@ -263,6 +265,8 @@ Account.prototype.shouldLiquidation = function(price) {
       var profitPrice = this._stopProfit.response.price
       var triggerProfit = long ? (price > profitPrice) : (price < profitPrice)
       if (triggerProfit) {
+        // 同上
+        this.timeCancelOrderLimit(0)
         this.liquidation(price, false)
         if (lossOrderID) {
           this.deleteStopOrder(lossOrderID)
