@@ -46,7 +46,7 @@ exports.BollingerBandsSignal = function(kline) {
 exports.RSI = function(kline) {
   const { T, O, H, L, C, V } = parseKline(kline)
   var result = RSI.calculate({ values: C, period: 14 })
-  const lastV = result.slice(-1)[0]
-  return lastV
+  const lastVs = result.slice(-5)
+  return lastVs
   // console.log(result.slice(result.length - 10))
 }
