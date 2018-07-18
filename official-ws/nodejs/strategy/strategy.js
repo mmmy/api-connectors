@@ -19,7 +19,7 @@ const tradeHistoryManager = new RealtimeTradeDataManager()
 const accout = new Account(true)
 var orderbook = new OrderBook()
 
-const AMOUNT = 2000
+const AMOUNT = 10000
 
 function slow(func, wait) {
 	var lastCall = 0

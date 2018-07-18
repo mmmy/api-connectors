@@ -107,19 +107,21 @@ Candles.prototype.bollSignal = function(realTime) {
 
 Candles.prototype.rsiSignal = function(realTime) {
   var data = this.getCandles(realTime)
-  var rsi = signal.RSI(data)
+  var rsis = signal.RSI(data)
   // console.log('rsi', rsi)
-  return rsi
+  return rsis
 }
 // 也许开始趋势反转, 这个根据历史数据
 Candles.prototype.mayTrendReverseSignal = function() {
   const bbSignal = this.bollSignal()
-  const rsi = this.rsiSignal()
+  const rsis = this.rsiSignal()
+  const lastRsi = rsis[rsis.length - 1]
+  const lastRsi2 = rsis[rsis.length - 2]
   let long = false,
       short = false
-  if (bbSignal.short && rsi < 29) {
+  if (bbSignal.short && lastRsi < lastRsi2 && lastRsi < 28) {
     long = true
-  } else if (bbSignal.long && rsi > 71) {
+  } else if (bbSignal.long && lastRsi > lastRsi2 && lastRsi > 72) {
     short = true
   }
 
@@ -130,13 +132,15 @@ Candles.prototype.mayTrendReverseSignal = function() {
 }
 // 注意要先调用上面的, 在用这个
 Candles.prototype.isReversed = function(maySignal) {
-  const rsi = this.rsiSignal(true)
+  const rsis = this.rsiSignal(true)
+  const lastRsi = rsis[rsis.length - 1]
+  const lastRsi2 = rsis[rsis.length - 2]
   let long = false,
       short = false
 
-  if (maySignal.long && rsi > 30) {
+  if (maySignal.long && lastRsi - lastRsi2 > 2 ) {
     long = true
-  } else if (maySignal.short && rsi < 70) {
+  } else if (maySignal.short && lastRsi - lastRsi2 < -2) {
     short = true
   }
 
