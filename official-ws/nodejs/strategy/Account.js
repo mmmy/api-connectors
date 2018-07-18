@@ -287,8 +287,8 @@ Account.prototype.shouldLiquidation = function(price) {
 }
 
 Account.prototype.isReadyToOrder = function() {
-  // 五分钟之内最多一次
-  var frequenceLimit = (new Date() - this._lastTradeTime) > 5 * 60 * 1000
+  // 十分钟之内最多一次
+  var frequenceLimit = (new Date() - this._lastTradeTime) > 10 * 60 * 1000
   return !this._inTrading && !this._hasPosition && frequenceLimit
 }
 
