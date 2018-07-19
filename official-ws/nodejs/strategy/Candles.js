@@ -119,9 +119,11 @@ Candles.prototype.mayTrendReverseSignal = function() {
   const lastRsi2 = rsis[rsis.length - 2]
   let long = false,
       short = false
-  if (bbSignal.short && lastRsi < lastRsi2 && lastRsi < 28) {
+  // if (bbSignal.short && lastRsi < lastRsi2 && lastRsi < 28) {
+  if (bbSignal.short && lastRsi < 29) {
     long = true
-  } else if (bbSignal.long && lastRsi > lastRsi2 && lastRsi > 72) {
+  // } else if (bbSignal.long && lastRsi > lastRsi2 && lastRsi > 72) {
+  } else if (bbSignal.long && lastRsi > 71) {
     short = true
   }
 
@@ -138,9 +140,11 @@ Candles.prototype.isReversed = function(maySignal) {
   let long = false,
       short = false
 
-  if (maySignal.long && lastRsi - lastRsi2 > 2 ) {
+  // if (maySignal.long && lastRsi - lastRsi2 > 2 ) {
+  if (maySignal.long && lastRsi > 30 ) {
     long = true
-  } else if (maySignal.short && lastRsi - lastRsi2 < -2) {
+  // } else if (maySignal.short && lastRsi - lastRsi2 < -2) {
+  } else if (maySignal.short && lastRsi < 70) {
     short = true
   }
 
