@@ -223,12 +223,15 @@ Account.prototype.deleteStopOrder = function(orderID) {
 
 Account.prototype.liquidation = function(price, mock) {
   this._inTrading = true
+  var timePassed = new Date() - this._lastTradeTime
+  var minute = timePassed / (60 * 1000)
+  minute = Math.round(minute)
   return new Promise((resolve, reject) => {
     setTimeout(()=>{
       this._hasPosition = false
       this._inTrading = false
       isWin = this._long ? (price > this._price) : (price < this._price)
-      this.notify(`win: ${isWin}, ${this._price} -> ${price} ${mock ? '模拟': '真实'}`)
+      this.notify(`win: ${isWin}, ${this._price} -> ${price} ${mock ? '模拟': '真实'} ${minute}m`)
       resolve()
     }, 100)
   })
@@ -236,6 +239,7 @@ Account.prototype.liquidation = function(price, mock) {
 
 Account.prototype.shouldLiquidation = function(price) {
   if (this._price && this._hasPosition && !this._inTrading) {
+    var _lastTradeTime = this._lastTradeTime
     var long = this._long
     var lossOrderID = this._stopLoss.response.orderID
     var lossLimitOrderID = this._stopLossLimit.response.orderID
@@ -246,7 +250,7 @@ Account.prototype.shouldLiquidation = function(price) {
       var triggerStopLoss = long ? (price <= stopLossLimitPrice) : (price >= stopLossLimitPrice)
       if (triggerStopLoss) {
         // 注意触发止盈止损后, 一定要取消订单, 因为3分钟内可能就已经这里就执行, 而订单可以还在, 导致重大bug
-        this.timeCancelOrderLimit(0)
+        this.cancelOrderLimitIfNeed()
         this.liquidation(price, false)
         if (profitOrderID) {
           this.deleteStopOrder(profitOrderID)
@@ -266,7 +270,7 @@ Account.prototype.shouldLiquidation = function(price) {
       var triggerProfit = long ? (price > profitPrice) : (price < profitPrice)
       if (triggerProfit) {
         // 同上
-        this.timeCancelOrderLimit(0)
+        this.cancelOrderLimitIfNeed()
         this.liquidation(price, false)
         if (lossOrderID) {
           this.deleteStopOrder(lossOrderID)
@@ -323,8 +327,16 @@ Account.prototype.timeCancelOrderLimit = function(minute = 3) {
       }
     })
   }
+  
   setTimeout(() => {
+    cancelFunc()
   }, minute * 60 * 1000)
+}
+
+Account.prototype.cancelOrderLimitIfNeed = function() {
+  if (new Date() - this._lastTradeTime < 3 * 60 * 1000) {
+    this.timeCancelOrderLimit(0)
+  }
 }
 
 Account.prototype.getRealPosition = function() {
