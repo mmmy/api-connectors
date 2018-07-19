@@ -46,7 +46,7 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
   var long = false
   var short = false
   var lenSmall = 1
-  var lenBig = 10
+  var lenBig = 24
   var buyRange0 = [lastBuyIndex - lenSmall + 1, lastBuyIndex]
   var buyRange1 = [lastBuyIndex - lenSmall - lenBig + 1, lastBuyIndex - lenSmall]
   var sellRange0 = [lastBuyIndex + 1, lastBuyIndex + lenSmall]
@@ -71,7 +71,7 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
     var bigIsShort = bigCompare < (1 / signalRate)
     // 判断该信息是不是稳定信息
     if (bigIsLong || bigIsShort) {
-      var signalLen = 40
+      var signalLen = 30
       for (var i=datalen - signalLen; i<datalen - 1; i++) {
         var sumv = this._buySellBigCompares[i]
         if (bigIsLong && sumv < signalRate) {
