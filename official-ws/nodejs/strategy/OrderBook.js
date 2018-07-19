@@ -65,13 +65,13 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
 
   // 数据量需要大点, 平均才有意义, 突然的信号可是反向的一个波动!!, 不能取
   var datalen = this._buySellBigCompares.length
-  if (datalen > 40) {
+  if (datalen > 50) {
     var signalRate = 1.3
     var bigIsLong = bigCompare > signalRate
     var bigIsShort = bigCompare < (1 / signalRate)
     // 判断该信息是不是稳定信息
     if (bigIsLong || bigIsShort) {
-      var signalLen = 30
+      var signalLen = 40
       for (var i=datalen - signalLen; i<datalen - 1; i++) {
         var sumv = this._buySellBigCompares[i]
         if (bigIsLong && sumv < signalRate) {
@@ -88,7 +88,7 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
     var smallIsLong = smallCompare > smallRate
     var smallIsShort = smallCompare < (1 / smallRate)
     if (smallIsLong || smallIsShort) {
-      var len = 5
+      var len = 10
       for (var i=datalen - len; i<datalen - 1; i++) {
         var ssumv = this._buySellSmallCompares[i]
         if (smallIsLong && ssumv < smallRate) {
