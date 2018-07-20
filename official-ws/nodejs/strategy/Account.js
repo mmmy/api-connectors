@@ -14,7 +14,7 @@ const logger = winston.createLogger({
 
 
 const STOP = -0.002
-const PROFIT = 0.0025
+const PROFIT = 0.00095
 
 function Account(notify, test) {
   this._inTrading= false
