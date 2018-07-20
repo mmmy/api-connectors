@@ -151,6 +151,16 @@ Candles.prototype.isReversed = function(maySignal) {
   return { long, short }
 }
 
+Candles.prototype.macdSignal = function(realTime) {
+  var klines = this.getCandles(realTime)
+  const macds = signal.MacdSignal(klines)
+  const lastMacd = macds[macds.length - 1]
+  const lastMacd2 = macds[macds.length - 2]
+  let long = lastMacd.MACD > lastMacd2.MACD
+  console.log(macds)
+  console.log(long)
+}
+
 Candles.prototype.getCandles = function(realTime) {
   return realTime ? this._histories.concat([this._latestCandle.getCandle()]) : this._histories
 }

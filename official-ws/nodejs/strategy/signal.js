@@ -26,7 +26,7 @@ function parseKline(kline) {
 }
 // [{MACD: ,histogram: , signal: }]
 exports.MacdSignal = function(kline) {
-    const { C } = this.parseKline(kline)
+    const { C } = parseKline(kline)
     const result = MACD.calculate({
         values: C,
         fastPeriod: 12,
@@ -35,7 +35,7 @@ exports.MacdSignal = function(kline) {
         SimpleMAOscillator: false,
         SimpleMASignal: false
     })
-    var lastVs = result.slice(-5)
+    var lastVs = result.slice(-10)
     return lastVs
 }
 
