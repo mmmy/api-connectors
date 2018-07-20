@@ -119,9 +119,13 @@ Candles.prototype.mayTrendReverseSignal = function() {
   const lastRsi2 = rsis[rsis.length - 2]
   let long = false,
       short = false
-  if (bbSignal.short && lastRsi < lastRsi2 && lastRsi < 28) {
+  // if (bbSignal.short && lastRsi < lastRsi2 && lastRsi < 28) {
+  if (bbSignal.short && lastRsi < 29) {
+  // if (bbSignal.short && lastRsi < 29) {
     long = true
-  } else if (bbSignal.long && lastRsi > lastRsi2 && lastRsi > 72) {
+  // } else if (bbSignal.long && lastRsi > lastRsi2 && lastRsi > 72) {
+  } else if (bbSignal.long && lastRsi > 71) {
+  // } else if (bbSignal.long && lastRsi > 71) {
     short = true
   }
 
@@ -139,12 +143,24 @@ Candles.prototype.isReversed = function(maySignal) {
       short = false
 
   if (maySignal.long && lastRsi - lastRsi2 > 2 ) {
+  // if (maySignal.long && lastRsi > 30 ) {
     long = true
   } else if (maySignal.short && lastRsi - lastRsi2 < -2) {
+  // } else if (maySignal.short && lastRsi < 70) {
     short = true
   }
 
   return { long, short }
+}
+
+Candles.prototype.macdSignal = function(realTime) {
+  var klines = this.getCandles(realTime)
+  const macds = signal.MacdSignal(klines)
+  const lastMacd = macds[macds.length - 1]
+  const lastMacd2 = macds[macds.length - 2]
+  let long = lastMacd.MACD > lastMacd2.MACD
+  console.log(macds)
+  console.log(long)
 }
 
 Candles.prototype.getCandles = function(realTime) {

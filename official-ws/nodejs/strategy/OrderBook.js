@@ -46,7 +46,7 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
   var long = false
   var short = false
   var lenSmall = 1
-  var lenBig = 10
+  var lenBig = 16
   var buyRange0 = [lastBuyIndex - lenSmall + 1, lastBuyIndex]
   var buyRange1 = [lastBuyIndex - lenSmall - lenBig + 1, lastBuyIndex - lenSmall]
   var sellRange0 = [lastBuyIndex + 1, lastBuyIndex + lenSmall]
@@ -65,7 +65,7 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
 
   // 数据量需要大点, 平均才有意义, 突然的信号可是反向的一个波动!!, 不能取
   var datalen = this._buySellBigCompares.length
-  if (datalen > 40) {
+  if (datalen > 50) {
     var signalRate = 1.3
     var bigIsLong = bigCompare > signalRate
     var bigIsShort = bigCompare < (1 / signalRate)
@@ -88,7 +88,7 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
     var smallIsLong = smallCompare > smallRate
     var smallIsShort = smallCompare < (1 / smallRate)
     if (smallIsLong || smallIsShort) {
-      var len = 5
+      var len = 8
       for (var i=datalen - len; i<datalen - 1; i++) {
         var ssumv = this._buySellSmallCompares[i]
         if (smallIsLong && ssumv < smallRate) {

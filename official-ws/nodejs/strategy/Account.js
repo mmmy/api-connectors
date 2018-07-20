@@ -14,7 +14,7 @@ const logger = winston.createLogger({
 
 
 const STOP = -0.002
-const PROFIT = 0.0025
+const PROFIT = 0.00095
 
 function Account(notify, test) {
   this._inTrading= false
@@ -295,8 +295,8 @@ Account.prototype.shouldLiquidation = function(price) {
 }
 
 Account.prototype.isReadyToOrder = function() {
-  // 十分钟之内最多一次
-  var frequenceLimit = (new Date() - this._lastTradeTime) > 10 * 60 * 1000
+  // 5分钟之内最多一次
+  var frequenceLimit = (new Date() - this._lastTradeTime) > 5 * 60 * 1000
   return !this._inTrading && !this._hasPosition && frequenceLimit
 }
 
