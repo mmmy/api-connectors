@@ -1,6 +1,7 @@
 var technicalindicators = require('technicalindicators')
 var RSI = technicalindicators.RSI
 var BB = technicalindicators.BollingerBands
+var MACD = technicalindicators.MACD
 // var jStat = require('jStat')
 
 function parseKline(kline) {
@@ -22,6 +23,20 @@ function parseKline(kline) {
     })
 
     return { T, O, H, L, C, V }
+}
+// [{MACD: ,histogram: , signal: }]
+exports.MacdSignal = function(kline) {
+    const { C } = this.parseKline(kline)
+    const result = MACD.calculate({
+        values: C,
+        fastPeriod: 12,
+        slowPeriod: 26,
+        signalPeriod: 9,
+        SimpleMAOscillator: false,
+        SimpleMASignal: false
+    })
+    var lastVs = result.slice(-5)
+    return lastVs
 }
 
 exports.BollingerBandsSignal = function(kline) {
