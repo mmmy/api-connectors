@@ -46,7 +46,7 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
   var long = false
   var short = false
   var lenSmall = 1
-  var lenBig = 24
+  var lenBig = 16
   var buyRange0 = [lastBuyIndex - lenSmall + 1, lastBuyIndex]
   var buyRange1 = [lastBuyIndex - lenSmall - lenBig + 1, lastBuyIndex - lenSmall]
   var sellRange0 = [lastBuyIndex + 1, lastBuyIndex + lenSmall]
@@ -88,7 +88,7 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
     var smallIsLong = smallCompare > smallRate
     var smallIsShort = smallCompare < (1 / smallRate)
     if (smallIsLong || smallIsShort) {
-      var len = 10
+      var len = 8
       for (var i=datalen - len; i<datalen - 1; i++) {
         var ssumv = this._buySellSmallCompares[i]
         if (smallIsLong && ssumv < smallRate) {
