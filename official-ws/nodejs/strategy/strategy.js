@@ -15,11 +15,12 @@ const SockServer = require('./mysocks/SockServer')
 // webServer.startServer()
 
 const candleManager = new Candles()
+const hourCandleManager = new Candles()
 const tradeHistoryManager = new RealtimeTradeDataManager()
 const accout = new Account(true)
 var orderbook = new OrderBook()
 
-const AMOUNT = 5000
+const AMOUNT = 3000
 
 function slow(func, wait) {
 	var lastCall = 0
@@ -86,17 +87,28 @@ client.on('open', () => {
         // console.log('\n')
       });
     })
+    // 小时线
+    bitmextSdk.getTradeHistory({ symbol: 'XBTUSD', binSize: '1h', count: 200 }).then((json) => {
+      json = JSON.parse(json)
+      client.addStream('XBTUSD', 'tradeBin1h', function(data, symbol, tableName) {
+        hourCandleManager.updateLastHistory(data.data[0])
+        hourCandleManager.checkData()
+      })
+    })
 });
 
 client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
   var lastData = data.data.slice(-1)[0]
   candleManager.updateRealTimeCandle(lastData)
-  tradeHistoryManager.appendData(data.data)
+  hourCandleManager.updateRealTimeCandle(lastData)
 
+  tradeHistoryManager.appendData(data.data)
+  // 注意应该和大的趋势一样, 比如小时线, 应该反向大的趋势很难
+  // 比如, 在小时线是上涨的时候, 不要做空
   if (accout.isReadyToOrder()) {
     var mayTrendSignal = candleManager.getMayTrendSignal()
-  
-    if (mayTrendSignal.long) {
+    // 小时线的macd是long
+    if (mayTrendSignal.long && hourCandleManager.macdTrendSignal().long) {
       // console.log('trade may long ========', new Date().toLocaleString(), lastData.price)
 
       var reverseSignal = candleManager.isReversed(mayTrendSignal)
@@ -121,7 +133,7 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
           accout.orderLimit(price, true, AMOUNT)
         }
       }
-    } else if (mayTrendSignal.short && candleManager.isReversed(mayTrendSignal).short) {
+    } else if (mayTrendSignal.short && hourCandleManager.macdTrendSignal().short && candleManager.isReversed(mayTrendSignal).short) {
       /*
       var tradeSignal = tradeHistoryManager.trendSignal()
       if (tradeSignal.short) {
