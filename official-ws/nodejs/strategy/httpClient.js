@@ -25,7 +25,7 @@ exports.get = function(url, options) {
             headers: options.headers || default_post_headers,
             proxy: options.proxy || '',
             agentOptions: agentOptions,
-            agent,
+            agent: argv.noProxy ? null : agent,
         }
         request.get(httpOptions, function(err, res, body) {
             if (err) {
