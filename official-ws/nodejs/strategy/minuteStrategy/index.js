@@ -28,6 +28,7 @@ var logSlow = slow(function() { console.log.apply(null, arguments) }, 0.1 * 60 *
 var orderbook = new OrderBook()
 var account = new Account()
 const candleManager = new Candles()
+const hourCandleManager = new Candles()
 
 client.addStream('XBTUSD', 'orderBookL2_25', function(data, symbol, tableName) {
   var compareData = orderbook.update(data)
@@ -57,6 +58,17 @@ client.on('open', () => {
       candleManager.checkData()
     })
   })
+
+  bitmextSdk.getTradeHistory({ symbol: 'XBTUSD', binSize: '1h', count: 200 }).then(json => {
+    json = JSON.parse(json)
+    hourCandleManager.setHistoryData(json.reverse())
+
+    client.addStream('XBTUSD', 'tradeBin1h', function(data, symbol, tableName) {
+      hourCandleManager.updateLastHistory(data.data[0])
+      hourCandleManager.checkData()
+    })
+  })
+  
 })
 
 client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
@@ -65,11 +77,11 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
   // tradeHistoryManager.appendData(data.data)
   if (account.isReadyToOrder()) {
     var macdSignal = candleManager.macdTrendSignal(true)
-    if (macdSignal.long && orderbook.getSignal().long) {
+    if (macdSignal.long && hourCandleManager.macdTrendSignal().long && orderbook.getSignal().long) {
       var bidPrice = orderbook.getTopBidPrice()
       // logSlow(new Date().toLocaleString() + ' LONG ' + bidPrice)
       account.orderLimit(bidPrice, true, 10000)
-    } else if (macdSignal.short && orderbook.getSignal().short) {
+    } else if (macdSignal.short && hourCandleManager.macdTrendSignal().short && orderbook.getSignal().short) {
       var askPrice = orderbook.getTopAskPrice()
       // logSlow(new Date().toLocaleString() + ' SHORT ' + askPrice)
       account.orderLimit(askPrice, false, 10000)
