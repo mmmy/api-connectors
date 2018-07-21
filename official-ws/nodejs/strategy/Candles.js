@@ -153,7 +153,7 @@ Candles.prototype.isReversed = function(maySignal) {
   return { long, short }
 }
 
-Candles.prototype.macdTrendSignal = function(realTime) {
+Candles.prototype.macdTrendSignal = function(realTime = true) {
   var klines = this.getCandles(realTime)
   const macds = signal.MacdSignal(klines)
   const lastMacd = macds[macds.length - 1]
