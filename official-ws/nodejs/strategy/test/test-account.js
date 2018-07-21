@@ -3,7 +3,23 @@ var Account = require('../Account')
 var assert = require('assert')
 var should = require('should')
 
-var account = new Account(false, true)
+var account1 = new Account()
+var account2 = new Account({ loss: '-0.2%', profit: '2' })
+var account3 = new Account({ loss: '-5', profit: 7 })
+
+account1.orderLimit(5000, false, 10000)
+account2.orderLimit(5000, true, 10000)
+account3.orderLimit(5000, false, 10000)
+
+setTimeout(()=> {
+  console.log(account2.getLossLimitPrices())
+  console.log(account2.getProfitLimitPrices())
+  account2.shouldLiquidation(4995)
+  account2.shouldLiquidation(4990)
+  console.log(account2.getLastTrade())
+  // account2.shouldLiquidation()
+}, 1000)
+/*
 describe('Account', function() {
   describe('isReadyToOrder', function() {
     it('should false when inited', function() {
@@ -39,3 +55,4 @@ describe('Account', function() {
     })
   })
 })
+*/
