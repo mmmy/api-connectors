@@ -67,12 +67,12 @@ class Account {
     this._inTrading = false
     if (win) {
       this._wins += 1
-      var msg = `${this._wins} / ${this._fails}}T ${timeStr} long: ${this._long} [${this._price} -> ${price}] ${sec}s`
+      var msg = `${this._wins}/${this._fails}}T ${timeStr} long: ${this._long} [${this._price} -> ${price}] ${sec}s\n`
       loggerToFile(msg)
       consoleGreen(msg)
     } else {
       this._fails += 1
-      var msg = `${this._wins} / ${this._fails}}F ${timeStr} long: ${this._long} [${this._price} -> ${price}] ${sec}s`
+      var msg = `${this._wins}/${this._fails}}F ${timeStr} long: ${this._long} [${this._price} -> ${price}] ${sec}s\n`
       loggerToFile(msg)
       consoleRed(msg)
     }
