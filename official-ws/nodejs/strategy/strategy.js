@@ -34,7 +34,7 @@ function slow(func, wait) {
 	}
 }
 
-const client = new BitMEXClient({testnet: false, ...argv});
+const client = new BitMEXClient({testnet: false});
 client.on('error', console.error);
 client.on('close', () => console.log('Connection closed.'));
 client.on('initialize', () => console.log('Client initialized, data is flowing.'));

@@ -7,4 +7,6 @@ let argv = {
   ...user
 }
 
+console.log(argv)
+
 module.exports = argv

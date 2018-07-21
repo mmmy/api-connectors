@@ -1,4 +1,5 @@
 'use strict';
+const args = require('./strategy/argv')
 const _ = require('lodash');
 const EventEmitter = require('eventemitter2').EventEmitter2;
 const util = require('util');
@@ -45,7 +46,11 @@ function BitMEXClient(options) {
     maxListeners: Infinity,
     newListener: true,
   });
-  if (!options) options = {};
+  options = {
+    ...args,
+    ...options
+  }
+  // if (!options) options = {};
   this._data = {}; // internal data store keyed by [tableName][symbol]. Used by deltaParser.
   this._keys = {}; // keys store - populated by images on connect
   this._maxTableLen = typeof options.maxTableLen === 'number' ? options.maxTableLen : DEFAULT_MAX_TABLE_LEN;
