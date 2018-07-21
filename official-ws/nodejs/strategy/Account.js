@@ -16,14 +16,17 @@ const logger = winston.createLogger({
 const STOP = -0.002
 const PROFIT = 0.002
 
-function Account(notify, test) {
+function Account(options) {
+  this._options = {
+    notify: true,
+    test: false,
+    ...options
+  }
   this._inTrading= false
   this._hasPosition = false
   this._price = null
   this._amount = 0
   this._long = false
-  this._notify = notify
-  this._test = test
   this._lastTradeTime = 0
   this._stopLoss = {
     retryTimes: 0,
@@ -63,7 +66,7 @@ Account.prototype.orderLimit = function(price, long, amount) {
   // 这点很重要, 万一没有一次性成功, 那么直接放弃这次机会, 以防, 重复下订单!!!
   this._lastTradeTime = new Date()
   this.resetStops()
-  if (this._test) {
+  if (this._options.test) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         this._price = price
@@ -305,7 +308,7 @@ Account.prototype.isReadyToLiquidation = function() {
 }
 
 Account.prototype.notify = function(msg) {
-  if (this._notify) {
+  if (this._options.notify) {
     notifyPhone(msg)
   }
 }
