@@ -1,7 +1,16 @@
 
 const DeltaParser = require('../libForBrowser')
 
-function OrderBook () {
+function OrderBook (options) {
+  this._options = {
+    lenSmall: 1,
+    lenBig: 16,
+    rateSmall: 1.3,
+    rateBig: 1.3,
+    histLenSmall: 8,
+    histLenBig: 30,
+    ...options
+  }
   this._data = []
   this._CLIENT = {
     _data: {},
@@ -45,8 +54,8 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
 
   var long = false
   var short = false
-  var lenSmall = 1
-  var lenBig = 16
+  var lenSmall = this._options.lenSmall
+  var lenBig = this._options.lenBig
   var buyRange0 = [lastBuyIndex - lenSmall + 1, lastBuyIndex]
   var buyRange1 = [lastBuyIndex - lenSmall - lenBig + 1, lastBuyIndex - lenSmall]
   var sellRange0 = [lastBuyIndex + 1, lastBuyIndex + lenSmall]
@@ -64,14 +73,14 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
   this.removeOldData()
 
   // 数据量需要大点, 平均才有意义, 突然的信号可是反向的一个波动!!, 不能取
+  var signalLen = this._options.histLenBig
   var datalen = this._buySellBigCompares.length
-  if (datalen > 50) {
-    var signalRate = 1.3
+  if (datalen > signalLen) {
+    var signalRate = this._options.rateBig
     var bigIsLong = bigCompare > signalRate
     var bigIsShort = bigCompare < (1 / signalRate)
     // 判断该信息是不是稳定信息
     if (bigIsLong || bigIsShort) {
-      var signalLen = 30
       for (var i=datalen - signalLen; i<datalen - 1; i++) {
         var sumv = this._buySellBigCompares[i]
         if (bigIsLong && sumv < signalRate) {
@@ -84,11 +93,11 @@ OrderBook.prototype.calcOrderLimitSignal = function() {
       }
     }
     
-    var smallRate = 1.3
+    var smallRate = this._options.rateSmall
     var smallIsLong = smallCompare > smallRate
     var smallIsShort = smallCompare < (1 / smallRate)
     if (smallIsLong || smallIsShort) {
-      var len = 8
+      var len = this._options.histLenSmall
       for (var i=datalen - len; i<datalen - 1; i++) {
         var ssumv = this._buySellSmallCompares[i]
         if (smallIsLong && ssumv < smallRate) {
@@ -151,7 +160,7 @@ OrderBook.prototype.getDepth = function(depth = 1) {
   }
 }
 // 检查数据有效性 正确性, 一般在交易瞬间变化很大的时候会出现长度错误.
-// 测试OK
+// 测试OK, 偶尔会长度错误, 正常
 OrderBook.prototype.checData = function() {
   var len = this._data.length
   if (len > 1) {
