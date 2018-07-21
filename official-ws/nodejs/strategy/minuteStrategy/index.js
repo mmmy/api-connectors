@@ -74,6 +74,7 @@ client.on('open', () => {
 client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
   var lastData = data.data.slice(-1)[0]
   candleManager.updateRealTimeCandle(lastData)
+  hourCandleManager.updateRealTimeCandle(lastData)
   // tradeHistoryManager.appendData(data.data)
   if (account.isReadyToOrder()) {
     var macdSignal = candleManager.macdTrendSignal(true)
