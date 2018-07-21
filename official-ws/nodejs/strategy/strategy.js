@@ -90,6 +90,7 @@ client.on('open', () => {
     // 小时线
     bitmextSdk.getTradeHistory({ symbol: 'XBTUSD', binSize: '1h', count: 200 }).then((json) => {
       json = JSON.parse(json)
+      hourCandleManager.setHistoryData(json.reverse())
       client.addStream('XBTUSD', 'tradeBin1h', function(data, symbol, tableName) {
         hourCandleManager.updateLastHistory(data.data[0])
         hourCandleManager.checkData()
