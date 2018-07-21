@@ -8,15 +8,19 @@ const CLOSE_NORMAL = 1000;
 const CLOSE_UNEXPECTED = 1011;
 const CLOSE_DOWNTIME = 1012;
 
-function WebSocketClient(){
+function WebSocketClient(options){
   this.initialAutoReconnectInterval = 1000;    // ms
   this.autoReconnectInterval = this.initialAutoReconnectInterval;
   this.maxAutoReconnectInterval = 60000; // maximum wait between reconnect retrys
   this.logConnection = true;
+  this._options = {
+    ...options
+  }
 }
 WebSocketClient.prototype.open = function(url){
+  const noProxy = this._options.noProxy
   this.url = url;
-  this.instance = new WebSocket(this.url, { agent });
+  this.instance = new WebSocket(this.url, { agent: noProxy ? null : agent });
   this.instance.on('open', () => {
     this.autoReconnectInterval = this.initialAutoReconnectInterval; // reset delay
     this.log("Connected.");

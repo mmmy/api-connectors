@@ -11,7 +11,7 @@ module.exports = function createSocket(options, bmexClient) {
   //debug('connecting to %s', endpoint);
 
   // Create client and bind listeners.
-  const wsClient = new WebSocketClient();
+  const wsClient = new WebSocketClient(options);
 
   wsClient.onopen = function() {
     wsClient.opened = true;
