@@ -12,14 +12,13 @@ const logger = winston.createLogger({
   ]
 })
 
-
-const STOP = -0.002
-const PROFIT = 0.002
-
 function Account(options) {
   this._options = {
-    notify: true,
-    test: false,
+    notify: false,
+    test: true,
+    loss: '-0.3%',          // price or percentage: -5 or '-0.2%'
+    profit: '0.3%',
+    frequenceLimit: 5,       // 5分钟最多交易一次
     ...options
   }
   this._inTrading= false
@@ -45,6 +44,7 @@ function Account(options) {
     response: {}
   }
   this._deleteUselessOrderTimes = 0
+  this._tradeHistories = []
 }
 
 Account.prototype.resetStops = function() {
@@ -66,15 +66,17 @@ Account.prototype.orderLimit = function(price, long, amount) {
   // 这点很重要, 万一没有一次性成功, 那么直接放弃这次机会, 以防, 重复下订单!!!
   this._lastTradeTime = new Date()
   this.resetStops()
+
   if (this._options.test) {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
         this._price = price
         this._hasPosition = true
         this._inTrading = false
+        this._amount = amount
         this.notify(`account long: ${long}, ${price}`)
         resolve()
-      }, 1000)
+      }, 10)
     })
   }
 
@@ -109,9 +111,8 @@ Account.prototype.orderLimit = function(price, long, amount) {
 // when orderLimit success
 // 限价止损, 手续费是负数
 Account.prototype.orderStopLimit = function() {
-  var stopPrice = this._price + this._price * (this._long ? STOP : -STOP)
-  stopPrice = Math.round(stopPrice * 2) / 2
-  var price = stopPrice + (this._long ? 0.5 : -0.5)
+  const { stopPrice, price } = this.getLossLimitPrices()
+
   signatureSDK.orderStopLimit(this._amount, stopPrice, this._long ? 'Sell' : 'Buy', price).then((json) => {
     this._stopLossLimit.retryTimes = 0
     // test ok
@@ -133,9 +134,8 @@ Account.prototype.orderStopLimit = function() {
 }
 // 注意, 止损要用市价止损, 虽然会损失0.0075的手续费, 如果使用限价, 很有可能爆仓!
 Account.prototype.orderStop = function() {
-  var price = this._price + this._price * (this._long ? STOP : -STOP)
-  price = Math.round(price * 2) / 2 + (this._long ? -0.5 : 0.5)
-  signatureSDK.orderStop(this._amount, price, this._long ? 'Sell' : 'Buy').then((json) => {
+  const { marketPrice } = this.getLossLimitPrices()
+  signatureSDK.orderStop(this._amount, marketPrice, this._long ? 'Sell' : 'Buy').then((json) => {
     this._stopLoss.retryTimes = 0
     // test ok
     this._stopLoss.response = json
@@ -154,11 +154,48 @@ Account.prototype.orderStop = function() {
     }
   })
 }
+// offset is number or string with %
+Account.prototype._calcOffsetPrice = function(offset) {
+  const positionPrice = this._price
+  if (typeof offset == 'string' && offset.indexOf('%') > -1) {
+    var offsetPrice = positionPrice * parseFloat(offset) / 100
+    offsetPrice = Math.round(offsetPrice * 2) / 2 // 0.5的倍数
+    return offsetPrice
+  } else if (parseFloat(offset) === +offset) {
+    return +offset
+  } else {
+    throw `不正确的stop值:${offset}`
+  }
+}
+
+Account.prototype.getLossLimitPrices = function() {
+  const loss = this._options.loss
+  const offsetP = this._calcOffsetPrice(loss)
+  const marketPrice = this._price + (this._long ? offsetP : -offsetP)
+  const stopPrice = marketPrice + (this._long ? 0.5 : -0.5)
+  const price = stopPrice + (this._long ? 0.5 : -0.5)
+  return {
+    stopPrice,
+    price,
+    marketPrice
+  }
+}
+
+Account.prototype.getProfitLimitPrices = function() {
+  const profit = this._options.profit
+  const offsetP = this._calcOffsetPrice(profit)
+  const price = this._price + (this._long ? offsetP : -offsetP)
+  const stopPrice = price + (this._long ? -0.5 : 0.5)
+  return {
+    stopPrice,
+    price
+  }
+}
+
 // 止盈用限价, 虽然不一定会触发, 但是胜率比较高
 Account.prototype.orderProfitLimitTouched = function() {
-  var stopPrice = this._price + this._price * (this._long ? PROFIT : -PROFIT)
-  stopPrice = Math.round(stopPrice * 2) / 2
-  var price = stopPrice + (this._long ? 0.5 : -0.5)
+  // TODO: test
+  const { stopPrice, price } = this.getProfitLimitPrices()
   var side = this._long ? 'Sell' : 'Buy'
   signatureSDK.orderProfitLimitTouched(this._amount, stopPrice, side, price).then((json) => {
     this._stopProfit.retryTimes = 0
@@ -181,6 +218,7 @@ Account.prototype.orderProfitLimitTouched = function() {
 }
 
 // 弃用
+/*
 Account.prototype.profitLimitTouched = function() {
   var price = this._price + this._price * (this._long ? PROFIT : -PROFIT)
   price = Math.round(price * 2) / 2
@@ -203,6 +241,7 @@ Account.prototype.profitLimitTouched = function() {
     }
   })
 }
+*/
 
 Account.prototype.deleteStopOrder = function(orderID) {
   signatureSDK.deleteOrder(orderID).then(json => {
@@ -224,20 +263,36 @@ Account.prototype.deleteStopOrder = function(orderID) {
   })
 }
 
+Account.prototype.getLastTrade = function() {
+  return this._tradeHistories[this._tradeHistories.length - 1]
+}
+
+// 触发结算了
 Account.prototype.liquidation = function(price, mock) {
-  this._inTrading = true
+  this._inTrading = false
+  this._hasPosition = false
   var timePassed = new Date() - this._lastTradeTime
   var minute = timePassed / (60 * 1000)
   minute = Math.round(minute)
-  return new Promise((resolve, reject) => {
-    setTimeout(()=>{
-      this._hasPosition = false
-      this._inTrading = false
-      isWin = this._long ? (price > this._price) : (price < this._price)
-      this.notify(`win: ${isWin}, ${this._price} -> ${price} ${mock ? '模拟': '真实'} ${minute}m`)
-      resolve()
-    }, 100)
+  isWin = this._long ? (price > this._price) : (price < this._price)
+  this.notify(`win: ${isWin}, ${this._price} -> ${price} ${mock ? '模拟': '真实'} ${minute}m`)
+
+  this._tradeHistories.push({
+    startTime: this._lastTradeTime,
+    endTime: new Date(),
+    minute: minute,
+    long: this._long,
+    price: this._price,
+    endPrice: price,
+    maxMinPrice: [],
+    loss: this._options.loss,
+    profit: this._options.profit,
+    win: isWin,
   })
+
+  if (this._tradeHistories.length > 100) {
+    this._tradeHistories.shift()
+  }
 }
 
 Account.prototype.shouldLiquidation = function(price) {
@@ -284,13 +339,16 @@ Account.prototype.shouldLiquidation = function(price) {
         return {win: true}
       }
     }
-    // 传统计算, 不准确了.
-    var earn = this._long ? (price - this._price) : (this._price - price)
-    var earnRate = earn / this._price
-    if (earnRate > PROFIT || earnRate < STOP) {
-      // this.liquidation(price, true)
-      console.log(`模拟stop, win: ${earnRate > 0}`)
-      return { win: earnRate > 0 }
+    // for test
+    const profitPrices = this.getProfitLimitPrices()
+    const lossPrices = this.getLossLimitPrices()
+    const lossed = this._long ? (price <= lossPrices.stopPrice) : (price >= lossPrices.stopPrice)
+    const wined = this._long ? (price > profitPrices.price) : (price < profitPrice.price)
+
+    if (lossed || wined) {
+      console.log(`模拟stop, win: ${wined}`)
+      this.liquidation(wined ? profitPrices.price : lossPrices.marketPrice, true)
+      return {win: wined}
     }
     return false
   }
@@ -299,7 +357,7 @@ Account.prototype.shouldLiquidation = function(price) {
 
 Account.prototype.isReadyToOrder = function() {
   // 5分钟之内最多一次
-  var frequenceLimit = (new Date() - this._lastTradeTime) > 5 * 60 * 1000
+  var frequenceLimit = (new Date() - this._lastTradeTime) > this._options.frequenceLimit * 60 * 1000
   return !this._inTrading && !this._hasPosition && frequenceLimit
 }
 
@@ -308,6 +366,7 @@ Account.prototype.isReadyToLiquidation = function() {
 }
 
 Account.prototype.notify = function(msg) {
+  console.log(msg)
   if (this._options.notify) {
     notifyPhone(msg)
   }
