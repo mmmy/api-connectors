@@ -284,6 +284,7 @@ Account.prototype.liquidation = function(price, mock) {
     long: this._long,
     price: this._price,
     endPrice: price,
+    earn: (price - this._price) / this._price,
     maxMinPrice: [],
     loss: this._options.loss,
     profit: this._options.profit,
