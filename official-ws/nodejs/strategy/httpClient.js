@@ -4,7 +4,7 @@ const moment = require('moment');
 const logger = console;
 var SocksProxyAgent = require('socks-proxy-agent');
 var agent = new SocksProxyAgent('socks://127.0.0.1:1080');
-
+var argv = require('./argv')
 var default_post_headers = {
     'content-type': 'application/json;charset=utf-8',
 }
@@ -53,7 +53,7 @@ exports.post = function(url, postdata, options) {
             headers: options.headers || default_post_headers,
             proxy: options.proxy || '',
             agentOptions: agentOptions,
-            agent,
+            agent: argv.noProxy ? null : agent,
         };
         request(httpOptions, function(err, res, body) {
             if (err) {
@@ -81,7 +81,7 @@ exports.delete = function(url, postdata, options) {
             headers: options.headers || default_post_headers,
             proxy: options.proxy || '',
             agentOptions: agentOptions,
-            agent,
+            agent: argv.noProxy ? null : agent,            
         };
         request(httpOptions, function(err, res, body) {
             if (err) {
@@ -109,7 +109,7 @@ exports.form_post = function(url, postdata, options) {
             headers: options.headers || default_post_headers,
             proxy: options.proxy || '',
             agentOptions: agentOptions,
-            agent,
+            agent: argv.noProxy ? null : agent,            
         };
         request(httpOptions, function(err, res, body) {
             if (err) {

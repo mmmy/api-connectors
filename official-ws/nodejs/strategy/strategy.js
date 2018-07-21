@@ -1,5 +1,6 @@
 
 require('./logger')
+const argv = require('./argv')
 const WebSocket = require('ws');
 const bitmextSdk = require('./bitmexSdk')
 const BitMEXClient = require('../index')
@@ -33,7 +34,7 @@ function slow(func, wait) {
 	}
 }
 
-const client = new BitMEXClient({testnet: false});
+const client = new BitMEXClient({testnet: false, ...argv});
 client.on('error', console.error);
 client.on('close', () => console.log('Connection closed.'));
 client.on('initialize', () => console.log('Client initialized, data is flowing.'));
