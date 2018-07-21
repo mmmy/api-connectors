@@ -76,7 +76,7 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
   candleManager.updateRealTimeCandle(lastData)
   hourCandleManager.updateRealTimeCandle(lastData)
   // tradeHistoryManager.appendData(data.data)
-  if (account.isReadyToOrder()) {
+  if (account.isReadyToOrder() && candleManager.isReady() && hourCandleManager.isReady()) {
     var macdSignal = candleManager.macdTrendSignal(true)
     if (macdSignal.long && hourCandleManager.macdTrendSignal().long && orderbook.getSignal().long) {
       var bidPrice = orderbook.getTopBidPrice()

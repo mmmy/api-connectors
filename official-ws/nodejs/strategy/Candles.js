@@ -156,16 +156,21 @@ Candles.prototype.isReversed = function(maySignal) {
 Candles.prototype.macdTrendSignal = function(realTime = true) {
   var klines = this.getCandles(realTime)
   const macds = signal.MacdSignal(klines)
-  const lastMacd = macds[macds.length - 1]
-  const lastMacd2 = macds[macds.length - 2]
-  const lastMacd3 = macds[macds.length - 3]
-  const lastMacd4 = macds[macds.length - 4]
-  let long = lastMacd.MACD > lastMacd2.MACD
-            && lastMacd2.MACD > lastMacd3.MACD
-            && lastMacd3.MACD > lastMacd4.MACD
-  let short = lastMacd < lastMacd2.MACD
-            && lastMacd2.MACD < lastMacd3.MACD
-            && lastMacd3.MACD < lastMacd4.MACD
+  let long = false,
+      short = false
+
+  if (macds.length > 5) {
+    const lastMacd = macds[macds.length - 1]
+    const lastMacd2 = macds[macds.length - 2]
+    const lastMacd3 = macds[macds.length - 3]
+    const lastMacd4 = macds[macds.length - 4]
+    long = lastMacd.MACD > lastMacd2.MACD
+              && lastMacd2.MACD > lastMacd3.MACD
+              && lastMacd3.MACD > lastMacd4.MACD
+    short = lastMacd < lastMacd2.MACD
+              && lastMacd2.MACD < lastMacd3.MACD
+              && lastMacd3.MACD < lastMacd4.MACD
+  }
 
   return {
     long,
@@ -181,6 +186,10 @@ Candles.prototype.getCandles = function(realTime) {
 
 Candles.prototype.getMayTrendSignal = function() {
   return this._mayTrendSignal
+}
+
+Candles.prototype.isReady = function() {
+  return this._histories.length > 100 && this._latestCandle
 }
 
 module.exports = Candles
