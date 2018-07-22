@@ -5,43 +5,29 @@ const OrderBookStrategyManager = require('./orderbook/Manager')
 
 const obManager = new OrderBookStrategyManager()
 
-obManager.addNewStrategy({ id: 'orderbook-rearch-1' })
-
 obManager.addNewStrategy({
-  id: 'orderbook-rearch-lossprofit5', 
-  account: {loss: -5, profit: 5, frequenceLimit: 0.1 },
+  id: 'orderbook-rearch-1-orderbook-lossprofit20', 
+  account: {loss: -20, profit: 20, frequenceLimit: 0.1 },
 })
 
+
 obManager.addNewStrategy({
-  id: 'orderbook-rearch-lossprofit10', 
+  id: 'orderbook-rearch-1-orderbook-rateBig2histLenBig60', 
   account: {loss: -10, profit: 10, frequenceLimit: 0.1 },
+  orderbook: {rateBig: 2, histLenBig: 60}
+})
+
+obManager.addNewStrategy({
+  id: 'orderbook-rearch-1-orderbook-rateBig2histLenBig60lenBig24', 
+  account: {loss: -10, profit: 10, frequenceLimit: 0.1 },
+  orderbook: {rateBig: 2, histLenBig: 60, lenBig: 24}
 })
 
 
 obManager.addNewStrategy({
-  id: 'orderbook-rearch-1-orderbook-ratesmall2', 
-  account: {loss: -2, profit: 2, frequenceLimit: 0.1 },
-  orderbook: {rateSmall: 2}
-})
-
-
-obManager.addNewStrategy({
-  id: 'orderbook-rearch-1-orderbook-histLenBig60', 
-  account: {loss: -2, profit: 2, frequenceLimit: 0.1 },
-  orderbook: {histLenBig: 60}
-})
-
-
-obManager.addNewStrategy({
-  id: 'orderbook-rearch-1-orderbook-lenBig24', 
-  account: {loss: -2, profit: 2, frequenceLimit: 0.1 },
-  orderbook: {lenBig: 24}
-})
-
-
-obManager.addNewStrategy({
-  id: 'orderbook-rearch-loss3profit5', 
-  account: {loss: -3, profit: 5, frequenceLimit: 0.1 },
+  id: 'orderbook-rearch-loss7profit10', 
+  account: {loss: -7, profit: 10, frequenceLimit: 0.1 },
+  orderbook: {rateBig: 2, histLenBig: 60, lenBig: 24}
 })
 
 
