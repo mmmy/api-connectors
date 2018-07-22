@@ -189,4 +189,8 @@ OrderBook.prototype.getTopAskPrice = function() {
   return this._ask && this._ask.price
 }
 
+OrderBook.prototype.getOptions = function() {
+  return this._options
+}
+
 module.exports = OrderBook

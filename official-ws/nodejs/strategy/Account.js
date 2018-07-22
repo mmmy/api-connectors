@@ -289,6 +289,7 @@ Account.prototype.liquidation = function(price, mock) {
   }
   
   this.notify(`win: ${isWin}, ${this._price} -> ${price} ${mock ? '模拟': '真实'} ${minute}m`)
+  var earn = (this._long ? (price - this._price) : (this._price - price)) / this._price
 
   this._tradeHistories.push({
     startTime: this._lastTradeTime,
@@ -298,8 +299,9 @@ Account.prototype.liquidation = function(price, mock) {
     long: this._long,
     price: this._price,
     endPrice: price,
-    earn: (price - this._price) / this._price,
-    maxMinPrice: this._minMaxPrices,
+    earn: earn,
+    minPrice: this._minMaxPrices[0],
+    maxPrice: this._minMaxPrices[1],
     loss: this._options.loss,
     profit: this._options.profit,
     win: isWin,
@@ -307,7 +309,7 @@ Account.prototype.liquidation = function(price, mock) {
   })
 
   
-  if (this._tradeHistories.length > 1000) {
+  if (this._tradeHistories.length > 5000) {
     this._tradeHistories.shift()
   }
 }
@@ -434,6 +436,10 @@ Account.prototype.getRealPosition = function() {
       reject(err)
     })
   })
+}
+
+Account.prototype.getOptions = function() {
+  return this._options
 }
 
 module.exports = Account

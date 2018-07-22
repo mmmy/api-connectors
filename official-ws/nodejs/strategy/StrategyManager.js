@@ -36,6 +36,16 @@ class StrategyManager {
   doStrategy() {
     this.applyStrategyFunc('doStrategy', arguments)
   }
+
+  getStragetiesInfo() {
+    const list = this._list.map(item => {
+      return {
+        options: item.getAllOptions(),
+        trades: item.getAllTrades()
+      }
+    })
+    return list
+  }
 }
 
 module.exports = StrategyManager

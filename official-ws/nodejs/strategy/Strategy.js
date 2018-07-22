@@ -92,6 +92,20 @@ class Strategy {
   getLastTrade() {
     return this._accont.getLastTrade()
   }
+
+  getAllOptions() {
+    var orderbookOptions = this._orderBook.getOptions()
+    var accountOptions = this._accont.getOptions()
+    return {
+      ...this._options,
+      orderbook: orderbookOptions,
+      account: accountOptions,
+    }
+  }
+
+  getAllTrades() {
+    return this._accont._tradeHistories
+  }
 }
 
 module.exports = Strategy
