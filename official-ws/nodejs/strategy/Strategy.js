@@ -68,11 +68,11 @@ class Strategy {
   }
 
   entry(price, long) {
-    accout.orderLimit(price, long, this._options.amount || defaultAmount)
+    this._accont.orderLimit(price, long, this._options.amount || defaultAmount)
   }
 
   shouldLiquidation(price) {
-    this._accont.shouldLiquidation(price)
+    return this._accont.shouldLiquidation(price)
   }
   
   doStrategy(price) {
@@ -85,7 +85,12 @@ class Strategy {
       }
     }
 
-    this.shouldLiquidation()
+    var result = this.shouldLiquidation(price)
+    return result
+  }
+
+  getLastTrade() {
+    return this._accont.getLastTrade()
   }
 }
 

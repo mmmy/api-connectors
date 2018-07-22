@@ -15,6 +15,7 @@ const logger = winston.createLogger({
 function Account(options) {
   this._options = {
     notify: false,
+    log: false,
     test: true,
     loss: '-0.3%',          // price or percentage: -5 or '-0.2%'
     profit: '0.3%',
@@ -45,9 +46,12 @@ function Account(options) {
   }
   this._deleteUselessOrderTimes = 0
   this._tradeHistories = []
+  this._minMaxPrices = []  // 记录整个持仓时间内的最高和最低价格
+  this._wins = 0
+  this._fails = 0
 }
 
-Account.prototype.resetStops = function() {
+Account.prototype.beforeOrderLimit = function(price) {
   this._stopLoss.retryTimes = 0
   this._stopLoss.response = {}
 
@@ -57,6 +61,8 @@ Account.prototype.resetStops = function() {
   this._stopProfit.retryTimes = 0
   this._stopProfit.response = {}
   this._deleteUselessOrderTimes = 0
+
+  this._minMaxPrices = [price, price]
 }
 // 注意这个price, 应该是来源于orderbook, 而不是最新的成交价, 因为需要挂单
 // 注意limit挂单之后, 不一定会成交, 成交的数量也是不定的, 故一定时间后应该取消该订单, 并查询真实的仓位
@@ -65,7 +71,7 @@ Account.prototype.orderLimit = function(price, long, amount) {
   this._long = long
   // 这点很重要, 万一没有一次性成功, 那么直接放弃这次机会, 以防, 重复下订单!!!
   this._lastTradeTime = new Date()
-  this.resetStops()
+  this.beforeOrderLimit(price)
 
   if (this._options.test) {
     return new Promise((resolve, reject) => {
@@ -273,31 +279,47 @@ Account.prototype.liquidation = function(price, mock) {
   this._hasPosition = false
   var timePassed = new Date() - this._lastTradeTime
   var minute = timePassed / (60 * 1000)
-  minute = Math.round(minute)
-  isWin = this._long ? (price > this._price) : (price < this._price)
+  var minute = Math.round(minute)
+  var isWin = this._long ? (price > this._price) : (price < this._price)
+
+  if (isWin) {
+    this._wins++
+  } else {
+    this._fails++
+  }
+  
   this.notify(`win: ${isWin}, ${this._price} -> ${price} ${mock ? '模拟': '真实'} ${minute}m`)
 
   this._tradeHistories.push({
     startTime: this._lastTradeTime,
     endTime: new Date(),
     minute: minute,
+    amount: this._amount,
     long: this._long,
     price: this._price,
     endPrice: price,
     earn: (price - this._price) / this._price,
-    maxMinPrice: [],
+    maxMinPrice: this._minMaxPrices,
     loss: this._options.loss,
     profit: this._options.profit,
     win: isWin,
+    winsFails: [this._wins, this._fails]
   })
 
-  if (this._tradeHistories.length > 100) {
+  
+  if (this._tradeHistories.length > 1000) {
     this._tradeHistories.shift()
   }
 }
 
+Account.prototype.updateMinMaxPrices = function(price) {
+  this._minMaxPrices[0] = Math.min(this._minMaxPrices[0], price)
+  this._minMaxPrices[1] = Math.max(this._minMaxPrices[1], price)
+}
+// 每次价格更新的时间都要调用
 Account.prototype.shouldLiquidation = function(price) {
   if (this._price && this._hasPosition && !this._inTrading) {
+    this.updateMinMaxPrices(price)
     var _lastTradeTime = this._lastTradeTime
     var long = this._long
     var lossOrderID = this._stopLoss.response.orderID
@@ -344,10 +366,10 @@ Account.prototype.shouldLiquidation = function(price) {
     const profitPrices = this.getProfitLimitPrices()
     const lossPrices = this.getLossLimitPrices()
     const lossed = this._long ? (price <= lossPrices.stopPrice) : (price >= lossPrices.stopPrice)
-    const wined = this._long ? (price > profitPrices.price) : (price < profitPrice.price)
+    const wined = this._long ? (price > profitPrices.price) : (price < profitPrices.price)
 
     if (lossed || wined) {
-      console.log(`模拟stop, win: ${wined}`)
+      // console.log(`模拟stop, win: ${wined}`)
       this.liquidation(wined ? profitPrices.price : lossPrices.marketPrice, true)
       return {win: wined}
     }
@@ -367,7 +389,9 @@ Account.prototype.isReadyToLiquidation = function() {
 }
 
 Account.prototype.notify = function(msg) {
-  console.log(msg)
+  if (this._options.log) {
+    console.log(msg)
+  }
   if (this._options.notify) {
     notifyPhone(msg)
   }
