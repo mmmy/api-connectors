@@ -17,9 +17,9 @@ obManager.addNewStrategy({
 })
 
 const bitmex = new BitmexManager()
-// bitmex.listenOrderBook(function(data) {
-//   obManager.updateOrderbook(data)
-// })
+bitmex.listenOrderBook(function(data) {
+  obManager.updateOrderbook(data)
+})
 
 bitmex.listenTrade(function(data) {
   var lastData = data.data.slice(-1)[0]

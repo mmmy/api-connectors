@@ -44,7 +44,7 @@ class BitmexManager {
   listenCandle({ binSize }, histCb, cb) {
     bitmextSdk.getTradeHistory({ symbol: 'XBTUSD', binSize, count: 200 }).then(json => {
       json = JSON.parse(json)
-      list = json.reverse()
+      const list = json.reverse()
       histCb(list)
       this._client.addStream('XBTUSD', `tradeBin${binSize}`, function(data, symbol, tableName) {
         cb(data, symbol, tableName)
