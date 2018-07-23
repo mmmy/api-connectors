@@ -74,14 +74,16 @@ class Strategy {
   shouldLiquidation(price) {
     return this._accont.shouldLiquidation(price)
   }
-  
+  // order book 必须watch
   doStrategy(price) {
     if (this._accont.isReadyToOrder()) {
       const signal = this._strategy(price, this._candles, this._orderBook, this._tradeHistoryManager)
       if (signal.long) {
-        this.entry(price, true)
+        var bidPrice = this._orderbook.getTopBidPrice()        
+        this.entry(bidPrice, true)
       } else if (signal.short) {
-        this.entry(price, false)
+        var askPrice = this._orderBook.getTopAskPrice()
+        this.entry(askPrice, false)
       }
     }
 
