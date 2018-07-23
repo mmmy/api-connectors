@@ -2,6 +2,7 @@
 const WebServer = require('./WebServer')
 const BitmexManager = require('./BitmexManager')
 const MinuteStrategyManager = require('./minute/Manager')
+const common = require('../common')
 
 const obManager = new MinuteStrategyManager()
 
