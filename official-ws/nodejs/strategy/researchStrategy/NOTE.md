@@ -1,0 +1,22 @@
+
+```
+ "options":{
+            "account":{
+                "notify":false,
+                "log":false,
+                "test":true,
+                "loss":-20,
+                "profit":20,
+                "frequenceLimit":0.1
+            },
+            "id":"orderbook-rearch-1-orderbook-lossprofit20",
+            "orderbook":{
+                "lenSmall":1,
+                "lenBig":16,
+                "rateSmall":1.3,
+                "rateBig":1.3,
+                "histLenSmall":8,
+                "histLenBig":30
+            }
+        },
+```

@@ -1,0 +1,21 @@
+
+.strategy-container {
+
+}
+
+.strategy-container .title {
+  margin: 5px;
+}
+
+.strategy-container .statistic {
+  margin: 5px;
+  font-size: 14px;
+}
+
+.jsgrid-row>.jsgrid-cell {
+  background: transparent;
+}
+
+.warn {
+  background: yellow;
+}
