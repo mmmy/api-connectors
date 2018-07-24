@@ -69,6 +69,26 @@ class StrategyManager {
       strategy.updateOptions(options)
     }
   }
+
+  getStratgyInfoById(id) {
+    var strategy = this.getStratgyById(id)
+    if (strategy) {
+      return {
+        options: strategy.getAllOptions(),
+        trades: strategy.getAllTrades()
+      }
+    }
+  }
+
+  deleteStrategyById(id) {
+    var strategy = this.getStratgyById(id)
+    var index = this._list.indexOf(strategy)
+    if (index > -1) {
+      this._list.splice(index, 1)
+      return true
+    }
+    return false
+  }
 }
 
 module.exports = StrategyManager

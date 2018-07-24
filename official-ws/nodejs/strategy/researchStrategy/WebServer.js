@@ -24,6 +24,40 @@ class WebServer {
       res.json(list)
     })
 
+    app.post('/list/add', (req, res) => {
+      const id = req.body.id
+      if (!id) {
+        res.json({
+          result: false,
+          msg: 'id is required'
+        })
+      } else {
+        this._stratetyManager.addNewStrategy({ id })
+        res.json(this._stratetyManager.getStratgyInfoById(id))
+      }
+    })
+
+    app.post('/strategy/update_options', (req, res) => {
+      const id = req.body.id
+      const options = req.body.options
+      this._stratetyManager.updateOptionsById(id, options)
+      res.json(this._stratetyManager.getStratgyInfoById(id))
+    })
+
+    app.post('/strategy/clear_trade', (req, res) => {
+      const id = req.body.id
+      this._stratetyManager.clearTradesById(id)
+      res.json(this._stratetyManager.getStratgyInfoById(id))
+    })
+
+    app.post('/strategy/delete', (req, res) => {
+      const id = req.body.id
+      const result = this._stratetyManager.deleteStrategyById(id)
+      res.json({
+        result: result
+      })
+    })
+
     app.listen(this._options.port)
     this._app = app
   }
