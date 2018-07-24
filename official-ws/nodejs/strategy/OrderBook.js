@@ -26,7 +26,7 @@ OrderBook.prototype.setOptions = function(options) {
     lenSmall: 1,
     lenBig: 16,
     rateSmall: 1.3,
-    rateBig: 1.3,
+    rateBig: 2,
     histLenSmall: 8,
     histLenBig: 30,
     ...options
