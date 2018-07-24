@@ -18,8 +18,20 @@ obManager.addNewStrategy({
 })
 
 obManager.addNewStrategy({
+  id: 'minute-18', 
+  account: {loss: -18, profit: 18, frequenceLimit: 0.1 },
+  // orderbook: {rateBig: 2, histLenBig: 60, lenBig: 24}
+})
+
+obManager.addNewStrategy({
   id: 'minute-20', 
   account: {loss: -20, profit: 20, frequenceLimit: 0.1 },
+  // orderbook: {rateBig: 2, histLenBig: 60, lenBig: 24}
+})
+
+obManager.addNewStrategy({
+  id: 'minute-23', 
+  account: {loss: -23, profit: 23, frequenceLimit: 0.1 },
   // orderbook: {rateBig: 2, histLenBig: 60, lenBig: 24}
 })
 
@@ -27,6 +39,12 @@ obManager.addNewStrategy({
   id: 'minute-30', 
   account: {loss: -30, profit: 30, frequenceLimit: 0.1 },
   // orderbook: {rateBig: 2, histLenBig: 60, lenBig: 24}
+})
+
+obManager.addNewStrategy({
+  id: 'minute-20', 
+  account: {loss: -20, profit: 20, frequenceLimit: 0.1 },
+  orderbook: {lenBig: 24}
 })
 
 const bitmex = new BitmexManager()
