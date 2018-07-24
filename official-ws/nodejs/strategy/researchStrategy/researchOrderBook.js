@@ -10,6 +10,20 @@ obManager.addNewStrategy({
   account: {loss: -20, profit: 20, frequenceLimit: 0.1 },
 })
 
+obManager.addNewStrategy({
+  id: 'orderbook-rearch-1-orderbook-lossprofit15', 
+  account: {loss: -18, profit: 18, frequenceLimit: 0.1 },
+})
+
+obManager.addNewStrategy({
+  id: 'orderbook-rearch-1-orderbook-lossprofit15', 
+  account: {loss: -15, profit: 15, frequenceLimit: 0.1 },
+})
+
+obManager.addNewStrategy({
+  id: 'orderbook-rearch-1-orderbook-lossprofit25', 
+  account: {loss: -23, profit: 23, frequenceLimit: 0.1 },
+})
 
 obManager.addNewStrategy({
   id: 'orderbook-rearch-1-orderbook-rateBig2', 
@@ -18,32 +32,39 @@ obManager.addNewStrategy({
 })
 
 obManager.addNewStrategy({
-  id: 'orderbook-rearch-1-orderbook-histLenBig20', 
+  id: 'orderbook-rearch-1-orderbook-rateBig2histLenBig40', 
   account: {loss: -20, profit: 20, frequenceLimit: 0.1 },
-  orderbook: {histLenBig: 20}
+  orderbook: {rateBig: 2, histLenBig: 40}
 })
 
 obManager.addNewStrategy({
-  id: 'orderbook-rearch-loss7profit10', 
+  id: 'orderbook-rearch-1-orderbook-rateBig3', 
   account: {loss: -20, profit: 20, frequenceLimit: 0.1 },
-  orderbook: {lenBig: 24}
+  orderbook: {rateBig: 3}
 })
 
 obManager.addNewStrategy({
-  id: 'orderbook-rearch-r2hl20lb24',
+  id: 'orderbook-rearch-1-orderbook-rateBig3lenBig24', 
   account: {loss: -20, profit: 20, frequenceLimit: 0.1 },
-  orderbook: {rateBig: 2, histLenBig: 20, lenBig: 24}
+  orderbook: {rateBig: 3, lenBig: 24}
 })
 
 obManager.addNewStrategy({
-  id: 'orderbook-rearch-1-orderbook-loss15profit20', 
+  id: 'orderbook-rearch-1-orderbook-histLenBig40', 
+  account: {loss: -20, profit: 20, frequenceLimit: 0.1 },
+  orderbook: {histLenBig: 40}
+})
+
+obManager.addNewStrategy({
+  id: 'orderbook-rearch-r2hl30lb24',
+  account: {loss: -20, profit: 20, frequenceLimit: 0.1 },
+  orderbook: {rateBig: 2, histLenBig: 30, lenBig: 24}
+})
+
+obManager.addNewStrategy({
+  id: 'orderbook-rearch-1-orderbook-loss15profit20rateBig2lenBig24', 
   account: {loss: -15, profit: 20, frequenceLimit: 0.1 },
-})
-
-
-obManager.addNewStrategy({
-  id: 'orderbook-rearch-1-orderbook-lossprofit30', 
-  account: {loss: -30, profit: 30, frequenceLimit: 0.1 },
+  orderbook: {rateBig: 2, histLenBig: 30, lenBig: 24}
 })
 
 
@@ -60,4 +81,4 @@ bitmex.listenTrade(function(data) {
   obManager.doStrategy(lastData.price)
 })
 
-const webserver = new WebServer({ port: 7000 }, obManager)
+const webserver = new WebServer({ port: 6999 }, obManager)
