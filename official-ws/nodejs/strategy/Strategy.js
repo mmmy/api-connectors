@@ -45,7 +45,7 @@ class Strategy {
   }
 
   updateCandleLastHistory(period, data) {
-    console.log('updateCandleLastHistory', period, data)
+    // console.log('updateCandleLastHistory', period, data)
     this._candles[period].updateLastHistory(data)
     this._candles[period].checkData()
   }
