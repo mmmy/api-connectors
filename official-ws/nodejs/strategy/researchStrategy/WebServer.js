@@ -1,6 +1,7 @@
 
 const express = require('express')
 const path = require('path')
+var bodyParser = require('body-parser')
 
 class WebServer {
   constructor(options, strategyManager) {
@@ -15,6 +16,9 @@ class WebServer {
   init() {
     const app = new express()
     app.use('/web', express.static(__dirname + '/web'))
+    app.use(bodyParser.json())
+    app.use(bodyParser.urlencoded({ extended: true }))
+    
     app.get('/', function(req, res) {
       res.sendFile(path.join(__dirname + '/web/index.html'))
     })

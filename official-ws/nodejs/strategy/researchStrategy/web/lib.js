@@ -58,10 +58,38 @@ function getWinsFails(trades) {
 }
 
 var Site = {
+  addNew: function(id) {
+    $.post({
+      url: '/list/add',
+      data: { id },
+      success: function(data) {
+        console.log(data)
+      },
+      dataType: 'json'
+    })
+  },
+
+  deleteById: function(id) {
+    if (confirm(`delete ${id}?`)) {
+      $.post('/strategy/delete', { id }, function(data) {
+        console.log(data)
+      })
+    }
+  },
+
+  clearTradesById: function(id) {
+    if (confirm(`clear ${id} trades ?`)) {
+      $.post('/strategy/clear_trade', { id }, function(data) {
+        console.log(data)
+      })
+    }
+  },
+
   renderStatistic: function(list) {
 
   },
-  renderStrategy: function(data) {
+
+  renderStrategy: function(data, index) {
     var $itemRoot = $('<div class="strategy-container"></div>')
     var $title = $('<h5 class="title"></h5>')
     var $statistic = $('<p class="statistic"></p>')
@@ -71,7 +99,10 @@ var Site = {
 
     var allEarn = sumEarn(data.trades)
     var winsFails = getWinsFails(data.trades)
-    $title.text(`${data.options.id} total: ${data.trades.length}`)
+    $title.append(`<span>${index + 1}. ${data.options.id} total: ${data.trades.length}</span>`)
+    $title.append($('<button>clear</button>').on('click', function() { Site.clearTradesById(data.options.id) }))
+    $title.append($('<button>delete</button>').on('click', function() { Site.deleteById(data.options.id) }))
+    $title.append($('<button>options</button>').on('click', function() {  }))
 
     var wftext = `[${winsFails.wins}(${winsFails.maxWins})/${winsFails.fails})(${winsFails.rate.toFixed(2)}%] 
                   earn:(${allEarn.all}% max:${allEarn.maxAll}% [${allEarn.fees}% fee max:${allEarn.maxFees}%])`
