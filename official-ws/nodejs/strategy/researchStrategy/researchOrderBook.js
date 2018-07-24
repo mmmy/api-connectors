@@ -11,7 +11,7 @@ obManager.addNewStrategy({
 })
 
 obManager.addNewStrategy({
-  id: 'orderbook-rearch-1-orderbook-lossprofit15', 
+  id: 'orderbook-rearch-1-orderbook-lossprofit18', 
   account: {loss: -18, profit: 18, frequenceLimit: 0.1 },
 })
 
