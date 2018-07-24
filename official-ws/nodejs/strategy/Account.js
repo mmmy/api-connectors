@@ -13,15 +13,7 @@ const logger = winston.createLogger({
 })
 
 function Account(options) {
-  this._options = {
-    notify: false,
-    log: false,
-    test: true,
-    loss: '-0.3%',          // price or percentage: -5 or '-0.2%'
-    profit: '0.3%',
-    frequenceLimit: 5,       // 5分钟最多交易一次
-    ...options
-  }
+  this.setOptions(options)
   this._inTrading= false
   this._hasPosition = false
   this._price = null
@@ -49,6 +41,18 @@ function Account(options) {
   this._minMaxPrices = []  // 记录整个持仓时间内的最高和最低价格
   this._wins = 0
   this._fails = 0
+}
+
+Account.prototype.setOptions = function(options) {
+  this._options = {
+    notify: false,
+    log: false,
+    test: true,
+    loss: '-0.3%',          // price or percentage: -5 or '-0.2%'
+    profit: '0.3%',
+    frequenceLimit: 5,       // 5分钟最多交易一次
+    ...options
+  }
 }
 
 Account.prototype.beforeOrderLimit = function(price) {
@@ -440,6 +444,10 @@ Account.prototype.getRealPosition = function() {
 
 Account.prototype.getOptions = function() {
   return this._options
+}
+
+Account.prototype.clearAllTrades = function() {
+  this._tradeHistories = []
 }
 
 module.exports = Account

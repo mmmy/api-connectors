@@ -2,15 +2,7 @@
 const DeltaParser = require('../libForBrowser')
 
 function OrderBook (options) {
-  this._options = {
-    lenSmall: 1,
-    lenBig: 16,
-    rateSmall: 1.3,
-    rateBig: 1.3,
-    histLenSmall: 8,
-    histLenBig: 30,
-    ...options
-  }
+  this.setOptions(options)
   this._data = []
   this._CLIENT = {
     _data: {},
@@ -27,6 +19,18 @@ function OrderBook (options) {
   this._bid = {}
   // 最近的ask
   this._ask = {}
+}
+
+OrderBook.prototype.setOptions = function(options) {
+  this._options = {
+    lenSmall: 1,
+    lenBig: 16,
+    rateSmall: 1.3,
+    rateBig: 1.3,
+    histLenSmall: 8,
+    histLenBig: 30,
+    ...options
+  }
 }
 
 OrderBook.prototype.removeOldData = function() {

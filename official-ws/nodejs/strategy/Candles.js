@@ -29,11 +29,18 @@ RealTimeCandle.prototype.getCandle = function() {
   return Object.assign({}, this._data)
 }
 
-function Candles() {
+function Candles(options) {
+  this.setOptions(options)
   this._histories = []  // 官方格式的json schema, 最新的需要是数组的最后一个
   this._latestCandle = null
   this._maxLength = 200
   this._mayTrendSignal = { long: false, short: false }
+}
+
+Candles.prototype.setOptions = function(options) {
+  this._options = {
+    ...options
+  }
 }
 
 Candles.prototype.setHistoryData = function(list) {

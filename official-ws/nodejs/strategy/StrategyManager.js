@@ -46,6 +46,29 @@ class StrategyManager {
     })
     return list
   }
+
+  getStratgyById(id) {
+    for (var i=0; i<this._list.length; i++) {
+      var s = this._list[i]
+      if (s.getStrategyId() === id) {
+        return s
+      }
+    }
+  }
+
+  clearTradesById(id) {
+    var strategy = this.getStratgyById(id)
+    if (strategy) {
+      strategy.clearAllTrades()
+    }
+  }
+
+  updateOptionsById(id, options) {
+    var strategy = this.getStratgyById(id)
+    if (strategy) {
+      strategy.updateOptions(options)
+    }
+  }
 }
 
 module.exports = StrategyManager

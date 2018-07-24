@@ -12,8 +12,8 @@ class Strategy {
     this._periods = ['1m', '5m', '1h']
 
     this._candles = {}
-    this._orderBook = null
-    this._accont = null
+    this._orderbook = null
+    this._account = null
     this._tradeHistoryManager = null
 
     this.initCandles()
@@ -27,11 +27,11 @@ class Strategy {
   }
 
   initOrderBook() {
-    this._orderBook = new OrderBook(this._options['orderbook'])
+    this._orderbook = new OrderBook(this._options['orderbook'])
   }
 
   initAccount() {
-    this._accont = new Account(this._options['account'])
+    this._account = new Account(this._options['account'])
   }
 
   initCandles() {
@@ -45,7 +45,7 @@ class Strategy {
   }
 
   updateCandleLastHistory(period, data) {
-    // console.log('updateCandleLastHistory', period, data)
+    console.log('updateCandleLastHistory', period, data)
     this._candles[period].updateLastHistory(data)
     this._candles[period].checkData()
   }
@@ -57,7 +57,7 @@ class Strategy {
   }
 
   updateOrderbook(data) {
-    this._orderBook.update(data)
+    this._orderbook.update(data)
   }
 
   updateTradeHistoryData(data) {
@@ -69,21 +69,21 @@ class Strategy {
   }
 
   entry(price, long) {
-    this._accont.orderLimit(price, long, this._options.amount || defaultAmount)
+    this._account.orderLimit(price, long, this._options.amount || defaultAmount)
   }
 
   shouldLiquidation(price) {
-    return this._accont.shouldLiquidation(price)
+    return this._account.shouldLiquidation(price)
   }
   // order book 必须watch
   doStrategy(price) {
-    if (this._accont.isReadyToOrder()) {
-      const signal = this._strategy(price, this._candles, this._orderBook, this._tradeHistoryManager)
+    if (this._account.isReadyToOrder()) {
+      const signal = this._strategy(price, this._candles, this._orderbook, this._tradeHistoryManager)
       if (signal.long) {
         var bidPrice = this._orderbook.getTopBidPrice()        
         this.entry(bidPrice, true)
       } else if (signal.short) {
-        var askPrice = this._orderBook.getTopAskPrice()
+        var askPrice = this._orderbook.getTopAskPrice()
         this.entry(askPrice, false)
       }
     }
@@ -93,12 +93,12 @@ class Strategy {
   }
 
   getLastTrade() {
-    return this._accont.getLastTrade()
+    return this._account.getLastTrade()
   }
 
   getAllOptions() {
-    var orderbookOptions = this._orderBook.getOptions()
-    var accountOptions = this._accont.getOptions()
+    var orderbookOptions = this._orderbook.getOptions()
+    var accountOptions = this._account.getOptions()
     return {
       ...this._options,
       orderbook: orderbookOptions,
@@ -107,7 +107,25 @@ class Strategy {
   }
 
   getAllTrades() {
-    return this._accont._tradeHistories
+    return this._account._tradeHistories
+  }
+
+  clearAllTrades() {
+    this._account.clearAllTrades()
+  }
+
+  updateOptions(options) {
+    this._options = {
+      ...this.options,
+      ...options
+    }
+
+    this._account.setOptions(this._options['account'])
+    this._orderbook.setOptions(this._options['orderbook'])
+  }
+
+  getStrategyId() {
+    return this._options.id
   }
 }
 
