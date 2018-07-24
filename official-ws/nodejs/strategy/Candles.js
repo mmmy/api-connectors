@@ -172,11 +172,11 @@ Candles.prototype.macdTrendSignal = function(realTime = true) {
     const lastMacd3 = macds[macds.length - 3]
     const lastMacd4 = macds[macds.length - 4]
     long = lastMacd.MACD > lastMacd2.MACD
-              && lastMacd2.MACD > lastMacd3.MACD
-              && lastMacd3.MACD > lastMacd4.MACD
-    short = lastMacd < lastMacd2.MACD
-              && lastMacd2.MACD < lastMacd3.MACD
-              && lastMacd3.MACD < lastMacd4.MACD
+              // && lastMacd2.MACD > lastMacd3.MACD
+              // && lastMacd3.MACD > lastMacd4.MACD
+    short = lastMacd.MACD < lastMacd2.MACD
+              // && lastMacd2.MACD < lastMacd3.MACD
+              // && lastMacd3.MACD < lastMacd4.MACD
   }
 
   return {
