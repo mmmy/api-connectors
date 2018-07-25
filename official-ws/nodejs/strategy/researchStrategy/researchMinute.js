@@ -73,4 +73,4 @@ bitmex.listenTrade(function(data) {
   obManager.doStrategy(lastData.price)
 })
 
-const webserver = new WebServer({ port: 7002 }, obManager)
+const webserver = new WebServer({ port: 7001 }, obManager)

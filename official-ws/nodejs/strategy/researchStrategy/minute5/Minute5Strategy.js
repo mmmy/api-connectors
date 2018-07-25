@@ -1,7 +1,7 @@
 
 const Strategy = require('../../Strategy')
 
-class MinuteStrategy extends Strategy {
+class Minute5Strategy extends Strategy {
   constructor(options) {
     super(options)
     this.initStratety()
@@ -13,18 +13,10 @@ class MinuteStrategy extends Strategy {
       let short = false
       const _1mCandle = candles['1m']
       const _1hCandle = candles['1h']
-      /* 这个策略不可取 胜率只有40%
       var m1macdSignal = _1mCandle.macdTrendSignal()
       if (m1macdSignal.long && _1hCandle.macdTrendSignal().long && orderbook.getSignal().long) {
         long = true
       } else if (m1macdSignal.short && _1hCandle.macdTrendSignal().short && orderbook.getSignal().short) {
-        short = true
-      }
-      */
-      var h1macdSignal = _1hCandle.macdTrendSignal()
-      if (h1macdSignal.long && orderbook.getSignal().long) {
-        long = true
-      } else if (h1macdSignal.short && orderbook.getSignal().short) {
         short = true
       }
       return {
@@ -35,4 +27,4 @@ class MinuteStrategy extends Strategy {
   }
 }
 
-module.exports = MinuteStrategy
+module.exports = Minute5Strategy
