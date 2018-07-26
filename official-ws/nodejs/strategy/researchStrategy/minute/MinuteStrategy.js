@@ -21,12 +21,21 @@ class MinuteStrategy extends Strategy {
         short = true
       }
       */
+     var m1macdSignal = _1mCandle.macdTrendSignal()
+     if (m1macdSignal.long && _1hCandle.macdTrendSignal().long && orderbook.getSignal().long) {
+       short = true
+     } else if (m1macdSignal.short && _1hCandle.macdTrendSignal().short && orderbook.getSignal().short) {
+       long = true
+     }
+     
+     /*比上面的 有 1m的策略胜率有所提升
       var h1macdSignal = _1hCandle.macdTrendSignal()
       if (h1macdSignal.long && orderbook.getSignal().long) {
         long = true
       } else if (h1macdSignal.short && orderbook.getSignal().short) {
         short = true
       }
+      */
       return {
         long,
         short,
