@@ -2,6 +2,7 @@ var technicalindicators = require('technicalindicators')
 var RSI = technicalindicators.RSI
 var BB = technicalindicators.BollingerBands
 var MACD = technicalindicators.MACD
+var PSAR = technicalindicators.PSAR
 // var jStat = require('jStat')
 
 function parseKline(kline) {
@@ -12,7 +13,7 @@ function parseKline(kline) {
         L = [],
         C = [],
         V = []
-    
+
     kline.forEach(item => {
         T.push(item.timestamp)
         O.push(parseFloat(item.open))
@@ -25,7 +26,7 @@ function parseKline(kline) {
     return { T, O, H, L, C, V }
 }
 // [{MACD: ,histogram: , signal: }]
-exports.MacdSignal = function(kline) {
+exports.MacdSignal = function (kline) {
     const { C } = parseKline(kline)
     const result = MACD.calculate({
         values: C,
@@ -39,7 +40,7 @@ exports.MacdSignal = function(kline) {
     return lastVs
 }
 
-exports.BollingerBandsSignal = function(kline) {
+exports.BollingerBandsSignal = function (kline) {
     const { T, O, H, L, C, V } = parseKline(kline)
     const result = BB.calculate({ period: 20, values: C, stdDev: 2 })
     const lastResult = result.slice(-1)[0] || {}
@@ -58,10 +59,27 @@ exports.BollingerBandsSignal = function(kline) {
     }
 }
 // 注意最好是200条k线以上
-exports.RSI = function(kline) {
-  const { T, O, H, L, C, V } = parseKline(kline)
-  var result = RSI.calculate({ values: C, period: 14 })
-  const lastVs = result.slice(-5)
-  return lastVs
-  // console.log(result.slice(result.length - 10))
+exports.RSI = function (kline) {
+    const { T, O, H, L, C, V } = parseKline(kline)
+    var result = RSI.calculate({ values: C, period: 14 })
+    const lastVs = result.slice(-5)
+    return lastVs
+    // console.log(result.slice(result.length - 10))
+}
+// 200条K线以上？？
+exports.PasrSignal = function (kline) {
+    const { T, O, H, L, C, V } = parseKline(kline)
+
+    const psar = new PSAR({ high: H, low: L, step: 0.02, max: 0.2 })
+    const result = psar.getResult()
+
+    const len = result.length
+    const signalLen = 100
+    const signals = []
+    for (var i = len - signalLen; i < len; i++) {
+        signals.push(C[i] > result[i])
+    }
+    return {
+        S: signals
+    }
 }
