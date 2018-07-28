@@ -59,14 +59,19 @@ Candles.prototype.updateLastHistory = function(data) {
   } else {
     throw 'Candles: 最近的时间不是最新数据时间'
   }
-  // 去掉多余数据
-  if (this._histories.length > this._maxLength) {
-    this._histories.shift()
-  }
+
+  this.removeOldData()
   // 计算缓存 信号
   this._mayTrendSignal = this.mayTrendReverseSignal()
   // 开始新的candle
   this._latestCandle && this._latestCandle.reset()
+}
+
+Candles.prototype.removeOldData = function() {
+  // 去掉多余数据
+  if (this._histories.length > this._maxLength) {
+    this._histories.shift()
+  }
 }
 
 // 检验时间是否正常
