@@ -23,10 +23,10 @@ class Minute5Strategy extends Strategy {
       
       const sarSmaSignal = mainCandle.sarSmaSignal()
       if (sarSmaSignal.long) {
-        console.log(`${this._options.id} SAR MA do long ++`)
+        console.log(`${this._options.id} ${new Date()} SAR MA do long ++`)
         long = true
       } else if (sarSmaSignal.short && _4hCandle.macdTrendSignal().short) {
-        console.log(`${this._options.id} SAR MA do short --`)
+        console.log(`${this._options.id}  ${new Date()} SAR MA do short --`)
         short = true
       }
       
