@@ -1,5 +1,6 @@
 
 const Candles = require('./Candles')
+const common = require('./common')
 
 // 比如 通过一小时线计算成 4 小时线
 class CandlesMerged extends Candles {
@@ -63,6 +64,9 @@ class CandlesMerged extends Candles {
           throw 'CandlesMerged: 最近的时间不是最新数据时间'
         }
       } else {
+        if (!this._mergeValidTimeStart(candle.timestamp)) {
+          common.consoleRed('_unMergeCandles[0]不合法', candle)
+        }
         this._unMergeCandles.push(candle)
       }
     }

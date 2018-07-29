@@ -50,6 +50,7 @@ Account.prototype.setOptions = function(options) {
     test: true,
     loss: '-0.3%',          // price or percentage: -5 or '-0.2%'
     profit: '0.3%',
+    shortProfit: null,        // 注意shortProfit如果没有设置就用profit
     frequenceLimit: 5,       // 5分钟最多交易一次
     ...options
   }
@@ -192,7 +193,11 @@ Account.prototype.getLossLimitPrices = function() {
 }
 
 Account.prototype.getProfitLimitPrices = function() {
-  const profit = this._options.profit
+  let profit = this._options.profit
+  // 有的时候做空需要不同的参数
+  if (!this._long && this._options.shortProfit) {
+    profit = this._options.shortProfit
+  }
   const offsetP = this._calcOffsetPrice(profit)
   const price = this._price + (this._long ? offsetP : -offsetP)
   const stopPrice = price + (this._long ? -0.5 : 0.5)

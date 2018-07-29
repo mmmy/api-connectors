@@ -130,3 +130,23 @@ exports.barssince = function(list, long) {
     // 如果第一个bar 就满足了， 那么返回1
     return len - index
 }
+// 最近第二次出现
+exports.barssince2 = function(list, long) {
+    const len = list.length
+    let index = -1
+    let fisrtFond = false
+    for (var i = len - 1; i > 0; i--) {
+        var pre = list[i - 1]
+        if (fisrtFond) {
+            if (list[i] != long && pre == long) {
+                index = i - 1
+                break
+            }
+        } else {
+            if (list[i] == long && pre != long) {
+                fisrtFond = true
+            }
+        }
+    }
+    return len - index
+}

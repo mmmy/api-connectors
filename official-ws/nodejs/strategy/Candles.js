@@ -227,12 +227,56 @@ Candles.prototype.sarSmaSignal = function(realTime) {
   const sarSLen = sarS.length
   const sarSLatest = sarS[sarSLen - 1]
   const sarSLatest1 = sarS[sarSLen - 2]
+  // 信号反转了
+  const sarLong = sarSLatest && !sarSLatest1
+  // 信号反转了
+  const sarShort = !sarSLatest && sarSLatest1
   const smaS = this.smaSignal(realTime)
   const { signals, diff } = smaS
   // test ok
+  /*
+  const barsLastMaShort = signal.barssince(signals, false)
+  const barsLastMaLong = signal.barssince(signals, true)
+  //console.log('barsLastMa', barsLastMaShort, barsLastMaLong)
+  // test ok
   const barsLastSarShort = signal.barssince(sarS, false)
   const barsLastSarLong = signal.barssince(sarS, true)
-  console.log(barsLastSarShort, barsLastSarLong)
+  // console.log(barsLastSarShort, barsLastSarLong)
+  // test ok
+  const barsLast2SarShort = signal.barssince2(sarS, false)
+  const barsLast2SarLong = signal.barssince2(sarS, true)
+  // console.log('barsLast2Sar', barsLast2SarShort, barsLast2SarLong)
+  */
+  let long = false
+  let short = false
+  // long: 之前一段时间ma 和 sar 都是向上的, 突然sar 向下了一下, sar 又向上了
+  if (sarLong) {
+    // 最近一次下跌趋势是很久之前的事
+    const barsLastMaShort = signal.barssince(signals, false)
+    const barsLast2SarLong = signal.barssince2(sarS, true)
+    // 最近上涨趋势
+    // < 40 是回测的最优值
+    if (barsLastMaShort > barsLast2SarLong && barsLastMaShort < 40) {
+      long = true
+    }
+  } else if (sarShort) {
+    const barsLastMaLong = signal.barssince(signals, true)
+    const barsLast2SarShort = signal.barssince2(sarS, false)
+    // 做空信号要强, 否则不做
+    if (barsLastMaLong > barsLast2SarShort && barsLastMaLong < 40) {
+      const diffLatest = diff[diff.length - 1]
+      const diffLatest1 = diff[diff.length - 2]
+      // 均线趋势还在下降
+      if (diffLatest < diffLatest1) {
+        short = true
+      }
+    }
+  }
+
+  return {
+    long,
+    short
+  }
 }
 
 Candles.prototype.getCandles = function(realTime) {
