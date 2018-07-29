@@ -16,12 +16,12 @@ function formatGetParams(params, defaultParams) {
 }
 
 const Bitmex = {}
-
+// 注意交易所返回的时间是 candle 结束的时间， 比如2018-07-17T16:00:00.000Z 实际上在tradingview 上显示的前1小时
 Bitmex.getTradeHistory = function(params) {
   var path = '/trade/bucketed'
   var paramstr = formatGetParams(params, {
     binSize: '5m',
-    partial: false,
+    partial: false,               // 是false 会导致 最后实时数据candle 中 open high low 不准确, 但是经过一个时间周期后就ok, 比如1小时线, 经过一个小时后, 数据就准确了
     count: 30,
     reverse: true,
   })

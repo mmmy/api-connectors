@@ -18,6 +18,15 @@ RealTimeCandle.prototype.reset = function() {
   this._data.low = price
 }
 
+RealTimeCandle.prototype.mergeHighLow = function(candle) {
+  this._data.high = Math.max(this._data.high, candle.high)
+  this._data.low = Math.min(this._data.low, candle.low)
+}
+
+RealTimeCandle.prototype.setOpen = function(open) {
+  this._data.open = open
+}
+
 RealTimeCandle.prototype.update = function(price) {
   this._data.close = price
   this._data.high = Math.max(this._data.high, price)
@@ -39,6 +48,8 @@ function Candles(options) {
 
 Candles.prototype.setOptions = function(options) {
   this._options = {
+    smaFastLen: 20,
+    smaSlowLen: 40,
     ...options
   }
 }
@@ -106,8 +117,12 @@ Candles.prototype.checkData = function() {
        foreignNotional: 404 } ] } 
 */
 Candles.prototype.updateRealTimeCandle = function(data) {
-  this._latestCandle = this._latestCandle || new RealTimeCandle(data.price)
+  this.initLatestCandle(data.price)
   this._latestCandle.update(data.price)
+}
+
+Candles.prototype.initLatestCandle = function(price) {
+  this._latestCandle = this._latestCandle || new RealTimeCandle(price)
 }
 
 Candles.prototype.bollSignal = function(realTime) {
@@ -190,6 +205,34 @@ Candles.prototype.macdTrendSignal = function(realTime = true) {
   }
   // console.log(macds)
   // console.log(long)
+}
+// 抛物线转向计算
+Candles.prototype.sarSignal = function(realTime) {
+  var klines = this.getCandles(realTime)
+  var sarSignal = signal.PasrSignal(klines)
+  // list of bool for longs
+  return sarSignal.signals
+}
+// 计算快线sma 和 慢线sma的 各种指标
+Candles.prototype.smaSignal = function(realTime) {
+  var klines = this.getCandles(realTime)
+  smaSignal = signal.SmaSignal(klines, this._options.smaFastLen, this._options.smaSlowLen)
+  // 详见signal.js
+  return smaSignal
+}
+
+// sar he sma 策略, 初步论证在tradingview上
+Candles.prototype.sarSmaSignal = function(realTime) {
+  const sarS = this.sarSignal(realTime)
+  const sarSLen = sarS.length
+  const sarSLatest = sarS[sarSLen - 1]
+  const sarSLatest1 = sarS[sarSLen - 2]
+  const smaS = this.smaSignal(realTime)
+  const { signals, diff } = smaS
+  // test ok
+  const barsLastSarShort = signal.barssince(sarS, false)
+  const barsLastSarLong = signal.barssince(sarS, true)
+  console.log(barsLastSarShort, barsLastSarLong)
 }
 
 Candles.prototype.getCandles = function(realTime) {

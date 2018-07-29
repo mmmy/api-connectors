@@ -2,6 +2,7 @@
 const Account = require('./Account')
 const OrderBook = require('./OrderBook')
 const Candles = require('./Candles')
+const Candles4H = require('./Candles4H')
 const RealtimeTradeDataManager = require('./RealtimeTradeDataManager')
 
 const defaultAmount = 2000
@@ -9,7 +10,7 @@ const defaultAmount = 2000
 class Strategy {
   constructor(options) {
     this._options = {...options}
-    this._periods = ['1m', '5m', '1h']
+    this._periods = ['1m', '5m', '1h', '4h']
 
     this._candles = {}
     this._orderbook = null
@@ -36,7 +37,14 @@ class Strategy {
 
   initCandles() {
     this._periods.forEach(key => {
-      this._candles[key] = new Candles(this._options[key])
+      // 四小时线是合成的
+      let candle = null
+      if (key === '4h') {
+        candle = new Candles4H(this._options[key])
+      } else {
+        candle = new Candles(this._options[key])
+      }
+      this._candles[key] = candle
     })
   }
 

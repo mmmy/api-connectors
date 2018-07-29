@@ -2,12 +2,16 @@
 const CandlesMerged = require('./CandlesMerged')
 
 class Candles4H extends CandlesMerged {
-  _mergeSize = 4
+  constructor(options) {
+    super(options)
+    this._mergeSize = 4
+  }
   _mergeValidTimeStart(timestamp) {
-    var date = new Date(timestamp)
+    // 注意交易所的实际时间是有一个小时偏差
+    var date = new Date(new Date(timestamp) - 3600 * 1000)
     // 为4小时的整数倍
     return date.getHours() % 4 === 0
   }
 }
 
-exports = Candles4H
+module.exports = Candles4H

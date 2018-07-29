@@ -94,20 +94,20 @@ function SMA(kline, period) {
 // fastLen: 20, slowLen: 20
 exports.SmaSignal = function(kline, fastLen, slowLen) {
     const { T, O, H, L, C, V } = parseKline(kline)
-    const fastResult = SMA.calculate({ period: fastLen, values: C })
-    const slowResult = SMA.calculate({ period: slowLen, values: C })
-    const slowLen = slowResult.length
+    const fastResult = SMA.calculate({ period: fastLen, values: C }).reverse()
+    const slowResult = SMA.calculate({ period: slowLen, values: C }).reverse()
+    const len = Math.min(slowResult.length, fastResult.length)
     const signals = []
     const slowS = []
     const fastS = []
     const diff = []
     // slow len 和 fast len 不一样， 所以要从最后还是遍历
-    for (var i = slowLen - 1; i > 0; i--) {
+    for (var i = 0; i < len - 1; i++) {
         // 快线 在 慢线之上 -》 long
         signals.unshift(fastResult[i] > slowResult[i])
-        slowS.unshift(slowResult[i] > slowResult[i - 1])
-        fastS.unshift(fastResult[i] > fastResult[i - 1])
-        diff.unshift(fastResult[i] - fastResult[i])
+        slowS.unshift(slowResult[i] > slowResult[i + 1])
+        fastS.unshift(fastResult[i] > fastResult[i + 1])
+        diff.unshift(fastResult[i] - slowResult[i])
     }
     return {
         signals,
@@ -120,7 +120,7 @@ exports.SmaSignal = function(kline, fastLen, slowLen) {
 exports.barssince = function(list, long) {
     const len = list.length
     let index = -1
-    for (var i = len - 1; i >= 0; i++) {
+    for (var i = len - 1; i >= 0; i--) {
         // 第一个满足条件的
         if (list[i] == long) {
             index = i
