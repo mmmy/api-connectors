@@ -312,7 +312,7 @@ Account.prototype.liquidation = function(price, mock) {
     minPrice: this._minMaxPrices[0],
     maxPrice: this._minMaxPrices[1],
     loss: this._options.loss,
-    profit: this._options.profit,
+    profit: (!this._long && this._options.shortProfit) || this._options.profit,
     win: isWin,
     winsFails: [this._wins, this._fails]
   })
