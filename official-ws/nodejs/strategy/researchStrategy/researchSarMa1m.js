@@ -54,4 +54,4 @@ bitmex.listenCandle({binSize: '1h'}, function(list) {
 })
 
 
-const webserver = new WebServer({ port: 7005 }, obManager)
+const webserver = new WebServer({ port: 7006 }, obManager)
