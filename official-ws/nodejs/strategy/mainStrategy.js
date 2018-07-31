@@ -1,3 +1,5 @@
+//弃用了
+return
 
 require('./logger')
 const argv = require('./argv')

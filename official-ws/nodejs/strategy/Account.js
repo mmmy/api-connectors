@@ -1,5 +1,5 @@
 
-var signatureSDK = require('./signatureSDK')
+var SignatureSDK = require('./signatureSDK')
 const notifyPhone = require('./notifyPhone').notifyPhone
 
 
@@ -14,6 +14,7 @@ const logger = winston.createLogger({
 
 function Account(options) {
   this.setOptions(options)
+  this.signatureSDK = new SignatureSDK(this._options)
   this._inTrading= false
   this._hasPosition = false
   this._price = null
@@ -93,7 +94,7 @@ Account.prototype.orderLimit = function(price, long, amount) {
   }
 
   return new Promise((resolve, reject) => {
-    signatureSDK.orderLimit(amount, long ? 'Buy' : 'Sell', price).then((json) => {
+    this.signatureSDK.orderLimit(amount, long ? 'Buy' : 'Sell', price).then((json) => {
       this._inTrading = false
       this._hasPosition = true
       // this._price = +json.avgPx
@@ -125,7 +126,7 @@ Account.prototype.orderLimit = function(price, long, amount) {
 Account.prototype.orderStopLimit = function() {
   const { stopPrice, price } = this.getLossLimitPrices()
 
-  signatureSDK.orderStopLimit(this._amount, stopPrice, this._long ? 'Sell' : 'Buy', price).then((json) => {
+  this.signatureSDK.orderStopLimit(this._amount, stopPrice, this._long ? 'Sell' : 'Buy', price).then((json) => {
     this._stopLossLimit.retryTimes = 0
     // test ok
     this._stopLossLimit.response = json
@@ -147,7 +148,7 @@ Account.prototype.orderStopLimit = function() {
 // 注意, 止损要用市价止损, 虽然会损失0.0075的手续费, 如果使用限价, 很有可能爆仓!
 Account.prototype.orderStop = function() {
   const { marketPrice } = this.getLossLimitPrices()
-  signatureSDK.orderStop(this._amount, marketPrice, this._long ? 'Sell' : 'Buy').then((json) => {
+  this.signatureSDK.orderStop(this._amount, marketPrice, this._long ? 'Sell' : 'Buy').then((json) => {
     this._stopLoss.retryTimes = 0
     // test ok
     this._stopLoss.response = json
@@ -213,7 +214,7 @@ Account.prototype.orderProfitLimitTouched = function() {
   // TODO: test
   const { stopPrice, price } = this.getProfitLimitPrices()
   var side = this._long ? 'Sell' : 'Buy'
-  signatureSDK.orderProfitLimitTouched(this._amount, stopPrice, side, price).then((json) => {
+  this.signatureSDK.orderProfitLimitTouched(this._amount, stopPrice, side, price).then((json) => {
     this._stopProfit.retryTimes = 0
     // test ok
     this._stopProfit.response = json
@@ -238,7 +239,7 @@ Account.prototype.orderProfitLimitTouched = function() {
 Account.prototype.profitLimitTouched = function() {
   var price = this._price + this._price * (this._long ? PROFIT : -PROFIT)
   price = Math.round(price * 2) / 2
-  signatureSDK.profitLimitTouched(this._amount, price, this._long ? 'Sell' : 'Buy').then((json) => {
+  this.signatureSDK.profitLimitTouched(this._amount, price, this._long ? 'Sell' : 'Buy').then((json) => {
     this._stopProfit.retryTimes = 0
     // test ok
     this._stopProfit.response = json
@@ -260,7 +261,7 @@ Account.prototype.profitLimitTouched = function() {
 */
 
 Account.prototype.deleteStopOrder = function(orderID) {
-  signatureSDK.deleteOrder(orderID).then(json => {
+  this.signatureSDK.deleteOrder(orderID).then(json => {
     this._deleteUselessOrderTimes = 0
     console.log('Account.prototype.deleteOrder OK')
   }).catch(err => {
@@ -413,7 +414,7 @@ Account.prototype.timeCancelOrderLimit = function(minute = 3) {
   var cancelTimes = 0
   var orderID = this._orderLimit.response.orderID
   var cancelFunc = () => {
-    signatureSDK.deleteOrder(orderID).then(json => {
+    this.signatureSDK.deleteOrder(orderID).then(json => {
       this.notify('取消了orderLimit,请看position')
     }).catch(err => {
       if (cancelTimes < 4) {
@@ -440,7 +441,7 @@ Account.prototype.cancelOrderLimitIfNeed = function() {
 
 Account.prototype.getRealPosition = function() {
   return new Promise((resolve, reject) => {
-    signatureSDK.getPosition().then(json => {
+    this.signatureSDK.getPosition().then(json => {
       resolve(json)
     }).catch(err => {
       reject(err)
