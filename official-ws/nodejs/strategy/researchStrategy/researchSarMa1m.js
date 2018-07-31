@@ -14,8 +14,37 @@ obManager.addNewStrategy({
 })
 
 obManager.addNewStrategy({
+  id: 'sar-ma-1min-disableShort-priceoffset2',
+  use1m: true,
+  disableShort: true,
+  priceOffset: 2,
+  account: {loss: -30, profit: 30.5, frequenceLimit: 0.1 },
+})
+
+obManager.addNewStrategy({
   id: 'sar-ma-1min',
   use1m: true,
+  account: {loss: -30, profit: 30.5, frequenceLimit: 0.1 },
+})
+
+obManager.addNewStrategy({
+  id: 'sar-ma-1min-priceoffset1',
+  use1m: true,
+  priceOffset: 1,
+  account: {loss: -30, profit: 30.5, frequenceLimit: 0.1 },
+})
+
+obManager.addNewStrategy({
+  id: 'sar-ma-1min-priceoffset2',
+  use1m: true,
+  priceOffset: 2,
+  account: {loss: -30, profit: 30.5, frequenceLimit: 0.1 },
+})
+
+obManager.addNewStrategy({
+  id: 'sar-ma-1min-priceoffset5',
+  use1m: true,
+  priceOffset: 5,
   account: {loss: -30, profit: 30.5, frequenceLimit: 0.1 },
 })
 
