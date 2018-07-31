@@ -10,7 +10,7 @@ function isWinNotEffecient(item) {
   if (item.win) {
     if (item.long && item.minPrice >= item.price) {
       return true
-    } else if (item.short && item.maxPrice <= item.price) {
+    } else if (!item.long && item.maxPrice <= item.price) {
       return true
     }
   }
