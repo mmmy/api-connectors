@@ -12,8 +12,8 @@
   font-size: 14px;
 }
 
-.jsgrid-row>.jsgrid-cell {
-  background: transparent;
+.jsgrid-cell {
+  background: transparent !important;
 }
 
 .warn {
