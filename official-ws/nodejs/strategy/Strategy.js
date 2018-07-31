@@ -76,8 +76,8 @@ class Strategy {
     this._strategy = strategy
   }
 
-  entry(price, long) {
-    this._account.orderLimit(price, long, this._options.amount || defaultAmount)
+  entry(price, long, tradePrice) {
+    this._account.orderLimit(price, long, this._options.amount || defaultAmount, tradePrice)
   }
 
   shouldLiquidation(price) {
@@ -91,10 +91,10 @@ class Strategy {
       const priceOffset = signal.priceOffset || 0
       if (signal.long) {
         var bidPrice = this._orderbook.getTopBidPrice()        
-        this.entry(bidPrice - priceOffset, true)
+        this.entry(bidPrice - priceOffset, true, price)
       } else if (signal.short) {
         var askPrice = this._orderbook.getTopAskPrice()
-        this.entry(askPrice + priceOffset, false)
+        this.entry(askPrice + priceOffset, false, price)
       }
     }
 

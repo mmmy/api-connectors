@@ -73,12 +73,12 @@ Account.prototype.beforeOrderLimit = function(price) {
 // 注意这个price, 应该是来源于orderbook, 而不是最新的成交价, 因为需要挂单
 // price 可以在当前成交价的基础上偏移 一段价格比如 $5 $10
 // 注意limit挂单之后, 不一定会成交, 成交的数量也是不定的, 故一定时间后应该取消该订单, 并查询真实的仓位
-Account.prototype.orderLimit = function(price, long, amount) {
+Account.prototype.orderLimit = function(price, long, amount, tradePrice/*真实价格*/) {
   this._inTrading = true
   this._long = long
   // 这点很重要, 万一没有一次性成功, 那么直接放弃这次机会, 以防, 重复下订单!!!
   this._lastTradeTime = new Date()
-  this.beforeOrderLimit(price)
+  this.beforeOrderLimit(tradePrice)
 
   if (this._options.test) {
     return new Promise((resolve, reject) => {
