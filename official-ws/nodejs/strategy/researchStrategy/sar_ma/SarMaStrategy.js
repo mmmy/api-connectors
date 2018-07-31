@@ -34,6 +34,7 @@ class Minute5Strategy extends Strategy {
       return {
         long,
         short,
+        priceOffset: this._options.priceOffset || 0,
       }
     })
   }

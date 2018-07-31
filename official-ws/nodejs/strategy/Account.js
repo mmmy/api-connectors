@@ -70,6 +70,7 @@ Account.prototype.beforeOrderLimit = function(price) {
   this._minMaxPrices = [price, price]
 }
 // 注意这个price, 应该是来源于orderbook, 而不是最新的成交价, 因为需要挂单
+// price 可以在当前成交价的基础上偏移 一段价格比如 $5 $10
 // 注意limit挂单之后, 不一定会成交, 成交的数量也是不定的, 故一定时间后应该取消该订单, 并查询真实的仓位
 Account.prototype.orderLimit = function(price, long, amount) {
   this._inTrading = true
