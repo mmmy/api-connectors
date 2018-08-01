@@ -150,3 +150,19 @@ exports.barssince2 = function(list, long) {
     }
     return len - index
 }
+
+exports.highestLowestClose = function(kline, barsLen) {
+    const len = kline.length
+    const endIndex = len - barsLen
+    let maxClose = kline[len - 1].close
+    let minClose = kline[len - 1].close
+    for (var i = len - 2; i >= endIndex; i--) {
+        const close = kline[i].close
+        maxClose = Math.max(close, maxClose)
+        minClose = Math.min(close, minClose)
+    }
+    return {
+        minClose,
+        maxClose
+    }
+}
