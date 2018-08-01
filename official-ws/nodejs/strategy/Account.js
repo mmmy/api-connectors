@@ -107,8 +107,8 @@ Account.prototype.orderLimit = function(price, long, amount, tradePrice/*真实�
       this.orderProfitLimitTouched()
       this.notify(`orderLimitOK${json.avgPx}(${price})`)
       console.log('Account.prototype.orderLimit 成功了')
-      // 三分钟后取消没有成交的, 所以最终的_amount 是<= amount
-      this.timeCancelOrderLimit(3)
+      // 60分钟后取消没有成交的, 所以最终的_amount 是<= amount
+      this.timeCancelOrderLimit(60)
       resolve(json)
     }).catch(err => {
       this._inTrading = false
@@ -410,7 +410,8 @@ Account.prototype.notify = function(msg) {
   }
 }
 // 注意挂单后应该 在 N 分钟内完成, 否则应该取消, minute 不能超过5分钟
-Account.prototype.timeCancelOrderLimit = function(minute = 3) {
+// 这个功能是否需要, 应该放到配置中, 目前的策略, 应该放长一点
+Account.prototype.timeCancelOrderLimit = function(minute = 60) {
   var cancelTimes = 0
   var orderID = this._orderLimit.response.orderID
   var cancelFunc = () => {
