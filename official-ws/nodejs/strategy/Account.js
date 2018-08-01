@@ -290,7 +290,7 @@ Account.prototype.liquidation = function(price, mock) {
   this._hasPosition = false
   var timePassed = new Date() - this._lastTradeTime
   var minute = timePassed / (60 * 1000)
-  var minute = Math.round(minute)
+  var minute = Math.round(minute * 10) / 10
   var isWin = this._long ? (price > this._price) : (price < this._price)
 
   if (isWin) {
