@@ -8,45 +8,45 @@ const obManager = new SarMaStrategyManager()
 
 obManager.addNewStrategy({
   id: 'sar-ma-5min', 
-  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 0.1 },
+  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 1 },
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-5min-priceoffset5',
   priceOffset: 5,
-  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 0.1 },
+  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 1 },
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-5min-priceoffset10',
   priceOffset: 10,
-  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 0.1 },
+  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 1 },
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-5min-priceoffset15',
   priceOffset: 15,
-  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 0.1 },
+  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 1 },
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-1min',
   use1m: true,
-  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 0.1 },
+  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 1 },
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-1min-priceoffset5',
   use1m: true,
   priceOffset: 5,
-  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 0.1 },
+  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 1 },
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-1min-priceoffset10',
   use1m: true,
   priceOffset: 10,
-  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 0.1 },
+  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 1 },
 })
 
 const bitmex = new BitmexManager()
