@@ -10,6 +10,7 @@ const obManager = new SarMaStrategyManager()
 obManager.addNewStrategy({
   id: 'sar-ma-5min-531905408',
   amount: 2000,
+  priceOffset: 5,
   account: {
     loss: -40,
     profit: 62,
