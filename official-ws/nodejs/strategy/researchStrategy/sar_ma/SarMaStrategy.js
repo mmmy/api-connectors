@@ -17,16 +17,17 @@ class Minute5Strategy extends Strategy {
       const _4hCandle = candles['4h']
 
       let mainCandle = _5mCandle
-      if (this._options.use1m) {
+      const use1m = this._options.use1m
+      if (use1m) {
         mainCandle = _1mCandle
       }
       // 设置中禁止做空
       const disableShort = this._options.disableShort
       const sarSmaSignal = mainCandle.sarSmaSignal()
-      if (sarSmaSignal.long) {
+      if (sarSmaSignal.long && (use1m ? _1mCandle.minMaxCloseFilter(50, 70, 30) : true)) {
         console.log(`${this._options.id} ${new Date()} SAR MA do long ++`)
         long = true
-      } else if (!disableShort && sarSmaSignal.short && _4hCandle.macdTrendSignal().short) {
+      } else if (!disableShort && sarSmaSignal.short && _4hCandle.macdTrendSignal().short && (use1m ? _1mCandle.minMaxCloseFilter(50, 70, 30) : true)) {
         console.log(`${this._options.id}  ${new Date()} SAR MA do short --`)
         short = true
       }
