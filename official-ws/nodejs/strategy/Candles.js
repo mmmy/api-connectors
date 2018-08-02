@@ -286,7 +286,8 @@ Candles.prototype.getMinMaxClose = function(len, realTime) {
 // 1min sar ma, len: 50, max: 70, min: 30
 Candles.prototype.minMaxCloseFilter = function(len, max, min) {
   const { minClose, maxClose } = this.getMinMaxClose(len, false)
-  return minClose > min && maxClose < max
+  const diff = maxClose - minClose
+  return diff > min && diff < max
 }
 
 Candles.prototype.getCandles = function(realTime) {
