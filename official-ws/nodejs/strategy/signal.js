@@ -60,10 +60,10 @@ exports.BollingerBandsSignal = function (kline) {
     }
 }
 // 注意最好是200条k线以上
-exports.RSI = function (kline) {
+exports.RSI = function (kline, len=14) {
     const { T, O, H, L, C, V } = parseKline(kline)
-    var result = RSI.calculate({ values: C, period: 14 })
-    const lastVs = result.slice(-5)
+    var result = RSI.calculate({ values: C, period: len })
+    const lastVs = result
     return lastVs
     // console.log(result.slice(result.length - 10))
 }
