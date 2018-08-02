@@ -41,6 +41,32 @@ exports.MacdSignal = function (kline) {
     return lastVs
 }
 
+exports.BBSignalSeries = function(kline) {
+    const { T, O, H, L, C, V } = parseKline(kline)
+    const result = BB.calculate({ period: 20, values: C, stdDev: 2 })
+    const rLen = result.length
+    const hLen = H.length
+    const lLen = L.length
+    const signals = [] // 1: top, 0: middle, -1: bottom
+    const maxLen = Math.min(100, rLen) // 只导出最近的100条
+    // 注意要从最后往前遍历
+    for (var i = 1; i <= maxLen; i++) {
+        const r = result[rLen - i]
+        const high = H[hLen - i]
+        const low = L[lLen - i]
+        let v = 0
+        if (high > r.upper) {
+            v = 1
+        } else if (low < r.lower) {
+            v = -1
+        }
+        signals.unshift(v)
+    }
+    return {
+        signals
+    }
+}
+
 exports.BollingerBandsSignal = function (kline) {
     const { T, O, H, L, C, V } = parseKline(kline)
     const result = BB.calculate({ period: 20, values: C, stdDev: 2 })

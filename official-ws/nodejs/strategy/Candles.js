@@ -125,6 +125,12 @@ Candles.prototype.initLatestCandle = function(price) {
   this._latestCandle = this._latestCandle || new RealTimeCandle(price)
 }
 
+Candles.prototype.bollSignalSeries = function(realTime) {
+  var klines = this.getCandles(realTime)
+  const bbSignal = signal.BBSignalSeries(klines)
+  return bbSignal
+}
+
 Candles.prototype.bollSignal = function(realTime) {
   var data = this.getCandles(realTime)
   var bbSignal = signal.BollingerBandsSignal(data)
@@ -132,9 +138,9 @@ Candles.prototype.bollSignal = function(realTime) {
   return bbSignal
 }
 
-Candles.prototype.rsiSignal = function(realTime) {
+Candles.prototype.rsiSignal = function(realTime, len) {
   var data = this.getCandles(realTime)
-  var rsis = signal.RSI(data)
+  var rsis = signal.RSI(data, len)
   // console.log('rsi', rsi)
   return rsis
 }
@@ -288,6 +294,93 @@ Candles.prototype.minMaxCloseFilter = function(len, max, min) {
   const { minClose, maxClose } = this.getMinMaxClose(len, false)
   const diff = maxClose - minClose
   return diff > min && diff < max
+}
+
+// 主要是为了确认 在backOffset bar 之前是上涨或者下跌趋势, 方法之一是用布林带
+Candles.prototype.barsIsInTrend = function(realTime, long, backOffset, bars) {
+  const { signals } = this.bollSignalSeries(realTime) // [1, 0, -1] 三种值
+  const sLen = signals.length // sLen 100
+  if (backOffset + bars > sLen) {
+    console.error('barsIsInTrend signals is not enough')
+    return false
+  }
+  let result = true
+  for (var i=0; i<bars; i++) {
+    const v = signals[sLen - 1 - backOffset - i]
+    // 是否是上升趋势
+    if (long && v === -1) {
+      result = false
+      break
+    } else if (!long && v === 1) {
+      result = false
+      break
+    }
+  }
+  return result
+}
+
+// 找到最近的RSI 顶部或者底部 的k线数
+Candles.prototype.barsLastRsiOverTrade = function(realTime, len=14, bottom=30, top=70) {
+  const rsis = this.rsiSignal(realTime, len)
+  let rsiLen = rsis.length
+  let atBottom = true
+  let index = -1
+  for (var i=rsiLen - 1; i>=0; i--) {
+    const rsiV = rsis[i]
+    if (rsiV < bottom) {
+      atBottom = true
+      index = i
+      break
+    } else if (rsiV > top) {
+      atBottom = false
+      index = i
+      break
+    }
+  }
+  return {
+    atBottom,
+    bars: rsiLen - index  // 距离最近K线bar数量
+  }
+}
+// realTime = false !!
+// 适用于震荡市, 超跌, 超买之后的反弹, 利用rsi 和布林带组合, 这里的默认参数适合1min
+Candles.prototype.rsiBbReverseSignal = function(realTime, efficientBars=10, continuousTrendBars=40) {
+  let long = false
+  let short = false
+  // const efficientBars = 10  //信号过去了10bar, 我们认为无效了
+  // const continuousTrendBars = 40 //信号出现之前连续出现上涨或者下跌
+  // rsi 为8, 上下为80, 20
+  const { atBottom, bars } = this.barsLastRsiOverTrade(realTime, 8, 20, 80) // bars 最小是 1
+  if (bars < efficientBars) {
+    const lastClose = this.getLastHistoryClose()
+    const signalCandle = this.getHistoryCandle(bars) 
+    // may reverse to long
+    if (atBottom) {
+      //TODO 当前闭合K线的close价格已经超过信号线的 (open close) 最高值(这个很重要), 表明趋势已经反转
+      const isCloseBreakUp = lastClose > Math.max(signalCandle.open, signalCandle.close)
+      if (isCloseBreakUp) {
+        // 而且之前的(40)根bar一直在跌, 这个一般作为过滤器
+        const isLastBarsIsShort = this.barsIsInTrend(realTime, false, efficientBars, continuousTrendBars)
+        if(isLastBarsIsShort) {
+          long = true
+        }
+      }
+    } else {
+
+    }
+  }
+  return {
+    long,
+    short
+  }
+}
+
+Candles.prototype.getLastHistoryClose = function() {
+  return this._histories[this._histories.length - 1].close
+}
+// 从最后一个开始索引
+Candles.prototype.getHistoryCandle = function(bars) {
+  return this._histories[this._histories.length - bars]
 }
 
 Candles.prototype.getCandles = function(realTime) {
