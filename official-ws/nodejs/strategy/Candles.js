@@ -352,12 +352,12 @@ Candles.prototype.rsiBbReverseSignal = function(realTime, efficientBars=10, cont
   // rsi 为8, 上下为80, 20
   const { atBottom, bars } = this.barsLastRsiOverTrade(realTime, 8, 20, 80) // bars 最小是 1
   if (bars < efficientBars) {
-    const lastClose = this.getLastHistoryClose()
+    const lastCandle = this.getHistoryCandle(1)
     const signalCandle = this.getHistoryCandle(bars) 
     // may reverse to long
     if (atBottom) {
       //TODO 当前闭合K线的close价格已经超过信号线的 (open close) 最高值(这个很重要), 表明趋势已经反转
-      const isCloseBreakUp = lastClose > Math.max(signalCandle.open, signalCandle.close)
+      const isCloseBreakUp = (lastCandle.close > lastCandle.open) && (lastCandle.close > Math.max(signalCandle.open, signalCandle.close))
       if (isCloseBreakUp) {
         // 而且之前的(40)根bar一直在跌, 这个一般作为过滤器
         const isLastBarsIsShort = this.barsIsInTrend(realTime, false, efficientBars, continuousTrendBars)
@@ -366,7 +366,14 @@ Candles.prototype.rsiBbReverseSignal = function(realTime, efficientBars=10, cont
         }
       }
     } else {
-
+      // 与上面相反
+      const isCloseBreakDown = (lastCandle.close < lastCandle.open) && (lastCandle.close < Math.min(signalCandle.open, signalCandle.close))
+      if (isCloseBreakDown) {
+        const isLastBarsIsLong = this.barsIsInTrend(realTime, true, efficientBars, continuousTrendBars)
+        if (isLastBarsIsLong) {
+          short = true
+        }
+      }
     }
   }
   return {
