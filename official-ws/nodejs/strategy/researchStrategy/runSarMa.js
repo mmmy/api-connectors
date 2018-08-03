@@ -4,23 +4,37 @@ const WebServer = require('./WebServer')
 const BitmexManager = require('./BitmexManager')
 const SarMaStrategyManager = require('./sar_ma/Manager')
 const common = require('../common')
-
+/*
+  5分钟策略
+*/
 const obManager = new SarMaStrategyManager()
 // run real rocket
 obManager.addNewStrategy({
-  id: 'sar-ma-5min-531905408',
+  id: 'sar-ma-5min-531905408-priceOffset2',
   amount: 2000,
-  priceOffset: 5,
+  priceOffset: 2,
   account: {
     loss: -40,
     profit: 62,
     shortProfit: 50,
-    frequenceLimit: 1,
+    frequenceLimit: 2,
     test: false,
     notify: true,
     apiKey,
     apiSecret
   },
+})
+
+// test
+obManager.addNewStrategy({
+  id: 'sar-ma-5min', 
+  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
+})
+
+obManager.addNewStrategy({
+  id: 'sar-ma-5min-priceoffset5',
+  priceOffset: 5,
+  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
 })
 
 const bitmex = new BitmexManager()

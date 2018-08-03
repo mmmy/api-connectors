@@ -343,16 +343,16 @@ Account.prototype.shouldLiquidation = function(price) {
       var stopLossLimitPrice = this._stopLossLimit.response.stopPx
       var triggerStopLoss = long ? (price <= stopLossLimitPrice) : (price >= stopLossLimitPrice)
       if (triggerStopLoss) {
-        // 注意触发止盈止损后, 一定要取消订单, 因为3分钟内可能就已经这里就执行, 而订单可以还在, 导致重大bug
+        // 注意触发止盈止损后, 一定要取消订单, 因为N分钟内可能就已经这里就执行, 而订单可以还在, 导致重大bug
         this.cancelOrderLimitIfNeed()
         this.liquidation(price, false)
         if (profitOrderID) {
           this.deleteStopOrder(profitOrderID)
-          // 四分钟后取消这两个order, 尴尬了, 因为不知道触发了哪一个.
+          // 1分钟后取消这两个order, 尴尬了, 因为不知道触发了哪一个.
           setTimeout(() => {
             this.deleteStopOrder(lossOrderID)
             this.deleteStopOrder(lossLimitOrderID)
-          }, 4 * 60 * 1000)
+          }, 1 * 60 * 1000)
         }
         // 暂时无用
         return {win: false}

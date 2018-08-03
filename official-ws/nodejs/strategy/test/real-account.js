@@ -12,14 +12,15 @@ var aa = new Account({
   shortProfit: 50
 })
 
-aa.orderLimit(7700, true, 2000).then((json) => {
+aa.orderLimit(7470, true, 2000).then((json) => {
   // console.log(json)
   // console.log(aa)
 })
 
 setTimeout(() => {
   console.log(aa)
-}, 8000)
+  aa.shouldLiquidation(7430)
+}, 15000)
 
 // aa.deleteOrder('hah')
 // aa.getRealPosition().then(console.log).catch(console.log)
