@@ -391,6 +391,10 @@ Candles.prototype.getLastHistoryClose = function() {
 Candles.prototype.getHistoryCandle = function(bars) {
   return this._histories[this._histories.length - bars]
 }
+// 获取 _histories 的最后一个close
+Candles.prototype.getLastHistoryClose = function() {
+  return this.getHistoryCandle(1).close
+}
 
 Candles.prototype.getCandles = function(realTime) {
   return realTime ? this._histories.concat([this._latestCandle.getCandle()]) : this._histories

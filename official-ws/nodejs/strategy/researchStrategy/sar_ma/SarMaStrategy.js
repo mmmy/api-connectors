@@ -11,6 +11,7 @@ class Minute5Strategy extends Strategy {
     this.setStrategy((price, candles, orderbook, tradeHistoryManager) => {
       let long = false
       let short = false
+      let strategyPrice
       const _1mCandle = candles['1m']
       const _5mCandle = candles['5m']
       const _1hCandle = candles['1h']
@@ -36,6 +37,7 @@ class Minute5Strategy extends Strategy {
         long,
         short,
         priceOffset: this._options.priceOffset || 0,
+        strategyPrice: (long || short) ? mainCandle.getLastHistoryClose() : null
       }
     })
   }
