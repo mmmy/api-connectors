@@ -12,7 +12,7 @@ const obManager = new SarMaStrategyManager()
 obManager.addNewStrategy({
   id: 'sar-ma-5min-531905408-priceOffset2',
   amount: 2000,
-  priceOffset: 2,
+  priceOffset: 5,
   account: {
     loss: -40,
     profit: 62,
@@ -34,6 +34,12 @@ obManager.addNewStrategy({
 obManager.addNewStrategy({
   id: 'sar-ma-5min-priceoffset5',
   priceOffset: 5,
+  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
+})
+
+obManager.addNewStrategy({
+  id: 'sar-ma-5min-priceoffset10',
+  priceOffset: 10,
   account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
 })
 
