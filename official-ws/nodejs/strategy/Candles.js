@@ -231,12 +231,14 @@ Candles.prototype.smaSignal = function(realTime) {
 Candles.prototype.sarSmaSignal = function(realTime) {
   const sarS = this.sarSignal(realTime)
   const sarSLen = sarS.length
+  // 注意 :按照tradingview 上的回测 来, 需要等一个bar!
   const sarSLatest = sarS[sarSLen - 1]
   const sarSLatest1 = sarS[sarSLen - 2]
+  const sarSLatest2 = sarS[sarSLen - 3]
   // 信号反转了
-  const sarLong = sarSLatest && !sarSLatest1
+  const sarLong = sarSLatest1 && !sarSLatest2
   // 信号反转了
-  const sarShort = !sarSLatest && sarSLatest1
+  const sarShort = !sarSLatest1 && sarSLatest2
   const smaS = this.smaSignal(realTime)
   const { signals, diff } = smaS
   // test ok
