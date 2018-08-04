@@ -108,7 +108,7 @@ Account.prototype.orderLimit = function(price, long, amount, tradePrice/*真实�
       this.notify(`orderLimitOK${json.avgPx}(${price})`)
       console.log('Account.prototype.orderLimit 成功了')
       // 60分钟后取消没有成交的, 所以最终的_amount 是<= amount
-      this.timeCancelOrderLimit(60)
+      this._timeoutCancelOrder = this.timeCancelOrderLimit(60)
       resolve(json)
     }).catch(err => {
       this._inTrading = false
@@ -286,6 +286,7 @@ Account.prototype.getLastTrade = function() {
 
 // 触发结算了
 Account.prototype.liquidation = function(price, mock) {
+  clearTimeout(this._timeoutCancelOrder)
   this._inTrading = false
   this._hasPosition = false
   var timePassed = new Date() - this._lastTradeTime
@@ -429,7 +430,7 @@ Account.prototype.timeCancelOrderLimit = function(minute = 60) {
     })
   }
   
-  setTimeout(() => {
+  return setTimeout(() => {
     cancelFunc()
   }, minute * 60 * 1000)
 }
