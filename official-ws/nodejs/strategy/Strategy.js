@@ -78,6 +78,13 @@ class Strategy {
   }
 
   entry(price, long, tradePrice) {
+    const { disableLong, disableShort } = this._options
+    if (long && disableLong) {
+      return
+    }
+    if (short && disableShort) {
+      return
+    }
     this._account.orderLimit(price, long, this._options.amount || defaultAmount, tradePrice)
   }
 

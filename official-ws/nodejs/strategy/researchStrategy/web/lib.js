@@ -1,3 +1,10 @@
+function showLoading() {
+  $('#loader').removeClass('disabled')
+}
+
+function hideLoading() {
+  $('#loader').addClass('disabled')
+}
 
 function timeFormat(value, item) {
   return new Date(value).toLocaleString()
@@ -75,6 +82,10 @@ var Site = {
         console.log(data)
       })
     }
+  },
+
+  updateOption: function(id, key, value, callback) {
+    $.post('/strategy/update_option', { id, key, value }, callback)
   },
 
   clearTradesById: function(id) {
