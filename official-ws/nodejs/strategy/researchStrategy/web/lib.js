@@ -115,8 +115,20 @@ var Site = {
     $title.append($('<button>delete</button>').on('click', function() { Site.deleteById(data.options.id) }))
     $title.append($('<button>options</button>').on('click', function() {  }))
 
-    var $longInput = $('<input type="checkbox"><span>long</span>')
-    var $shortInput = $('<input type="checkbox"><span>short</span>')
+    var $longInput = $('<input type="checkbox"><span>long</span>').on('click', function() {
+      showLoading()
+      Site.updateOption(data.options.id, 'disableLong', $longInput[0].checked, function(data) {
+        $longInput[0].checked = !data.data
+        hideLoading()
+      })
+    })
+    var $shortInput = $('<input type="checkbox"><span>short</span>').on('click', function() {
+      showLoading()
+      Site.updateOption(data.options.id, 'disableShort', $shortInput[0].checked, function(data) {
+        $shortInput[0].checked = !data.data
+        hideLoading()
+      })
+    })
     if (!data.options.disableLong) {
       $longInput[0].checked = true
     }
@@ -124,22 +136,8 @@ var Site = {
       $shortInput[0].checked = true
     }
 
-    $title.append($longInput).on('click', function() {
-      showLoading()
-      Site.updateOption(data.options.id, 'disableLong', !data.options.disableLong, function(data) {
-        $longInput[0].checked = !data.data
-        hideLoading()
-      })
-    })
-    $title.append($shortInput).on('click', function() {
-      showLoading()
-      Site.updateOption(data.options.id, 'disableShort', !data.options.disableShort, function(data) {
-        $shortInput[0].checked = !data.data
-        hideLoading()
-      })
-    })
-    $title.append($shortInput).on('click', function() {  })
-
+    $title.append($longInput)
+    $title.append($shortInput)
 
     var wftext = `[${winsFails.wins}(${winsFails.maxWins})/${winsFails.fails})(${winsFails.rate.toFixed(2)}%] 
                   earn:(${allEarn.all}% max:${allEarn.maxAll}% [${allEarn.fees}% fee max:${allEarn.maxFees}%])`

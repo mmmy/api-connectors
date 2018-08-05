@@ -58,10 +58,10 @@ class WebServer {
     app.post('/strategy/update_option', (req, res) => {
       const id = req.body.id
       const val = this._stratetyManager.updateOptionById(id, req.body)
-      return {
+      res.json({
         result: true,
         data: val
-      }
+      })
     })
 
     app.post('/strategy/clear_trade', (req, res) => {
