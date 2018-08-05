@@ -85,7 +85,15 @@ var Site = {
   },
 
   updateOption: function(id, key, value, callback) {
-    $.post('/strategy/update_option', { id, key, value }, callback)
+    // $.ajax({
+    //   url: '/strategy/update_option',
+    //   type: 'POST',
+    //   hearders: {
+    //     "Content-Type": "application/json"
+    //   },
+
+    // })
+    $.post('/strategy/update_option', { id, key, value: !!value }, callback, 'json')
   },
 
   clearTradesById: function(id) {

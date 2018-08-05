@@ -56,6 +56,7 @@ class WebServer {
     })
 
     app.post('/strategy/update_option', (req, res) => {
+      console.log(req.body)
       const id = req.body.id
       const val = this._stratetyManager.updateOptionById(id, req.body)
       res.json({
