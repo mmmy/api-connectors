@@ -44,8 +44,24 @@ class WebServer {
     app.post('/strategy/update_options', (req, res) => {
       const id = req.body.id
       const options = req.body.options
+      if (typeof options !== 'object') {
+        res.json({
+          result: false,
+          msg: 'options 必须是个object'
+        })
+        return
+      }
       this._stratetyManager.updateOptionsById(id, options)
       res.json(this._stratetyManager.getStratgyInfoById(id))
+    })
+
+    app.post('/strategy/update_option', (req, res) => {
+      const id = req.body.id
+      const val = this._stratetyManager.updateOptionById(id, req.body)
+      return {
+        result: true,
+        data: val
+      }
     })
 
     app.post('/strategy/clear_trade', (req, res) => {

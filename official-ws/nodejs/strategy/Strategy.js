@@ -4,6 +4,7 @@ const OrderBook = require('./OrderBook')
 const Candles = require('./Candles')
 const Candles4H = require('./Candles4H')
 const RealtimeTradeDataManager = require('./RealtimeTradeDataManager')
+const _ = require('lodash')
 
 const defaultAmount = 2000
 
@@ -142,6 +143,11 @@ class Strategy {
 
     this._account.setOptions(this._options['account'])
     this._orderbook.setOptions(this._options['orderbook'])
+  }
+
+  updateOption(key, value) {
+    _.set(this._options, key, value)
+    return this._options[key]
   }
 
   getStrategyId() {

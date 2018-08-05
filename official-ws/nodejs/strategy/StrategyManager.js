@@ -70,6 +70,13 @@ class StrategyManager {
     }
   }
 
+  updateOptionById(id, body) {
+    var strategy = this.getStratgyById(id)
+    if (strategy) {
+      return strategy.updateOption(body.key, body.value)
+    }
+  }
+
   getStratgyInfoById(id) {
     var strategy = this.getStratgyById(id)
     if (strategy) {

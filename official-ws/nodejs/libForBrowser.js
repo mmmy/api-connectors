@@ -7,7 +7,7 @@
  * @param  {Object|Array} socketDescriptors Description of a socket connection.
  */
 var _ = (typeof window !== 'undefined') && window._
-if (module) {
+if (typeof module != 'undefined') {
   _ = require('lodash')
 }
 /*
@@ -237,6 +237,7 @@ function updateItem(item, newData) {
   return _.extend({}, item, newData);
 }
 
-if (module) {
+if (typeof module != 'undefined') {
   module.exports = DeltaParser
 }
+
