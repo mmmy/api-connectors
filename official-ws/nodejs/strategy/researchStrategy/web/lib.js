@@ -145,8 +145,11 @@ var Site = {
       $shortInput[0].checked = true
     }
 
+    $amount = $(`<span><span class="value">${data.options.amount}</span><i class="closed edit outline icon"></i></span>`)
+
     $title.append($longInput)
     $title.append($shortInput)
+    $title.append($amount)
 
     var wftext = `[${winsFails.wins}(${winsFails.maxWins})/${winsFails.fails})(${winsFails.rate.toFixed(2)}%] 
                   earn:(${allEarn.all}% max:${allEarn.maxAll}% [${allEarn.fees}% fee max:${allEarn.maxFees}%])`
