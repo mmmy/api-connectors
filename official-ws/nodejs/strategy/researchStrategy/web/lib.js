@@ -85,15 +85,16 @@ var Site = {
   },
 
   updateOption: function(id, key, value, callback) {
-    // $.ajax({
-    //   url: '/strategy/update_option',
-    //   type: 'POST',
-    //   hearders: {
-    //     "Content-Type": "application/json"
-    //   },
-
-    // })
-    $.post('/strategy/update_option', { id, key, value: !!value }, callback, 'json')
+    $.ajax({
+      url: '/strategy/update_option',
+      type: 'POST',
+      data: JSON.stringify({id, key, value}),
+      headers: {
+        "Content-Type": "application/json"
+      },
+      success: callback
+    })
+    // $.post('/strategy/update_option', { id, key, value: !!value }, callback, 'json')
   },
 
   clearTradesById: function(id) {
@@ -125,14 +126,14 @@ var Site = {
 
     var $longInput = $('<input type="checkbox"><span>long</span>').on('click', function() {
       showLoading()
-      Site.updateOption(data.options.id, 'disableLong', $longInput[0].checked, function(data) {
+      Site.updateOption(data.options.id, 'disableLong', !$longInput[0].checked, function(data) {
         $longInput[0].checked = !data.data
         hideLoading()
       })
     })
     var $shortInput = $('<input type="checkbox"><span>short</span>').on('click', function() {
       showLoading()
-      Site.updateOption(data.options.id, 'disableShort', $shortInput[0].checked, function(data) {
+      Site.updateOption(data.options.id, 'disableShort', !$shortInput[0].checked, function(data) {
         $shortInput[0].checked = !data.data
         hideLoading()
       })
