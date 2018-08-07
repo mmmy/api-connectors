@@ -83,7 +83,7 @@ class Strategy {
     if (long && disableLong) {
       return
     }
-    if (short && disableShort) {
+    if (!long && disableShort) {
       return
     }
     this._account.orderLimit(price, long, this._options.amount, tradePrice)
