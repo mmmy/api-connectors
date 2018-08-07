@@ -6,11 +6,12 @@ const Candles4H = require('./Candles4H')
 const RealtimeTradeDataManager = require('./RealtimeTradeDataManager')
 const _ = require('lodash')
 
-const defaultAmount = 2000
-
 class Strategy {
   constructor(options) {
-    this._options = {...options}
+    this._options = {
+      ...options,
+      amount: 2000
+    }
     this._periods = ['1m', '5m', '1h', '4h']
 
     this._candles = {}
@@ -85,7 +86,7 @@ class Strategy {
     if (short && disableShort) {
       return
     }
-    this._account.orderLimit(price, long, this._options.amount || defaultAmount, tradePrice)
+    this._account.orderLimit(price, long, this._options.amount, tradePrice)
   }
 
   shouldLiquidation(price) {
