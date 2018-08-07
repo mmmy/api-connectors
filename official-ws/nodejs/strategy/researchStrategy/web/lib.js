@@ -146,7 +146,22 @@ var Site = {
     }
 
     $amount = $(`<span><span class="value">${data.options.amount}</span><i class="closed edit outline icon"></i></span>`)
-
+    $amount.find('.icon').on('click', function(){
+      var newAmount = +prompt('amount')
+      if (newAmount) {
+        showLoading()
+        Site.updateOption(data.options.id, 'amount', newAmount, function(data) {
+          if (data.result) {
+            $amount.find('.value').text(data.data)
+          } else {
+            $amount.find('.value').text('error')
+          }
+          hideLoading()
+        })
+      }
+      console.log(newAmount)
+    })
+    
     $title.append($longInput)
     $title.append($shortInput)
     $title.append($amount)
