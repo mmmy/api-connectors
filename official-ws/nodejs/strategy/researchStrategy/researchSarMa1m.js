@@ -7,45 +7,38 @@ const common = require('../common')
 const obManager = new SarMaStrategyManager()
 
 obManager.addNewStrategy({
-  id: 'sar-ma-1min-disableShort',
-  use1m: true,
-  disableShort: true,
-  account: {loss: -30, profit: 30.5, frequenceLimit: 1 },
-})
-
-obManager.addNewStrategy({
   id: 'sar-ma-1min-disableShort-priceoffset4-profit33.5',
   use1m: true,
   disableShort: true,
   priceOffset: 4,
-  account: {loss: -30, profit: 33.5, frequenceLimit: 1 },
-})
-
-obManager.addNewStrategy({
-  id: 'sar-ma-1min',
-  use1m: true,
-  account: {loss: -30, profit: 30.5, frequenceLimit: 1 },
-})
-
-obManager.addNewStrategy({
-  id: 'sar-ma-1min-priceoffset3-profit32.5',
-  use1m: true,
-  priceOffset: 3,
-  account: {loss: -30, profit: 32.5, shortProfit: 31, frequenceLimit: 1 },
-})
-
-obManager.addNewStrategy({
-  id: 'sar-ma-1min-priceoffset5-profit33.5',
-  use1m: true,
-  priceOffset: 5,
-  account: {loss: -30, profit: 33.5, shortProfit: 32, frequenceLimit: 1 },
+  account: {loss: -30, profit: 33.5, orderCancelTime: 10, frequenceLimit: 2 },
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-1min-priceoffset7-profit35',
   use1m: true,
   priceOffset: 7,
-  account: {loss: -30, profit: 35, shortProfit: 33, frequenceLimit: 1 },
+  account: {loss: -30, profit: 33, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2},
+})
+
+obManager.addNewStrategy({
+  id: 'sar-ma-1min-priceoffset7-profit35',
+  use1m: true,
+  priceOffset: 7,
+  account: {loss: -30, profit: 35, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
+})
+
+obManager.addNewStrategy({
+  id: 'sar-ma-1min',
+  use1m: true,
+  account: {loss: -30, profit: 30.5, orderCancelTime: 10, frequenceLimit: 2 },
+})
+
+obManager.addNewStrategy({
+  id: 'sar-ma-1min-priceoffset5-profit33.5',
+  use1m: true,
+  priceOffset: 5,
+  account: {loss: -30, profit: 33.5, shortProfit: 32, orderCancelTime: 10, frequenceLimit: 2 },
 })
 
 const bitmex = new BitmexManager()

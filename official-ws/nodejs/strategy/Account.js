@@ -53,6 +53,7 @@ Account.prototype.setOptions = function(options) {
     profit: '0.3%',
     shortProfit: null,        // 注意shortProfit如果没有设置就用profit
     frequenceLimit: 5,       // 5分钟最多交易一次
+    orderCancelTime: 60,     // 60分钟后取消挂单
     ...options
   }
 }
@@ -108,7 +109,7 @@ Account.prototype.orderLimit = function(price, long, amount, tradePrice/*真实�
       this.notify(`orderLimitOK${json.avgPx}(${price})`)
       console.log('Account.prototype.orderLimit 成功了')
       // 60分钟后取消没有成交的, 所以最终的_amount 是<= amount
-      this._timeoutCancelOrder = this.timeCancelOrderLimit(60)
+      this._timeoutCancelOrder = this.timeCancelOrderLimit(this._options.orderCancelTime)
       resolve(json)
     }).catch(err => {
       this._inTrading = false
