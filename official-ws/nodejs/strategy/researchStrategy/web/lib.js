@@ -163,16 +163,18 @@ var Site = {
     })
 
     $test = $('<input type="checkbox">').on('click', function() {
-      showLoading()
       if (confirm(`change account.text to ${!data.options.account.test} ?`)) {
+        showLoading()
         Site.updateOption(data.options.id, 'account.test', !data.options.account.test, function(res) {
           data.options.account.test = res.data
           hideLoading()
         })
+      } else {
+        // $test.prop('checked', data.options.account.test)
       }
     })
 
-    $test[0].checked = data.options.account.test
+    $test.prop('checked', data.options.account.test)
     
     $title.append($longInput)
     $title.append($shortInput)
