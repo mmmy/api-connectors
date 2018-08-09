@@ -154,10 +154,9 @@ class Strategy {
   }
 
   updateOption(key, value) {
-    console.log(typeof value)
-    this._options[key] = value
-    // _.set(this._options, key, value)
-    return this._options[key]
+    console.log(updateOption, key, value)
+    _.set(this._options, key, value)
+    return _.get(this._options, key)
   }
 
   getStrategyId() {
