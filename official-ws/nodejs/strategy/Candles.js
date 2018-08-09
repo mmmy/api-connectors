@@ -263,15 +263,15 @@ Candles.prototype.sarSmaSignal = function(realTime) {
     const barsLastMaShort = signal.barssince(signals, false)
     const barsLast2SarLong = signal.barssince2(sarS, true)
     // 最近上涨趋势
-    // < 40 是回测的最优值
-    if (barsLastMaShort > barsLast2SarLong && barsLastMaShort < 40) {
+    // < 30 是回测的最优值
+    if (barsLastMaShort > barsLast2SarLong && barsLastMaShort < 30) {
       long = true
     }
   } else if (sarShort) {
     const barsLastMaLong = signal.barssince(signals, true)
     const barsLast2SarShort = signal.barssince2(sarS, false)
     // 做空信号要强, 否则不做
-    if (barsLastMaLong > barsLast2SarShort && barsLastMaLong < 40) {
+    if (barsLastMaLong > barsLast2SarShort && barsLastMaLong < 30) {
       const diffLatest = diff[diff.length - 1]
       const diffLatest1 = diff[diff.length - 2]
       // 均线趋势还在下降
