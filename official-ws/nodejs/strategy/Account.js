@@ -437,9 +437,9 @@ Account.prototype.timeCancelOrderLimit = function(minute = 60) {
 }
 
 Account.prototype.cancelOrderLimitIfNeed = function() {
-  if (new Date() - this._lastTradeTime < 3 * 60 * 1000) {
+  // if (new Date() - this._lastTradeTime < 3 * 60 * 1000) {
     this.timeCancelOrderLimit(0)
-  }
+  // }
 }
 
 Account.prototype.getRealPosition = function() {
