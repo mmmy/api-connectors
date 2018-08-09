@@ -154,7 +154,7 @@ class Strategy {
   }
 
   updateOption(key, value) {
-    console.log(updateOption, key, value)
+    console.log('updateOption', key, value)
     _.set(this._options, key, value)
     this._account.setOptions(this._options['account'])
     this._orderbook.setOptions(this._options['orderbook'])

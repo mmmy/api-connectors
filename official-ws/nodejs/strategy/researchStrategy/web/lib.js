@@ -161,10 +161,24 @@ var Site = {
       }
       console.log(newAmount)
     })
+
+    $test = $('<input type="checkbox">').on('click', function() {
+      showLoading()
+      if (confirm(`change account.text to ${!data.options.account.test} ?`)) {
+        Site.updateOption(data.options.id, 'account.test', !data.options.account.test, function(res) {
+          data.options.account.test = res.data
+          hideLoading()
+        })
+      }
+    })
+
+    $test[0].checked = data.options.account.test
     
     $title.append($longInput)
     $title.append($shortInput)
     $title.append($amount)
+    $title.append($test)
+    $title.append('<span>test</span>')
 
     var wftext = `[${winsFails.wins}(${winsFails.maxWins})/${winsFails.fails})(${winsFails.rate.toFixed(2)}%] 
                   earn:(${allEarn.all}% max:${allEarn.maxAll}% [${allEarn.fees}% fee max:${allEarn.maxFees}%])`
