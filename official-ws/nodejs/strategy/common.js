@@ -24,3 +24,9 @@ exports.consoleGreen = function() {
 }
 
 exports.logSlow = logSlow
+
+exports.xbtPriceFromID = function(id) {
+	const instrumentIdx = 88
+	const tickSize = 0.01
+	return ((1e8 * instrumentIdx) - id) * tickSize
+}

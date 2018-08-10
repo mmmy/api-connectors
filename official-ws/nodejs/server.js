@@ -1,5 +1,6 @@
 const WebSocket = require('ws');
 const BitMEXClient = require('./index');
+const researchOrderbookL2 = require('./strategy/researchOrderbookL2')
 
 const wss = new WebSocket.Server({ port: 8099 });
  
@@ -26,3 +27,10 @@ wss.on('connection', function connection(ws) {
     client.close()
   })
 })
+
+const watchClient = new BitMEXClient({testnet: false})
+watchClient.addStream('XBTUSD', 'orderBookL2', function(data, symbol, tableName) {
+  // console.log(`Got update for ${tableName}:${symbol}. Current state:\n${JSON.stringify(data).slice(0, 100)}...`);
+  // Do something with the table data...
+  researchOrderbookL2.update(data)
+});

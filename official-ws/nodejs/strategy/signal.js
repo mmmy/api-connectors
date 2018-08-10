@@ -97,7 +97,7 @@ exports.RSI = function (kline, len=14) {
 exports.PasrSignal = function (kline) {
     const { T, O, H, L, C, V } = parseKline(kline)
 
-    const psar = new PSAR({ high: H, low: L, step: 0.02, max: 0.2 })
+    const psar = new PSAR({ high: H, low: L, step: 0.02, max: 0.11 }) // 0.11效果好
     const result = psar.getResult()
 
     const len = result.length

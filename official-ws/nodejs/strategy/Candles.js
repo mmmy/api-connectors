@@ -48,8 +48,8 @@ function Candles(options) {
 
 Candles.prototype.setOptions = function(options) {
   this._options = {
-    smaFastLen: 20,
-    smaSlowLen: 40,
+    smaFastLen: 29,
+    smaSlowLen: 50,
     ...options
   }
 }
