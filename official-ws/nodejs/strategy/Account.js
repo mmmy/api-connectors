@@ -300,8 +300,17 @@ Account.prototype.liquidation = function(price, mock) {
   } else {
     this._fails++
   }
+
+  let touched = true
+  if (isWin) {
+    if (this._long && this._price <= this._minMaxPrices[0]) {
+      touched = false
+    } else if(!this._long && this._price >= this._minMaxPrices[1]) {
+      touched = false
+    }
+  }
   
-  this.notify(`win: ${isWin}, ${this._price} -> ${price} ${mock ? '模拟': '真实'} ${minute}m`)
+  this.notify(`win: ${isWin}(${touched ? 'touched' : 'missed'}), ${this._price} -> ${price} ${mock ? '模拟': '真实'} ${minute}m`)
   var earn = (this._long ? (price - this._price) : (this._price - price)) / this._price
 
   this._tradeHistories.push({
