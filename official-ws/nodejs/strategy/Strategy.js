@@ -128,10 +128,15 @@ class Strategy {
   getAllOptions() {
     var orderbookOptions = this._orderbook.getOptions()
     var accountOptions = this._account.getOptions()
+    var candleOptions = {}
+    this._periods.forEach(key => {
+      candleOptions[key] = this._candles[key].getOptions()
+    })
     return {
       ...this._options,
       orderbook: orderbookOptions,
       account: accountOptions,
+      ...candleOptions
     }
   }
 
@@ -151,6 +156,9 @@ class Strategy {
 
     this._account.setOptions(this._options['account'])
     this._orderbook.setOptions(this._options['orderbook'])
+    this._periods.forEach(key => {
+      this._candles[key].setOptions(this._options[key])
+    })
   }
 
   updateOption(key, value) {
@@ -158,6 +166,7 @@ class Strategy {
     _.set(this._options, key, value)
     this._account.setOptions(this._options['account'])
     this._orderbook.setOptions(this._options['orderbook'])
+    // TODO: update _candles options
     return _.get(this._options, key)
   }
 

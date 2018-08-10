@@ -55,6 +55,10 @@ Candles.prototype.setOptions = function(options) {
   }
 }
 
+Candles.prototype.getOptions = function() {
+  return this._options
+}
+
 Candles.prototype.setHistoryData = function(list) {
   this._histories = list
 }
