@@ -29,7 +29,7 @@ obManager.addNewStrategy({
 obManager.addNewStrategy({
   id: 'sar-ma-5min', 
   account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
-  candles: { smaFastLen: 2 }
+  '5m': { smaFastLen: 2 }
 })
 
 obManager.addNewStrategy({
