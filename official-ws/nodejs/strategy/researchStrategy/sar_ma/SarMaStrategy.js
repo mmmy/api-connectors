@@ -25,7 +25,7 @@ class Minute5Strategy extends Strategy {
       // 设置中禁止做空
       const disableShort = this._options.disableShort
       const sarSmaSignal = mainCandle.sarSmaSignal()
-      if (sarSmaSignal.long && (use1m ? _1hCandle.macdTrendSignal(false).long : true) && (use1m ? _1mCandle.minMaxCloseFilter(50, 70, 30) : true)) {
+      if (sarSmaSignal.long && (use1m ? _1mCandle.minMaxCloseFilter(50, 70, 30) : true)) {
         console.log(`${this._options.id} ${new Date()} SAR MA do long ++`)
         long = true
       } else if (!disableShort && sarSmaSignal.short && (use1m ? _1hCandle.macdTrendSignal(false).short :  _4hCandle.macdTrendSignal(false).short) && (use1m ? _1mCandle.minMaxCloseFilter(50, 70, 30) : true)) {

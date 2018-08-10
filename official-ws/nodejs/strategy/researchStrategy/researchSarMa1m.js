@@ -12,6 +12,7 @@ obManager.addNewStrategy({
   disableShort: true,
   priceOffset: 4,
   account: {loss: -30, profit: 33.5, orderCancelTime: 10, frequenceLimit: 2 },
+  candles: { smaFastLen: 5, sarMax: 0.13 }
 })
 
 obManager.addNewStrategy({
@@ -19,6 +20,7 @@ obManager.addNewStrategy({
   use1m: true,
   priceOffset: 7,
   account: {loss: -30, profit: 33, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2},
+  candles: { smaFastLen: 5, sarMax: 0.13 }
 })
 
 obManager.addNewStrategy({
@@ -26,12 +28,14 @@ obManager.addNewStrategy({
   use1m: true,
   priceOffset: 7,
   account: {loss: -30, profit: 35, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
+  candles: { smaFastLen: 5, sarMax: 0.13 }
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-1min',
   use1m: true,
   account: {loss: -30, profit: 33, orderCancelTime: 10, frequenceLimit: 2 },
+  candles: { smaFastLen: 5, sarMax: 0.13 }
 })
 
 obManager.addNewStrategy({
@@ -39,6 +43,7 @@ obManager.addNewStrategy({
   use1m: true,
   priceOffset: 5,
   account: {loss: -30, profit: 33, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
+  candles: { smaFastLen: 5, sarMax: 0.13 }
 })
 
 const bitmex = new BitmexManager()

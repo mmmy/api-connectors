@@ -10,15 +10,15 @@ const common = require('../common')
 const obManager = new SarMaStrategyManager()
 // run real rocket
 obManager.addNewStrategy({
-  id: 'sar-ma-5min-531905408-priceOffset2',
+  id: 'sar-ma-5min-531905408-priceOffset1',
   amount: 2000,
-  priceOffset: 2,
+  priceOffset: 1,
   account: {
     loss: -40,
     profit: 62,
     shortProfit: 50,
     frequenceLimit: 2,
-    test: false,
+    test: true,
     notify: true,
     apiKey,
     apiSecret
@@ -29,6 +29,7 @@ obManager.addNewStrategy({
 obManager.addNewStrategy({
   id: 'sar-ma-5min', 
   account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
+  candles: { smaFastLen: 2 }
 })
 
 obManager.addNewStrategy({
