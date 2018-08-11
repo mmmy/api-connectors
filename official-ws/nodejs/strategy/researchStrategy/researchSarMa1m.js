@@ -6,6 +6,16 @@ const common = require('../common')
 
 const obManager = new SarMaStrategyManager()
 
+const defaultPriceFilter = {
+  longPriceLen: 50,
+  longMaxPriceDiff: 100,
+  longMinPriceDiff: 40,
+
+  shortPriceLen: 50,
+  shortMaxPriceDiff: 43,
+  shortMinPriceDiff: 20
+}
+
 obManager.addNewStrategy({
   id: 'sar-ma-1min-disableShort-priceoffset4-profit33.5',
   use1m: true,
@@ -13,8 +23,7 @@ obManager.addNewStrategy({
   priceOffset: 4,
   account: { loss: -30, profit: 33.5, orderCancelTime: 10, frequenceLimit: 2 },
   '1m': { smaFastLen: 5, sarMax: 0.13 },
-  shortMaxPriceDiff: 43,
-  shortMinPriceDiff: 20
+  ...defaultPriceFilter
 })
 
 obManager.addNewStrategy({
@@ -23,8 +32,7 @@ obManager.addNewStrategy({
   priceOffset: 7,
   account: { loss: -30, profit: 33, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
   '1m': { smaFastLen: 5, sarMax: 0.13 },
-  shortMaxPriceDiff: 43,
-  shortMinPriceDiff: 20
+  ...defaultPriceFilter
 })
 
 obManager.addNewStrategy({
@@ -33,8 +41,7 @@ obManager.addNewStrategy({
   priceOffset: 7,
   account: { loss: -30, profit: 35, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
   '1m': { smaFastLen: 5, sarMax: 0.13 },
-  shortMaxPriceDiff: 43,
-  shortMinPriceDiff: 20
+  ...defaultPriceFilter
 })
 
 obManager.addNewStrategy({
@@ -42,8 +49,7 @@ obManager.addNewStrategy({
   use1m: true,
   account: { loss: -30, profit: 33, orderCancelTime: 10, frequenceLimit: 2 },
   '1m': { smaFastLen: 5, sarMax: 0.13 },
-  shortMaxPriceDiff: 43,
-  shortMinPriceDiff: 20
+  ...defaultPriceFilter
 })
 
 obManager.addNewStrategy({
@@ -52,8 +58,7 @@ obManager.addNewStrategy({
   priceOffset: 5,
   account: { loss: -30, profit: 33, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
   '1m': { smaFastLen: 5, sarMax: 0.13 },
-  shortMaxPriceDiff: 43,
-  shortMinPriceDiff: 20
+  ...defaultPriceFilter
 })
 
 const bitmex = new BitmexManager()

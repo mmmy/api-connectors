@@ -9,8 +9,13 @@ class Minute5Strategy extends Strategy {
 
   initStratety() {
     this.setStrategy((price, candles, orderbook, tradeHistoryManager) => {
-      const shortMaxPriceDiff = this._options.shortMaxPriceDiff || 70
-      const shortMinPriceDiff = this._options.shortMinPriceDiff || 30
+      const longPriceLen = this._options.longPriceLen || 15             // 1min: 50  // disable: -1
+      const longMaxPriceDiff = this._options.longMaxPriceDiff || 60     // 1min: 100
+      const longMinPriceDiff = this._options.longMinPriceDiff || 0      // 1min: 40
+      
+      const shortPriceLen = this.options.longPriceLen || 15             // 1min: 50 // disable: -1
+      const shortMaxPriceDiff = this._options.shortMaxPriceDiff || 60   // 1min: 43
+      const shortMinPriceDiff = this._options.shortMinPriceDiff || 0   // 1min: 20
       let long = false
       let short = false
       let strategyPrice
@@ -27,10 +32,15 @@ class Minute5Strategy extends Strategy {
       // 设置中禁止做空
       const disableShort = this._options.disableShort
       const sarSmaSignal = mainCandle.sarSmaSignal()
-      if (sarSmaSignal.long && (use1m ? _1mCandle.minMaxCloseFilter(50, 100, 40) : true)) {
+      if (sarSmaSignal.long && (longPriceLen > 0 ? mainCandle.minMaxCloseFilter(longPriceLen, longMaxPriceDiff, longMinPriceDiff) : true)) {
         console.log(`${this._options.id} ${new Date()} SAR MA do long ++`)
         long = true
-      } else if (!disableShort && sarSmaSignal.short && (use1m ? _1hCandle.macdTrendSignal(false).short :  _4hCandle.macdTrendSignal(false).short) && (use1m ? _1mCandle.minMaxCloseFilter(50, shortMaxPriceDiff, shortMinPriceDiff) : true)) {
+      } else if (
+        !disableShort &&
+        sarSmaSignal.short &&
+        (use1m ? _1hCandle.macdTrendSignal(false).short :  _4hCandle.macdTrendSignal(false).short) &&
+        (shortPriceLen ? mainCandle.minMaxCloseFilter(shortPriceLen, shortMaxPriceDiff, shortMinPriceDiff) : true)
+      ) {
         console.log(`${this._options.id}  ${new Date()} SAR MA do short --`)
         short = true
       }
