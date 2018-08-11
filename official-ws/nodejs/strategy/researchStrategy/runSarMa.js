@@ -26,8 +26,8 @@ obManager.addNewStrategy({
   priceOffset: 1,
   account: {
     loss: -40,
-    profit: 62,
-    shortProfit: 50,
+    profit: 58,
+    shortProfit: 55,
     frequenceLimit: 2,
     test: true,
     notify: true,
@@ -40,7 +40,7 @@ obManager.addNewStrategy({
 // test
 obManager.addNewStrategy({
   id: 'sar-ma-5min', 
-  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
+  account: {loss: -40, profit: 58, shortProfit: 55, frequenceLimit: 2 },
   '5m': { smaFastLen: 2 },
   ...defaultPriceFilter
 })
@@ -48,14 +48,14 @@ obManager.addNewStrategy({
 obManager.addNewStrategy({
   id: 'sar-ma-5min-priceoffset5',
   priceOffset: 5,
-  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
+  account: {loss: -40, profit: 58, shortProfit: 55, frequenceLimit: 2 },
   ...defaultPriceFilter
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-5min-priceoffset10',
   priceOffset: 10,
-  account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
+  account: {loss: -40, profit: 58, shortProfit: 55, frequenceLimit: 2 },
   ...defaultPriceFilter
 })
 
