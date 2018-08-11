@@ -16,30 +16,31 @@ const defaultPriceFilter = {
   shortMinPriceDiff: 20
 }
 
+
 obManager.addNewStrategy({
-  id: 'sar-ma-1min-disableShort-priceoffset4-profit33.5',
+  id: 'sar-ma-1min-priceoffset7-profit36',
+  use1m: true,
+  priceOffset: 7,
+  account: { loss: -30, profit: 36, shortProfit: 36, orderCancelTime: 10, frequenceLimit: 2 },
+  '1m': { smaFastLen: 5, sarMax: 0.13 },
+  ...defaultPriceFilter
+})
+
+obManager.addNewStrategy({
+  id: 'sar-ma-1min-disableShort-priceoffset7-profit36',
   use1m: true,
   disableShort: true,
-  priceOffset: 4,
-  account: { loss: -30, profit: 33.5, orderCancelTime: 10, frequenceLimit: 2 },
+  priceOffset: 7,
+  account: { loss: -30, profit: 36, orderCancelTime: 10, frequenceLimit: 2 },
   '1m': { smaFastLen: 5, sarMax: 0.13 },
   ...defaultPriceFilter
 })
 
 obManager.addNewStrategy({
-  id: 'sar-ma-1min-priceoffset7-profit33',
+  id: 'sar-ma-1min-priceoffset7-profit38',
   use1m: true,
   priceOffset: 7,
-  account: { loss: -30, profit: 33, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
-  '1m': { smaFastLen: 5, sarMax: 0.13 },
-  ...defaultPriceFilter
-})
-
-obManager.addNewStrategy({
-  id: 'sar-ma-1min-priceoffset7-profit35',
-  use1m: true,
-  priceOffset: 7,
-  account: { loss: -30, profit: 35, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
+  account: { loss: -30, profit: 38, shortProfit: 38, orderCancelTime: 10, frequenceLimit: 2 },
   '1m': { smaFastLen: 5, sarMax: 0.13 },
   ...defaultPriceFilter
 })
@@ -53,10 +54,10 @@ obManager.addNewStrategy({
 })
 
 obManager.addNewStrategy({
-  id: 'sar-ma-1min-priceoffset5-profit33',
+  id: 'sar-ma-1min-priceoffset5-profit34',
   use1m: true,
   priceOffset: 5,
-  account: { loss: -30, profit: 33, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
+  account: { loss: -30, profit: 34, shortProfit: 34, orderCancelTime: 10, frequenceLimit: 2 },
   '1m': { smaFastLen: 5, sarMax: 0.13 },
   ...defaultPriceFilter
 })
