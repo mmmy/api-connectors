@@ -11,48 +11,58 @@ obManager.addNewStrategy({
   use1m: true,
   disableShort: true,
   priceOffset: 4,
-  account: {loss: -30, profit: 33.5, orderCancelTime: 10, frequenceLimit: 2 },
-  '1m': { smaFastLen: 5, sarMax: 0.13 }
+  account: { loss: -30, profit: 33.5, orderCancelTime: 10, frequenceLimit: 2 },
+  '1m': { smaFastLen: 5, sarMax: 0.13 },
+  shortMaxPriceDiff: 43,
+  shortMinPriceDiff: 20
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-1min-priceoffset7-profit33',
   use1m: true,
   priceOffset: 7,
-  account: {loss: -30, profit: 33, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2},
-  '1m': { smaFastLen: 5, sarMax: 0.13 }
+  account: { loss: -30, profit: 33, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
+  '1m': { smaFastLen: 5, sarMax: 0.13 },
+  shortMaxPriceDiff: 43,
+  shortMinPriceDiff: 20
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-1min-priceoffset7-profit35',
   use1m: true,
   priceOffset: 7,
-  account: {loss: -30, profit: 35, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
-  '1m': { smaFastLen: 5, sarMax: 0.13 }
+  account: { loss: -30, profit: 35, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
+  '1m': { smaFastLen: 5, sarMax: 0.13 },
+  shortMaxPriceDiff: 43,
+  shortMinPriceDiff: 20
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-1min',
   use1m: true,
-  account: {loss: -30, profit: 33, orderCancelTime: 10, frequenceLimit: 2 },
-  '1m': { smaFastLen: 5, sarMax: 0.13 }
+  account: { loss: -30, profit: 33, orderCancelTime: 10, frequenceLimit: 2 },
+  '1m': { smaFastLen: 5, sarMax: 0.13 },
+  shortMaxPriceDiff: 43,
+  shortMinPriceDiff: 20
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-1min-priceoffset5-profit33',
   use1m: true,
   priceOffset: 5,
-  account: {loss: -30, profit: 33, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
-  '1m': { smaFastLen: 5, sarMax: 0.13 }
+  account: { loss: -30, profit: 33, shortProfit: 33, orderCancelTime: 10, frequenceLimit: 2 },
+  '1m': { smaFastLen: 5, sarMax: 0.13 },
+  shortMaxPriceDiff: 43,
+  shortMinPriceDiff: 20
 })
 
 const bitmex = new BitmexManager()
 
-bitmex.listenOrderBook(function(data) {
+bitmex.listenOrderBook(function (data) {
   obManager.updateOrderbook(data)
 })
 
-bitmex.listenTrade(function(data) {
+bitmex.listenTrade(function (data) {
   var lastData = data.data.slice(-1)[0]
 
   obManager.updateCandlesRealTime(lastData)
@@ -60,22 +70,22 @@ bitmex.listenTrade(function(data) {
   obManager.doStrategy(lastData.price)
 })
 
-bitmex.listenCandle({binSize: '1m'}, function(list) {
+bitmex.listenCandle({ binSize: '1m' }, function (list) {
   obManager.setCandleHistory('1m', list)
-}, function(data) {
+}, function (data) {
   obManager.updateCandleLastHistory('1m', data.data[0])
 })
 
-bitmex.listenCandle({binSize: '5m'}, function(list) {
+bitmex.listenCandle({ binSize: '5m' }, function (list) {
   obManager.setCandleHistory('5m', list)
-}, function(data) {
+}, function (data) {
   obManager.updateCandleLastHistory('5m', data.data[0])
 })
 
-bitmex.listenCandle({binSize: '1h'}, function(list) {
+bitmex.listenCandle({ binSize: '1h' }, function (list) {
   obManager.setCandleHistory('1h', list)
   obManager.setCandleHistory('4h', list)
-}, function(data) {
+}, function (data) {
   obManager.updateCandleLastHistory('1h', data.data[0])
   obManager.updateCandleLastHistory('4h', data.data[0])
 })
