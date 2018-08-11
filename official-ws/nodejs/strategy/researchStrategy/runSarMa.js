@@ -7,6 +7,17 @@ const common = require('../common')
 /*
   5分钟策略
 */
+
+const defaultPriceFilter = {
+  longPriceLen: 15,
+  longMaxPriceDiff: 60,
+  longMinPriceDiff: 0,
+
+  shortPriceLen: -1,
+  // shortMaxPriceDiff: 43,
+  // shortMinPriceDiff: 20
+}
+
 const obManager = new SarMaStrategyManager()
 // run real rocket
 obManager.addNewStrategy({
@@ -23,25 +34,29 @@ obManager.addNewStrategy({
     apiKey,
     apiSecret
   },
+  ...defaultPriceFilter
 })
 
 // test
 obManager.addNewStrategy({
   id: 'sar-ma-5min', 
   account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
-  '5m': { smaFastLen: 2 }
+  '5m': { smaFastLen: 2 },
+  ...defaultPriceFilter
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-5min-priceoffset5',
   priceOffset: 5,
   account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
+  ...defaultPriceFilter
 })
 
 obManager.addNewStrategy({
   id: 'sar-ma-5min-priceoffset10',
   priceOffset: 10,
   account: {loss: -40, profit: 62, shortProfit: 50, frequenceLimit: 2 },
+  ...defaultPriceFilter
 })
 
 const bitmex = new BitmexManager()

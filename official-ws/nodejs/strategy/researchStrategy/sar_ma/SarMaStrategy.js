@@ -9,11 +9,11 @@ class Minute5Strategy extends Strategy {
 
   initStratety() {
     this.setStrategy((price, candles, orderbook, tradeHistoryManager) => {
-      const longPriceLen = this._options.longPriceLen || 15             // 1min: 50  // disable: -1
+      const longPriceLen = this._options.longPriceLen || -1             // 5min: 15, 1min: 50  // disable: -1
       const longMaxPriceDiff = this._options.longMaxPriceDiff || 60     // 1min: 100
       const longMinPriceDiff = this._options.longMinPriceDiff || 0      // 1min: 40
       
-      const shortPriceLen = this.options.longPriceLen || 15             // 1min: 50 // disable: -1
+      const shortPriceLen = this.options.longPriceLen || -1             // 1min: 50 // disable: -1
       const shortMaxPriceDiff = this._options.shortMaxPriceDiff || 60   // 1min: 43
       const shortMinPriceDiff = this._options.shortMinPriceDiff || 0   // 1min: 20
       let long = false
