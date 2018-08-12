@@ -52,6 +52,7 @@ Account.prototype.setOptions = function(options) {
     loss: '-0.3%',          // price or percentage: -5 or '-0.2%'
     profit: '0.3%',
     shortProfit: null,        // 注意shortProfit如果没有设置就用profit
+    shortLoss: null,
     frequenceLimit: 5,       // 5分钟最多交易一次
     orderCancelTime: 60,     // 60分钟后取消挂单
     ...options
@@ -183,7 +184,11 @@ Account.prototype._calcOffsetPrice = function(offset) {
 }
 
 Account.prototype.getLossLimitPrices = function() {
-  const loss = this._options.loss
+  let loss = this._options.loss
+  // short 有时候需要不同的参数
+  if (!this._long && this._options.shortLoss) {
+    loss = this._options.shortLoss
+  }
   const offsetP = this._calcOffsetPrice(loss)
   const marketPrice = this._price + (this._long ? offsetP : -offsetP)
   const stopPrice = marketPrice + (this._long ? 0.5 : -0.5)
