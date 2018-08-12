@@ -6,31 +6,31 @@ const common = require('../common')
 
 const obManager = new RsiBBStrategyManager()
 
-obManager.addNewStrategy({
-  id: 'rsi-bb-1min-disableShort',
-  use1m: true,
-  disableShort: true,
-  account: {loss: -20, profit: 23, frequenceLimit: 1 },
-})
+// obManager.addNewStrategy({
+//   id: 'rsi-bb-1min-disableShort',
+//   use1m: true,
+//   disableShort: true,
+//   account: {loss: -20, profit: 23, frequenceLimit: 1 },
+// })
 
 obManager.addNewStrategy({
   id: 'rsi-bb-1min',
   use1m: true,
-  account: {loss: -20, profit: 23, shortProfit: 20, frequenceLimit: 1 },
+  account: {loss: -30, profit: 45, shortProfit: 45, frequenceLimit: 1 },
 })
 
 obManager.addNewStrategy({
   id: 'rsi-bb-1min-priceoffset2-shortProfit20.5',
   use1m: true,
   priceOffset: 2,
-  account: {loss: -20, profit: 23, shortProfit: 20.5, frequenceLimit: 1 },
+  account: {loss: -30, profit: 45, shortProfit: 45, frequenceLimit: 1 },
 })
 
 obManager.addNewStrategy({
   id: 'rsi-bb-1min-priceoffset4-profit24',
   use1m: true,
   priceOffset: 4,
-  account: {loss: -20, profit: 24, shortProfit: 21, frequenceLimit: 1 },
+  account: {loss: -30, profit: 45, shortProfit: 45, frequenceLimit: 1 },
 })
 
 const bitmex = new BitmexManager()
