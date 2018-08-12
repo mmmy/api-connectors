@@ -8,11 +8,11 @@ const obManager = new SarMaStrategyManager()
 
 const defaultPriceFilter = {
   longPriceLen: 50,
-  longMaxPriceDiff: 100,
-  longMinPriceDiff: 40,
+  longMaxPriceDiff: 47,
+  longMinPriceDiff: 20,
 
   shortPriceLen: 50,
-  shortMaxPriceDiff: 43,
+  shortMaxPriceDiff: 47,
   shortMinPriceDiff: 20
 }
 
