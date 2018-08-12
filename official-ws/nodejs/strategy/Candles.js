@@ -357,7 +357,7 @@ Candles.prototype.rsiBbReverseSignal = function(realTime, efficientBars=10, cont
   // const efficientBars = 10  //信号过去了10bar, 我们认为无效了
   // const continuousTrendBars = 40 //信号出现之前连续出现上涨或者下跌
   // rsi 为8, 上下为80, 20
-  const { atBottom, bars } = this.barsLastRsiOverTrade(realTime, 8, 20, 80) // bars 最小是 1
+  const { atBottom, bars } = this.barsLastRsiOverTrade(realTime, 10, 20, 80) // bars 最小是 1
   if (bars < efficientBars) {
     const lastCandle = this.getHistoryCandle(1)
     const signalCandle = this.getHistoryCandle(bars) 
