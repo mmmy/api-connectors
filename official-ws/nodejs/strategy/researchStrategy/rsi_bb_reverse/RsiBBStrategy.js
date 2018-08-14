@@ -32,10 +32,14 @@ class RsiBBStrategy extends Strategy {
         short = true
       }
       
+      const priceOffset = this._options.priceOffset || 0
+      if (long || short) {
+        strategyPrice = mainCandle.getLastHistoryClose() + (long ? -priceOffset : priceOffset)
+      }
       return {
         long,
         short,
-        priceOffset: this._options.priceOffset || 0,
+        strategyPrice,
       }
     })
   }
