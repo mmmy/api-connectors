@@ -45,11 +45,18 @@ class Minute5Strategy extends Strategy {
         short = true
       }
       
+      //有的时候需要在当前的orderbook 上偏移一段价格来挂单, 这样对我们有利
+      const priceOffset = this._options.priceOffset || 0
+      let strategyPrice = null
+      if (long || short) {
+        strategyPrice = mainCandle.getLastHistoryClose() + (long ? -priceOffset : priceOffset)
+      }
+
       return {
         long,
         short,
-        priceOffset: this._options.priceOffset || 0,
-        strategyPrice: (long || short) ? mainCandle.getLastHistoryClose() : null
+        // priceOffset,
+        strategyPrice,
       }
     })
   }

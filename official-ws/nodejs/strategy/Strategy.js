@@ -96,8 +96,6 @@ class Strategy {
   doStrategy(price) {
     if (this._account.isReadyToOrder()) {
       const signal = this._strategy(price, this._candles, this._orderbook, this._tradeHistoryManager)
-      //有的时候需要在当前的orderbook 上偏移一段价格来挂单, 这样对我们有利
-      const priceOffset = signal.priceOffset || 0
       const strategyPrice = signal.strategyPrice
       
       if (signal.long) {
@@ -106,14 +104,14 @@ class Strategy {
         if (strategyPrice) {
           bidPrice = Math.min(bidPrice, strategyPrice)
         }        
-        this.entry(bidPrice - priceOffset, true, price)
+        this.entry(bidPrice, true, price)
       } else if (signal.short) {
         var askPrice = this._orderbook.getTopAskPrice()
         // 同上
         if (strategyPrice) {
           askPrice = Math.max(askPrice, strategyPrice)
         }
-        this.entry(askPrice + priceOffset, false, price)
+        this.entry(askPrice, false, price)
       }
     }
 
