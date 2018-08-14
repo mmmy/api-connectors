@@ -24,7 +24,7 @@ class RsiBBStrategy extends Strategy {
       // 设置中禁止做空
       const disableShort = this._options.disableShort
       const RsiBBSignal = mainCandle.rsiBbReverseSignal() // 最好是缓存的, 要重构
-      if (RsiBBSignal.long && _1hCandle.macdTrendSignal().long() && (use1m ? _1mCandle.minMaxCloseFilter(25, 1000, 30) : true)) {
+      if (RsiBBSignal.long && _1hCandle.macdTrendSignal().long && (use1m ? _1mCandle.minMaxCloseFilter(25, 1000, 30) : true)) {
         console.log(`${this._options.id} ${new Date()} RSI BB do long ++`)
         long = true
       } else if (!disableShort && RsiBBSignal.short && _1hCandle.macdTrendSignal().short && (use1m ? _1mCandle.minMaxCloseFilter(25, 1000, 30) : true)) {
