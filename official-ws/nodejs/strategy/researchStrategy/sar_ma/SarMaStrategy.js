@@ -18,7 +18,6 @@ class Minute5Strategy extends Strategy {
       const shortMinPriceDiff = this._options.shortMinPriceDiff || 0   // 1min: 20
       let long = false
       let short = false
-      let strategyPrice
       const _1mCandle = candles['1m']
       const _5mCandle = candles['5m']
       const _1hCandle = candles['1h']
