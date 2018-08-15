@@ -12,6 +12,7 @@ class Strategy {
       amount: 2000,
       ...options,
     }
+    console.log(this._options)
     this._periods = ['1m', '5m', '1h', '4h']
 
     this._candles = {}
@@ -148,7 +149,7 @@ class Strategy {
 
   updateOptions(options) {
     this._options = {
-      ...this.options,
+      ...this._options,
       ...options
     }
 
