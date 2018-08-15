@@ -9,8 +9,8 @@ const _ = require('lodash')
 class Strategy {
   constructor(options) {
     this._options = {
+      amount: 2000,
       ...options,
-      amount: 2000
     }
     this._periods = ['1m', '5m', '1h', '4h']
 
