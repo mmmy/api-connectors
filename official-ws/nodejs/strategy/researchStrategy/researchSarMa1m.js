@@ -8,7 +8,7 @@ const obManager = new SarMaStrategyManager()
 
 const defaultPriceFilter = {
   longPriceLen: 50,
-  longMaxPriceDiff: 47,
+  longMaxPriceDiff: 58,
   longMinPriceDiff: 20,
 
   shortPriceLen: 50,
@@ -45,22 +45,22 @@ obManager.addNewStrategy({
   ...defaultPriceFilter
 })
 
-obManager.addNewStrategy({
-  id: 'sar-ma-1min',
-  use1m: true,
-  account: { loss: -30, profit: 33, orderCancelTime: 10, frequenceLimit: 2 },
-  '1m': { smaFastLen: 5, sarMax: 0.13 },
-  ...defaultPriceFilter
-})
+// obManager.addNewStrategy({
+//   id: 'sar-ma-1min',
+//   use1m: true,
+//   account: { loss: -30, profit: 33, orderCancelTime: 10, frequenceLimit: 2 },
+//   '1m': { smaFastLen: 5, sarMax: 0.13 },
+//   ...defaultPriceFilter
+// })
 
-obManager.addNewStrategy({
-  id: 'sar-ma-1min-priceoffset5-profit34',
-  use1m: true,
-  priceOffset: 5,
-  account: { loss: -30, profit: 34, shortProfit: 34, orderCancelTime: 10, frequenceLimit: 2 },
-  '1m': { smaFastLen: 5, sarMax: 0.13 },
-  ...defaultPriceFilter
-})
+// obManager.addNewStrategy({
+//   id: 'sar-ma-1min-priceoffset5-profit34',
+//   use1m: true,
+//   priceOffset: 5,
+//   account: { loss: -30, profit: 34, shortProfit: 34, orderCancelTime: 10, frequenceLimit: 2 },
+//   '1m': { smaFastLen: 5, sarMax: 0.13 },
+//   ...defaultPriceFilter
+// })
 
 const bitmex = new BitmexManager()
 
@@ -82,11 +82,11 @@ bitmex.listenCandle({ binSize: '1m' }, function (list) {
   obManager.updateCandleLastHistory('1m', data.data[0])
 })
 
-bitmex.listenCandle({ binSize: '5m' }, function (list) {
-  obManager.setCandleHistory('5m', list)
-}, function (data) {
-  obManager.updateCandleLastHistory('5m', data.data[0])
-})
+// bitmex.listenCandle({ binSize: '5m' }, function (list) {
+//   obManager.setCandleHistory('5m', list)
+// }, function (data) {
+//   obManager.updateCandleLastHistory('5m', data.data[0])
+// })
 
 bitmex.listenCandle({ binSize: '1h' }, function (list) {
   obManager.setCandleHistory('1h', list)
