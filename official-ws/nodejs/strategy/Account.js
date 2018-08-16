@@ -190,9 +190,9 @@ Account.prototype.getLossLimitPrices = function() {
     loss = this._options.shortLoss
   }
   const offsetP = this._calcOffsetPrice(loss)
-  const marketPrice = this._price + (this._long ? offsetP : -offsetP)
-  const stopPrice = marketPrice + (this._long ? 0.5 : -0.5)
-  const price = stopPrice + (this._long ? 0.5 : -0.5)
+  const marketPrice = this._price + (this._long ? offsetP : -offsetP)  // 市价止损
+  const stopPrice = marketPrice + (this._long ? 1 : -1)               // 限价触发价格
+  const price = stopPrice + (this._long ? 0.5 : -0.5)                  // 限价
   return {
     stopPrice,
     price,
@@ -208,7 +208,7 @@ Account.prototype.getProfitLimitPrices = function() {
   }
   const offsetP = this._calcOffsetPrice(profit)
   const price = this._price + (this._long ? offsetP : -offsetP)
-  const stopPrice = price + (this._long ? -0.5 : 0.5)
+  const stopPrice = price + (this._long ? -3 : 3)                // 触发价格
   return {
     stopPrice,
     price
