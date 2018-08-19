@@ -107,7 +107,7 @@ Account.prototype.orderLimit = function(price, long, amount, tradePrice/*真实�
       this.orderStop()
       this.orderStopLimit()
       this.orderProfitLimitTouched()
-      this.notify(`orderLimitOK${json.avgPx}(${price})`)
+      this.notify(`orderLimitOK ${long}(${price})`)
       console.log('Account.prototype.orderLimit 成功了')
       // 60分钟后取消没有成交的, 所以最终的_amount 是<= amount
       this._timeoutCancelOrder = this.timeCancelOrderLimit(this._options.orderCancelTime)
