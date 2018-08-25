@@ -38,18 +38,25 @@
       })
     </script>
   </div>
-  <div class="ui modal">
+  <div class="ui modal" id="option-modal">
     <i class="close icon"></i>
     <div class="header">
       Modal Title
     </div>
-    <div class="content">
-      <div id="codemirror">
+    <div class="content ui form">
+      <div class="field">
+        <label>key</label>
+        <input type="text" id="option-key">
       </div>
+      <div class="field">
+        <label>value</label>
+        <input type="text" id="option-value">
+      </div>
+
     </div>
     <div class="actions">
-      <div class="ui button">Cancel</div>
-      <div class="ui button">OK</div>
+      <div class="ui button" id="option-cancel">取消</div>
+      <div class="ui button" id="option-ok">确定</div>
     </div>
   </div>
   <div id="loader" class="ui active disabled massive loader"></div>

@@ -6,6 +6,34 @@ function hideLoading() {
   $('#loader').addClass('disabled')
 }
 
+function showOptionModal(id) {
+  var $modal = $('#option-modal')
+  var $ok = $modal.find('#option-ok')
+  $modal.find('.header').text(id)
+  $ok.off().on('click', function() {
+    var key = $modal.find('#option-key').val()
+    var value = +$modal.find('#option-value').val()
+    if (!key) {
+      alert('输入key')
+      return
+    }
+    if (isNaN(value)) {
+      alert('目前只支持数字类型option')
+    } else {
+      $ok.addClass('loading')
+      window.Site.updateOption(id, key, value, function(json) {
+        $ok.removeClass('loading')
+        if (!json.result || json.data != value) {
+          alert('设置失败!' + json.data)
+        } else {
+          $modal.modal('hide')
+        }
+      })
+    }
+  })
+  $modal.modal('show')
+}
+
 function timeFormat(value, item) {
   return new Date(value).toLocaleString()
 }
@@ -38,7 +66,7 @@ function sumEarn(trades) {
       fees += fee
     }
   })
-  return {maxAll: percentFormat(maxAll), maxFees: percentFormat(maxFees), all: percentFormat(all), fees: percentFormat(fees)}
+  return { maxAll: percentFormat(maxAll), maxFees: percentFormat(maxFees), all: percentFormat(all), fees: percentFormat(fees) }
 }
 
 function getWinsFails(trades) {
@@ -48,7 +76,7 @@ function getWinsFails(trades) {
   let rate = 0
 
   trades.forEach(item => {
-    if(item.win) {
+    if (item.win) {
       maxWins++
       if (!isWinNotEffecient(item)) {
         wins++
@@ -61,34 +89,34 @@ function getWinsFails(trades) {
   if (wins > 0 || fails > 0) {
     rate = 100 * wins / (wins + fails)
   }
-  return {maxWins, wins, fails, rate}
+  return { maxWins, wins, fails, rate }
 }
 
 var Site = {
-  addNew: function(id) {
+  addNew: function (id) {
     $.post({
       url: '/list/add',
       data: { id },
-      success: function(data) {
+      success: function (data) {
         console.log(data)
       },
       dataType: 'json'
     })
   },
 
-  deleteById: function(id) {
+  deleteById: function (id) {
     if (confirm(`delete ${id}?`)) {
-      $.post('/strategy/delete', { id }, function(data) {
+      $.post('/strategy/delete', { id }, function (data) {
         console.log(data)
       })
     }
   },
 
-  updateOption: function(id, key, value, callback) {
+  updateOption: function (id, key, value, callback) {
     $.ajax({
       url: '/strategy/update_option',
       type: 'POST',
-      data: JSON.stringify({id, key, value}),
+      data: JSON.stringify({ id, key, value }),
       headers: {
         "Content-Type": "application/json"
       },
@@ -97,19 +125,19 @@ var Site = {
     // $.post('/strategy/update_option', { id, key, value: !!value }, callback, 'json')
   },
 
-  clearTradesById: function(id) {
+  clearTradesById: function (id) {
     if (confirm(`clear ${id} trades ?`)) {
-      $.post('/strategy/clear_trade', { id }, function(data) {
+      $.post('/strategy/clear_trade', { id }, function (data) {
         console.log(data)
       })
     }
   },
 
-  renderStatistic: function(list) {
+  renderStatistic: function (list) {
 
   },
 
-  renderStrategy: function(data, index) {
+  renderStrategy: function (data, index) {
     var $itemRoot = $('<div class="strategy-container"></div>')
     var $title = $('<h5 class="title"></h5>')
     var $statistic = $('<p class="statistic"></p>')
@@ -120,20 +148,20 @@ var Site = {
     var allEarn = sumEarn(data.trades)
     var winsFails = getWinsFails(data.trades)
     $title.append(`<span>${index + 1}. ${data.options.id} total: ${data.trades.length}</span>`)
-    $title.append($('<button>clear</button>').on('click', function() { Site.clearTradesById(data.options.id) }))
-    $title.append($('<button>delete</button>').on('click', function() { Site.deleteById(data.options.id) }))
-    $title.append($('<button>options</button>').on('click', function() {  }))
+    $title.append($('<button>clear</button>').on('click', function () { Site.clearTradesById(data.options.id) }))
+    $title.append($('<button>delete</button>').on('click', function () { Site.deleteById(data.options.id) }))
+    $title.append($('<button>options</button>').on('click', function () { showOptionModal(data.options.id) }))
 
-    var $longInput = $('<input type="checkbox"><span>long</span>').on('click', function() {
+    var $longInput = $('<input type="checkbox"><span>long</span>').on('click', function () {
       showLoading()
-      Site.updateOption(data.options.id, 'disableLong', !$longInput[0].checked, function(data) {
+      Site.updateOption(data.options.id, 'disableLong', !$longInput[0].checked, function (data) {
         $longInput[0].checked = !data.data
         hideLoading()
       })
     })
-    var $shortInput = $('<input type="checkbox"><span>short</span>').on('click', function() {
+    var $shortInput = $('<input type="checkbox"><span>short</span>').on('click', function () {
       showLoading()
-      Site.updateOption(data.options.id, 'disableShort', !$shortInput[0].checked, function(data) {
+      Site.updateOption(data.options.id, 'disableShort', !$shortInput[0].checked, function (data) {
         $shortInput[0].checked = !data.data
         hideLoading()
       })
@@ -146,11 +174,11 @@ var Site = {
     }
 
     $amount = $(`<span><span class="value">${data.options.amount}</span><i class="closed edit outline icon"></i></span>`)
-    $amount.find('.icon').on('click', function(){
+    $amount.find('.icon').on('click', function () {
       var newAmount = +prompt('amount')
       if (newAmount) {
         showLoading()
-        Site.updateOption(data.options.id, 'amount', newAmount, function(data) {
+        Site.updateOption(data.options.id, 'amount', newAmount, function (data) {
           if (data.result) {
             $amount.find('.value').text(data.data)
           } else {
@@ -162,10 +190,10 @@ var Site = {
       console.log(newAmount)
     })
 
-    $test = $('<input type="checkbox">').on('click', function() {
+    $test = $('<input type="checkbox">').on('click', function () {
       if (confirm(`change account.text to ${!data.options.account.test} ?`)) {
         showLoading()
-        Site.updateOption(data.options.id, 'account.test', !data.options.account.test, function(res) {
+        Site.updateOption(data.options.id, 'account.test', !data.options.account.test, function (res) {
           data.options.account.test = res.data
           hideLoading()
         })
@@ -175,7 +203,7 @@ var Site = {
     })
 
     $test.prop('checked', data.options.account.test)
-    
+
     $title.append($longInput)
     $title.append($shortInput)
     $title.append($amount)
@@ -195,20 +223,20 @@ var Site = {
       sorting: true,
       data: data.trades,
       fields: [
-        {name: 'startTime', type: 'text', width: 150, itemTemplate: timeFormat},
+        { name: 'startTime', type: 'text', width: 150, itemTemplate: timeFormat },
         // {name: 'endTime', type: 'text'},
-        {name: 'minute', type: 'number', width: 30},
-        {name: 'long', type: 'checkbox', width: 20},
-        {name: 'price', type: 'number', width: 60},
-        {name: 'endPrice', type: 'number', width: 60},
-        {name: 'minPrice', type: 'number', width: 60},
-        {name: 'maxPrice', type: 'number', width: 60},
-        {name: 'loss', type: 'number', width: 40},
-        {name: 'profit', type: 'number', width: 40},
-        {name: 'win', type: 'checkbox', width: 20},
-        {name: 'earn', type: 'number', width: 50, itemTemplate: percentFormat},
+        { name: 'minute', type: 'number', width: 30 },
+        { name: 'long', type: 'checkbox', width: 20 },
+        { name: 'price', type: 'number', width: 60 },
+        { name: 'endPrice', type: 'number', width: 60 },
+        { name: 'minPrice', type: 'number', width: 60 },
+        { name: 'maxPrice', type: 'number', width: 60 },
+        { name: 'loss', type: 'number', width: 40 },
+        { name: 'profit', type: 'number', width: 40 },
+        { name: 'win', type: 'checkbox', width: 20 },
+        { name: 'earn', type: 'number', width: 50, itemTemplate: percentFormat },
       ],
-      rowClass: function(item, itemIndex) {
+      rowClass: function (item, itemIndex) {
         var isNotEffecient = isWinNotEffecient(item)
         return isNotEffecient ? 'warn' : ''
       },

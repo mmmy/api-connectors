@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,25 +14,48 @@
   <script src="https://cdn.bootcss.com/jsgrid/1.5.3/jsgrid.min.js"></script>
   <script src="https://cdn.bootcss.com/semantic-ui/2.3.1/semantic.min.js"></script>
 </head>
+
 <body>
   <div id="app"></div>
   <div>
-      <form class="ui form">
-        <div class="inline field">
-          <label>id</label>
-          <input type="text" name="id" id="new-id-input">
-        </div>
-        <button class="ui button" type="button" id="add-new-btn">新增</button>
-      </form>
-      <script>
-        $('#add-new-btn').click(function() {
-          var id = $('#new-id-input').val()
-          Site.addNew(id)
-        })
-      </script>
+    <form class="ui form">
+      <div class="inline field">
+        <label>id</label>
+        <input type="text" name="id" id="new-id-input">
+      </div>
+      <button class="ui button" type="button" id="add-new-btn">新增</button>
+    </form>
+    <script>
+      $('#add-new-btn').click(function () {
+        var id = $('#new-id-input').val()
+        Site.addNew(id)
+      })
+    </script>
+  </div>
+  <div class="ui modal" id="option-modal">
+    <i class="close icon"></i>
+    <div class="header">
+      Modal Title
     </div>
+    <div class="content ui form">
+      <div class="field">
+        <label>key</label>
+        <input type="text" id="option-key">
+      </div>
+      <div class="field">
+        <label>value</label>
+        <input type="text" id="option-value">
+      </div>
+
+    </div>
+    <div class="actions">
+      <div class="ui button" id="option-cancel">取消</div>
+      <div class="ui button" id="option-ok">确定</div>
+    </div>
+  </div>
   <div id="loader" class="ui active disabled massive loader"></div>
   <script src="./web/lib.js"></script>
   <script src="./web/main.js"></script>
 </body>
+
 </html>
