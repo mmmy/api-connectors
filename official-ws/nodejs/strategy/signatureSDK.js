@@ -72,9 +72,9 @@ class SignatureSDK {
     const data = {symbol: SYMBOL, orderQty, stopPx, side, ordType:"MarketIfTouched", execInst:"Close,LastPrice"}
     return this.order(data)
   }
-  // 限价手续费是-0.025%, 所以最好买入用orderLimit, displayQty: 0, 隐藏订单, 不显示到orderbook
+  // 限价手续费是-0.025%, 所以最好买入用orderLimit, displayQty: 0, 隐藏订单, 不显示到orderbook, 但是要收手续费
   orderLimit(orderQty, side, price) {
-    const data = {symbol: SYMBOL, orderQty, side, price, ordType: 'Limit', displayQty: 0}
+    const data = {symbol: SYMBOL, orderQty, side, price, ordType: 'Limit'}
     return this.order(data)
   }
   // 限价止损, 手续费是负数, 你懂的
