@@ -126,7 +126,9 @@ class Strategy {
 
   getAllOptions() {
     var orderbookOptions = this._orderbook.getOptions()
-    var accountOptions = this._account.getOptions()
+    var accountOptions = { ...this._account.getOptions() }
+    delete accountOptions.apiKey
+    delete accountOptions.apiSecret
     var candleOptions = {}
     this._periods.forEach(key => {
       candleOptions[key] = this._candles[key].getOptions()
