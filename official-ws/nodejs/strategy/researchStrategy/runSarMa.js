@@ -22,13 +22,13 @@ const obManager = new SarMaStrategyManager()
 // run real rocket
 obManager.addNewStrategy({
   id: 'sar-ma-5min-531905408-priceOffset1',
-  amount: 5000,
+  amount: 10000,
   priceOffset: 1,
   disableShort: true,
   account: {
     loss: -41,
     shortLoss: -44,
-    profit: 58,
+    profit: 60,
     shortProfit: 55,
     frequenceLimit: 2,
     test: false,
