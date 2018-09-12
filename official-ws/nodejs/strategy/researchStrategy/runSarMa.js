@@ -26,7 +26,7 @@ obManager.addNewStrategy({
   priceOffset: 3,
   disableShort: true,
   account: {
-    loss: -41,
+    loss: -40,
     shortLoss: -44,
     profit: 60,
     shortProfit: 55,
