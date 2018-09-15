@@ -2,8 +2,8 @@ var technicalindicators = require('technicalindicators')
 var RSI = technicalindicators.RSI
 var BB = technicalindicators.BollingerBands
 var MACD = technicalindicators.MACD
-var PSAR = technicalindicators.PSAR
 var SMA = technicalindicators.SMA
+var PSAR = require('../lib/PSAR').PSAR
 // var jStat = require('jStat')
 
 function parseKline(kline) {
@@ -94,10 +94,10 @@ exports.RSI = function (kline, len=14) {
     // console.log(result.slice(result.length - 10))
 }
 // 200条K线以上？？
-exports.PasrSignal = function (kline, max=0.11) {
+exports.PasrSignal = function (kline, start=0.02, step=0.02, max=0.11) {
     const { T, O, H, L, C, V } = parseKline(kline)
 
-    const psar = new PSAR({ high: H, low: L, step: 0.02, max: max }) // 0.11-0.13效果好
+    const psar = new PSAR({ high: H, low: L, start, step, max }) // 0.11-0.13效果好
     const result = psar.getResult()
 
     const len = result.length

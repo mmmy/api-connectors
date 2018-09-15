@@ -50,6 +50,8 @@ Candles.prototype.setOptions = function(options) {
   this._options = {
     smaFastLen: 29,
     smaSlowLen: 50,
+    sarStart: 0.02,
+    sarStep: 0.02,
     sarMax: 0.11, // 0.11 - 0.13 good
     ...options
   }
@@ -220,7 +222,7 @@ Candles.prototype.macdTrendSignal = function(realTime = true) {
 // 抛物线转向计算
 Candles.prototype.sarSignal = function(realTime) {
   var klines = this.getCandles(realTime)
-  var sarSignal = signal.PasrSignal(klines, this._options.sarMax)
+  var sarSignal = signal.PasrSignal(klines, this._options.sarStart, this._options.sarStep, this._options.sarMax)
   // list of bool for longs
   return sarSignal.signals
 }
