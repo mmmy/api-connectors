@@ -418,6 +418,9 @@ Account.prototype.isReadyToLiquidation = function() {
 }
 
 Account.prototype.notify = function(msg) {
+  if (this._options.name) {
+    msg = `${this._options.name})` + msg
+  }
   if (this._options.log) {
     console.log(msg)
   }

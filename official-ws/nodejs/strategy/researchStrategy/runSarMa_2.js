@@ -1,4 +1,4 @@
-var { apiKey, apiSecret } = require('../secret.json')
+var { apiKey, apiSecret } = require('../yqhero_secret.json')
 
 const WebServer = require('./WebServer')
 const BitmexManager = require('./BitmexManager')
@@ -23,7 +23,7 @@ const obManager = new SarMaStrategyManager()
 // run real rocket
 obManager.addNewStrategy({
   id: 'sar-ma-5min-yangqihero-priceOffset1',
-  amount: 10000,
+  amount: 2000,
   priceOffset: 3,
   disableShort: true,
   account: {
@@ -33,7 +33,8 @@ obManager.addNewStrategy({
     shortProfit: 55,
     frequenceLimit: 2,
     test: true,
-    notify: false,
+    notify: true,
+    name: '2',
     // apiKey,
     // apiSecret
   },
