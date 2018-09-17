@@ -31,7 +31,7 @@ obManager.addNewStrategy({
     profit: 60,
     shortProfit: 55,
     frequenceLimit: 2,
-    test: false,
+    test: true,
     notify: true,
     apiKey,
     apiSecret
