@@ -9,8 +9,8 @@ const common = require('../common')
 */
 
 const defaultPriceFilter = {
-  longPriceLen: -1,
-  longMaxPriceDiff: 60,
+  longPriceLen: 6,
+  longMaxPriceDiff: 30,
   longMinPriceDiff: 0,
 
   shortPriceLen: -1,

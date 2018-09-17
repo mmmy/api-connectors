@@ -9,7 +9,13 @@ class SmaCrossStrategy extends Strategy {
 
   initStratety() {
     this.setStrategy((price, candles, orderbook, tradeHistoryManager) => {
-
+      const longPriceLen = this._options.longPriceLen || -1             // 5min: 6, 1min: 50  // disable: -1
+      const longMaxPriceDiff = this._options.longMaxPriceDiff || 30     // 1min: 47
+      const longMinPriceDiff = this._options.longMinPriceDiff || 0      // 1min: 20
+      
+      const shortPriceLen = this._options.longPriceLen || -1             // 1min: 50 // disable: -1
+      const shortMaxPriceDiff = this._options.shortMaxPriceDiff || 60   // 1min: 47
+      const shortMinPriceDiff = this._options.shortMinPriceDiff || 0   // 1min: 20
       let long = false
       let short = false
       const _1mCandle = candles['1m']
@@ -26,7 +32,11 @@ class SmaCrossStrategy extends Strategy {
       // 设置中禁止做空
       const disableShort = this._options.disableShort
       const smaCrossSignal = mainCandle.smaCrossSignal()
-      if (smaCrossSignal.long && _1dCandle.priceIsAboveSma()) {
+      if (
+        smaCrossSignal.long &&
+        _1dCandle.priceIsAboveSma() &&
+        (longPriceLen > 0 ? mainCandle.minMaxCloseFilter(longPriceLen, longMaxPriceDiff, longMinPriceDiff) : true)
+      ) {
         console.log(`${this._options.id} ${new Date()} SMA cross do long ++`)
         long = true
       } else if (
