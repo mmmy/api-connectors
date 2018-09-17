@@ -50,6 +50,7 @@ Candles.prototype.setOptions = function(options) {
   this._options = {
     smaFastLen: 29,
     smaSlowLen: 50,
+    smaFilterLen: 8, // 一般用于均线过滤, 比如日线在8日均线以上
     sarStart: 0.02,
     sarStep: 0.02,
     sarMax: 0.11, // 0.11 - 0.13 good
@@ -389,6 +390,29 @@ Candles.prototype.rsiBbReverseSignal = function(realTime, efficientBars=10, cont
     long,
     short
   }
+}
+
+// 用于sma交叉策略
+Candles.prototype.smaCrossSignal = function() {
+  const smaS = this.smaSignal(false)
+  const { signals } = smaS
+  const sLen = signals.length
+  const lastS = signals[sLen - 1]
+  const lastS2 = signals[sLen - 2]
+  // 金叉
+  const goldCross = lastS && !lastS2
+  // 暂时不做空
+  const deathCross = false
+  return {
+    long: goldCross,
+    short: deathCross
+  }
+}
+
+// 一般是实时的
+Candles.prototype.priceIsAboveSma = function() {
+  var klines = this.getCandles(true)
+  return signal.PriceAboveSma(klines, this._options.smaFilterLen)
 }
 
 Candles.prototype.getLastHistoryClose = function() {

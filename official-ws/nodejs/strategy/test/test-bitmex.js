@@ -25,7 +25,10 @@ const client = new BitMEXClient({testnet: false});
 client.on('error', console.error);
 client.on('close', () => console.log('Connection closed.'));
 client.on('initialize', () => console.log('Client initialized, data is flowing.'));
-
+client.addStream('XBTUSD', `tradeBin1d`, function(data, symbol, tableName) {
+    console.log('1d data', data)
+  })
+/*
 client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
   
   var lastData = data.data.slice(-1)[0]
@@ -62,3 +65,4 @@ client.addStream('XBTUSD', 'trade', function(data, symbol, tableName) {
     }
   }
 });
+*/

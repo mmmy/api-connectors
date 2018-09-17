@@ -13,7 +13,7 @@ class Strategy {
       ...options,
     }
     console.log(this._options)
-    this._periods = ['1m', '5m', '1h', '4h']
+    this._periods = ['1m', '5m', '1h', '4h', '1d']
 
     this._candles = {}
     this._orderbook = null

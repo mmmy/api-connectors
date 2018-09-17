@@ -142,6 +142,27 @@ exports.SmaSignal = function(kline, fastLen, slowLen) {
         diff,
     }
 }
+
+function SmaValue(kline, smaLen) {
+    const { T, O, H, L, C, V } = parseKline(kline)
+    const closeLen = C.length
+    let sum = 0
+    const startIndex = closeLen - smaLen
+    for (let i = startIndex; i < closeLen; i++) {
+        sum += C[i]
+    }
+    const avg = sum / smaLen
+    return avg
+}
+exports.SmaValue = SmaValue
+
+// 判断价格(一般是close)是否在均线之上
+exports.PriceAboveSma = function(kline, smaLen) {
+    const avg = SmaValue(kline, smaLen)
+    const lastPrice = C[closeLen - 1]
+    return lastPrice > avg
+}
+
 // 模仿TradingView barssince, list的length 一般100, true false list
 exports.barssince = function(list, long) {
     const len = list.length
