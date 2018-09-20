@@ -145,6 +145,10 @@ class Strategy {
     return this._account._tradeHistories
   }
 
+  getCurrentPostion() {
+    return this._account.getCurrentPostion()
+  }
+
   clearAllTrades() {
     this._account.clearAllTrades()
   }
