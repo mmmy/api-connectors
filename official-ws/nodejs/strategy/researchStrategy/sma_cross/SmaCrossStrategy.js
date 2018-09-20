@@ -33,9 +33,9 @@ class SmaCrossStrategy extends Strategy {
       const disableShort = this._options.disableShort
       const smaCrossSignal = mainCandle.smaCrossSignal()
       if (
-        smaCrossSignal.long &&
+        smaCrossSignal.long
         // _1dCandle.priceIsAboveSma() && 测试 暂时不要日线过滤
-        (longPriceLen > 0 ? mainCandle.minMaxCloseFilter(longPriceLen, longMaxPriceDiff, longMinPriceDiff) : true)
+        // (longPriceLen > 0 ? mainCandle.minMaxCloseFilter(longPriceLen, longMaxPriceDiff, longMinPriceDiff) : true)
       ) {
         console.log(`${this._options.id} ${new Date()} SMA cross do long ++`)
         long = true

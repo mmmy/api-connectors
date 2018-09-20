@@ -41,7 +41,8 @@ class StrategyManager {
     const list = this._list.map(item => {
       return {
         options: item.getAllOptions(),
-        trades: item.getAllTrades()
+        trades: item.getAllTrades(),
+        currentPostion: item.getCurrentPostion(),
       }
     })
     return list
@@ -82,7 +83,8 @@ class StrategyManager {
     if (strategy) {
       return {
         options: strategy.getAllOptions(),
-        trades: strategy.getAllTrades()
+        trades: strategy.getAllTrades(),
+        currentPostion: strategy.getCurrentPostion(),
       }
     }
   }

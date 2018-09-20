@@ -477,4 +477,16 @@ Account.prototype.clearAllTrades = function() {
   this._tradeHistories = []
 }
 
+Account.prototype.getCurrentPostion = function() {
+  if (this._hasPosition) {
+    return {
+      price: this._price,
+      long: this._long,
+      lastTradeTime: this._lastTradeTime.toLocaleString(),
+      amount: this._amount,
+    }
+  }
+  return false
+}
+
 module.exports = Account
