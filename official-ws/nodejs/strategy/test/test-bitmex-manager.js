@@ -10,6 +10,10 @@ obManager.addNewStrategy({
 
 const bitmex = new BitmexManager()
 
+bitmex.listenOrderBook(function(data) {
+  obManager.updateOrderbook(data)
+})
+
 bitmex.listenCandle({binSize: '5m'}, function(list) {
   obManager.setCandleHistory('5m', list)
 }, function(data) {
