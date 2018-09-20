@@ -103,6 +103,7 @@ Candles.prototype.checkData = function() {
       throw 'Candles: 顺序不对'
     }
     if (timeIntervals.length > 0 && interval !== timeIntervals[timeIntervals.length - 1]) {
+      console.log(_histories.slice(-2))
       throw 'Candles: _histories 时间序列不合法'
     }
     timeIntervals.push(interval)
