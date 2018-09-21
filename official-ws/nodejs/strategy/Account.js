@@ -15,7 +15,7 @@ const logger = winston.createLogger({
 function Account(options) {
   this.setOptions(options)
   this.signatureSDK = new SignatureSDK(this._options)
-  this._inTrading= false
+  this._inTrading = false
   this._hasPosition = false
   this._price = null
   this._amount = 0
@@ -44,7 +44,7 @@ function Account(options) {
   this._fails = 0
 }
 
-Account.prototype.setOptions = function(options) {
+Account.prototype.setOptions = function (options) {
   this._options = {
     notify: false,
     log: false,
@@ -59,13 +59,13 @@ Account.prototype.setOptions = function(options) {
   }
 }
 
-Account.prototype.beforeOrderLimit = function(price) {
+Account.prototype.beforeOrderLimit = function (price) {
   this._stopLoss.retryTimes = 0
   this._stopLoss.response = {}
 
   this._stopLossLimit.retryTimes = 0
   this._stopLossLimit.response = {}
-  
+
   this._stopProfit.retryTimes = 0
   this._stopProfit.response = {}
   this._deleteUselessOrderTimes = 0
@@ -75,7 +75,7 @@ Account.prototype.beforeOrderLimit = function(price) {
 // 注意这个price, 应该是来源于orderbook, 而不是最新的成交价, 因为需要挂单
 // price 可以在当前成交价的基础上偏移 一段价格比如 $5 $10
 // 注意limit挂单之后, 不一定会成交, 成交的数量也是不定的, 故一定时间后应该取消该订单, 并查询真实的仓位
-Account.prototype.orderLimit = function(price, long, amount, tradePrice/*真实价格*/) {
+Account.prototype.orderLimit = function (price, long, amount, tradePrice/*真实价格*/) {
   this._inTrading = true
   this._long = long
   // 这点很重要, 万一没有一次性成功, 那么直接放弃这次机会, 以防, 重复下订单!!!
@@ -125,7 +125,7 @@ Account.prototype.orderLimit = function(price, long, amount, tradePrice/*真实�
 }
 // when orderLimit success
 // 限价止损, 手续费是负数
-Account.prototype.orderStopLimit = function() {
+Account.prototype.orderStopLimit = function () {
   const { stopPrice, price } = this.getLossLimitPrices()
 
   this.signatureSDK.orderStopLimit(this._amount, stopPrice, this._long ? 'Sell' : 'Buy', price).then((json) => {
@@ -148,7 +148,7 @@ Account.prototype.orderStopLimit = function() {
   })
 }
 // 注意, 止损要用市价止损, 虽然会损失0.0075的手续费, 如果使用限价, 很有可能爆仓!
-Account.prototype.orderStop = function() {
+Account.prototype.orderStop = function () {
   const { marketPrice } = this.getLossLimitPrices()
   this.signatureSDK.orderStop(this._amount, marketPrice, this._long ? 'Sell' : 'Buy').then((json) => {
     this._stopLoss.retryTimes = 0
@@ -170,7 +170,7 @@ Account.prototype.orderStop = function() {
   })
 }
 // offset is number or string with %
-Account.prototype._calcOffsetPrice = function(offset) {
+Account.prototype._calcOffsetPrice = function (offset) {
   const positionPrice = this._price
   if (typeof offset == 'string' && offset.indexOf('%') > -1) {
     var offsetPrice = positionPrice * parseFloat(offset) / 100
@@ -183,7 +183,7 @@ Account.prototype._calcOffsetPrice = function(offset) {
   }
 }
 
-Account.prototype.getLossLimitPrices = function() {
+Account.prototype.getLossLimitPrices = function () {
   let loss = this._options.loss
   // short 有时候需要不同的参数
   if (!this._long && this._options.shortLoss) {
@@ -200,7 +200,7 @@ Account.prototype.getLossLimitPrices = function() {
   }
 }
 
-Account.prototype.getProfitLimitPrices = function() {
+Account.prototype.getProfitLimitPrices = function () {
   let profit = this._options.profit
   // 有的时候做空需要不同的参数
   if (!this._long && this._options.shortProfit) {
@@ -216,7 +216,7 @@ Account.prototype.getProfitLimitPrices = function() {
 }
 
 // 止盈用限价, 虽然不一定会触发, 但是胜率比较高
-Account.prototype.orderProfitLimitTouched = function() {
+Account.prototype.orderProfitLimitTouched = function () {
   // TODO: test
   const { stopPrice, price } = this.getProfitLimitPrices()
   var side = this._long ? 'Sell' : 'Buy'
@@ -266,7 +266,7 @@ Account.prototype.profitLimitTouched = function() {
 }
 */
 
-Account.prototype.deleteStopOrder = function(orderID) {
+Account.prototype.deleteStopOrder = function (orderID) {
   this.signatureSDK.deleteOrder(orderID).then(json => {
     this._deleteUselessOrderTimes = 0
     console.log('Account.prototype.deleteOrder OK')
@@ -286,12 +286,12 @@ Account.prototype.deleteStopOrder = function(orderID) {
   })
 }
 
-Account.prototype.getLastTrade = function() {
+Account.prototype.getLastTrade = function () {
   return this._tradeHistories[this._tradeHistories.length - 1]
 }
 
 // 触发结算了
-Account.prototype.liquidation = function(price, mock) {
+Account.prototype.liquidation = function (price, mock) {
   clearTimeout(this._timeoutCancelOrder)
   this._inTrading = false
   this._hasPosition = false
@@ -310,12 +310,12 @@ Account.prototype.liquidation = function(price, mock) {
   if (isWin) {
     if (this._long && this._price <= this._minMaxPrices[0]) {
       touched = false
-    } else if(!this._long && this._price >= this._minMaxPrices[1]) {
+    } else if (!this._long && this._price >= this._minMaxPrices[1]) {
       touched = false
     }
   }
-  
-  this.notify(`win: ${isWin}(${touched ? 'touched' : 'missed'}), ${this._price} -> ${price} ${mock ? '模拟': '真实'} ${minute}m`)
+
+  this.notify(`win: ${isWin}(${touched ? 'touched' : 'missed'}), ${this._price} -> ${price} ${mock ? '模拟' : '真实'} ${minute}m`)
   var earn = (this._long ? (price - this._price) : (this._price - price)) / this._price
 
   this._tradeHistories.push({
@@ -335,18 +335,18 @@ Account.prototype.liquidation = function(price, mock) {
     winsFails: [this._wins, this._fails]
   })
 
-  
+
   if (this._tradeHistories.length > 5000) {
     this._tradeHistories.shift()
   }
 }
 
-Account.prototype.updateMinMaxPrices = function(price) {
+Account.prototype.updateMinMaxPrices = function (price) {
   this._minMaxPrices[0] = Math.min(this._minMaxPrices[0], price)
   this._minMaxPrices[1] = Math.max(this._minMaxPrices[1], price)
 }
 // 每次价格更新的时间都要调用
-Account.prototype.shouldLiquidation = function(price) {
+Account.prototype.shouldLiquidation = function (price) {
   if (this._price && this._hasPosition && !this._inTrading) {
     this.updateMinMaxPrices(price)
     var _lastTradeTime = this._lastTradeTime
@@ -355,7 +355,7 @@ Account.prototype.shouldLiquidation = function(price) {
     var lossLimitOrderID = this._stopLossLimit.response.orderID
     var profitOrderID = this._stopProfit.response.orderID
     // 市价止损的 和限价止损的, 
-    if(lossOrderID || lossLimitOrderID) {
+    if (lossOrderID || lossLimitOrderID) {
       var stopLossLimitPrice = this._stopLossLimit.response.stopPx
       var triggerStopLoss = long ? (price <= stopLossLimitPrice) : (price >= stopLossLimitPrice)
       if (triggerStopLoss) {
@@ -371,7 +371,7 @@ Account.prototype.shouldLiquidation = function(price) {
           }, 1 * 60 * 1000)
         }
         // 暂时无用
-        return {win: false}
+        return { win: false }
       }
     }
     // 由于是限价, 所以, 价格要穿过limit价格, 才认为已经止ying平仓
@@ -388,7 +388,7 @@ Account.prototype.shouldLiquidation = function(price) {
         if (lossLimitOrderID) {
           this.deleteStopOrder(lossLimitOrderID)
         }
-        return {win: true}
+        return { win: true }
       }
     }
     // for test
@@ -400,24 +400,24 @@ Account.prototype.shouldLiquidation = function(price) {
     if (lossed || wined) {
       // console.log(`模拟stop, win: ${wined}`)
       this.liquidation(wined ? profitPrices.price : lossPrices.marketPrice, true)
-      return {win: wined}
+      return { win: wined }
     }
     return false
   }
   return false
 }
 
-Account.prototype.isReadyToOrder = function() {
+Account.prototype.isReadyToOrder = function () {
   // 5分钟之内最多一次
   var frequenceLimit = (new Date() - this._lastTradeTime) > this._options.frequenceLimit * 60 * 1000
   return !this._inTrading && !this._hasPosition && frequenceLimit
 }
 
-Account.prototype.isReadyToLiquidation = function() {
+Account.prototype.isReadyToLiquidation = function () {
   return !this._inTrading && this._hasPosition
 }
 
-Account.prototype.notify = function(msg) {
+Account.prototype.notify = function (msg) {
   if (this._options.name) {
     msg = `${this._options.name})` + msg
   }
@@ -430,7 +430,7 @@ Account.prototype.notify = function(msg) {
 }
 // 注意挂单后应该 在 N 分钟内完成, 否则应该取消, minute 不能超过5分钟
 // 这个功能是否需要, 应该放到配置中, 目前的策略, 应该放长一点
-Account.prototype.timeCancelOrderLimit = function(minute = 60) {
+Account.prototype.timeCancelOrderLimit = function (minute = 60) {
   var cancelTimes = 0
   var orderID = this._orderLimit.response.orderID
   var cancelFunc = () => {
@@ -438,7 +438,7 @@ Account.prototype.timeCancelOrderLimit = function(minute = 60) {
       this.notify('取消了orderLimit,请看position')
     }).catch(err => {
       if (cancelTimes < 4) {
-        cancelTimes ++
+        cancelTimes++
         setTimeout(() => {
           cancelFunc()
         }, 2000)
@@ -447,19 +447,19 @@ Account.prototype.timeCancelOrderLimit = function(minute = 60) {
       }
     })
   }
-  
+
   return setTimeout(() => {
     cancelFunc()
   }, minute * 60 * 1000)
 }
 
-Account.prototype.cancelOrderLimitIfNeed = function() {
+Account.prototype.cancelOrderLimitIfNeed = function () {
   // if (new Date() - this._lastTradeTime < 3 * 60 * 1000) {
-    this.timeCancelOrderLimit(0)
+  this.timeCancelOrderLimit(0)
   // }
 }
 
-Account.prototype.getRealPosition = function() {
+Account.prototype.getRealPosition = function () {
   return new Promise((resolve, reject) => {
     this.signatureSDK.getPosition().then(json => {
       resolve(json)
@@ -469,24 +469,22 @@ Account.prototype.getRealPosition = function() {
   })
 }
 
-Account.prototype.getOptions = function() {
+Account.prototype.getOptions = function () {
   return this._options
 }
 
-Account.prototype.clearAllTrades = function() {
+Account.prototype.clearAllTrades = function () {
   this._tradeHistories = []
 }
 
-Account.prototype.getCurrentPostion = function() {
-  if (this._hasPosition) {
-    return {
-      price: this._price,
-      long: this._long,
-      lastTradeTime: this._lastTradeTime.toLocaleString(),
-      amount: this._amount,
-    }
+Account.prototype.getCurrentPostion = function () {
+  return {
+    hasPosition: this._hasPosition,
+    price: this._price,
+    long: this._long,
+    lastTradeTime: this._lastTradeTime.toLocaleString(),
+    amount: this._amount,
   }
-  return false
 }
 
 module.exports = Account
