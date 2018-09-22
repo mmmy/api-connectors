@@ -38,7 +38,7 @@ class Minute5Strategy extends Strategy {
         !disableShort &&
         sarSmaSignal.short &&
         (use1m ? _1hCandle.macdTrendSignal(false).short :  _4hCandle.macdTrendSignal(false).short) &&
-        (shortPriceLen ? mainCandle.minMaxCloseFilter(shortPriceLen, shortMaxPriceDiff, shortMinPriceDiff) : true)
+        (shortPriceLen > 0 ? mainCandle.minMaxCloseFilter(shortPriceLen, shortMaxPriceDiff, shortMinPriceDiff) : true)
       ) {
         console.log(`${this._options.id}  ${new Date()} SAR MA do short --`)
         short = true
