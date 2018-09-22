@@ -2,7 +2,7 @@
 
 const WebServer = require('./WebServer')
 const BitmexManager = require('./BitmexManager')
-const SarMaStrategyManager = require('./sar_ma/Manager')
+const SarMaStrategyManager = require('./sma_cross/Manager')
 const common = require('../common')
 /*
   5分钟策略, SMA cross
