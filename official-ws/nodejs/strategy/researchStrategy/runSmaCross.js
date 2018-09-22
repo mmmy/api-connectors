@@ -48,6 +48,34 @@ obManager.addNewStrategy({
 })
 
 obManager.addNewStrategy({
+  id: 'samcorss-5m-yangqihero-profit37',
+  amount: 2000,
+  priceOffset: 2,
+  disableShort: true,
+  account: {
+    loss: -30,
+    shortLoss: -30,
+    profit: 37,
+    shortProfit: 37,
+    frequenceLimit: 2,
+    test: true,
+    notify: true,
+    name: '4',
+    // apiKey,
+    // apiSecret
+  },
+  '5m': {
+    smaFastLen: 53,
+    smaSlowLen: 88,
+  },
+  '1d': {
+    smaFilterLen: 8
+  },
+  ...defaultPriceFilter,
+  longMaxPriceDiff: 12,
+})
+
+obManager.addNewStrategy({
   id: 'samcorss-5m-yangqihero-test',
   amount: 2000,
   priceOffset: 2,
@@ -60,7 +88,7 @@ obManager.addNewStrategy({
     frequenceLimit: 2,
     test: true,
     notify: true,
-    name: '4',
+    name: '5',
     // apiKey,
     // apiSecret
   },
