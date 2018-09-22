@@ -79,6 +79,24 @@ class WebServer {
       })
     })
 
+    app.get('/candles/:id/:timeframe', (req, res) => {
+      const id = req.params.id
+      const timeframe = req.params.timeframe
+      if (!id) {
+        res.json({
+          result: false,
+          msg: '/candles/:id id必填'
+        })
+      } else {
+        const candles = this._stratetyManager.getCandlesById(id, timeframe)
+        return res.json({
+          result: true,
+          data: candles
+        })
+      }
+
+    })
+
     app.listen(this._options.port)
     this._app = app
   }

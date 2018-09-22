@@ -178,6 +178,13 @@ class Strategy {
   getStrategyId() {
     return this._options.id
   }
+
+  getCandlesByPeriod(period='5m') {
+    const cM = this._candles[period]
+    if (cM) {
+      return cM.getCandles(true)
+    }
+  }
 }
 
 module.exports = Strategy

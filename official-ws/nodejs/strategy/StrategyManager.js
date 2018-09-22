@@ -98,6 +98,13 @@ class StrategyManager {
     }
     return false
   }
+
+  getCandlesById(id, period) {
+    var strategy = this.getStratgyById(id)
+    if (strategy) {
+      return strategy.getCandlesByPeriod(period)
+    }
+  }
 }
 
 module.exports = StrategyManager
