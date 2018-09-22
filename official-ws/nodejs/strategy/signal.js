@@ -152,15 +152,15 @@ function SmaValue(kline, smaLen) {
         sum += C[i]
     }
     const avg = sum / smaLen
-    return avg
+    const lastPrice = C[closeLen - 1]
+    return { avg, lastClose: lastPrice }
 }
 exports.SmaValue = SmaValue
 
 // 判断价格(一般是close)是否在均线之上
 exports.PriceAboveSma = function(kline, smaLen) {
-    const avg = SmaValue(kline, smaLen)
-    const lastPrice = C[closeLen - 1]
-    return lastPrice > avg
+    const { avg, lastClose } = SmaValue(kline, smaLen)
+    return lastClose > avg
 }
 
 // 模仿TradingView barssince, list的length 一般100, true false list
