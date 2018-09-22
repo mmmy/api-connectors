@@ -403,7 +403,7 @@ Candles.prototype.smaCrossSignal = function() {
   // 金叉
   const goldCross = lastS && !lastS2
   // 暂时不做空
-  const deathCross = false
+  const deathCross = !lastS && lastS2
   return {
     long: goldCross,
     short: deathCross

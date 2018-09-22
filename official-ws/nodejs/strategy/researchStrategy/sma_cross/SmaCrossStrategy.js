@@ -41,8 +41,8 @@ class SmaCrossStrategy extends Strategy {
         long = true
       } else if (
         !disableShort &&
-        smaCrossSignal.short &&
-        !_1dCandle.priceIsAboveSma()
+        smaCrossSignal.short
+        // !_1dCandle.priceIsAboveSma()
       ) {
         console.log(`${this._options.id}  ${new Date()} SMA cross do short --`)
         short = true
