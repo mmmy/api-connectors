@@ -1,4 +1,5 @@
 // var { apiKey, apiSecret } = require('../yqhero_secret.json')
+var { apiKey, apiSecret } = require('../secret.json')
 
 const WebServer = require('./WebServer')
 const BitmexManager = require('./BitmexManager')
@@ -32,7 +33,7 @@ obManager.addNewStrategy({
     shortProfit: 55,
     frequenceLimit: 2,
     test: true,
-    notify: true,
+    notify: false,
     name: '3',
     // apiKey,
     // apiSecret
@@ -58,11 +59,11 @@ obManager.addNewStrategy({
     profit: 37,
     shortProfit: 37,
     frequenceLimit: 2,
-    test: true,
+    test: false,
     notify: true,
     name: '4',
-    // apiKey,
-    // apiSecret
+    apiKey,
+    apiSecret
   },
   '5m': {
     smaFastLen: 53,
@@ -87,7 +88,7 @@ obManager.addNewStrategy({
     shortProfit: 55,
     frequenceLimit: 2,
     test: true,
-    notify: true,
+    notify: false,
     name: '5',
     // apiKey,
     // apiSecret
