@@ -50,7 +50,7 @@ obManager.addNewStrategy({
 
 obManager.addNewStrategy({
   id: 'samcorss-5m-yangqihero-profit37',
-  amount: 2000,
+  amount: 10000,
   priceOffset: 2,
   disableShort: true,
   account: {
