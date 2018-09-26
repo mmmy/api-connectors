@@ -24,13 +24,13 @@ const obManager = new SarMaStrategyManager()
 obManager.addNewStrategy({
   id: 'samcorss-5m-yangqihero-priceOffset1',
   amount: 2000,
-  priceOffset: 2,
+  priceOffset: 1,
   disableShort: true,
   account: {
-    loss: -40,
-    shortLoss: -44,
-    profit: 59,
-    shortProfit: 55,
+    loss: -30,
+    shortLoss: -30,
+    profit: 37,
+    shortProfit: 37,
     frequenceLimit: 2,
     test: true,
     notify: false,
@@ -51,7 +51,7 @@ obManager.addNewStrategy({
 obManager.addNewStrategy({
   id: 'samcorss-5m-yangqihero-profit37',
   amount: 10000,
-  priceOffset: 2,
+  priceOffset: 1,
   disableShort: true,
   account: {
     loss: -30,
@@ -76,32 +76,32 @@ obManager.addNewStrategy({
   longMaxPriceDiff: 12,
 })
 
-obManager.addNewStrategy({
-  id: 'samcorss-5m-yangqihero-test',
-  amount: 2000,
-  priceOffset: 2,
-  disableShort: false,
-  account: {
-    loss: -40,
-    shortLoss: -44,
-    profit: 59,
-    shortProfit: 55,
-    frequenceLimit: 2,
-    test: true,
-    notify: false,
-    name: '5',
-    // apiKey,
-    // apiSecret
-  },
-  '5m': {
-    smaFastLen: 15,
-    smaSlowLen: 30,
-  },
-  '1d': {
-    smaFilterLen: 8
-  },
-  ...defaultPriceFilter
-})
+// obManager.addNewStrategy({
+//   id: 'samcorss-5m-yangqihero-test',
+//   amount: 2000,
+//   priceOffset: 1,
+//   disableShort: false,
+//   account: {
+//     loss: -40,
+//     shortLoss: -44,
+//     profit: 59,
+//     shortProfit: 55,
+//     frequenceLimit: 2,
+//     test: true,
+//     notify: false,
+//     name: '5',
+//     // apiKey,
+//     // apiSecret
+//   },
+//   '5m': {
+//     smaFastLen: 15,
+//     smaSlowLen: 30,
+//   },
+//   '1d': {
+//     smaFilterLen: 8
+//   },
+//   ...defaultPriceFilter
+// })
 
 // test
 // obManager.addNewStrategy({
