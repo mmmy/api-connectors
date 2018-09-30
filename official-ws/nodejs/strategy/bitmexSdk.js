@@ -20,6 +20,7 @@ const Bitmex = {}
 Bitmex.getTradeHistory = function(params) {
   var path = '/trade/bucketed'
   var paramstr = formatGetParams(params, {
+    symbol: 'XBTUSD',
     binSize: '5m',
     partial: false,               // 是false 会导致 最后实时数据candle 中 open high low 不准确, 但是经过一个时间周期后就ok, 比如1小时线, 经过一个小时后, 数据就准确了
     count: 30,
