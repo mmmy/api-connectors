@@ -50,7 +50,7 @@ class BackTest {
     if (this._accout.isReadyToOrder()) {
       const signal = this._strategy(bar, this._candles)
       if (signal.long || signal.short) {
-        this.entry(bar), signal.long
+        this.entry(bar, signal.long)
       }
     }
     const result = this._accout.shouldLiquidation(bar)
@@ -73,22 +73,22 @@ class BackTest {
     
     let wins = 0
     let sumMinute = 0
-    let back = 0
-    this._tradeHistory.forEach(t => {
+    let backList = [0]
+    this._tradeHistory.forEach((t, i) => {
       const { wined, minute, profit } = t
       if (wined) {
         wins ++
       }
       sumMinute += minute
       netProfit += profit
-      if (profit > 0) {
-        back = 0
-      } else {
-        back += profit
+      if (i > 0) {
+        let backLen = backList.length
+        let back = backList[backLen - 1] + profit
+        back = Math.min(0, back)
+        backList.push(back)
       }
-      maxBack = Math.min(back, maxBack)
     })
-
+    maxBack = Math.min.apply(null, backList)
     winRate = (wins / total).toFixed(4)
     avgHoldMinute = Math.round(sumMinute / total)
 

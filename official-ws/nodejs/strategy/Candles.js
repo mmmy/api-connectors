@@ -408,6 +408,10 @@ Candles.prototype.smaCrossSignal = function() {
   const lastS2 = signals[sLen - 2]
   // 金叉
   const goldCross = lastS && !lastS2
+  if (goldCross) {
+    let lastBar = this._histories.slice(-1)
+    let a = 1
+  }
   // 暂时不做空
   const deathCross = !lastS && lastS2
   return {

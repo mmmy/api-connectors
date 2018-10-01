@@ -14,9 +14,11 @@ class BackTestSma extends BackTest {
       const _5mCandle = candles['5m']
       let mainCandle = _5mCandle
       const smaCrossSignal = mainCandle.smaCrossSignal()
+      // 设置中禁止做空
+      const disableShort = this._options.disableShort
       if (smaCrossSignal.long) {
         long = true
-      } else if (smaCrossSignal.short) {
+      } else if (!disableShort && smaCrossSignal.short) {
         short = true
       }
       let strategyPrice = null

@@ -10,12 +10,13 @@ class Account {
     this._long = true
   }
 
-  order(bar) {
+  order(bar, long) {
     const { timestamp, close, open } = bar
     if (!this._hasPosition) {
       this._lastTradeTime = new Date(timestamp)
       this._price = open
       this._hasPosition = true
+      this._long = long
     }
   }
 

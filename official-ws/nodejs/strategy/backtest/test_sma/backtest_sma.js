@@ -8,10 +8,13 @@ var len = xbt5m.length
 
 const manager = new BackTestManager()
 manager.addNewStrategy(new BackTestSma({
-  '5m': { smaFastLen: 50, smaSlowLen: 88 }
+  id: 'sma-back-test',
+  '5m': { smaFastLen: 53, smaSlowLen: 88 },
+  disableShort: true,
 }))
 
-const startDateTime = new Date("2018-08-27T14:00:00.000Z")
+// const startDateTime = new Date("2018-08-27T14:00:00.000Z")
+const startDateTime = new Date("2018-06-16T14:00:00.000Z")
 let startIndex = len - 1200
 for (let i = 0; i < len; i++) {
   const b = xbt5m[i]
