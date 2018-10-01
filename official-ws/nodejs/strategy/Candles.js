@@ -395,6 +395,12 @@ Candles.prototype.rsiBbReverseSignal = function(realTime, efficientBars=10, cont
 
 // 用于sma交叉策略
 Candles.prototype.smaCrossSignal = function() {
+  if (this._histories.length < this._options.smaSlowLen + 2) {
+    return {
+      long: false,
+      short: false
+    }
+  }
   const smaS = this.smaSignal(false)
   const { signals } = smaS
   const sLen = signals.length
