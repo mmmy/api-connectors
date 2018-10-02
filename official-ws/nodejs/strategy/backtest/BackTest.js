@@ -35,7 +35,7 @@ class BackTest {
   updateCandleLastHistory(period, data) {
     // console.log('updateCandleLastHistory', period, data)
     this._candles[period].updateLastHistory(data)
-    this._candles[period].checkData()
+    // this._candles[period].checkData()
   }
 
   setStrategy(strategy) {
@@ -69,7 +69,8 @@ class BackTest {
         winRate = 0,
         total = this._tradeHistory.length,
         maxBack = 0,
-        avgHoldMinute = 0
+        avgHoldMinute = 0,
+        tradeEarnList = []
     
     let wins = 0
     let sumMinute = 0
@@ -81,12 +82,18 @@ class BackTest {
       }
       sumMinute += minute
       netProfit += profit
+
       if (i > 0) {
         let backLen = backList.length
         let back = backList[backLen - 1] + profit
         back = Math.min(0, back)
         backList.push(back)
       }
+      tradeEarnList.push({
+        st: new Date(t.startTime).toISOString(),
+        pf: netProfit,
+        bk: backList[backList.length - 1] || 0,
+      })
     })
     maxBack = Math.min.apply(null, backList)
     winRate = (wins / total).toFixed(4)
@@ -98,6 +105,7 @@ class BackTest {
       winRate,
       maxBack,
       avgHoldMinute,
+      tradeEarnList,
     }
   }
 }

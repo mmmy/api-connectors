@@ -419,6 +419,21 @@ Candles.prototype.smaCrossSignal = function() {
     short: deathCross
   }
 }
+// 计算效率更高
+Candles.prototype.smaCrossSignalFast = function() {
+  if (this._histories.length < this._options.smaSlowLen + 2) {
+    return {
+      long: false,
+      short: false
+    }
+  }
+  const klines = this.getCandles(false)
+  const { goldCross, deadCross } = signal.SmaCross(klines, this._options.smaFastLen, this._options.smaSlowLen)
+  return {
+    long: goldCross,
+    short: deadCross
+  }
+}
 
 // 一般是实时的
 Candles.prototype.priceIsAboveSma = function() {

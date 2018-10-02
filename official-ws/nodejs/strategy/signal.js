@@ -142,6 +142,31 @@ exports.SmaSignal = function(kline, fastLen, slowLen) {
         diff,
     }
 }
+// 效率比上面高25%
+exports.SmaCross = function(kline, fastLen, slowLen) {
+    const dataLen = kline.length
+    const startSlowIndex = dataLen - slowLen - 1
+    const startFastIndex = dataLen - fastLen - 1
+    let sumFast = 0
+    let sumSlow = 0
+    for (let i = startSlowIndex; i < dataLen - 1; i++) {
+        const { close } = kline[i]
+        sumSlow += close
+        if (i >= startFastIndex) {
+            sumFast += close
+        }
+    }
+    const lastClose = kline[dataLen - 1].close
+    const slowMa1 = sumSlow / slowLen,
+          slowMa = (sumSlow - kline[dataLen - slowLen - 1].close + lastClose) / slowLen,
+          fastMa1 = sumFast / fastLen,
+          fastMa = (sumFast - kline[dataLen - fastLen - 1].close + lastClose) / fastLen
+
+    return {
+        goldCross: fastMa > slowMa && fastMa1 <= slowMa1,
+        deadCross: fastMa < slowMa && fastMa1 >= slowMa1
+    }
+}
 
 function SmaValue(kline, smaLen) {
     const { T, O, H, L, C, V } = parseKline(kline)

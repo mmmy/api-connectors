@@ -26,11 +26,12 @@ class BackTestManager {
     this.applyStrategyFunc('readBar', arguments)
   }
 
-  getAllTrades() {
+  getAllTrades(trades) {
     return this._list.map((s, i) => {
       return {
+        id: s._options.id,
         index: i,
-        trades: s.getTrades(),
+        trades: trades ? s.getTrades() : undefined,
         statistic: s.statistic()
       }
     })
