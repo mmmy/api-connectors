@@ -21,12 +21,12 @@ const defaultPriceFilter = {
 }
 const manager = new BackTestManager()
 manager.addNewStrategy(new BackTestSma({
-  id: 'pf58',
+  id: 'abs10',
   account: {
-    loss: -40,
-    profit: 58
+    // loss: -40,
+    // profit: 58
   },
-  '5m': { smaFastLen: 58, smaSlowLen: 88 },
+  '5m': { smaFastLen: 53, smaSlowLen: 88 },
   // '5m': { smaFastLen: 40, smaSlowLen: 88 },
   disableShort: true,
   ...defaultPriceFilter,

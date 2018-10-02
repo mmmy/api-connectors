@@ -27,6 +27,7 @@ class BackTestSma extends BackTest {
       const disableShort = this._options.disableShort
       if (
         smaCrossSignal.long &&
+        (Math.abs(bar.close - smaCrossSignal.fastMa) < 20) &&
         (longPriceLen > 0 ? mainCandle.minMaxCloseFilter(longPriceLen, longMaxPriceDiff, longMinPriceDiff) : true)
       ) {
         long = true

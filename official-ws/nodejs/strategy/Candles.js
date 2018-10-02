@@ -428,10 +428,11 @@ Candles.prototype.smaCrossSignalFast = function() {
     }
   }
   const klines = this.getCandles(false)
-  const { goldCross, deadCross } = signal.SmaCross(klines, this._options.smaFastLen, this._options.smaSlowLen)
+  const { goldCross, deadCross, fastMa } = signal.SmaCross(klines, this._options.smaFastLen, this._options.smaSlowLen)
   return {
     long: goldCross,
-    short: deadCross
+    short: deadCross,
+    fastMa
   }
 }
 

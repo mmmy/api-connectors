@@ -164,7 +164,8 @@ exports.SmaCross = function(kline, fastLen, slowLen) {
 
     return {
         goldCross: fastMa > slowMa && fastMa1 <= slowMa1,
-        deadCross: fastMa < slowMa && fastMa1 >= slowMa1
+        deadCross: fastMa < slowMa && fastMa1 >= slowMa1,
+        fastMa
     }
 }
 
