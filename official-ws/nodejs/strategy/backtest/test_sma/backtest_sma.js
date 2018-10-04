@@ -21,10 +21,10 @@ const defaultPriceFilter = {
 }
 const manager = new BackTestManager()
 manager.addNewStrategy(new BackTestSma({
-  id: 'abs10',
+  id: 'deleteme',
   account: {
-    // loss: -40,
-    // profit: 58
+    loss: -30,
+    profit: 37
   },
   '5m': { smaFastLen: 53, smaSlowLen: 88 },
   // '5m': { smaFastLen: 40, smaSlowLen: 88 },
@@ -32,9 +32,9 @@ manager.addNewStrategy(new BackTestSma({
   ...defaultPriceFilter,
 }))
 
-// const startDateTime = new Date("2018-08-27T14:00:00.000Z")
+const startDateTime = new Date("2018-08-27T14:00:00.000Z")
 // const startDateTime = new Date("2018-06-16T14:00:00.000Z")
-const startDateTime = null// new Date("2018-03-19T00:00:00.000Z")
+// const startDateTime = null// new Date("2018-03-19T00:00:00.000Z")
 let startIndex = 300// len - 1200
 if (startDateTime) {
   for (let i = 0; i < len; i++) {
@@ -65,6 +65,7 @@ for (let i = startIndex; i < len; i++) {
 }
 
 const allTrades = manager.getAllTrades()
+console.log(JSON.stringify(allTrades))
 allTrades.map((t, i) => {
   const { id, statistic } = t
   const saveName = `sma_test_result_${id || (i + 1)}.csv`
@@ -72,6 +73,5 @@ allTrades.map((t, i) => {
   const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk'])
   fs.writeFileSync(savePath, dataToCsv)
 })
-console.log(JSON.stringify(allTrades))
 console.log('time used:', (new Date() - d0) / 1000)
 // console.log('end')

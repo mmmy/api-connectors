@@ -47,10 +47,15 @@ class BackTest {
   }
 
   readBar(bar) {
+    const signal = this._strategy(bar, this._candles)
     if (this._accout.isReadyToOrder()) {
-      const signal = this._strategy(bar, this._candles)
       if (signal.long || signal.short) {
         this.entry(bar, signal.long)
+      }
+    } else {
+      // close trade
+      if (signal.close) {
+        this._accout.close(bar)
       }
     }
     const result = this._accout.shouldLiquidation(bar)
