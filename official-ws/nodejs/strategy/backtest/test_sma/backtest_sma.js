@@ -15,9 +15,9 @@ const defaultPriceFilter = {
   longMaxPriceDiff: 30,
   longMinPriceDiff: 0,
 
-  shortPriceLen: -1,
-  // shortMaxPriceDiff: 43,
-  // shortMinPriceDiff: 20
+  shortPriceLen: 6,
+  shortMaxPriceDiff: 30,
+  shortMinPriceDiff: 0
 }
 const manager = new BackTestManager()
 manager.addNewStrategy(new BackTestSma({
@@ -28,41 +28,63 @@ manager.addNewStrategy(new BackTestSma({
   },
   '5m': { smaFastLen: 53, smaSlowLen: 88 },
   // '5m': { smaFastLen: 40, smaSlowLen: 88 },
+  disableLong: false,
   disableShort: true,
   ...defaultPriceFilter,
 }))
 
-const startDateTime = new Date("2018-08-27T14:00:00.000Z")
-// const startDateTime = new Date("2018-06-16T14:00:00.000Z")
-// const startDateTime = null// new Date("2018-03-19T00:00:00.000Z")
-let startIndex = 300// len - 1200
-if (startDateTime) {
+function findIndexByTime(time) {
+  time = +new Date(time)
   for (let i = 0; i < len; i++) {
     const b = xbt5m[i]
-    if (+new Date(b.timestamp) === +startDateTime) {
-      startIndex = i
+    if (+new Date(b.timestamp) === time) {
+      return i
     }
   }
 }
 
-console.log('startIndex',startIndex)
-var d0 = new Date()
-
-manager.setCandleHistory('5m', xbt5m.slice(startIndex - 200, startIndex))
-var progress = new ProgressBar(':bar', { total: len - startIndex });
-
-for (let i = startIndex; i < len; i++) {
-  const bar = xbt5m[i]
-  // progress.tick();
-  // if (bar.complete) {
-  //   console.log('\ncomplete\n');
-  // }
-  if (i % 1000 === 0) {
-    console.log(i)
-  }
-  manager.readBar(bar)
-  manager.updateCandleLastHistory('5m', bar)
+function timeToSeries(list) {
+  return list.map(r => {
+    return r.map(t => typeof t === 'string' ? findIndexByTime(t) : t)
+  })
 }
+
+function testRange(indexRange) {
+  const startIndex = indexRange[0]
+  const endIndex = indexRange[1] || len
+  manager.setCandleHistory('5m', xbt5m.slice(startIndex - 200, startIndex))
+  for (let i = startIndex; i < endIndex; i++) {
+    const bar = xbt5m[i]
+    // progress.tick();
+    // if (bar.complete) {
+    //   console.log('\ncomplete\n');
+    // }
+    if (i % 1000 === 0) {
+      console.log(i)
+    }
+    manager.readBar(bar)
+    manager.updateCandleLastHistory('5m', bar)
+  }
+}
+
+// const startDateTime = new Date("2018-08-27T11:00:00.000Z")
+// const startDateTime = new Date("2018-06-16T14:00:00.000Z")
+// const startDateTime = null// new Date("2018-03-19T00:00:00.000Z")
+
+
+dataSeries = [
+  // ["2017-10-01T00:00:00.000Z", "2017-11-10T00:00:00.000Z",],
+  ["2017-11-13T00:00:00.000Z", "2017-12-08T00:00:00.000Z",],
+  // ["2018-08-27T11:00:00.000Z"]
+]
+
+seriesIndex = timeToSeries(dataSeries)
+console.log(seriesIndex)
+seriesIndex.forEach(range => {
+  testRange(range)
+})
+
+var d0 = new Date()
 
 const allTrades = manager.getAllTrades()
 console.log(JSON.stringify(allTrades))

@@ -35,7 +35,7 @@ class BackTest {
   updateCandleLastHistory(period, data) {
     // console.log('updateCandleLastHistory', period, data)
     this._candles[period].updateLastHistory(data)
-    // this._candles[period].checkData()
+    this._candles[period].checkData()
   }
 
   setStrategy(strategy) {
