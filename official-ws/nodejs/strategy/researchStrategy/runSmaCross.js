@@ -73,7 +73,6 @@ obManager.addNewStrategy({
     smaFilterLen: 8
   },
   ...defaultPriceFilter,
-  // longMaxPriceDiff: 12,
 })
 
 // obManager.addNewStrategy({
