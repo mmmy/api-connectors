@@ -1,6 +1,7 @@
 
 const Account = require('./Account')
 const Candles = require('../../strategy/Candles')
+const statisticTrades = require('./utils').statisticTrades
 
 class BackTest {
   constructor(options) {
@@ -70,48 +71,7 @@ class BackTest {
 
   // 統計
   statistic() {
-    let netProfit = 0,
-        winRate = 0,
-        total = this._tradeHistory.length,
-        maxBack = 0,
-        avgHoldMinute = 0,
-        tradeEarnList = []
-    
-    let wins = 0
-    let sumMinute = 0
-    let backList = [0]
-    this._tradeHistory.forEach((t, i) => {
-      const { wined, minute, profit } = t
-      if (wined) {
-        wins ++
-      }
-      sumMinute += minute
-      netProfit += profit
-
-      if (i > 0) {
-        let backLen = backList.length
-        let back = backList[backLen - 1] + profit
-        back = Math.min(0, back)
-        backList.push(back)
-      }
-      tradeEarnList.push({
-        st: new Date(t.startTime).toISOString(),
-        pf: netProfit,
-        bk: backList[backList.length - 1] || 0,
-      })
-    })
-    maxBack = Math.min.apply(null, backList)
-    winRate = (wins / total).toFixed(4)
-    avgHoldMinute = Math.round(sumMinute / total)
-
-    return {
-      total,
-      netProfit,
-      winRate,
-      maxBack,
-      avgHoldMinute,
-      tradeEarnList,
-    }
+    return statisticTrades(this._tradeHistory)
   }
 }
 

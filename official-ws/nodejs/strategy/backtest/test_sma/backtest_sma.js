@@ -21,7 +21,7 @@ const defaultPriceFilter = {
 }
 const manager = new BackTestManager()
 manager.addNewStrategy(new BackTestSma({
-  id: 'deleteme',
+  id: 'benchmark',
   account: {
     loss: -30,
     profit: 37
@@ -73,8 +73,9 @@ function testRange(indexRange) {
 
 
 dataSeries = [
+  [300]
   // ["2017-10-01T00:00:00.000Z", "2017-11-10T00:00:00.000Z",],
-  ["2017-11-13T00:00:00.000Z", "2017-12-08T00:00:00.000Z",],
+  // ["2017-11-13T00:00:00.000Z", "2017-12-08T00:00:00.000Z",],
   // ["2018-08-27T11:00:00.000Z"]
 ]
 
@@ -86,8 +87,10 @@ seriesIndex.forEach(range => {
 
 var d0 = new Date()
 
-const allTrades = manager.getAllTrades()
-console.log(JSON.stringify(allTrades))
+const allTrades = manager.getAllTrades(true)
+const str = JSON.stringify(allTrades)
+console.log(str)
+fs.writeFileSync(path.join(__dirname, 'temp.json'), str)
 allTrades.map((t, i) => {
   const { id, statistic } = t
   const saveName = `sma_test_result_${id || (i + 1)}.csv`
