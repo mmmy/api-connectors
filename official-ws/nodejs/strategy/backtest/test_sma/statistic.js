@@ -3,7 +3,7 @@ const fs = require('fs')
 const JSONtoCSV = require('../utils').JSONtoCSV
 const statisticTrades = require('../utils').statisticTrades
 
-const file = 'benchmark.json'
+const file = 'temp.json'
 
 const filePath = path.join(__dirname, file)
 const fileConent = fs.readFileSync(filePath).toString()
@@ -38,11 +38,23 @@ function filterTrades(trades) {
   return newTrades
 }
 
+function filterTradesBars(trades) {
+  const newTrades = []
+  const len = trades.length
+  for (let i = 0; i < trades.length; i++) {
+    const t = trades[i];
+    if (t.entryBars < 6) {
+      newTrades.push(t)
+    }
+  }
+  return newTrades
+}
+
 dataList.map((t, i) => {
   const { id, trades } = t
   const saveName = `filter_${id || (i + 1)}.csv`
   const savePath = path.join(__dirname, saveName)
-  const newTrades = filterTrades(trades)
+  const newTrades = filterTradesBars(trades)
   const statistic = statisticTrades(newTrades)
   console.log(statistic)
   const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk'])

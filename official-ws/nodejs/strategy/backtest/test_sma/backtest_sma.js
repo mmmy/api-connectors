@@ -24,7 +24,8 @@ manager.addNewStrategy(new BackTestSma({
   id: 'benchmark',
   account: {
     loss: -30,
-    profit: 37
+    profit: 40,
+    priceOffset: 10,
   },
   '5m': { smaFastLen: 53, smaSlowLen: 88 },
   // '5m': { smaFastLen: 40, smaSlowLen: 88 },

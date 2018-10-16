@@ -11,9 +11,11 @@ const JSONtoCSV = (arr, columns, delimiter = ',') =>
 
 // 統計
 const statisticTrades = function (trades) {
+  const touchedTrades = trades.filter(t => t.touched)
   let netProfit = 0,
     winRate = 0,
     total = trades.length,
+    touchedTotal = touchedTrades.length,
     maxBack = 0,
     avgHoldMinute = 0,
     tradeEarnList = []
@@ -21,7 +23,7 @@ const statisticTrades = function (trades) {
   let wins = 0
   let sumMinute = 0
   let backList = [0]
-  trades.forEach((t, i) => {
+  touchedTrades.forEach((t, i) => {
     const { wined, minute, profit } = t
     if (wined) {
       wins++
@@ -42,11 +44,13 @@ const statisticTrades = function (trades) {
     })
   })
   maxBack = Math.min.apply(null, backList)
-  winRate = (wins / total).toFixed(4)
-  avgHoldMinute = Math.round(sumMinute / total)
+  winRate = (wins / touchedTotal).toFixed(4)
+  avgHoldMinute = Math.round(sumMinute / touchedTotal)
 
   return {
     total,
+    touchedTotal,
+    touchedRate: touchedTotal / total,
     netProfit,
     winRate,
     maxBack,

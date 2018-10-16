@@ -9,15 +9,38 @@ class Account {
     this._hasPosition = false
     this._price = null
     this._long = true
+    this._minMaxPrices = {minP:null, maxP:null}
+    this._bars = -1
+    this._entryBars = -1
   }
 
   order(bar, long) {
-    const { timestamp, close, open } = bar
+    const { timestamp, close, open, high, low } = bar
     if (!this._hasPosition) {
+      const priceOffset = this._options.priceOffset || 0
       this._lastTradeTime = new Date(timestamp)
-      this._price = open
+      this._price = open + (long ? -priceOffset : priceOffset)
       this._hasPosition = true
       this._long = long
+      this._minMaxPrices.minP = low
+      this._minMaxPrices.maxP = high
+      this._bars = 1
+      this._entryBars = -1
+      this.updateEntryBars()
+    }
+  }
+  updateMinMax(bar) {
+    this._bars ++
+    this._minMaxPrices.minP = Math.min(this._minMaxPrices.minP, bar.low)
+    this._minMaxPrices.maxP = Math.max(this._minMaxPrices.maxP, bar.high)
+    this.updateEntryBars()
+  }
+
+  updateEntryBars() {
+    const {minP, maxP} = this._minMaxPrices
+    const touched = this._long ? this._price >= minP : this._price <= maxP
+    if (this._entryBars === -1 && touched) {
+      this._entryBars = this._bars
     }
   }
   // 暂时无用
@@ -46,11 +69,14 @@ class Account {
     var minute = Math.round(minute * 10) / 10
     const profit = this._long ? (price - this._price) : (this._price - price)
     const wined = profit > 0
+    const touched = this._entryBars > -1
 
     return {
+      touched,
       wined,
       minute,
       profit,
+      entryBars: this._entryBars,
       long: this._long,
       entryPrice: this._price,
       exitPrice: price,
@@ -72,6 +98,7 @@ class Account {
   shouldLiquidation(bar) {
     const { timestamp, high, low } = bar
     if (this._hasPosition) {
+      this.updateMinMax(bar)
       const lossPrice = this.getLossLimitPrices()
       const profitPrice = this.getProfitLimitPrices()
       const long = this._long
