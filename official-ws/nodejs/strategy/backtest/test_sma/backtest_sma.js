@@ -24,13 +24,15 @@ manager.addNewStrategy(new BackTestSma({
   id: 'benchmark',
   account: {
     loss: -30,
-    profit: 40,
-    priceOffset: 10,
+    profit: 37,
+    priceOffset: 0,
   },
   '5m': { smaFastLen: 53, smaSlowLen: 88 },
   // '5m': { smaFastLen: 40, smaSlowLen: 88 },
   disableLong: false,
   disableShort: true,
+  rateLen: 199,
+  priceRate: 0.8,
   ...defaultPriceFilter,
 }))
 
@@ -77,7 +79,7 @@ dataSeries = [
   [300]
   // ["2017-10-01T00:00:00.000Z", "2017-11-10T00:00:00.000Z",],
   // ["2017-11-13T00:00:00.000Z", "2017-12-08T00:00:00.000Z",],
-  // ["2018-08-27T11:00:00.000Z"]
+  // ["2018-09-10T22:00:00.000Z"]
 ]
 
 seriesIndex = timeToSeries(dataSeries)

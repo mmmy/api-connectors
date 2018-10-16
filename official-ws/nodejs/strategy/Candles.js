@@ -307,6 +307,13 @@ Candles.prototype.minMaxCloseFilter = function(len, max, min) {
   return diff > min && diff < max
 }
 
+Candles.prototype.priceRateFilter = function(len, rate) {
+  const lastCandle = this.getHistoryCandle(1)
+  const { minClose, maxClose } = this.getMinMaxClose(len, false)
+  const p = minClose + (maxClose - minClose) * rate
+  return lastCandle.close >= p
+}
+
 // 主要是为了确认 在backOffset bar 之前是上涨或者下跌趋势, 方法之一是用布林带
 Candles.prototype.barsIsInTrend = function(realTime, long, backOffset, bars) {
   const { signals } = this.bollSignalSeries(realTime) // [1, 0, -1] 三种值
