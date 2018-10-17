@@ -42,7 +42,7 @@ function Candles(options) {
   this.setOptions(options)
   this._histories = []  // 官方格式的json schema, 最新的需要是数组的最后一个
   this._latestCandle = null
-  this._maxLength = 200
+  this._maxLength = 400
   this._mayTrendSignal = { long: false, short: false }
 }
 
@@ -307,11 +307,26 @@ Candles.prototype.minMaxCloseFilter = function(len, max, min) {
   return diff > min && diff < max
 }
 
-Candles.prototype.priceRateFilter = function(len, rate) {
+
+Candles.prototype.priceRateFilter = function(len, rateMin, rateMax=2) {
   const lastCandle = this.getHistoryCandle(1)
   const { minClose, maxClose } = this.getMinMaxClose(len, false)
-  const p = minClose + (maxClose - minClose) * rate
-  return lastCandle.close >= p
+  const pMin = minClose + (maxClose - minClose) * rateMin
+  const pMax = minClose + (maxClose - minClose) * rateMax
+  return lastCandle.close >= pMin && lastCandle.close <= pMax
+}
+
+Candles.prototype.getMinMaxHighLow = function(len, realTime) {
+  var klines = this.getCandles(realTime)
+  return signal.highestLowestHighLow(klines, len)
+}
+
+Candles.prototype.priceRateFilterHighLow = function(len, rateMin, rateMax=2) {
+  const lastCandle = this.getHistoryCandle(1)
+  const { minLow, maxHigh } = this.getMinMaxHighLow(len, false)
+  const pMin = minLow + (maxHigh - minLow) * rateMin
+  const pMax = minLow + (maxHigh - minLow) * rateMax
+  return lastCandle.close >= pMin && lastCandle.close <= pMax
 }
 
 // 主要是为了确认 在backOffset bar 之前是上涨或者下跌趋势, 方法之一是用布林带

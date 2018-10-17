@@ -11,3 +11,4 @@ npm-debug.log
 **/data/*.json
 **/data/*.csv
 **/package-lock.json
+**/backtest/**/*.json

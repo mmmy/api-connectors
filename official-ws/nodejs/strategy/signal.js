@@ -239,3 +239,20 @@ exports.highestLowestClose = function(kline, barsLen) {
         maxClose
     }
 }
+
+exports.highestLowestHighLow = function(kline, barsLen) {
+    const len = kline.length
+    const endIndex = len - barsLen
+    let maxHigh = kline[len - 1].high
+    let minLow = kline[len - 1].low
+    for (var i = len - 2; i >= endIndex; i--) {
+        const h = kline[i].high
+        const l = kline[i].low
+        maxHigh = Math.max(h, maxHigh)
+        minLow = Math.min(l, minLow)
+    }
+    return {
+        maxHigh,
+        minLow
+    }
+}

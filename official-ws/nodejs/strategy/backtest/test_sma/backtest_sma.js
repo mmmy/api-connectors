@@ -20,8 +20,25 @@ const defaultPriceFilter = {
   shortMinPriceDiff: 0
 }
 const manager = new BackTestManager()
+// manager.addNewStrategy(new BackTestSma({
+//   id: 'p6080hl',
+//   account: {
+//     loss: -30,
+//     profit: 37,
+//     priceOffset: 0,
+//   },
+//   '5m': { smaFastLen: 53, smaSlowLen: 88 },
+//   // '5m': { smaFastLen: 40, smaSlowLen: 88 },
+//   disableLong: false,
+//   disableShort: true,
+//   rateLen: 250,
+//   priceRateMin: 0.6,
+//   priceRateMax: 0.8,
+//   ...defaultPriceFilter,
+// }))
+
 manager.addNewStrategy(new BackTestSma({
-  id: 'benchmark',
+  id: 'p6090hl350',
   account: {
     loss: -30,
     profit: 37,
@@ -31,8 +48,26 @@ manager.addNewStrategy(new BackTestSma({
   // '5m': { smaFastLen: 40, smaSlowLen: 88 },
   disableLong: false,
   disableShort: true,
-  rateLen: 199,
-  priceRate: 0.8,
+  rateLen: 200,
+  priceRateMin: 0.6,
+  priceRateMax: 0.9,
+  ...defaultPriceFilter,
+}))
+
+manager.addNewStrategy(new BackTestSma({
+  id: 'p6080hl250',
+  account: {
+    loss: -30,
+    profit: 37,
+    priceOffset: 0,
+  },
+  '5m': { smaFastLen: 53, smaSlowLen: 88 },
+  // '5m': { smaFastLen: 40, smaSlowLen: 88 },
+  disableLong: false,
+  disableShort: true,
+  rateLen: 250,
+  priceRateMin: 0.6,
+  priceRateMax: 0.8,
   ...defaultPriceFilter,
 }))
 
@@ -55,7 +90,7 @@ function timeToSeries(list) {
 function testRange(indexRange) {
   const startIndex = indexRange[0]
   const endIndex = indexRange[1] || len
-  manager.setCandleHistory('5m', xbt5m.slice(startIndex - 200, startIndex))
+  manager.setCandleHistory('5m', xbt5m.slice(startIndex - 380, startIndex))
   for (let i = startIndex; i < endIndex; i++) {
     const bar = xbt5m[i]
     // progress.tick();
@@ -74,13 +109,42 @@ function testRange(indexRange) {
 // const startDateTime = new Date("2018-06-16T14:00:00.000Z")
 // const startDateTime = null// new Date("2018-03-19T00:00:00.000Z")
 
+let upSeries = [
+  ['2017-09-16T00:00:00.000Z', '2017-10-15T00:00:00.000Z'],
+  ['2017-10-19T00:00:00.000Z', '2017-10-22T00:00:00.000Z'],
+  ['2017-10-25T00:00:00.000Z', '2017-11-05T00:00:00.000Z'],
+  ['2017-11-08T00:00:00.000Z', '2017-11-10T00:00:00.000Z'],
+  ['2017-11-13T00:00:00.000Z', '2017-11-21T00:00:00.000Z'],
+  ['2017-11-24T00:00:00.000Z', '2017-11-29T00:00:00.000Z'],
+  ['2017-12-01T00:00:00.000Z', '2017-12-07T00:00:00.000Z'],
+  ['2017-12-11T00:00:00.000Z', '2017-12-13T00:00:00.000Z'],
+]
 
-dataSeries = [
-  [300]
+let upSeries1 = [
+  ['2017-12-23T00:00:00.000Z', '2017-12-27T00:00:00.000Z'],
+  ['2017-12-31T00:00:00.000Z', '2018-01-07T00:00:00.000Z'],
+  ['2018-01-12T00:00:00.000Z', '2018-01-14T00:00:00.000Z'],
+  ['2018-01-17T00:00:00.000Z', '2018-01-21T00:00:00.000Z'],
+  ['2018-01-23T00:00:00.000Z', '2018-01-29T00:00:00.000Z'],
+  ['2018-02-06T00:00:00.000Z', '2018-02-21T00:00:00.000Z'],
+  ['2018-02-25T00:00:00.000Z', '2018-03-04T00:00:00.000Z'],
+  ['2018-03-18T00:00:00.000Z', '2018-03-22T00:00:00.000Z'],
+  ['2018-03-31T00:00:00.000Z', '2018-05-05T00:00:00.000Z'],
+]
+
+let upSeries2 = [
+  ['2018-05-06T00:00:00.000Z'],
+]
+
+let dataSeries = [
+  [400]
+  // ['2017-09-16T00:00:00.000Z', '2017-12-13T00:00:00.000Z'],
   // ["2017-10-01T00:00:00.000Z", "2017-11-10T00:00:00.000Z",],
   // ["2017-11-13T00:00:00.000Z", "2017-12-08T00:00:00.000Z",],
   // ["2018-09-10T22:00:00.000Z"]
 ]
+
+// dataSeries = upSeries2 // upSeries.concat(upSeries1).concat(upSeries2)
 
 seriesIndex = timeToSeries(dataSeries)
 console.log(seriesIndex)
