@@ -21,44 +21,10 @@ const defaultPriceFilter = {
 }
 const manager = new BackTestManager()
 manager.addNewStrategy(new BackTestSma({
-  id: 'p6080hl200',
+  id: 'p6090pro50',
   account: {
     loss: -30,
-    profit: 37,
-    priceOffset: 0,
-  },
-  '5m': { smaFastLen: 53, smaSlowLen: 88 },
-  // '5m': { smaFastLen: 40, smaSlowLen: 88 },
-  disableLong: false,
-  disableShort: true,
-  rateLen: 200,
-  priceRateMin: 0.6,
-  priceRateMax: 0.8,
-  ...defaultPriceFilter,
-}))
-
-manager.addNewStrategy(new BackTestSma({
-  id: 'p5080hl200',
-  account: {
-    loss: -30,
-    profit: 37,
-    priceOffset: 0,
-  },
-  '5m': { smaFastLen: 53, smaSlowLen: 88 },
-  // '5m': { smaFastLen: 40, smaSlowLen: 88 },
-  disableLong: false,
-  disableShort: true,
-  rateLen: 200,
-  priceRateMin: 0.5,
-  priceRateMax: 0.8,
-  ...defaultPriceFilter,
-}))
-
-manager.addNewStrategy(new BackTestSma({
-  id: 'p6080hl250',
-  account: {
-    loss: -30,
-    profit: 37,
+    profit: 50,
     priceOffset: 0,
   },
   '5m': { smaFastLen: 53, smaSlowLen: 88 },
@@ -67,32 +33,50 @@ manager.addNewStrategy(new BackTestSma({
   disableShort: true,
   rateLen: 250,
   priceRateMin: 0.6,
-  priceRateMax: 0.8,
+  priceRateMax: 0.9,
   ...defaultPriceFilter,
 }))
 
 manager.addNewStrategy(new BackTestSma({
-  id: 'p6080hl300',
+  id: 'p6090pro40',
   account: {
     loss: -30,
-    profit: 37,
+    profit: 40,
     priceOffset: 0,
   },
   '5m': { smaFastLen: 53, smaSlowLen: 88 },
   // '5m': { smaFastLen: 40, smaSlowLen: 88 },
   disableLong: false,
   disableShort: true,
-  rateLen: 300,
+  rateLen: 250,
   priceRateMin: 0.6,
-  priceRateMax: 0.8,
+  priceRateMax: 0.9,
+  ...defaultPriceFilter,
+}))
+
+
+manager.addNewStrategy(new BackTestSma({
+  id: 'p6090pro45',
+  account: {
+    loss: -30,
+    profit: 45,
+    priceOffset: 0,
+  },
+  '5m': { smaFastLen: 53, smaSlowLen: 88 },
+  // '5m': { smaFastLen: 40, smaSlowLen: 88 },
+  disableLong: false,
+  disableShort: true,
+  rateLen: 250,
+  priceRateMin: 0.6,
+  priceRateMax: 0.9,
   ...defaultPriceFilter,
 }))
 
 manager.addNewStrategy(new BackTestSma({
-  id: 'p6090hl250',
+  id: 'p6090pro6040',
   account: {
-    loss: -30,
-    profit: 37,
+    loss: -40,
+    profit: 60,
     priceOffset: 0,
   },
   '5m': { smaFastLen: 53, smaSlowLen: 88 },
