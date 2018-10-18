@@ -20,25 +20,8 @@ const defaultPriceFilter = {
   shortMinPriceDiff: 0
 }
 const manager = new BackTestManager()
-// manager.addNewStrategy(new BackTestSma({
-//   id: 'p6080hl',
-//   account: {
-//     loss: -30,
-//     profit: 37,
-//     priceOffset: 0,
-//   },
-//   '5m': { smaFastLen: 53, smaSlowLen: 88 },
-//   // '5m': { smaFastLen: 40, smaSlowLen: 88 },
-//   disableLong: false,
-//   disableShort: true,
-//   rateLen: 250,
-//   priceRateMin: 0.6,
-//   priceRateMax: 0.8,
-//   ...defaultPriceFilter,
-// }))
-
 manager.addNewStrategy(new BackTestSma({
-  id: 'p6090hl350',
+  id: 'p6080hl200',
   account: {
     loss: -30,
     profit: 37,
@@ -50,7 +33,24 @@ manager.addNewStrategy(new BackTestSma({
   disableShort: true,
   rateLen: 200,
   priceRateMin: 0.6,
-  priceRateMax: 0.9,
+  priceRateMax: 0.8,
+  ...defaultPriceFilter,
+}))
+
+manager.addNewStrategy(new BackTestSma({
+  id: 'p5080hl200',
+  account: {
+    loss: -30,
+    profit: 37,
+    priceOffset: 0,
+  },
+  '5m': { smaFastLen: 53, smaSlowLen: 88 },
+  // '5m': { smaFastLen: 40, smaSlowLen: 88 },
+  disableLong: false,
+  disableShort: true,
+  rateLen: 200,
+  priceRateMin: 0.5,
+  priceRateMax: 0.8,
   ...defaultPriceFilter,
 }))
 
@@ -68,6 +68,40 @@ manager.addNewStrategy(new BackTestSma({
   rateLen: 250,
   priceRateMin: 0.6,
   priceRateMax: 0.8,
+  ...defaultPriceFilter,
+}))
+
+manager.addNewStrategy(new BackTestSma({
+  id: 'p6080hl300',
+  account: {
+    loss: -30,
+    profit: 37,
+    priceOffset: 0,
+  },
+  '5m': { smaFastLen: 53, smaSlowLen: 88 },
+  // '5m': { smaFastLen: 40, smaSlowLen: 88 },
+  disableLong: false,
+  disableShort: true,
+  rateLen: 300,
+  priceRateMin: 0.6,
+  priceRateMax: 0.8,
+  ...defaultPriceFilter,
+}))
+
+manager.addNewStrategy(new BackTestSma({
+  id: 'p6090hl250',
+  account: {
+    loss: -30,
+    profit: 37,
+    priceOffset: 0,
+  },
+  '5m': { smaFastLen: 53, smaSlowLen: 88 },
+  // '5m': { smaFastLen: 40, smaSlowLen: 88 },
+  disableLong: false,
+  disableShort: true,
+  rateLen: 250,
+  priceRateMin: 0.6,
+  priceRateMax: 0.9,
   ...defaultPriceFilter,
 }))
 
@@ -144,7 +178,7 @@ let dataSeries = [
   // ["2018-09-10T22:00:00.000Z"]
 ]
 
-// dataSeries = upSeries2 // upSeries.concat(upSeries1).concat(upSeries2)
+// dataSeries = upSeries.concat(upSeries1).concat(upSeries2)
 
 seriesIndex = timeToSeries(dataSeries)
 console.log(seriesIndex)
