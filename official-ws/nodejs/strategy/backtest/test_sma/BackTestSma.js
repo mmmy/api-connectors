@@ -34,7 +34,7 @@ class BackTestSma extends BackTest {
         smaCrossSignal.long &&
         // (Math.abs(bar.close - smaCrossSignal.fastMa) < 20) &&
         (longPriceLen > 0 ? mainCandle.minMaxCloseFilter(longPriceLen, longMaxPriceDiff, longMinPriceDiff) : true) &&
-        (rateLen > 0 ? mainCandle.priceRateFilterHighLow(rateLen, priceRateMin, priceRateMax) : true)
+        (rateLen > 0 ? mainCandle.priceRateFilter(rateLen, priceRateMin, priceRateMax) : true)
       ) {
         long = true
       } else if (
