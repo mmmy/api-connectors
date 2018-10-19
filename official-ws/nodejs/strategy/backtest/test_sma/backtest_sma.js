@@ -21,70 +21,18 @@ const defaultPriceFilter = {
 }
 const manager = new BackTestManager()
 manager.addNewStrategy(new BackTestSma({
-  id: 'p8090l150',
+  id: 'p8090l200',
   account: {
     loss: -30,
     profit: 37,
     priceOffset: 0,
   },
-  '5m': { smaFastLen: 53, smaSlowLen: 88 },
-  // '5m': { smaFastLen: 40, smaSlowLen: 88 },
-  disableLong: false,
-  disableShort: true,
-  rateLen: 150,
-  priceRateMin: 0.8,
-  priceRateMax: 0.9,
-  ...defaultPriceFilter,
-}))
-
-manager.addNewStrategy(new BackTestSma({
-  id: 'p7090l200',
-  account: {
-    loss: -30,
-    profit: 37,
-    priceOffset: 0,
-  },
-  '5m': { smaFastLen: 53, smaSlowLen: 88 },
+  '5m': { smaFastLen: 60, smaSlowLen: 100 },
   // '5m': { smaFastLen: 40, smaSlowLen: 88 },
   disableLong: false,
   disableShort: true,
   rateLen: 200,
   priceRateMin: 0.7,
-  priceRateMax: 0.9,
-  ...defaultPriceFilter,
-}))
-
-
-manager.addNewStrategy(new BackTestSma({
-  id: 'p7590l200',
-  account: {
-    loss: -30,
-    profit: 37,
-    priceOffset: 0,
-  },
-  '5m': { smaFastLen: 53, smaSlowLen: 88 },
-  // '5m': { smaFastLen: 40, smaSlowLen: 88 },
-  disableLong: false,
-  disableShort: true,
-  rateLen: 200,
-  priceRateMin: 0.75,
-  priceRateMax: 0.9,
-  ...defaultPriceFilter,
-}))
-
-manager.addNewStrategy(new BackTestSma({
-  id: 'p7590pr40',
-  account: {
-    loss: -30,
-    profit: 40,
-    priceOffset: 0,
-  },
-  '5m': { smaFastLen: 53, smaSlowLen: 88 },
-  // '5m': { smaFastLen: 40, smaSlowLen: 88 },
-  disableLong: false,
-  disableShort: true,
-  rateLen: 200,
-  priceRateMin: 0.75,
   priceRateMax: 0.9,
   ...defaultPriceFilter,
 }))
