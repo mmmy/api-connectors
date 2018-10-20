@@ -14,9 +14,9 @@ const defaultPriceFilter = {
   longMaxPriceDiff: 30,
   longMinPriceDiff: 0,
 
-  shortPriceLen: -1,
-  // shortMaxPriceDiff: 43,
-  // shortMinPriceDiff: 20
+  shortPriceLen: 6,
+  shortMaxPriceDiff: 30,
+  shortMinPriceDiff: 0
 }
 
 const obManager = new SarMaStrategyManager()
@@ -49,10 +49,10 @@ obManager.addNewStrategy({
 })
 
 obManager.addNewStrategy({
-  id: 'samcorss-5m-yangqihero-profit37',
+  id: 'samcorss-5m-profit37',
   amount: 10000,
-  priceOffset: 2,
-  disableShort: true,
+  priceOffset: 1,
+  disableShort: false,
   account: {
     loss: -30,
     shortLoss: -30,
@@ -70,8 +70,14 @@ obManager.addNewStrategy({
     smaSlowLen: 88,
   },
   '1d': {
-    smaFilterLen: 8
+    // smaFilterLen: 8
   },
+  longRateLen: 200,
+  longPriceRateMin: 0.75,
+  longPriceRateMax: 0.9,
+  shortRateLen: 200,
+  shortPriceRateMin: 0.1,
+  shortPriceRateMax: 0.15,
   ...defaultPriceFilter,
 })
 
@@ -144,10 +150,10 @@ bitmex.listenCandle({binSize: '5m'}, function(list) {
 //   obManager.updateCandleLastHistory('4h', data.data[0])
 // })
 
-bitmex.listenCandle({binSize: '1d'}, function(list) {
-  obManager.setCandleHistory('1d', list)
-}, function(data) {
-  obManager.updateCandleLastHistory('1d', data.data[0])
-})
+// bitmex.listenCandle({binSize: '1d'}, function(list) {
+//   obManager.setCandleHistory('1d', list)
+// }, function(data) {
+//   obManager.updateCandleLastHistory('1d', data.data[0])
+// })
 
 const webserver = new WebServer({ port: 7779 }, obManager)

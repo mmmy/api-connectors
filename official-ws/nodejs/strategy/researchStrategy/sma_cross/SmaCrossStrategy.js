@@ -12,10 +12,19 @@ class SmaCrossStrategy extends Strategy {
       const longPriceLen = this._options.longPriceLen || -1             // 5min: 6, 1min: 50  // disable: -1
       const longMaxPriceDiff = this._options.longMaxPriceDiff || 30     // 1min: 47
       const longMinPriceDiff = this._options.longMinPriceDiff || 0      // 1min: 20
-      
+
       const shortPriceLen = this._options.longPriceLen || -1             // 1min: 50 // disable: -1
       const shortMaxPriceDiff = this._options.shortMaxPriceDiff || 60   // 1min: 47
       const shortMinPriceDiff = this._options.shortMinPriceDiff || 0   // 1min: 20
+
+      const longRateLen = this._options.longRateLen || -1
+      const longPriceRateMin = this._options.longPriceRateMin || 0.6
+      const longPriceRateMax = this._options.longPriceRateMax || 2
+
+      const shortRateLen = this._options.shortRateLen || -1
+      const shortPriceRateMin = this._options.shortPriceRateMin || 0.1
+      const shortPriceRateMax = this._options.shortPriceRateMax || 0.3
+
       let long = false
       let short = false
       const _1mCandle = candles['1m']
@@ -31,11 +40,12 @@ class SmaCrossStrategy extends Strategy {
       }
       // 设置中禁止做空
       const disableShort = this._options.disableShort
-      const smaCrossSignal = mainCandle.smaCrossSignal()
+      const smaCrossSignal = mainCandle.smaCrossSignalFast()
       if (
         smaCrossSignal.long &&
         // _1dCandle.priceIsAboveSma() &&
-        (longPriceLen > 0 ? mainCandle.minMaxCloseFilter(longPriceLen, longMaxPriceDiff, longMinPriceDiff) : true)
+        (longPriceLen > 0 ? mainCandle.minMaxCloseFilter(longPriceLen, longMaxPriceDiff, longMinPriceDiff) : true) &&
+        (longRateLen > 0 ? mainCandle.priceRateFilter(longRateLen, longPriceRateMin, longPriceRateMax) : true)
       ) {
         console.log(`${this._options.id} ${new Date()} SMA cross do long ++`)
         long = true
@@ -43,12 +53,13 @@ class SmaCrossStrategy extends Strategy {
         !disableShort &&
         smaCrossSignal.short &&
         // !_1dCandle.priceIsAboveSma() &&
-        (shortPriceLen > 0 ? mainCandle.minMaxCloseFilter(shortPriceLen, shortMaxPriceDiff, shortMinPriceDiff) : true)
+        (shortPriceLen > 0 ? mainCandle.minMaxCloseFilter(shortPriceLen, shortMaxPriceDiff, shortMinPriceDiff) : true) &&
+        (shortRateLen > 0 ? mainCandle.priceRateFilter(shortRateLen, shortPriceRateMin, shortPriceRateMax) : true)
       ) {
         console.log(`${this._options.id}  ${new Date()} SMA cross do short --`)
         short = true
       }
-      
+
       //有的时候需要在当前的orderbook 上偏移一段价格来挂单, 这样对我们有利
       const priceOffset = this._options.priceOffset || 0
       let strategyPrice = null

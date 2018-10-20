@@ -33,29 +33,29 @@ manager.addNewStrategy(new BackTestSma({
   disableShort: false,
   shortRateLen: 200,
   shortPriceRateMin: 0,
-  shortPriceRateMax: 0.2,
+  shortPriceRateMax: 0.15,
   ...defaultPriceFilter,
 }))
 
-// manager.addNewStrategy(new BackTestSma({
-//   id: 'lands200',
-//   account: {
-//     loss: -30,
-//     profit: 37,
-//     priceOffset: 0,
-//   },
-//   '5m': { smaFastLen: 53, smaSlowLen: 88 },
-//   // '5m': { smaFastLen: 40, smaSlowLen: 88 },
-//   disableLong: false,
-//   disableShort: false,
-//   longRateLen: 200,
-//   longPriceRateMin: 0.8,
-//   longPriceRateMax: 0.9,
-//   shortRateLen: 200,
-//   shortPriceRateMin: 0.1,
-//   shortPriceRateMax: 0.2,
-//   ...defaultPriceFilter,
-// }))
+manager.addNewStrategy(new BackTestSma({
+  id: 'lands200',
+  account: {
+    loss: -30,
+    profit: 37,
+    priceOffset: 0,
+  },
+  '5m': { smaFastLen: 53, smaSlowLen: 88 },
+  // '5m': { smaFastLen: 40, smaSlowLen: 88 },
+  disableLong: false,
+  disableShort: false,
+  longRateLen: 200,
+  longPriceRateMin: 0.75,
+  longPriceRateMax: 0.9,
+  shortRateLen: 200,
+  shortPriceRateMin: 0.1,
+  shortPriceRateMax: 0.15,
+  ...defaultPriceFilter,
+}))
 
 function findIndexByTime(time) {
   time = +new Date(time)
