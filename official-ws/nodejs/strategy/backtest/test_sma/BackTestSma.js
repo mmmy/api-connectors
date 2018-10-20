@@ -17,9 +17,13 @@ class BackTestSma extends BackTest {
       const shortMaxPriceDiff = this._options.shortMaxPriceDiff || 30   // 1min: 47
       const shortMinPriceDiff = this._options.shortMinPriceDiff || 0   // 1min: 20
 
-      const rateLen = this._options.rateLen || -1
-      const priceRateMin = this._options.priceRateMin || 0.6
-      const priceRateMax = this._options.priceRateMax || 2
+      const longRateLen = this._options.longRateLen || -1
+      const longPriceRateMin = this._options.longPriceRateMin || 0.6
+      const longPriceRateMax = this._options.longPriceRateMax || 2
+
+      const shortRateLen = this._options.shortRateLen || -1
+      const shortPriceRateMin = this._options.shortPriceRateMin || 0.1
+      const shortPriceRateMax = this._options.shortPriceRateMax || 0.3
 
       let long = false
       let short = false
@@ -34,14 +38,15 @@ class BackTestSma extends BackTest {
         smaCrossSignal.long &&
         // (Math.abs(bar.close - smaCrossSignal.fastMa) < 20) &&
         (longPriceLen > 0 ? mainCandle.minMaxCloseFilter(longPriceLen, longMaxPriceDiff, longMinPriceDiff) : true) &&
-        (rateLen > 0 ? mainCandle.priceRateFilter(rateLen, priceRateMin, priceRateMax) : true)
+        (longRateLen > 0 ? mainCandle.priceRateFilter(longRateLen, longPriceRateMin, longPriceRateMax) : true)
       ) {
         long = true
       } else if (
         !disableShort &&
         smaCrossSignal.short &&
-        (shortPriceLen > 0 ? mainCandle.minMaxCloseFilter(shortPriceLen, shortMaxPriceDiff, shortMinPriceDiff) : true)
-      ) {
+        (shortPriceLen > 0 ? mainCandle.minMaxCloseFilter(shortPriceLen, shortMaxPriceDiff, shortMinPriceDiff) : true) &&
+        (shortRateLen > 0 ? mainCandle.priceRateFilter(shortRateLen, shortPriceRateMin, shortPriceRateMax) : true)      
+        ) {
         short = true
       }
       let strategyPrice = null
