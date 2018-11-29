@@ -19,8 +19,8 @@ const checkData = function(list) {
       return '顺序不对'
     }
     if (timeIntervals.length > 0 && interval !== timeIntervals[timeIntervals.length - 1]) {
-      console.log(list.slice(-2))
-      return 'list 时间序列不合法'
+      console.log(list[i])
+      console.log('list 时间序列不合法')
     }
     timeIntervals.push(interval)
   }

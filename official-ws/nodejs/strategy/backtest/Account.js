@@ -4,6 +4,7 @@ class Account {
     this._options = {
       loss: 0,
       profit: 0,
+      orderPrecie: 0.5,       // 挂单精确度btc 0.5, eth 0.02
       ...options,
     }
     this._hasPosition = false

@@ -104,7 +104,8 @@ Candles.prototype.checkData = function() {
     }
     if (timeIntervals.length > 0 && interval !== timeIntervals[timeIntervals.length - 1]) {
       console.log(_histories.slice(-2))
-      throw 'Candles: _histories 时间序列不合法'
+      // throw 'Candles: _histories 时间序列不合法'
+      console.log('Candles: _histories 时间序列不合法')
     }
     timeIntervals.push(interval)
   }

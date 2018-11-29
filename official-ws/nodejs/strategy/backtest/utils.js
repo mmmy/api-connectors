@@ -9,6 +9,10 @@ const JSONtoCSV = (arr, columns, delimiter = ',') =>
     )
   ].join('\n');
 
+
+const arrayToCSV = (arr, delimiter=',') => {
+  return arr.map(item => item.join(delimiter)).join('\n')
+}
 // 統計
 const statisticTrades = function (trades) {
   const touchedTrades = trades.filter(t => t.touched)
@@ -60,6 +64,7 @@ const statisticTrades = function (trades) {
 }
 
 module.exports = {
+  arrayToCSV,
   JSONtoCSV,
   statisticTrades
 }
