@@ -14,6 +14,10 @@ let maxTrades = 0
 
 function orderBookTrade(json, symbol, tableName) {
   const { table, action, data } = json
+  if (action === 'delete' && data.length > 1) {
+    console.log(data.length)
+  }
+  return
   if (table === 'orderBookL2_25') {
     if (lastTable === 'orderBookL2_25') {
       continueTrades ++
