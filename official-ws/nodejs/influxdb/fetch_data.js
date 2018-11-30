@@ -15,6 +15,8 @@ let lastTable = ''
 let continueTrades = 0
 let maxTrades = 0
 
+let lastTime = null
+
 function orderBookTest(json) {
   const { table, action, data } = json
   const topAsk = ob.getTopAsk()
@@ -33,6 +35,27 @@ function orderBookTest(json) {
   ob.update(json)
 }
 
+function tradeTest(json) {
+  const { table, action, data } = json
+  const dataToInflux = data.map(item => {
+    const time_num = (+new Date(item.timestamp)) * 1E6
+    lastTime = time_num
+    return {
+      measurement: table,
+      fields: {
+        size: item.size,
+        price: item.price,
+      },
+      tags: {
+        action,
+        side: item.side,
+      },
+      timestamp: time_num
+    }
+  })
+  // client.writePoints(dataToInflux)
+}
+
 function orderBookTrade(json, symbol, tableName) {
   const { table, action, data } = json
 
@@ -47,8 +70,10 @@ function orderBookTrade(json, symbol, tableName) {
     // if (continueTrades > 1) {
     //   console.log(continueTrades, maxTrades)
     // }
+  } else {
+    tradeTest(json)
   }
-  lastTable = table
+  // lastTable = table
   // console.log(json)
   // var lastData = data.data.slice(-1)[0]
   // const { table, action } = data
