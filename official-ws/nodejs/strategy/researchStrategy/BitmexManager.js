@@ -34,7 +34,22 @@ class BitmexManager {
     client.on('initialize', () => console.log('BitmexManager Client initialized, data is flowing.'));
     this._client = client
   }
-
+  /* 
+  { table: 'orderBookL2_25',
+  action: 'update',  // 'insert', 'delete'
+  data:
+   [ { symbol: 'XBTUSD', id: 8799570200, side: 'Sell', size: 76715 },
+     { symbol: 'XBTUSD', id: 8799570550, side: 'Sell', size: 10617 },
+     { symbol: 'XBTUSD', id: 8799570600, side: 'Sell', size: 187141 },
+     { symbol: 'XBTUSD', id: 8799570700, side: 'Sell', size: 1012791 },
+     { symbol: 'XBTUSD', id: 8799570800, side: 'Sell', size: 182780 },
+     { symbol: 'XBTUSD', id: 8799570900, side: 'Sell', size: 51365 },
+     { symbol: 'XBTUSD', id: 8799571400, side: 'Buy', size: 754186 },
+     { symbol: 'XBTUSD', id: 8799571700, side: 'Buy', size: 56857 },
+     { symbol: 'XBTUSD', id: 8799571850, side: 'Buy', size: 25311 },
+     { symbol: 'XBTUSD', id: 8799572200, side: 'Buy', size: 47089 },
+     { symbol: 'XBTUSD', id: 8799572300, side: 'Buy', size: 38650 } ] }
+  */
   listenOrderBook(cb) {
     this._client.addStream('XBTUSD', 'orderBookL2_25', function(data, symbol, tableName) {
       cb(data, symbol, tableName)

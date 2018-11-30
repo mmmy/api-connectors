@@ -173,12 +173,24 @@ OrderBook.prototype.getSignal = function () {
   return this._signal
 }
 
+OrderBook.prototype.getTopBid = function () {
+  return this._bid
+}
+
 OrderBook.prototype.getTopBidPrice = function () {
   return this._bid && this._bid.price
 }
 
+OrderBook.prototype.getTopAsk = function () {
+  return this._ask
+}
+
 OrderBook.prototype.getTopAskPrice = function () {
   return this._ask && this._ask.price
+}
+
+OrderBook.prototype.getPriceGap = function() {
+  return this.getTopAskPrice() - this.getTopBidPrice()
 }
 
 OrderBook.prototype.getOptions = function () {
