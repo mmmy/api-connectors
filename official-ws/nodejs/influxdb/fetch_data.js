@@ -53,7 +53,7 @@ function orderBookTest(json) {
           action,
           side: 'Buy'
         },
-        timestamp: lastTime + 1E6
+        timestamp: lastTime += 1E6
       }]
       client.writePoints(continuesMeasument)
     }
@@ -69,7 +69,7 @@ function orderBookTest(json) {
           action,
           side: 'Sell'
         },
-        timestamp: lastTime + 1E6
+        timestamp: lastTime += 1E6
       }]
       client.writePoints(continuesMeasument)
     }
@@ -80,14 +80,14 @@ function orderBookTest(json) {
       return {
         measurement: 'trade_orderbook',
         fields: {
-          size: order && order.side || 0,
+          size: order && +order.side || 0,
           price: item.price
         },
         tags: {
           action,
           side: 'Buy'
         },
-        timestamp: lastTime + (i + 1) * 1E6
+        timestamp: lastTime += 1E6
       }
     })
     const tradesSellInflux = sideBuy.map((item, i) => {
@@ -95,14 +95,14 @@ function orderBookTest(json) {
       return {
         measurement: 'trade_orderbook',
         fields: {
-          size: order && order.side || 0,
+          size: order && +order.side || 0,
           price: item.price
         },
         tags: {
           action,
           side: 'Sell'
         },
-        timestamp: lastTime + (i + 1) * 1E6
+        timestamp: lastTime += 1E6
       }
     })
 
@@ -112,7 +112,53 @@ function orderBookTest(json) {
     // console.log(data)
     // console.log('---------------------', ob.getTopBidPrice())
   } else if (action === 'update') {
-    
+    let topBidOk = false
+    let topAskOk = false
+    let len = data.length
+    for (let i=0; i<len; i++) {
+      const item = data[i]
+      if (topBidOk && topAskOk) {
+        break
+      }
+      if (topBidId === item.id) {
+        topBidOk = true
+        // 买一价发生的size变化值
+        const deltaSize = topBid.size - item.size
+        if (deltaSize > 0) {
+          client.writePoints([{
+            measurement: 'trade_orderbook',
+            fields: {
+              size: deltaSize,
+              price: topBid.price
+            },
+            tags: {
+              action,
+              size: 'Sell'
+            },
+            timestamp: lastTime += 1E6
+          }])
+        }
+      }
+      if (topAskId === item.id) {
+        topAskOk = true
+        // 卖一价发生的size变化值
+        const deltaSize = topAsk.size - item.size
+        if (deltaSize > 0) {
+          client.writePoints([{
+            measurement: 'trade_orderbook',
+            fields: {
+              size: deltaSize,
+              price: topAsk.price
+            },
+            tags: {
+              action,
+              size: 'Buy'
+            },
+            timestamp: lastTime += 1E6
+          }])
+        }
+      }
+    }
   }
   ob.update(json)
   // check orderbook is countines
