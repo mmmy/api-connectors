@@ -50,6 +50,9 @@ class BitmexManager {
      { symbol: 'XBTUSD', id: 8799572200, side: 'Buy', size: 47089 },
      { symbol: 'XBTUSD', id: 8799572300, side: 'Buy', size: 38650 } ] }
   */
+ /* 
+  
+ */
   listenOrderBook(cb) {
     this._client.addStream('XBTUSD', 'orderBookL2_25', function(data, symbol, tableName) {
       cb(data, symbol, tableName)

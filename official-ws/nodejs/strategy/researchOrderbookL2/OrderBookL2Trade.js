@@ -197,4 +197,40 @@ OrderBook.prototype.getOptions = function () {
   return this._options
 }
 
+OrderBook.prototype.getMissPrices = function() {
+  var len = this._data.length
+  const prices = []
+  if (len > 1) {
+    for (var i = 1; i < len; i++) {
+      var preBook = this._data[i - 1]
+      var book = this._data[i]
+      for (let p = preBook.price + 0.5; p < book.price; p+=0.5) {
+        prices.push(p)
+      }
+    }
+  }
+  return prices
+}
+// 永远是true?
+OrderBook.prototype.isMissPriceContinues = function() {
+  const prices = this.getMissPrices()
+  for (let i=1; i<prices.length; i++) {
+    if (prices[i] - prices[i-1] !== 0.5) {
+      return false
+    }
+  }
+  return true
+}
+
+OrderBook.prototype.getOrderById = function(id) {
+  var len = this._data.length
+  for (var i = 0; i < len; i++) {
+    var book = this._data[i]
+    if (book.id === id) {
+      return book
+    }
+  }
+  console.warn('warning: getOrderById not found')
+}
+
 module.exports = OrderBook

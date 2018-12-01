@@ -2,6 +2,7 @@ const Influx = require('influx')
 const BitmexManager = require('../strategy/researchStrategy/BitmexManager')
 const OrderBook = require('../strategy/researchOrderbookL2/OrderBookL2Trade')
 const common = require('../strategy/common')
+const _ = require('lodash')
 
 const client = new Influx.InfluxDB({
   database: 'bitmex',
@@ -17,22 +18,118 @@ let maxTrades = 0
 
 let lastTime = null
 
+function isPriceContinues(prices) {
+  for (let i=1; i<prices.length; i++) {
+    if (prices[i] - prices[i-1] !== 0.5) {
+      return false
+    }
+  }
+  return true
+}
+
 function orderBookTest(json) {
   const { table, action, data } = json
   const topAsk = ob.getTopAsk()
-  const topBid = ob.getTopBidPrice()
+  const topBid = ob.getTopBid()
   const topAskId = topAsk.id
   const topBidId = topBid.id
   const gap = topAsk.price - topBid.price
   if (gap > 1) {
-    console.log(gap)
+    // console.log(gap)
   }
   if (action == 'delete') {
     data.forEach(item => item.price = common.xbtPriceFromID(item.id))
-    console.log(data)
-    console.log('---------------------', ob.getTopBidPrice())
+    const sideBuy = data.filter(item => item.side === 'Buy')
+    const sideSell = data.filter(item => item.side === 'Sell')
+
+    if (sideBuy.length > 0) {
+      let isContinues = isPriceContinues(sideBuy.map(item => item.price).sort())
+      let continuesMeasument = [{
+        measurement: 'action_price_continues',
+        fields: {
+          continues: isContinues ? 1 : -1
+        },
+        tags: {
+          action,
+          side: 'Buy'
+        },
+        timestamp: lastTime + 1E6
+      }]
+      client.writePoints(continuesMeasument)
+    }
+
+    if (sideSell.length > 0) {
+      let isContinues = isPriceContinues(sideSell.map(item => item.price).sort())
+      let continuesMeasument = [{
+        measurement: 'action_price_continues',
+        fields: {
+          continues: isContinues ? 1 : -1
+        },
+        tags: {
+          action,
+          side: 'Sell'
+        },
+        timestamp: lastTime + 1E6
+      }]
+      client.writePoints(continuesMeasument)
+    }
+
+    // trading from orderbook
+    const tradesBuyInflux = sideSell.map((item, i) => {
+      const order = ob.getOrderById(item.id)
+      return {
+        measurement: 'trade_orderbook',
+        fields: {
+          size: order && order.side || 0,
+          price: item.price
+        },
+        tags: {
+          action,
+          side: 'Buy'
+        },
+        timestamp: lastTime + (i + 1) * 1E6
+      }
+    })
+    const tradesSellInflux = sideBuy.map((item, i) => {
+      const order = ob.getOrderById(item.id)
+      return {
+        measurement: 'trade_orderbook',
+        fields: {
+          size: order && order.side || 0,
+          price: item.price
+        },
+        tags: {
+          action,
+          side: 'Sell'
+        },
+        timestamp: lastTime + (i + 1) * 1E6
+      }
+    })
+
+    client.writePoints(tradesBuyInflux)
+    client.writePoints(tradesSellInflux)
+
+    // console.log(data)
+    // console.log('---------------------', ob.getTopBidPrice())
+  } else if (action === 'update') {
+    
   }
   ob.update(json)
+  // check orderbook is countines
+  if (action == 'delete') {
+  }
+  const missPricesContinues = [{
+    measurement: 'ob_price_miss_continues',
+    fields: {
+      continues: ob.isMissPriceContinues() ? 1 : -1
+    },
+    tags: {
+      action
+    },
+    timestamp: lastTime + 1E6
+  }]
+  client.writePoints(missPricesContinues)
+    // console.log(ob.getMissPrices(), [ob.getTopBid().price, ob.getTopAsk().price])
 }
 
 function tradeTest(json) {
@@ -53,7 +150,7 @@ function tradeTest(json) {
       timestamp: time_num
     }
   })
-  // client.writePoints(dataToInflux)
+  client.writePoints(dataToInflux)
 }
 
 function orderBookTrade(json, symbol, tableName) {
