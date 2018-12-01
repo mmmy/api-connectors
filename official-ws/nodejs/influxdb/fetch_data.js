@@ -180,9 +180,16 @@ function orderBookTest(json) {
 
 function tradeTest(json) {
   const { table, action, data } = json
-  const dataToInflux = data.map(item => {
-    const time_num = (+new Date(item.timestamp)) * 1E6
-    lastTime = time_num
+  // const times = data.map(item => item.timestamp)
+  // const timesUniq = _.uniq(times)
+  // if (times.length !== timesUniq.length) {
+  //   console.log('trade times are not uniq', times.length, timesUniq.length)
+  // }
+  // 所有的timestamp都是同样值
+  const dataToInflux = data.map((item, i) => {
+    if (i === 0) {
+      lastTime = (+new Date(item.timestamp)) * 1E6
+    }
     return {
       measurement: table,
       fields: {
@@ -193,7 +200,7 @@ function tradeTest(json) {
         action,
         side: item.side,
       },
-      timestamp: time_num
+      timestamp: lastTime += 1E6
     }
   })
   client.writePoints(dataToInflux)
