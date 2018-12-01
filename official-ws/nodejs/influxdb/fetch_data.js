@@ -133,7 +133,7 @@ function orderBookTest(json) {
             },
             tags: {
               action,
-              size: 'Sell'
+              side: 'Sell'
             },
             timestamp: lastTime += 1E6
           }])
@@ -152,7 +152,7 @@ function orderBookTest(json) {
             },
             tags: {
               action,
-              size: 'Buy'
+              side: 'Buy'
             },
             timestamp: lastTime += 1E6
           }])
