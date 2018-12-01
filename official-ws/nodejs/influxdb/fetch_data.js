@@ -80,7 +80,7 @@ function orderBookTest(json) {
       return {
         measurement: 'trade_orderbook',
         fields: {
-          size: order && +order.side || 0,
+          size: order && +order.size || 0,
           price: item.price
         },
         tags: {
@@ -95,7 +95,7 @@ function orderBookTest(json) {
       return {
         measurement: 'trade_orderbook',
         fields: {
-          size: order && +order.side || 0,
+          size: order && +order.size || 0,
           price: item.price
         },
         tags: {
