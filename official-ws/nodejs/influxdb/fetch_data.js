@@ -19,8 +19,8 @@ let maxTrades = 0
 let lastTime = null
 
 function isPriceContinues(prices) {
-  for (let i=1; i<prices.length; i++) {
-    if (prices[i] - prices[i-1] !== 0.5) {
+  for (let i = 1; i < prices.length; i++) {
+    if (prices[i] - prices[i - 1] !== 0.5) {
       return false
     }
   }
@@ -115,7 +115,7 @@ function orderBookTest(json) {
     let topBidOk = false
     let topAskOk = false
     let len = data.length
-    for (let i=0; i<len; i++) {
+    for (let i = 0; i < len; i++) {
       const item = data[i]
       if (topBidOk && topAskOk) {
         break
@@ -175,7 +175,7 @@ function orderBookTest(json) {
     timestamp: lastTime + 1E6
   }]
   client.writePoints(missPricesContinues)
-    // console.log(ob.getMissPrices(), [ob.getTopBid().price, ob.getTopAsk().price])
+  // console.log(ob.getMissPrices(), [ob.getTopBid().price, ob.getTopAsk().price])
 }
 
 function tradeTest(json) {
@@ -249,3 +249,22 @@ const bitmex = new BitmexManager()
 bitmex.listenTrade(orderBookTrade)
 
 bitmex.listenOrderBook(orderBookTrade)
+
+bitmex.listenInstrument((json) => {
+  const { table, action, data } = json
+  //indicativeSettlePrice
+  const data0 = data[0]
+  if (data0.indicativeSettlePrice) {
+    client.writePoints([{
+      measurement: 'indicativeSettlePrice',
+      fields: {
+        price: data0.indicativeSettlePrice,
+      },
+      tags: {
+        action,
+      },
+      timestamp: (+new Date(data0.timestamp)) * 1E6
+    }])
+  }
+  // console.log(data.length)
+})

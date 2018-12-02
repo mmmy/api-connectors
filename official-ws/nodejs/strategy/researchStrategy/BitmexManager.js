@@ -119,6 +119,12 @@ class BitmexManager {
       cb(data, symbol, tableName)
     })
   }
+
+  listenInstrument(cb) {
+    this._client.addStream('XBTUSD', 'instrument', function(data, symbol, tableName) {
+      cb(data, symbol, tableName)
+    })
+  }
 }
 
 module.exports = BitmexManager

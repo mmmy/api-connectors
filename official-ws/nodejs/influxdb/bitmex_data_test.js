@@ -18,9 +18,25 @@ function orderBookTrade(json) {
       }
     }
   } else if (table === 'trade') {
-    console.log(json)
+    let totalSize = 0
+    const len = data.length
+    for (let i=0; i<len; i++) {
+      const item = data[i]
+      totalSize += item.size
+    }
+    console.log(totalSize)
   }
 }
 
-bitmex.listenOrderBook(orderBookTrade)
-bitmex.listenTrade(orderBookTrade)
+// bitmex.listenOrderBook(orderBookTrade)
+// bitmex.listenTrade(orderBookTrade)
+
+bitmex.listenInstrument((json) => {
+  const { table, action, data } = json
+  //indicativeSettlePrice
+  const data0 = data[0]
+  if (data0.indicativeSettlePrice) {
+    console.log(data0.indicativeSettlePrice)
+  }
+  // console.log(data.length)
+})
