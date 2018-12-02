@@ -31,12 +31,12 @@ function orderBookTest(json) {
   const { table, action, data } = json
   const topAsk = ob.getTopAsk()
   const topBid = ob.getTopBid()
-  const topAskId = topAsk.id
-  const topBidId = topBid.id
-  const gap = topAsk.price - topBid.price
-  if (gap > 1) {
-    // console.log(gap)
-  }
+  const topAskId = topAsk && topAsk.id
+  const topBidId = topBid && topBid.id
+  // const gap = topAsk.price - topBid.price
+  // if (gap > 1) {
+  //   // console.log(gap)
+  // }
   if (action == 'delete') {
     data.forEach(item => item.price = common.xbtPriceFromID(item.id))
     const sideBuy = data.filter(item => item.side === 'Buy')
