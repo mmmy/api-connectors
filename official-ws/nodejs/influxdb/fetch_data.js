@@ -41,9 +41,15 @@ function orderBookTest(json) {
     data.forEach(item => item.price = common.xbtPriceFromID(item.id))
     const sideBuy = data.filter(item => item.side === 'Buy')
     const sideSell = data.filter(item => item.side === 'Sell')
+    let buyDelLevel1 = false
+    let sellDelLevel1 = false
 
     if (sideBuy.length > 0) {
-      let isContinues = isPriceContinues(sideBuy.map(item => item.price).sort())
+      const buyPrices = sideBuy.map(item => item.price).sort()
+      if (topBid && buyPrices.indexOf(topBid.price) > -1) {
+        sellDelLevel1 = true
+      }
+      let isContinues = isPriceContinues(buyPrices)
       let continuesMeasument = [{
         measurement: 'action_price_continues',
         fields: {
@@ -59,7 +65,11 @@ function orderBookTest(json) {
     }
 
     if (sideSell.length > 0) {
-      let isContinues = isPriceContinues(sideSell.map(item => item.price).sort())
+      const sellPrices = sideSell.map(item => item.price).sort()
+      if (topAsk && sellPrices.indexOf(topAsk.price) > -1) {
+        buyDelLevel1 = true
+      }
+      let isContinues = isPriceContinues(sellPrices)
       let continuesMeasument = [{
         measurement: 'action_price_continues',
         fields: {
@@ -75,39 +85,48 @@ function orderBookTest(json) {
     }
 
     // trading from orderbook
-    const tradesBuyInflux = sideSell.map((item, i) => {
-      const order = ob.getOrderById(item.id)
-      return {
-        measurement: 'trade_orderbook',
-        fields: {
-          size: order && +order.size || 0,
-          price: item.price
-        },
-        tags: {
-          action,
-          side: 'Buy'
-        },
-        timestamp: lastTime += 1E6
-      }
-    })
-    const tradesSellInflux = sideBuy.map((item, i) => {
-      const order = ob.getOrderById(item.id)
-      return {
-        measurement: 'trade_orderbook',
-        fields: {
-          size: order && +order.size || 0,
-          price: item.price
-        },
-        tags: {
-          action,
-          side: 'Sell'
-        },
-        timestamp: lastTime += 1E6
-      }
-    })
+    if (buyDelLevel1) {
+      const tradesBuyInflux = sideSell.map((item, i) => {
+        const order = ob.getOrderById(item.id)
+        return {
+          measurement: 'trade_orderbook',
+          fields: {
+            size: order && +order.size || 0,
+            price: item.price
+          },
+          tags: {
+            action,
+            side: 'Buy'
+          },
+          timestamp: lastTime += 1E6
+        }
+      })
+      client.writePoints(tradesBuyInflux)
+    }
 
-    client.writePoints(tradesBuyInflux)
-    client.writePoints(tradesSellInflux)
+    if (!buyDelLevel1 && sideSell.length > 0) {
+      console.log('hehehe', topAsk && topAsk.price, sideSell.map(item => item.price))
+    }
+
+    if (sellDelLevel1) {
+      const tradesSellInflux = sideBuy.map((item, i) => {
+        const order = ob.getOrderById(item.id)
+        return {
+          measurement: 'trade_orderbook',
+          fields: {
+            size: order && +order.size || 0,
+            price: item.price
+          },
+          tags: {
+            action,
+            side: 'Sell'
+          },
+          timestamp: lastTime += 1E6
+        }
+      })
+  
+      client.writePoints(tradesSellInflux)
+    }
 
     // console.log(data)
     // console.log('---------------------', ob.getTopBidPrice())
