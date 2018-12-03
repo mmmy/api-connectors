@@ -15,6 +15,7 @@ const ob = new OrderBook()
 let lastTable = ''
 let continueTrades = 0
 let maxTrades = 0
+let indicativeSettlePrice = 0
 
 let lastTime = null
 
@@ -104,9 +105,9 @@ function orderBookTest(json) {
       client.writePoints(tradesBuyInflux)
     }
 
-    if (!buyDelLevel1 && sideSell.length > 0) {
-      console.log('hehehe', topAsk && topAsk.price, sideSell.map(item => item.price))
-    }
+    // if (!buyDelLevel1 && sideSell.length > 0) {
+    //   console.log('hehehe', topAsk && topAsk.price, sideSell.map(item => item.price))
+    // }
 
     if (sellDelLevel1) {
       const tradesSellInflux = sideBuy.map((item, i) => {
@@ -214,6 +215,7 @@ function tradeTest(json) {
       fields: {
         size: item.size,
         price: item.price,
+        price_gap: indicativeSettlePrice && (item.price - indicativeSettlePrice) || 0
       },
       tags: {
         action,
@@ -265,10 +267,6 @@ function orderBookTrade(json, symbol, tableName) {
 
 const bitmex = new BitmexManager()
 
-bitmex.listenTrade(orderBookTrade)
-
-bitmex.listenOrderBook(orderBookTrade)
-
 bitmex.listenInstrument((json) => {
   const { table, action, data } = json
   //indicativeSettlePrice
@@ -278,12 +276,19 @@ bitmex.listenInstrument((json) => {
       measurement: 'indicativeSettlePrice',
       fields: {
         price: data0.indicativeSettlePrice,
+        delta: indicativeSettlePrice ? data0.indicativeSettlePrice - indicativeSettlePrice : 0
       },
       tags: {
         action,
       },
       timestamp: (+new Date(data0.timestamp)) * 1E6
     }])
+
+    indicativeSettlePrice = data0.indicativeSettlePrice
   }
   // console.log(data.length)
 })
+
+bitmex.listenTrade(orderBookTrade)
+
+bitmex.listenOrderBook(orderBookTrade)
