@@ -16,7 +16,10 @@ function saveJson(json) {
   let time = new Date() * 1E6
   if (time <= lastTime) {
     time = lastTime + 1E6
-    console.log('time wrong',time_wrongs++)
+    time_wrongs++
+    if (time_wrongs % 1E5 === 0) {
+      console.log('time wrong', time_wrongs)
+    }
   }
   client.writePoints([{
     measurement: 'json',
