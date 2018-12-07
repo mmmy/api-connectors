@@ -10,7 +10,7 @@ const client = new Influx.InfluxDB({
 class MockData {
   constructor(options) {
     this._options = {
-      start_time: '2018-12-05T01:18:00.000Z',
+      start_time: '2018-12-07T10:51:00.000Z',
       time_long: '1d',
       ...options,
     }
@@ -57,7 +57,7 @@ class MockData {
     const total = countResult[0].count_json_str
     const pages = Math.ceil(total /  pageSize)
     for (let i=0; i<pages; i++) {
-      const rows = await client.query(`select * from json ${whereClause} limit ${pageSize} offset ${pageSize * i}`)
+      const rows = await client.query(`select * from json ${whereClause} order by time limit ${pageSize} offset ${pageSize * i}`)
       this.sendData(rows)
     }
     this._events.end && this._events.end()

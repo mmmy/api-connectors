@@ -15,6 +15,9 @@ function orderBookTrade(json) {
   if (table === 'orderBookL2_25') {
     const topAsk = ob.getTopAsk()
     const topBid = ob.getTopBid()
+    if (action == 'partial') {
+      console.log(json)
+    }
     if (action === 'update') {
       const ids = data.map(item => item.id)
       const idsUniq = _.uniq(ids)

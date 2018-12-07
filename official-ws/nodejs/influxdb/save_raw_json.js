@@ -8,8 +8,16 @@ const client = new Influx.InfluxDB({
   port: 8086,
 })
 
+let lastTime = 0
+let time_wrongs = 0
+
 function saveJson(json) {
   const { table, action, data } = json
+  let time = new Date() * 1E6
+  if (time <= lastTime) {
+    time = lastTime + 1E6
+    console.log('time wrong',time_wrongs++)
+  }
   client.writePoints([{
     measurement: 'json',
     fields: {
@@ -18,8 +26,10 @@ function saveJson(json) {
     tags: {
       table,
       action
-    }
+    },
+    timestamp: time
   }])
+  lastTime = time
 }
 
 const bitmex = new BitmexManager()

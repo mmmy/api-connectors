@@ -1,6 +1,8 @@
 
 const MockData = require('../MockData')
+const FlowDataManager = require('../FlowDataManager')
 
+const manager = new FlowDataManager()
 let count = 1
 
 let total_volume = 0
@@ -22,10 +24,11 @@ function cb(json) {
   if (table == 'orderBookL2_25') {
 
   } else if (table == 'trade') {
-    statsVolume(json)
+    // statsVolume(json)
   } else if (table == 'instrument') {
 
   }
+  manager.listenJson(json)
 }
 
 const mockdata = new MockData()
@@ -36,5 +39,6 @@ mockdata.start()
 
 mockdata.on('end', () => {
   console.log('count', count)
-  console.log('total_volume', total_volume)
+  console.log(manager.stats())
+  // console.log('total_volume', total_volume)
 })
