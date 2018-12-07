@@ -8,6 +8,14 @@ const client = new Influx.InfluxDB({
 })
 
 class MockData {
+  constructor(options) {
+    this._options = {
+      start_time: '2018-12-05T01:18:00.000Z',
+      time_long: '1d',
+      ...options,
+    }
+    this._events = {}
+  }
   listenOrderBook(cb) {
     this._obCb = cb
   }
@@ -17,8 +25,13 @@ class MockData {
   listenInstrument(cb) {
     this._insCb = cb
   }
+  createWhereClause() {
+    const { start_time, time_long } = this._options
+    return `where time > '${start_time}' and time <= '${start_time}' + ${time_long}`
+  }
   queryCount() {
-    return client.query(`select count(*) from json`)
+    const whereClause = this.createWhereClause()
+    return client.query(`select count(*) from json ${whereClause}`)
   }
   sendData(rows) {
     const len = rows.length
@@ -39,16 +52,21 @@ class MockData {
     }
   }
   async start(pageSize = 1E5) {
+    const whereClause = this.createWhereClause()    
     const countResult = await this.queryCount()
     const total = countResult[0].count_json_str
     const pages = Math.ceil(total /  pageSize)
     for (let i=0; i<pages; i++) {
-      const rows = await client.query(`select * from json limit ${pageSize} offset ${pageSize * i}`)
+      const rows = await client.query(`select * from json ${whereClause} limit ${pageSize} offset ${pageSize * i}`)
       this.sendData(rows)
     }
+    this._events.end && this._events.end()
   }
   stop() {
 
+  }
+  on(name, cb) {
+    this._events[name] = cb
   }
 }
 
