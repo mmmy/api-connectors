@@ -10,7 +10,7 @@ const DEFAULT_HEADERS = {
 
 function requestWidthHeader(url, params, headers, method) {
   return new Promise((resolve, reject) => {
-    console.log(url, params, headers)
+    // console.log(url, params, headers)
     httpClient[method](url, params, {
           timeout: 10000,
           headers: headers
