@@ -28,7 +28,7 @@ class BitmexManager {
   }
 
   _initClient() {
-    const client = new BitMEXClient({ testnet: false });
+    const client = new BitMEXClient({ testnet: this._options.testnet });
     client.on('error', console.error);
     client.on('close', () => console.log('BitmexManager Connection closed.'));
     client.on('initialize', () => console.log('BitmexManager Client initialized, data is flowing.'));

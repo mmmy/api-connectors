@@ -1,8 +1,16 @@
 
 const MockData = require('../MockData')
-const FlowDataManager = require('../FlowDataManager')
+const TestStrategyManager = require('./IspStrategy/Manager')
+const { JSONtoCSV } = require('../util')
+const fs = require('fs')
+const path = require('path')
 
-const manager = new FlowDataManager()
+const manager = new TestStrategyManager()
+manager.addNewStrategy({
+  id: 'test_indicativeSettlePrice',
+  test: true,
+})
+
 let count = 1
 
 let total_volume = 0
@@ -39,6 +47,18 @@ mockdata.start()
 
 mockdata.on('end', () => {
   console.log('count', count)
-  console.log(manager.stats())
+  const results = manager.stats()
+  console.log(results)
+  results.forEach(result => {
+    const list = result.positions.map(item => {
+      return {
+        ...item,
+        openPositionsLen: item.openPositions.length
+      }
+    })
+    const dataToCsv = JSONtoCSV(list, ['timestamp', 'profit', 'openPositionsLen'])
+    fs.appendFileSync(path.join(__dirname, `temp/backtest_result_${result.id}.csv`), dataToCsv + '\n')
+  })
+
   // console.log('total_volume', total_volume)
 })
