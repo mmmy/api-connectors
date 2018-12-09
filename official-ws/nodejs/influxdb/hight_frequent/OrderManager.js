@@ -23,7 +23,7 @@ class OrderManager {
       this.signatureSDK.deleteOrder(orderID).then(json => {
         // this.notify('取消了orderLimit,请看position')
       }).catch(err => {
-        if (cancelTimes < 3) {
+        if (cancelTimes < 2) {
           cancelTimes++
           setTimeout(() => {
             cancelFunc()
