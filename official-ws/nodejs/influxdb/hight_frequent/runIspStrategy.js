@@ -1,22 +1,23 @@
 const BitmexManager = require('../../strategy/researchStrategy/BitmexManager')
-var { apiKey, apiSecret } = require('../../strategy/test-secret.json')
+// var { apiKey, apiSecret } = require('../../strategy/test-secret.json')
+var { apiKey, apiSecret } = require('../../strategy/daishu-secret.json')
 const IspStrategyManager = require('./IspStrategy/Manager')
 
 const bitmex = new BitmexManager({
-  testnet: true
+  testnet: false
 })
 
 const strategyManager = new IspStrategyManager()
 
 strategyManager.addNewStrategy({
-  id: 'ISP-strategy-3-3',
+  id: 'ISP-strategy-5-5',
   test: false,
-  testnet: true,
+  testnet: false,
   apiKey,
   apiSecret,
-  amount: 1000,
-  upThreshold: 3,
-  downThreshold: -3,
+  amount: 50,
+  upThreshold: 5,
+  downThreshold: -5,
 })
 
 function dataCb(json) {
