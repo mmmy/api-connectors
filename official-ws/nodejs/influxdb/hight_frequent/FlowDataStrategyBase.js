@@ -66,8 +66,8 @@ class FlowDataStrategyBase {
   }
 
   updatePosition(json) {
-    const { data } = json
-    if (this._options.database && data[0]) {
+    const { action, data } = json
+    if (this._options.database && action == 'update' && data[0]) {
       StrageyDB.writePosition(this._options, data[0])
     }
   }

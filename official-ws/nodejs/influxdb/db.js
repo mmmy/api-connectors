@@ -23,18 +23,22 @@ const StrageyDB = {
   },
   //{accout,symbol,currency,deleveragePercetile, currentTimestamp, timestamp, currentQty, markPrice, liquidationPrice,...}
   writePosition: function (options, position) {
-    strategy_client.writePoints([{
-      measurement: 'position',
-      tags: {
-        id: options.id
-      },
-      fields: {
-        currentQty: position.currentQty,
-        markPrice: position.markPrice,
-        liquidationPrice: position.liquidationPrice,
-      },
-      timestamp: new Date(position.timestamp) * 1E6
-    }])
+    const { currentQty, markPrice, liquidationPrice } = position
+    if (currentQty !== undefined) {
+      let fields = { currentQty }
+      if (markPrice && liquidationPrice) {
+        fields.markPrice = markPrice
+        fields.liquidationPrice = liquidationPrice
+      }
+      strategy_client.writePoints([{
+        measurement: 'position',
+        tags: {
+          id: options.id
+        },
+        fields,
+        timestamp: new Date(position.timestamp) * 1E6
+      }])
+    }
   }
 }
 
