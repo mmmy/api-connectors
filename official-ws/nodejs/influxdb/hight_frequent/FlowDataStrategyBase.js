@@ -2,11 +2,13 @@
 const OrderBook = require('../../strategy/researchOrderbookL2/OrderBookL2Trade')
 const _ = require('lodash')
 const OrderManager = require('./OrderManager')
+const { StrageyDB } = require('../db')
 
 class FlowDataStrategyBase {
   constructor(options) {
     this._options = {
       test: true,
+      database: false,
       ...options
     }
     this._indicativeSettlePrice = 0
@@ -81,6 +83,9 @@ class FlowDataStrategyBase {
     this._orderHistory.push(order)
     if (!this._options.test) {
       this._orderManager.addAutoCancelOrder(amount, long, price)
+    }
+    if (this._options.database) {
+      StrageyDB.writeOrder(this._options, order)
     }
   }
 

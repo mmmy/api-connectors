@@ -9,6 +9,8 @@ const manager = new TestStrategyManager()
 manager.addNewStrategy({
   id: 'test_indicativeSettlePrice',
   test: true,
+  upThreshold: 3,
+  downThreshold: -3,
 })
 
 let count = 1

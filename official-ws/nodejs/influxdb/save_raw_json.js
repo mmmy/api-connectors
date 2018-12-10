@@ -1,44 +1,16 @@
 
-const Influx = require('influx')
 const BitmexManager = require('../strategy/researchStrategy/BitmexManager')
-
-const client = new Influx.InfluxDB({
-  database: 'raw_data',
-  host: 'localhost',
-  port: 8086,
-})
-
-let lastTime = 0
-let time_wrongs = 0
-
-function saveJson(json) {
-  const { table, action, data } = json
-  let time = new Date() * 1E6
-  if (time <= lastTime) {
-    time = lastTime + 1E6
-    time_wrongs++
-    if (time_wrongs % 1E5 === 0) {
-      console.log('time wrong', time_wrongs)
-    }
-  }
-  client.writePoints([{
-    measurement: 'json',
-    fields: {
-      json_str: JSON.stringify(data)
-    },
-    tags: {
-      table,
-      action
-    },
-    timestamp: time
-  }])
-  lastTime = time
-}
+const { SaveRawJson } = require('./db')
 
 const bitmex = new BitmexManager()
+const client = new SaveRawJson()
 
-bitmex.listenInstrument(saveJson)
+function cb(json) {
+  client.saveJson(json)
+}
 
-bitmex.listenTrade(saveJson)
+bitmex.listenInstrument(cb)
 
-bitmex.listenOrderBook(saveJson)
+bitmex.listenTrade(cb)
+
+bitmex.listenOrderBook(cb)
