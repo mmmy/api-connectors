@@ -22,6 +22,8 @@ strategyManager.addNewStrategy({
   upThreshold: 5,
   downThreshold: -5,
   database: true,
+  initCheckSystem: true,
+  notify: true,
 })
 
 function dataCb(json) {

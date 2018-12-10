@@ -3,6 +3,7 @@ const OrderBook = require('../../strategy/researchOrderbookL2/OrderBookL2Trade')
 const _ = require('lodash')
 const OrderManager = require('./OrderManager')
 const { StrageyDB } = require('../db')
+const notifyPhone = require('../../strategy/notifyPhone')
 
 class FlowDataStrategyBase {
   constructor(options) {
@@ -16,6 +17,13 @@ class FlowDataStrategyBase {
     this._systemTime = 0
     this._orderHistory = []
     this._orderManager = new OrderManager(this._options)
+
+    this._lastOrderBookUpdate = new Date()
+    this._lastInstrumentUpdate = new Date()
+
+    if (this._options.initCheckSystem) {
+      this.initCheckSystem()
+    }
   }
 
   getOptions() {
@@ -26,12 +34,14 @@ class FlowDataStrategyBase {
     const { table, action, data } = json
     switch(table) {
       case 'orderBookL2_25':
+        this._lastOrderBookUpdate = new Date()
         this.updateOrderBook(json)
         break
       case 'trade':
         this.updateTrade(json)
         break
       case 'instrument':
+        this._lastInstrumentUpdate = new Date()
         this.updateInstrument(json)
         break
     }
@@ -54,16 +64,18 @@ class FlowDataStrategyBase {
   }
 
   updateTrade(json) {
-
+    
   }
 
   updateInstrument(json) {
     const { data } = json
     const data0 = data[0]
+    if (data0) {
+      this._systemTime = new Date(data0.timestamp)
+    }
     if (data0.indicativeSettlePrice) {
       const delta = this._indicativeSettlePrice ? data0.indicativeSettlePrice - this._indicativeSettlePrice : 0
       this._indicativeSettlePrice = data0.indicativeSettlePrice
-      this._systemTime = new Date(data0.timestamp)
       this.onIndicativeSettlePriceChange(delta)
     }
   }
@@ -84,9 +96,12 @@ class FlowDataStrategyBase {
     if (!this._options.test) {
       this._orderManager.addAutoCancelOrder(amount, long, price)
     }
-    console.log('order---', order)
     if (this._options.database) {
       StrageyDB.writeOrder(this._options, order)
+    }
+    console.log('order---', order)
+    if (this._options.notify) {
+      notifyPhone(`${order.price} ${order.long ? 1 : -1} ${order.amount}`)
     }
   }
 
@@ -171,6 +186,23 @@ class FlowDataStrategyBase {
       longs,
       positions,
     }
+  }
+
+  checkAlive() {
+    let time = 10 * 60 * 1000
+    let now = new Date()
+    if (now - this._lastOrderBookUpdate > time || now - this._lastInstrumentUpdate > time) {
+      return false
+    }
+    return true
+  }
+
+  initCheckSystem() {
+    this._interval = setInterval(() => {
+      if (!this.checkAlive()) {
+        notifyPhone('data not flow error')
+      }
+    }, 5 * 60 * 1000)
   }
 }
 
