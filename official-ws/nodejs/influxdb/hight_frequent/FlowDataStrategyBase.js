@@ -84,6 +84,7 @@ class FlowDataStrategyBase {
     if (!this._options.test) {
       this._orderManager.addAutoCancelOrder(amount, long, price)
     }
+    console.log('order---', order)
     if (this._options.database) {
       StrageyDB.writeOrder(this._options, order)
     }

@@ -11,7 +11,7 @@ class MockData {
   constructor(options) {
     this._options = {
       start_time: '2018-12-07T10:51:00.000Z',
-      time_long: '1d',
+      time_long: '5d',
       ...options,
     }
     this._events = {}
