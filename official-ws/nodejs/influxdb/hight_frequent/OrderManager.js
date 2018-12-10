@@ -10,13 +10,13 @@ class OrderManager {
 
   addAutoCancelOrder(amount, long, price) {
     this.signatureSDK.orderLimit(amount, long ? 'Buy' : 'Sell', price).then(json => {
-      this.cancelOrderLimit(json, 30)
+      this.cancelOrderLimit(json, 60)
     }).catch(err => {
       console.log('OrderManager addAutoCancelOrder 失败', amount, long, price, err)
     })
   }
 
-  cancelOrderLimit(res, seconds = 30) {
+  cancelOrderLimit(res, seconds = 60) {
     var cancelTimes = 0
     var orderID = res.orderID
     var cancelFunc = () => {
