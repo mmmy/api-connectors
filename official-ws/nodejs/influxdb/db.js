@@ -8,12 +8,16 @@ const strategy_client = new Influx.InfluxDB({
 })
 
 const StrageyDB = {
-  writeOrder: function (options, order) {
+  writeOrder: function (options, order, error) {
+    let tags = {
+      id: options.id
+    }
+    if (error && error.error && error.error.name) {
+      tags.error = error.error.name
+    }
     strategy_client.writePoints([{
       measurement: 'order',
-      tags: {
-        id: options.id
-      },
+      tags,
       fields: {
         long: order.long ? 1 : -1,
         amount: order.amount,

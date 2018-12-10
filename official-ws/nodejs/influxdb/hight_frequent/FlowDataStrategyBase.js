@@ -102,15 +102,17 @@ class FlowDataStrategyBase {
       timestamp: this._systemTime,
     }
     this._orderHistory.push(order)
+    const cb = (error) => {
+      console.log('order---', order, error)
+      if (this._options.database) {
+        StrageyDB.writeOrder(this._options, order, error)
+      }
+      if (this._options.notify) {
+        notifyPhone(`${order.price} ${order.long ? 1 : -1} ${order.amount} ${error ? 'error' : ''}`)
+      }
+    }
     if (!this._options.test) {
-      this._orderManager.addAutoCancelOrder(amount, long, price)
-    }
-    if (this._options.database) {
-      StrageyDB.writeOrder(this._options, order)
-    }
-    console.log('order---', order)
-    if (this._options.notify) {
-      notifyPhone(`${order.price} ${order.long ? 1 : -1} ${order.amount}`)
+      this._orderManager.addAutoCancelOrder(amount, long, price).then(cb).catch(cb)
     }
   }
 
