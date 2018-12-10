@@ -12,8 +12,8 @@ obManager.addNewStrategy({
 
 const bitmex = new BitmexManager({
   testnet: true,
-  // apiKeyID: apiKey,
-  // apiKeySecret: apiSecret
+  apiKeyID: apiKey,
+  apiKeySecret: apiSecret
 })
 
 bitmex.listenOrderBook(function(data) {
