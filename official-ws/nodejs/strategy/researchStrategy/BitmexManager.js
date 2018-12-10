@@ -28,7 +28,7 @@ class BitmexManager {
   }
 
   _initClient() {
-    const client = new BitMEXClient({ testnet: this._options.testnet });
+    const client = new BitMEXClient(this._options);
     client.on('error', console.error);
     client.on('close', () => console.log('BitmexManager Connection closed.'));
     client.on('initialize', () => console.log('BitmexManager Client initialized, data is flowing.'));
@@ -122,6 +122,18 @@ class BitmexManager {
 
   listenInstrument(cb) {
     this._client.addStream('XBTUSD', 'instrument', function(data, symbol, tableName) {
+      cb(data, symbol, tableName)
+    })
+  }
+
+  listenPosition(cb) {
+    this._client.addStream('XBTUSD', 'position', function(data, symbol, tableName) {
+      cb(data, symbol, tableName)
+    })
+  }
+
+  listenExecution(cb) {
+    this._client.addStream('XBTUSD', 'execution', function(data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
