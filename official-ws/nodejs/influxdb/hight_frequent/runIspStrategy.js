@@ -16,8 +16,8 @@ strategyManager.addNewStrategy({
   apiKey,
   apiSecret,
   amount: 50,
-  upThreshold: 5,
-  downThreshold: -5,
+  upThreshold: 3,
+  downThreshold: -3,
 })
 
 function dataCb(json) {
