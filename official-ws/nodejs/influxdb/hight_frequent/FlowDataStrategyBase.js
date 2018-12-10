@@ -3,7 +3,7 @@ const OrderBook = require('../../strategy/researchOrderbookL2/OrderBookL2Trade')
 const _ = require('lodash')
 const OrderManager = require('./OrderManager')
 const { StrageyDB } = require('../db')
-const notifyPhone = require('../../strategy/notifyPhone')
+const notifyPhone = require('../../strategy/notifyPhone').notifyPhone
 
 class FlowDataStrategyBase {
   constructor(options) {
