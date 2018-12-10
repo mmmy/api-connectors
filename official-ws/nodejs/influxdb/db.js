@@ -20,6 +20,21 @@ const StrageyDB = {
         price: order.price,
       }
     }])
+  },
+  //{accout,symbol,currency,deleveragePercetile, currentTimestamp, timestamp, currentQty, markPrice, liquidationPrice,...}
+  writePosition: function (options, position) {
+    strategy_client.writePoints([{
+      measurement: 'position',
+      tags: {
+        id: options.id
+      },
+      fields: {
+        currentQty: position.currentQty,
+        markPrice: position.markPrice,
+        liquidationPrice: position.liquidationPrice,
+      },
+      timestamp: new Date(position.timestamp) * 1E6
+    }])
   }
 }
 

@@ -7,7 +7,9 @@ const { SaveRawJson } = require('../db')
 const client = new SaveRawJson()
 
 const bitmex = new BitmexManager({
-  testnet: false
+  testnet: false,
+  apiKeyID: apiKey,
+  apiKeySecret: apiSecret
 })
 
 const strategyManager = new IspStrategyManager()
@@ -33,6 +35,8 @@ function dataCb(json) {
 
 bitmex.listenInstrument(dataCb)
 
-bitmex.listenTrade(dataCb)
+// bitmex.listenTrade(dataCb)
 
 bitmex.listenOrderBook(dataCb)
+
+bitmex.listenPosition(dataCb)

@@ -43,6 +43,8 @@ class FlowDataStrategyBase {
       case 'instrument':
         this._lastInstrumentUpdate = new Date()
         this.updateInstrument(json)
+      case 'position':
+        this.updatePosition(json)
         break
     }
   }
@@ -61,6 +63,13 @@ class FlowDataStrategyBase {
     }
     
     this._ob.update(json)
+  }
+
+  updatePosition(json) {
+    const { data } = json
+    if (this._options.database && data[0]) {
+      StrageyDB.writePosition(this._options, data[0])
+    }
   }
 
   updateTrade(json) {
