@@ -30,7 +30,7 @@ strategyManager.addNewStrategy({
 
 function dataCb(json) {
   strategyManager.listenJson(json)
-  // client.saveJson(json)
+  client.saveJson(json)
 }
 
 bitmex.listenInstrument(dataCb)
