@@ -12,6 +12,16 @@ const StrageyDB = {
     let tags = {
       id: options.id
     }
+    if (error) {
+      console.log(error, typeof error)
+    }
+    if (typeof error === 'string') {
+      try {
+        error = JSON.parse(error)
+      } catch (e) {
+        console.log(e)
+      }
+    }
     if (error && error.error && error.error.name) {
       tags.error = error.error.name
     }
