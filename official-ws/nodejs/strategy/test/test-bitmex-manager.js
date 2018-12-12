@@ -31,9 +31,9 @@ bitmex.listenExecution(function(data) {
 })
 
 bitmex.listenPosition(function(data) {
-  // console.log(data)
+  console.log(data)
 })
 
 bitmex.listenMargin(function(json) {
-  console.log(json)
+  // console.log(json)
 })
