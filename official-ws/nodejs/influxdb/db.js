@@ -12,9 +12,6 @@ const StrageyDB = {
     let tags = {
       id: options.id
     }
-    if (error) {
-      console.log(error, typeof error)
-    }
     if (typeof error === 'string') {
       try {
         error = JSON.parse(error)
@@ -57,7 +54,11 @@ const StrageyDB = {
 }
 
 class SaveRawJson {
-  constructor() {
+  constructor(options) {
+    this._options = {
+      cacheLen: 600,               // 差不多一分钟数据
+      ...options
+    }
     this._lastTime = 0
     this._time_wrongs = 0
     this._client = new Influx.InfluxDB({
@@ -65,6 +66,7 @@ class SaveRawJson {
       host: 'localhost',
       port: 8086,
     })
+    this._cache = []
   }
 
   saveJson(json) {
@@ -77,7 +79,7 @@ class SaveRawJson {
         console.log('time wrong', this._time_wrongs)
       }
     }
-    this._client.writePoints([{
+    let record = {
       measurement: 'json',
       fields: {
         json_str: JSON.stringify(data)
@@ -87,7 +89,18 @@ class SaveRawJson {
         action
       },
       timestamp: time
-    }])
+    }
+
+    if (this._cache.length < this._options.cacheLen) {
+      this._cache.push(record)
+    } else {
+      this._client.writePoints(this._cache).catch(e => {
+        console.log('--------------------write data error ---------------------------')
+        console.log(e)
+      })
+      this._cache = []
+    }
+    
     this._lastTime = time
   }
 }
