@@ -35,5 +35,5 @@ bitmex.listenPosition(function(data) {
 })
 
 bitmex.listenMargin(function(json) {
-  console.log(data)
+  console.log(json)
 })
