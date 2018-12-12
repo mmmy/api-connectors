@@ -1,6 +1,4 @@
 
-
-
 const bitmextSdk = require('../bitmexSdk')
 const BitMEXClient = require('../../index')
 const common = require('../common')
@@ -134,6 +132,12 @@ class BitmexManager {
 
   listenExecution(cb) {
     this._client.addStream('XBTUSD', 'execution', function(data, symbol, tableName) {
+      cb(data, symbol, tableName)
+    })
+  }
+
+  listenMargin(cb) {
+    this._client.addStream('XBTUSD', 'margin', function(data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
