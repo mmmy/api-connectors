@@ -117,7 +117,7 @@ class BitmexManager {
       cb(data, symbol, tableName)
     })
   }
-
+  // data { indicativeSettlePrice指数价格, openInterest未平仓合约数, openValue未平仓合约价值 }
   listenInstrument(cb) {
     this._client.addStream('XBTUSD', 'instrument', function(data, symbol, tableName) {
       cb(data, symbol, tableName)
