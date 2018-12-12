@@ -26,14 +26,18 @@ const bitmex = new BitmexManager({
 //   obManager.updateCandleLastHistory('5m', data.data[0])
 // })
 
-bitmex.listenExecution(function(data) {
-  // console.log(data)
-})
+// bitmex.listenExecution(function(data) {
+//   // console.log(data)
+// })
 
-bitmex.listenPosition(function(data) {
-  console.log(data)
-})
+// bitmex.listenPosition(function(data) {
+//   console.log(data)
+// })
 
-bitmex.listenMargin(function(json) {
-  // console.log(json)
+// bitmex.listenMargin(function(json) {
+//   // console.log(json)
+// })
+
+bitmex.listenInstrument(function(json) {
+  console.log(json)
 })
