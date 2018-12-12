@@ -135,7 +135,7 @@ class BitmexManager {
       cb(data, symbol, tableName)
     })
   }
-  // data {walletBalance, marginBalance}
+  // data {walletBalance, marginBalance} /1E8
   listenMargin(cb) {
     this._client.addStream('XBTUSD', 'margin', function(data, symbol, tableName) {
       cb(data, symbol, tableName)

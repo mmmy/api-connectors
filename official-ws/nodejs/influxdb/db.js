@@ -50,6 +50,21 @@ const StrageyDB = {
         timestamp: new Date(position.timestamp) * 1E6
       }])
     }
+  },
+  writeMargin: function(options, margin) {
+    if (margin) {
+      const { walletBalance } = margin
+      strategy_client.writePoints([{
+        measurement: 'margin',
+        tags: {
+          id: options.id
+        },
+        fields: {
+          walletBalance
+        },
+        timestamp: new Date(margin.timestamp) * 1E6
+      }])
+    }
   }
 }
 
