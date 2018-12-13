@@ -39,8 +39,8 @@ const StrageyDB = {
         price: order.price,
       }
     }]).catch(e => {
-      logger.error('writeOrder error')
-      logger.error(e)
+      console.error('writeOrder error', e)
+      // logger.error(e)
     })
   },
   //{accout,symbol,currency,deleveragePercetile, currentTimestamp, timestamp, currentQty, markPrice, liquidationPrice,...}
@@ -60,8 +60,8 @@ const StrageyDB = {
         fields,
         timestamp: new Date(position.timestamp) * 1E6
       }]).catch(e => {
-        logger.error('writeOrder error')
-        logger.error(e)
+        console.error('writeOrder error', e)
+        // logger.error(e)
       })
     }
   },
@@ -78,8 +78,8 @@ const StrageyDB = {
         },
         timestamp: new Date(margin.timestamp) * 1E6
       }]).catch(e => {
-        logger.error('writeMargin error')
-        logger.error(e)
+        console.error('writeMargin error', e)
+        // logger.error(e)
       })
     }
   }
@@ -128,8 +128,8 @@ class SaveRawJson {
     } else {
       this._client.writePoints(this._cache).catch(e => {
         console.log('--------------------write data error ---------------------------')
-        logger.error('write json error')
-        logger.error(e)
+        console.error('write json error', e)
+        // logger.error(e)
         // console.log(e)
       })
       this._cache = []

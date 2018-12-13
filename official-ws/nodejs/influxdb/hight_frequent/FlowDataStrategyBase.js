@@ -226,6 +226,7 @@ class FlowDataStrategyBase {
     this._interval = setInterval(() => {
       if (!this.checkAlive()) {
         notifyPhone('data not flow error')
+        process.exit(1) // centos7 设置 systemctl 服务会自动重启
       }
     }, 5 * 60 * 1000)
   }
