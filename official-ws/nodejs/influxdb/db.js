@@ -1,5 +1,13 @@
 
 const Influx = require('influx')
+var winston = require('winston')
+
+const logger = winston.createLogger({
+  level: 'error',
+  transports: [
+    new winston.transports.File({ filename: './write-db-error.log', level: 'error' })
+  ]
+})
 
 const strategy_client = new Influx.InfluxDB({
   database: 'strategy',
@@ -30,7 +38,10 @@ const StrageyDB = {
         amount: order.amount,
         price: order.price,
       }
-    }])
+    }]).catch(e => {
+      logger.error('writeOrder error')
+      logger.error(e)
+    })
   },
   //{accout,symbol,currency,deleveragePercetile, currentTimestamp, timestamp, currentQty, markPrice, liquidationPrice,...}
   writePosition: function (options, position) {
@@ -48,7 +59,10 @@ const StrageyDB = {
         },
         fields,
         timestamp: new Date(position.timestamp) * 1E6
-      }])
+      }]).catch(e => {
+        logger.error('writeOrder error')
+        logger.error(e)
+      })
     }
   },
   writeMargin: function(options, margin) {
@@ -63,7 +77,10 @@ const StrageyDB = {
           walletBalance
         },
         timestamp: new Date(margin.timestamp) * 1E6
-      }])
+      }]).catch(e => {
+        logger.error('writeMargin error')
+        logger.error(e)
+      })
     }
   }
 }
@@ -111,7 +128,9 @@ class SaveRawJson {
     } else {
       this._client.writePoints(this._cache).catch(e => {
         console.log('--------------------write data error ---------------------------')
-        console.log(e)
+        logger.error('write json error')
+        logger.error(e)
+        // console.log(e)
       })
       this._cache = []
     }
