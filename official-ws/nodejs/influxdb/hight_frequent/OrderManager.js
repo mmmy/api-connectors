@@ -12,7 +12,7 @@ class OrderManager {
     return new Promise((resove, reject) => {
       this.signatureSDK.orderLimit(amount, long ? 'Buy' : 'Sell', price).then(json => {
         resove(null, json)
-        this.cancelOrderLimit(json, 60)
+        this.cancelOrderLimit(json, long ? 120 : 60)
       }).catch(err => {
         reject(err)
       })
