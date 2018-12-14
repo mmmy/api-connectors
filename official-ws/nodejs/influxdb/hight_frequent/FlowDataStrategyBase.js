@@ -24,6 +24,7 @@ class FlowDataStrategyBase {
     if (this._options.initCheckSystem) {
       this.initCheckSystem()
     }
+    console.log({...this._options, apiKeyID: '', apiKeySecret: ''})
   }
 
   getOptions() {
