@@ -14,9 +14,9 @@ const strategy_client = new Influx.InfluxDB({
   host: 'localhost',
   port: 8086,
 })
-
+// type is string like "filtered"
 const StrageyDB = {
-  writeOrder: function (options, order, error) {
+  writeOrder: function (options, order, error, type) {
     let tags = {
       id: options.id
     }
@@ -29,6 +29,9 @@ const StrageyDB = {
     }
     if (error && error.error && error.error.name) {
       tags.error = error.error.name
+    }
+    if (type) {
+      tags.type = type
     }
     strategy_client.writePoints([{
       measurement: 'order',

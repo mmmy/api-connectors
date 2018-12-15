@@ -11,7 +11,7 @@ class MockData {
   constructor(options) {
     this._options = {
       start_time: '2018-12-10T00:00:00.000Z',
-      time_long: '5d',
+      time_long: '2d',
       ...options,
     }
     this._events = {}
@@ -92,7 +92,8 @@ class MockData {
     for (let i=0; i<pages; i++) {
       console.log(`page:${i+1}/${pages}`)
       const rows = await client.query(`select * from json ${whereClause} order by time limit ${pageSize} offset ${pageSize * i}`)
-      await this.handleRowsDelay(rows)
+      // await this.handleRowsDelay(rows)
+      this.handleRows(rows)
     }
     this._events.end && this._events.end()
   }

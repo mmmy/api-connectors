@@ -20,7 +20,10 @@ class FlowDataStrategyBase {
 
     this._lastOrderBookUpdate = new Date()
     this._lastInstrumentUpdate = new Date()
-
+    this._orderCache = {
+      longs: [],
+      shorts: [],
+    }
     if (this._options.initCheckSystem) {
       this.initCheckSystem()
     }
@@ -108,7 +111,7 @@ class FlowDataStrategyBase {
     
   }
 
-  order(long, amount=100) {
+  createOrder(long, amount=100) {
     const price = long ? this._ob.getTopBidPrice() : this._ob.getTopAskPrice()
     const order = {
       long,
@@ -116,19 +119,52 @@ class FlowDataStrategyBase {
       price: price,
       timestamp: this._systemTime,
     }
+    return order
+  }
+
+  order(order) {
     this._orderHistory.push(order)
+
     const cb = (error) => {
       console.log('order---', order, error)
       if (this._options.database) {
-        StrageyDB.writeOrder(this._options, order, error)
+        this.writeOrder(order, error)
       }
       if (this._options.notify) {
-        notifyPhone(`${order.price} ${order.long ? 1 : -1} ${order.amount} ${error ? 'error' : ''}`)
+        this.notifyPhone(`${order.price} ${order.long ? 1 : -1} ${order.amount} ${error ? 'error' : ''}`)
       }
     }
     if (!this._options.test) {
       this._orderManager.addAutoCancelOrder(amount, long, price).then(cb).catch(cb)
     }
+    
+  }
+
+  pushOrderToCache(order) {
+    if (order.long) {
+      this._orderCache.longs.push(order)
+    } else {
+      this._orderCache.shorts.push(order)
+    }
+  }
+
+  removeOldOrderCache() {
+    // 缓存最多保存200个
+    let maxLen = 200
+    if (this._orderCache.longs.length > maxLen) {
+      this._orderCache.longs.shift()
+    }
+    if (this._orderCache.shorts.length > maxLen) {
+      this._orderCache.shorts.shift()
+    }
+  }
+  
+  notifyPhone(msg) {
+    notifyPhone(msg)
+  }
+
+  writerOrder(order, error, type) {
+    StrageyDB.writeOrder(this._options, order, error, type)
   }
 
   stats() {

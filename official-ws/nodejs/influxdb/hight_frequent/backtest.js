@@ -7,7 +7,7 @@ const path = require('path')
 
 const manager = new TestStrategyManager()
 manager.addNewStrategy({
-  id: 'test_indicativeSettlePrice',
+  id: 'test_indicativeSettlePrice-filtered-2-2-40',
   test: true,
   upThreshold: 2,
   downThreshold: -2,

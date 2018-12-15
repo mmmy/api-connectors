@@ -306,9 +306,9 @@ bitmex.listenInstrument((json) => {
   // console.log(data.length)
 })
 
-bitmex.listenTrade(orderBookTrade)
+// bitmex.listenTrade(orderBookTrade)
 
-bitmex.listenOrderBook(orderBookTrade)
+// bitmex.listenOrderBook(orderBookTrade)
 
 bitmex.start()
 bitmex.on('end', () => {
