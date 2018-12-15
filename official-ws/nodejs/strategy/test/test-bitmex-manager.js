@@ -30,13 +30,13 @@ const bitmex = new BitmexManager({
 //   // console.log(data)
 // })
 
-// bitmex.listenPosition(function(data) {
-//   console.log(data)
-// })
-
-bitmex.listenMargin(function(json) {
-  console.log(json)
+bitmex.listenPosition(function(data) {
+  console.log(data)
 })
+
+// bitmex.listenMargin(function(json) {
+//   console.log(json)
+// })
 
 // bitmex.listenInstrument(function(json) {
 //   console.log(json)
