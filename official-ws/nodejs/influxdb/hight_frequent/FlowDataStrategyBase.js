@@ -135,7 +135,7 @@ class FlowDataStrategyBase {
       }
     }
     if (!this._options.test) {
-      this._orderManager.addAutoCancelOrder(amount, long, price).then(cb).catch(cb)
+      this._orderManager.addAutoCancelOrder(order.amount, order.long, order.price).then(cb).catch(cb)
     }
     
   }
