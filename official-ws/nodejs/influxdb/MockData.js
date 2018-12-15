@@ -10,7 +10,7 @@ const client = new Influx.InfluxDB({
 class MockData {
   constructor(options) {
     this._options = {
-      start_time: '2018-12-07T10:51:00.000Z',
+      start_time: '2018-12-10T00:00:00.000Z',
       time_long: '5d',
       ...options,
     }
@@ -34,32 +34,65 @@ class MockData {
     const whereClause = this.createWhereClause()
     return client.query(`select count(*) from json ${whereClause}`)
   }
-  sendData(rows) {
+
+  handleRowsDelay(rows) {
     const len = rows.length
-    for (let i = 0; i < len; i++) {
-      const { action, table, json_str } = rows[i]
-      const json = {
-        table,
-        action,
-        data: JSON.parse(json_str)
-      }
-      if (table == 'orderBookL2_25' && this._obCb) {
-        this._obCb(json)
-      } else if (table == 'trade' && this._tdCb) {
-        this._tdCb(json)
-      } else if (table == 'instrument' && this._insCb) {
-        this._insCb(json)
+    let i = 0
+    const loop = (cb) => {
+      if (i < len) {
+        setTimeout(() => {
+          const row = rows[i]
+          this.sendData(row)
+          i++
+          loop(cb)
+        }, 1)
+      } else {
+        cb()
       }
     }
+    return new Promise((resove) => {
+      loop(resove)
+    })
   }
+
+  handleRows(rows) {
+    const len = rows.length
+    for (let i = 0; i < len; i++) {
+      const row = rows[i]
+      this.sendData(row)
+      // let date = new Date()
+      // for (let j=0; j<1E4; j++) {
+      //   new Date()
+      // }
+      // console.log(new Date() - date)
+    }
+  }
+
+  sendData(row) {
+    const { action, table, json_str } = row
+    const json = {
+      table,
+      action,
+      data: JSON.parse(json_str)
+    }
+    if (table == 'orderBookL2_25' && this._obCb) {
+      this._obCb(json)
+    } else if (table == 'trade' && this._tdCb) {
+      this._tdCb(json)
+    } else if (table == 'instrument' && this._insCb) {
+      this._insCb(json)
+    }
+  }
+
   async start(pageSize = 1E5) {
     const whereClause = this.createWhereClause()    
     const countResult = await this.queryCount()
     const total = countResult[0].count_json_str
     const pages = Math.ceil(total /  pageSize)
     for (let i=0; i<pages; i++) {
+      console.log(`page:${i+1}/${pages}`)
       const rows = await client.query(`select * from json ${whereClause} order by time limit ${pageSize} offset ${pageSize * i}`)
-      this.sendData(rows)
+      await this.handleRowsDelay(rows)
     }
     this._events.end && this._events.end()
   }

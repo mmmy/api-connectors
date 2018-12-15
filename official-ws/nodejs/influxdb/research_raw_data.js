@@ -3,6 +3,7 @@ const BitmexManager = require('../strategy/researchStrategy/BitmexManager')
 const OrderBook = require('../strategy/researchOrderbookL2/OrderBookL2Trade')
 const common = require('../strategy/common')
 const _ = require('lodash')
+const MockData = require('./MockData')
 
 const client = new Influx.InfluxDB({
   database: 'bitmex',
@@ -38,6 +39,17 @@ function orderBookTest(json) {
   // if (gap > 1) {
   //   // console.log(gap)
   // }
+  let dataPoints = []
+  if (action === 'partial') {
+    json.keys = ['symbol', 'id', 'side']
+    json.types = {
+      symbol: 'symbol',
+      id: 'long',
+      side: 'symbol',
+      size: 'long',
+      price: 'float'
+    }
+  }
   if (action == 'delete') {
     data.forEach(item => item.price = common.xbtPriceFromID(item.id))
     const sideBuy = data.filter(item => item.side === 'Buy')
@@ -51,7 +63,7 @@ function orderBookTest(json) {
         sellDelLevel1 = true
       }
       let isContinues = isPriceContinues(buyPrices)
-      let continuesMeasument = [{
+      let continuesMeasument = {
         measurement: 'action_price_continues',
         fields: {
           continues: isContinues ? 1 : -1
@@ -61,8 +73,8 @@ function orderBookTest(json) {
           side: 'Buy'
         },
         timestamp: lastTime += 1E6
-      }]
-      client.writePoints(continuesMeasument)
+      }
+      dataPoints.push(continuesMeasument)
     }
 
     if (sideSell.length > 0) {
@@ -71,7 +83,7 @@ function orderBookTest(json) {
         buyDelLevel1 = true
       }
       let isContinues = isPriceContinues(sellPrices)
-      let continuesMeasument = [{
+      let continuesMeasument = {
         measurement: 'action_price_continues',
         fields: {
           continues: isContinues ? 1 : -1
@@ -81,8 +93,8 @@ function orderBookTest(json) {
           side: 'Sell'
         },
         timestamp: lastTime += 1E6
-      }]
-      client.writePoints(continuesMeasument)
+      }
+      dataPoints.push(continuesMeasument)
     }
 
     // trading from orderbook
@@ -102,7 +114,7 @@ function orderBookTest(json) {
           timestamp: lastTime += 1E6
         }
       })
-      client.writePoints(tradesBuyInflux)
+      dataPoints = dataPoints.concat(tradesBuyInflux)
     }
 
     // if (!buyDelLevel1 && sideSell.length > 0) {
@@ -126,7 +138,7 @@ function orderBookTest(json) {
         }
       })
   
-      client.writePoints(tradesSellInflux)
+      dataPoints = dataPoints.concat(tradesSellInflux)
     }
 
     // console.log(data)
@@ -164,7 +176,7 @@ function orderBookTest(json) {
         // 卖一价发生的size变化值
         const deltaSize = topAsk.size - item.size
         if (deltaSize > 0) {
-          client.writePoints([{
+          dataPoints.push({
             measurement: 'trade_orderbook',
             fields: {
               size: deltaSize,
@@ -175,7 +187,7 @@ function orderBookTest(json) {
               side: 'Buy'
             },
             timestamp: lastTime += 1E6
-          }])
+          })
         }
       }
     }
@@ -184,7 +196,7 @@ function orderBookTest(json) {
   // check orderbook is countines
   if (action == 'delete') {
   }
-  const missPricesContinues = [{
+  const missPricesContinues = {
     measurement: 'ob_price_miss_continues',
     fields: {
       continues: ob.isMissPriceContinues() ? 1 : -1
@@ -193,8 +205,12 @@ function orderBookTest(json) {
       action
     },
     timestamp: lastTime + 1E6
-  }]
-  client.writePoints(missPricesContinues)
+  }
+  dataPoints.push(missPricesContinues)
+  client.writePoints(dataPoints).catch(e => {
+    console.log(e)
+    process.exit()
+  })
   // console.log(ob.getMissPrices(), [ob.getTopBid().price, ob.getTopAsk().price])
 }
 
@@ -241,7 +257,7 @@ function orderBookTrade(json, symbol, tableName) {
     // if (continueTrades > 1) {
     //   console.log(continueTrades, maxTrades)
     // }
-  } else {
+  } else if (table === 'trade') {
     tradeTest(json)
   }
   // lastTable = table
@@ -265,7 +281,8 @@ function orderBookTrade(json, symbol, tableName) {
   // console.log('length', data.data.length)
 }
 
-const bitmex = new BitmexManager()
+// const bitmex = new BitmexManager()
+const bitmex = new MockData()
 
 bitmex.listenInstrument((json) => {
   const { table, action, data } = json
@@ -282,7 +299,7 @@ bitmex.listenInstrument((json) => {
         action,
       },
       timestamp: (+new Date(data0.timestamp)) * 1E6
-    }])
+    }]).catch(e => console.log(e))
 
     indicativeSettlePrice = data0.indicativeSettlePrice
   }
@@ -292,3 +309,8 @@ bitmex.listenInstrument((json) => {
 bitmex.listenTrade(orderBookTrade)
 
 bitmex.listenOrderBook(orderBookTrade)
+
+bitmex.start()
+bitmex.on('end', () => {
+  console.log('data end...')
+})
