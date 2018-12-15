@@ -163,7 +163,7 @@ class FlowDataStrategyBase {
     notifyPhone(msg)
   }
 
-  writerOrder(order, error, type) {
+  writeOrder(order, error, type) {
     StrageyDB.writeOrder(this._options, order, error, type)
   }
 
