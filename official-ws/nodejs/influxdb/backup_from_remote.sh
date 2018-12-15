@@ -10,7 +10,17 @@ echo "执行备份raw_data start at $lastest_time"
 remote_cmd="ssh root@$remote_ip rm $backup_path/* & influxd backup -portable -db raw_data -since $lastest_time $backup_path"
 echo $remote_cmd
 response=`$remote_cmd`
+echo $?
 echo $response
 
-# echo '下载文件'
-# sftp -r root@$remote_ip:$backup_path ./backup
+echo '下载文件'
+
+rm -rf ./restore_temp/*
+sftp -r root@$remote_ip:$backup_path ./restore_temp
+
+influxd restore -portable -db raw_data -newdb raw_data_bak ./restore_temp
+
+echo '下载文件结束 请手动执行'
+echo 'USE raw_data_bak'
+echo 'SELECT * INTO raw_data..:MEASUREMENT FROM /.*/ GROUP BY *'
+echo 'DROP DATABASE raw_data_bak'

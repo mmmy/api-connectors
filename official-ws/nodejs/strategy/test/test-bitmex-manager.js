@@ -34,10 +34,10 @@ const bitmex = new BitmexManager({
 //   console.log(data)
 // })
 
-// bitmex.listenMargin(function(json) {
-//   // console.log(json)
-// })
-
-bitmex.listenInstrument(function(json) {
+bitmex.listenMargin(function(json) {
   console.log(json)
 })
+
+// bitmex.listenInstrument(function(json) {
+//   console.log(json)
+// })

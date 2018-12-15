@@ -15,6 +15,7 @@ class MockData {
       ...options,
     }
     this._events = {}
+    console.log('Moca data from', this._options.start_time)
   }
   listenOrderBook(cb) {
     this._obCb = cb
