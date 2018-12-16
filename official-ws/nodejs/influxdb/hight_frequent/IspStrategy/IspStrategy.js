@@ -16,7 +16,7 @@ class TestFlowDataStrategy extends FlowDataStrategyBase {
           this.writeOrder(orderObj, null, 'filtered')
         }
         if (this._options.notify) {
-          this.notifyPhone(`filtered ${order.price} ${order.long ? 1 : -1} ${order.amount}`)
+          this.notifyPhone(`filtered ${orderObj.price} ${orderObj.long ? 1 : -1} ${orderObj.amount}`)
         }
       }
 
