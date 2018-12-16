@@ -16,6 +16,11 @@ const strategy_client = new Influx.InfluxDB({
 })
 // type is string like "filtered"
 const StrageyDB = {
+  // 返回的顺序是时间倒序的
+  queryOrders(long, count=200) {
+    return strategy_client.query(`select * from "order" where ${long ? 'long > 0' : 'long < 0'} order by time desc limit ${count}`)
+  },
+
   writeOrder: function (options, order, error, type) {
     let tags = {
       id: options.id
@@ -40,7 +45,8 @@ const StrageyDB = {
         long: order.long ? 1 : -1,
         amount: order.amount,
         price: order.price,
-      }
+      },
+      timestamp: new Date(order.timestamp) * 1E6
     }]).catch(e => {
       console.error('writeOrder error', e)
       // logger.error(e)

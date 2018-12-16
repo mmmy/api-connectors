@@ -10,6 +10,7 @@ class FlowDataStrategyBase {
     this._options = {
       test: true,
       database: false,
+      maxCache: 200,
       ...options
     }
     this._indicativeSettlePrice = 0
@@ -27,7 +28,29 @@ class FlowDataStrategyBase {
     if (this._options.initCheckSystem) {
       this.initCheckSystem()
     }
+    this.initOrdersFromDB()
     console.log({...this._options, apiKeyID: '', apiKeySecret: ''})
+  }
+
+  initOrdersFromDB() {
+    StrageyDB.queryOrders(true, this._options.maxCache).then(rows => {
+      const orders = rows.reverse().map(row => ({
+        long: true,
+        amount: row.amount,
+        price: row.price
+      }))
+      this._orderCache.longs = orders.concat(this._orderCache.longs)
+      console.log('longs form db', this._orderCache.longs.slice(-3))
+    })
+    StrageyDB.queryOrders(false, this._options.maxCache).then(rows => {
+      const orders = rows.reverse().map(row => ({
+        long: false,
+        amount: row.amount,
+        price: row.price
+      }))
+      this._orderCache.shorts = orders.concat(this._orderCache.shorts)
+      console.log('shorts form db', this._orderCache.shorts.slice(-3))
+    })
   }
 
   getOptions() {
