@@ -29,7 +29,7 @@ class FlowDataStrategyBase {
       this.initCheckSystem()
     }
     this.initOrdersFromDB()
-    console.log({...this._options, apiKeyID: '', apiKeySecret: ''})
+    console.log({...this._options, apiKey: '', apiSecret: ''})
   }
 
   initOrdersFromDB() {
