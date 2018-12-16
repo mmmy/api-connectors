@@ -48,7 +48,7 @@ const StrageyDB = {
   },
   //{accout,symbol,currency,deleveragePercetile, currentTimestamp, timestamp, currentQty, markPrice, liquidationPrice,...}
   writePosition: function (options, position) {
-    const { currentQty, markPrice, liquidationPrice, unrealisedRoePcnt } = position
+    const { currentQty, markPrice, liquidationPrice, unrealisedRoePcnt, unrealisedPnl } = position
     if (currentQty !== undefined) {
       let fields = { currentQty }
       if (markPrice && liquidationPrice) {
@@ -56,7 +56,10 @@ const StrageyDB = {
         fields.liquidationPrice = liquidationPrice
       }
       if (unrealisedRoePcnt !== undefined) {
-        fields.unrealisedRoePcnt = unrealisedRoePcnt
+        fields.unrealisedRoePcnt = unrealisedRoePcnt     // 未实现盈利率
+      }
+      if (unrealisedPnl == undefined) {
+        fields.unrealisedPnl = unrealisedPnl             // 未实现盈利
       }
       strategy_client.writePoints([{
         measurement: 'position',
