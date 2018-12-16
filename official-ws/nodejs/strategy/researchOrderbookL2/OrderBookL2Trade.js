@@ -28,7 +28,7 @@ OrderBook.prototype.update = function (json) {
   // this.watchUpdate(json)
   var newData = DeltaParser.onAction(json.action, json.table, 'XBTUSD', this._CLIENT, json)
   this._data = newData
-  this.calcOrderLimitSignal()
+  // this.calcOrderLimitSignal()   // 每次都计算的话，有性能影响
   // return this._buySellBigCompares.slice(-1).concat(this._buySellSmallCompares.slice(-1))
 }
 
@@ -171,6 +171,57 @@ OrderBook.prototype.getSumSizeTest = function () {
 
 OrderBook.prototype.getSignal = function () {
   return this._signal
+}
+
+// 根据累计挂单量获取订单
+// 如果minSize = 0 返回level1, 结果与getTopAsk，getTopBid一致
+//
+OrderBook.prototype._getBookBySizeTheshold = function (buySide, maxSize=0) {
+  var len = this._data.length
+  if (len === 0) {
+    return null
+  }
+  const lastBuyIndex = this.getLastBuyIndex()
+  if (buySide) {
+    let curtotalSize = 0
+    let nextTotalSize = 0
+    for (var i=lastBuyIndex; i>=0; i--) {
+      var book = this._data[i]
+      nextTotalSize += book.size
+      if (nextTotalSize > maxSize && curtotalSize <= maxSize) {
+        return book
+      }
+      curtotalSize = nextTotalSize
+    }
+    if (lastBuyIndex > 0 && this._data[0] && this._data[0].side === 'Buy') {
+      return this._data[0]
+    }
+  } else {
+    let curtotalSize = 0
+    let nextTotalSize = 0
+    for (var i=lastBuyIndex + 1; i<len; i++) {
+      var book = this._data[i]
+      nextTotalSize += book.size
+      if (nextTotalSize > maxSize && curtotalSize <= maxSize) {
+        return book
+      }
+      curtotalSize = nextTotalSize
+    }
+    const last = this._data[len - 1]
+    if (lastBuyIndex < len && last && last.side === 'Sell') {
+      return last
+    }
+  }
+}
+// 实时计算
+OrderBook.prototype.getTopBidPrice2 = function (maxSize) {
+  const book = this._getBookBySizeTheshold(true, maxSize)
+  return book && book.price
+}
+
+OrderBook.prototype.getTopAskPrice2 = function (maxSize) {
+  const book = this._getBookBySizeTheshold(false, maxSize)
+  return book && book.price
 }
 
 OrderBook.prototype.getTopBid = function () {

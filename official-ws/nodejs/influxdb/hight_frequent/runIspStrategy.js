@@ -23,6 +23,8 @@ strategyManager.addNewStrategy({
   amount: 50,
   upThreshold: 2.5,
   downThreshold: -3,
+  bookMaxSizeBuy: 5E5,
+  bookMaxSizeSell: 5E5,
   database: true,
   initCheckSystem: true,
   notify: true,

@@ -57,8 +57,19 @@ function orderBookTrade(json) {
   ob.update(json)
 }
 
-bitmex.listenOrderBook(orderBookTrade)
-bitmex.listenTrade(orderBookTrade)
+function testGetPrices2(json) {
+  const { table, action, data } = json
+  ob.update(json)
+  let minSize = 10E6  // 50W = 5E5
+  const bidPrice = ob.getTopBidPrice2(minSize)
+  const askPrice = ob.getTopAskPrice2(minSize)
+  console.log(bidPrice, askPrice)
+  // console.log(ob._data[0] && ob._data[0].size)
+}
+
+bitmex.listenOrderBook(testGetPrices2)
+// bitmex.listenOrderBook(orderBookTrade)
+// bitmex.listenTrade(orderBookTrade)
 return
 bitmex.listenInstrument((json) => {
   const { table, action, data } = json

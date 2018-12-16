@@ -11,6 +11,8 @@ class FlowDataStrategyBase {
       test: true,
       database: false,
       maxCache: 200,
+      bookMaxSizeBuy: 5E5,         // 50w, 这个需要做基本市场计算
+      bookMaxSizeSell: 5E5,         // 50w, 这个需要做基本市场计算
       ...options
     }
     this._indicativeSettlePrice = 0
@@ -135,7 +137,9 @@ class FlowDataStrategyBase {
   }
 
   createOrder(long, amount=100) {
-    const price = long ? this._ob.getTopBidPrice() : this._ob.getTopAskPrice()
+    const { bookMaxSizeBuy, bookMaxSizeSell } = this._options
+    // bookMaxSize == 0 那么返回level1的 price
+    const price = long ? this._ob.getTopBidPrice2(bookMaxSizeBuy) : this._ob.getTopAskPrice2(bookMaxSizeSell)
     const order = {
       long,
       amount,
