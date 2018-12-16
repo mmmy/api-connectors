@@ -64,7 +64,7 @@ const StrageyDB = {
       if (unrealisedRoePcnt !== undefined) {
         fields.unrealisedRoePcnt = unrealisedRoePcnt     // 未实现盈利率
       }
-      if (unrealisedPnl == undefined) {
+      if (unrealisedPnl !== undefined) {
         fields.unrealisedPnl = unrealisedPnl             // 未实现盈利
       }
       strategy_client.writePoints([{
