@@ -44,3 +44,5 @@ bitmex.listenOrderBook(dataCb)
 bitmex.listenPosition(dataCb)
 
 bitmex.listenMargin(dataCb)
+
+bitmex.listenExecution(dataCb)

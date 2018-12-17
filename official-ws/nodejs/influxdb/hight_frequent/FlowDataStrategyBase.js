@@ -79,6 +79,9 @@ class FlowDataStrategyBase {
       case 'margin':
         this.updateMargin(json)
         break
+      case 'execution':
+        this.updateExecution(json)
+        break
       default:
         break
     }
@@ -130,6 +133,11 @@ class FlowDataStrategyBase {
       this._indicativeSettlePrice = data0.indicativeSettlePrice
       this.onIndicativeSettlePriceChange(delta)
     }
+  }
+
+  updateExecution(json) {
+    const { data } = json
+    StrageyDB.writeExecution(this._options, data)
   }
 
   onIndicativeSettlePriceChange(delta) {

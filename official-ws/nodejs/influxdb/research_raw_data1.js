@@ -284,56 +284,33 @@ function orderBookTrade(json, symbol, tableName) {
 // const bitmex = new BitmexManager()
 const bitmex = new MockData()
 
-// bitmex.listenInstrument((json) => {
-//   const { table, action, data } = json
-//   //indicativeSettlePrice
-//   const data0 = data[0]
-//   if (data0.indicativeSettlePrice) {
-//     client.writePoints([{
-//       measurement: 'indicativeSettlePrice',
-//       fields: {
-//         price: data0.indicativeSettlePrice,
-//         delta: indicativeSettlePrice ? data0.indicativeSettlePrice - indicativeSettlePrice : 0
-//       },
-//       tags: {
-//         action,
-//       },
-//       timestamp: (+new Date(data0.timestamp)) * 1E6
-//     }]).catch(e => console.log(e))
+bitmex.listenInstrument((json) => {
+  const { table, action, data } = json
+  //indicativeSettlePrice
+  const data0 = data[0]
+  if (data0.indicativeSettlePrice) {
+    client.writePoints([{
+      measurement: 'indicativeSettlePrice',
+      fields: {
+        price: data0.indicativeSettlePrice,
+        delta: indicativeSettlePrice ? data0.indicativeSettlePrice - indicativeSettlePrice : 0
+      },
+      tags: {
+        action,
+      },
+      timestamp: (+new Date(data0.timestamp)) * 1E6
+    }]).catch(e => console.log(e))
 
-//     indicativeSettlePrice = data0.indicativeSettlePrice
-//   }
-//   // console.log(data.length)
-// })
+    indicativeSettlePrice = data0.indicativeSettlePrice
+  }
+  // console.log(data.length)
+})
 
 // bitmex.listenTrade(orderBookTrade)
 
 // bitmex.listenOrderBook(orderBookTrade)
-const gapMaps = {}
-bitmex.listenOrderBook(json => {
-  if (json.action === 'partial') {
-    json.keys = ['symbol', 'id', 'side']
-    json.types = {
-      symbol: 'symbol',
-      id: 'long',
-      side: 'symbol',
-      size: 'long',
-      price: 'float'
-    }
-  }
-  ob.update(json)
-  const bidPrice = ob.getTopBidPrice2(0)
-  const askPrice = ob.getTopAskPrice2(0)
-  const gap = askPrice - bidPrice
-  if (gapMaps[gap] === undefined) {
-    gapMaps[gap] = 1
-  } else {
-    gapMaps[gap] = gapMaps[gap] + 1
-  }
-})
 
 bitmex.start()
 bitmex.on('end', () => {
   console.log('data end...')
-  console.log(gapMaps)
 })

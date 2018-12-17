@@ -97,6 +97,29 @@ const StrageyDB = {
         // logger.error(e)
       })
     }
+  },
+  writeExecution: function(options, executions) {
+    if (executions && executions[0]) {
+      let e0 = executions[0]
+      let { side, timestamp, price, execType } = e0
+      if (execType === 'Trade') {
+        let totalLastQty = executions.reduce((sum, e) => (sum + e.lastQty), 0)
+        strategy_client.writeExecution([{
+          measurement: 'execution',
+          tags: {
+            side,
+            id: options.id,
+          },
+          fields: {
+            price,
+            totalLastQty,
+          },
+          timestamp: new Date(timestamp) * 1E6,
+        }]).catch(e => {
+          console.log('writeExecution error', e)
+        })
+      }
+    }
   }
 }
 
