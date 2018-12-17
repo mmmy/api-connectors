@@ -27,6 +27,8 @@ class FlowDataStrategyBase {
       longs: [],
       shorts: [],
     }
+    this._currentQty = 0
+
     if (this._options.initCheckSystem) {
       this.initCheckSystem()
     }
@@ -107,6 +109,10 @@ class FlowDataStrategyBase {
     const { action, data } = json
     if (this._options.database && action == 'update' && data[0]) {
       StrageyDB.writePosition(this._options, data[0])
+      const { currentQty } = data[0]
+      if (currentQty !== undefined) {
+        this._currentQty = currentQty   // 记录当前的仓位,  小于0表示 做空的
+      }
     }
   }
 
@@ -143,9 +149,28 @@ class FlowDataStrategyBase {
   onIndicativeSettlePriceChange(delta) {
     
   }
+  // 需要平衡仓位
+  createBlanceAmout(long) {
+    const baseMount = this._options.amount || 100
+    const positionLong = this._currentQty >= 0
+    const qtyRate = Math.abs(this._currentQty) / baseMount
+    // 方向相同，那么使用amout
+    if (long && positionLong || (!long && !positionLong)) {
+      return baseMount
+    }
+    // 如果持仓很小， 那么使用amount
+    if (qtyRate <= 1) {
+      return baseMount
+    } else {
+      const blanceAmount = Math.sqrt(qtyRate) * baseMount
+      return blanceAmount
+    }
+    return baseMount
+  }
 
-  createOrder(long, amount=100) {
+  createOrder(long) {
     const { bookMaxSizeBuy, bookMaxSizeSell } = this._options
+    const amount = this.createBlanceAmout()
     // bookMaxSize == 0 那么返回level1的 price
     const price = long ? this._ob.getTopBidPrice2(bookMaxSizeBuy) : this._ob.getTopAskPrice2(bookMaxSizeSell)
     const order = {

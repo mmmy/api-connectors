@@ -3,11 +3,11 @@ const FlowDataStrategyBase = require('../FlowDataStrategyBase')
 
 class TestFlowDataStrategy extends FlowDataStrategyBase {
   onIndicativeSettlePriceChange(delta) {
-    const { amount, upThreshold, downThreshold } = this._options
+    const { upThreshold, downThreshold } = this._options
     const long = delta > upThreshold
     const short = delta < downThreshold
     if (long || short) {
-      const orderObj = this.createOrder(long, amount)
+      const orderObj = this.createOrder(long)
       if (this.filterOrder(orderObj)) {
         this.order(orderObj)
       } else {
