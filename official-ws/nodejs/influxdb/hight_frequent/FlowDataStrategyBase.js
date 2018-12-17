@@ -32,7 +32,9 @@ class FlowDataStrategyBase {
     if (this._options.initCheckSystem) {
       this.initCheckSystem()
     }
-    this.initOrdersFromDB()
+    if (this._options.database) {
+      this.initOrdersFromDB()
+    }
     console.log({...this._options, apiKey: '', apiSecret: ''})
   }
 
@@ -170,7 +172,7 @@ class FlowDataStrategyBase {
 
   createOrder(long) {
     const { bookMaxSizeBuy, bookMaxSizeSell } = this._options
-    const amount = this.createBlanceAmout()
+    const amount = this.createBlanceAmout(long)
     // bookMaxSize == 0 那么返回level1的 price
     const price = long ? this._ob.getTopBidPrice2(bookMaxSizeBuy) : this._ob.getTopAskPrice2(bookMaxSizeSell)
     const order = {
