@@ -104,7 +104,7 @@ const StrageyDB = {
       let { side, timestamp, price, execType } = e0
       if (execType === 'Trade') {
         let totalLastQty = executions.reduce((sum, e) => (sum + e.lastQty), 0)
-        strategy_client.writeExecution([{
+        strategy_client.writePoints([{
           measurement: 'execution',
           tags: {
             side,
