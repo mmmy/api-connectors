@@ -162,7 +162,7 @@ class FlowDataStrategyBase {
     if (qtyRate <= 1) {
       return baseMount
     } else {
-      const blanceAmount = Math.sqrt(qtyRate) * baseMount
+      const blanceAmount = Math.round(Math.sqrt(qtyRate) * baseMount)
       return blanceAmount
     }
     return baseMount
