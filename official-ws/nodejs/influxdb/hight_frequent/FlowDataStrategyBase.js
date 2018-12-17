@@ -158,12 +158,19 @@ class FlowDataStrategyBase {
     const qtyRate = Math.abs(this._currentQty) / baseMount
     // 方向相同，那么使用amout
     if (long && positionLong || (!long && !positionLong)) {
-      return baseMount
+      if (qtyRate <= 1) {
+        return baseMount
+      } else {
+        // 使用更小的相同方向挂单
+        const blanceAmount = Math.round(baseMount / Math.sqrt(qtyRate))
+        return blanceAmount
+      }
     }
     // 如果持仓很小， 那么使用amount
     if (qtyRate <= 1) {
       return baseMount
     } else {
+      // 使用更大的反向挂单
       const blanceAmount = Math.round(Math.sqrt(qtyRate) * baseMount)
       return blanceAmount
     }
