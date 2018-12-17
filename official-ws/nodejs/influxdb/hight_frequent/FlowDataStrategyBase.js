@@ -35,7 +35,7 @@ class FlowDataStrategyBase {
     if (this._options.database) {
       this.initOrdersFromDB()
     }
-    console.log({...this._options, apiKey: '', apiSecret: ''})
+    console.log({ ...this._options, apiKey: '', apiSecret: '' })
   }
 
   initOrdersFromDB() {
@@ -65,7 +65,7 @@ class FlowDataStrategyBase {
 
   listenJson(json) {
     const { table, action, data } = json
-    switch(table) {
+    switch (table) {
       case 'orderBookL2_25':
         this._lastOrderBookUpdate = new Date()
         this.updateOrderBook(json)
@@ -103,7 +103,7 @@ class FlowDataStrategyBase {
         price: 'float'
       }
     }
-    
+
     this._ob.update(json)
   }
 
@@ -127,7 +127,7 @@ class FlowDataStrategyBase {
   }
 
   updateTrade(json) {
-    
+
   }
 
   updateInstrument(json) {
@@ -149,7 +149,7 @@ class FlowDataStrategyBase {
   }
 
   onIndicativeSettlePriceChange(delta) {
-    
+
   }
   // 需要平衡仓位
   createBlanceAmout(long) {
@@ -206,7 +206,10 @@ class FlowDataStrategyBase {
     if (!this._options.test) {
       this._orderManager.addAutoCancelOrder(order.amount, order.long, order.price).then(cb).catch(cb)
     }
-    
+
+    if (this._options.test) {
+      this.backtest(order)
+    }
   }
 
   pushOrderToCache(order) {
@@ -227,7 +230,7 @@ class FlowDataStrategyBase {
       this._orderCache.shorts.shift()
     }
   }
-  
+
   notifyPhone(msg) {
     notifyPhone(msg)
   }
@@ -240,7 +243,7 @@ class FlowDataStrategyBase {
     let total = this._orderHistory.length
     let longs = 0
     const positions = []
-    for (let i=0; i<total; i++) {
+    for (let i = 0; i < total; i++) {
       const t = this._orderHistory[i]
       if (positions.length === 0) {
         positions.push({
@@ -273,7 +276,7 @@ class FlowDataStrategyBase {
             let newProfit = 0
             const preOp = preP.openPositions
             let preOpRest = []
-            for (let i=0; i<preOp.length; i++) {
+            for (let i = 0; i < preOp.length; i++) {
               const item = preOp[i]
               const reduceAmount = Math.min(tm, item.amount)
               newProfit += reduceAmount * (t.price - item.price) / item.price * (t.long ? -1 : 1)
@@ -308,7 +311,7 @@ class FlowDataStrategyBase {
         }
       }
       if (t.long) {
-        longs ++
+        longs++
       }
     }
     return {
@@ -335,6 +338,87 @@ class FlowDataStrategyBase {
         process.exit(1) // centos7 设置 systemctl 服务会自动重启
       }
     }, 5 * 60 * 1000)
+  }
+
+  backtest(order) {
+    // init at first
+    if (!this._positionList) {
+      this._total = 1
+      this._positionList = [{
+        profit: 0,
+        timestamp: order.timestamp,
+        openPositions: [order]
+      }]
+      this._currentQty = order.amount
+    } else {
+      this._total += 1
+      const positions = this._positionList
+      const preP = positions[positions.length - 1]
+      if (_.uniq(preP.openPositions.map(t => t.long)) > 1) {
+        throw '存在多个方向'
+      }
+      if (preP.openPositions.length === 0) {
+        positions.push({
+          profit: preP.profit,
+          timestamp: order.timestamp,
+          openPositions: [order]
+        })
+      } else {
+        const opLong = preP.openPositions[0].long
+        const t = order
+        if (!(t.long ^ opLong)) {                   // 同或运算， 同为true, 或者同为false, side相同
+          positions.push({
+            profit: preP.profit,
+            timestamp: t.timestamp,
+            openPositions: preP.openPositions.concat([t])
+          })
+        } else {
+          let tm = t.amount
+          let newProfit = 0
+          const preOp = preP.openPositions
+          let preOpRest = []
+          for (let i = 0; i < preOp.length; i++) {
+            const item = preOp[i]
+            const reduceAmount = Math.min(tm, item.amount)
+            newProfit += reduceAmount * (t.price - item.price) / item.price * (t.long ? -1 : 1)
+            tm -= reduceAmount
+            if (tm <= 0) {
+              // 计算剩余部分
+              if (item.amount > reduceAmount) {
+                preOpRest.push({
+                  ...item,
+                  amount: item.amount - reduceAmount
+                })
+              }
+              preOpRest = preOpRest.concat(preOp.slice(i + 1))
+              break
+            }
+          }
+          if (tm > 0) {
+            if (preOpRest.length > 0) {
+              throw '还有剩余? 算法错误, 请检查'
+            }
+            preOpRest.push({
+              ...t,
+              amount: tm
+            })
+          }
+          positions.push({
+            profit: preP.profit + newProfit,
+            timestamp: t.timestamp,
+            openPositions: preOpRest
+          })
+        }
+      }
+      this._currentQty = positions[positions.length - 1].openPositions.reduce((q, p) => (q + p.amount), 0)
+    }
+  }
+
+  getLastBacktestPositions() {
+    return {
+      id: this._options.id,
+      positions: this._positionList
+    }
   }
 }
 

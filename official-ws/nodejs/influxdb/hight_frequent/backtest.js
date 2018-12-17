@@ -7,7 +7,7 @@ const path = require('path')
 
 const manager = new TestStrategyManager()
 manager.addNewStrategy({
-  id: 'test_indicativeSettlePrice-filtered-2-2-40',
+  id: 'test_indicativeSettlePrice-filtered-2-2-40-balance_amount_compare',
   test: true,
   upThreshold: 2,
   downThreshold: -2,
@@ -49,7 +49,7 @@ mockdata.start()
 
 mockdata.on('end', () => {
   console.log('count', count)
-  const results = manager.stats()
+  const results = manager.getLastBacktestPositions()
   console.log(results)
   results.forEach(result => {
     const list = result.positions.map(item => {
@@ -61,6 +61,16 @@ mockdata.on('end', () => {
     const dataToCsv = JSONtoCSV(list, ['timestamp', 'profit', 'openPositionsLen'])
     fs.appendFileSync(path.join(__dirname, `temp/backtest_result_${result.id}.csv`), dataToCsv + '\n')
   })
-
+  const results1 = manager.stats()
+  results1.forEach(result => {
+    const list = result.positions.map(item => {
+      return {
+        ...item,
+        openPositionsLen: item.openPositions.length
+      }
+    })
+    const dataToCsv = JSONtoCSV(list, ['timestamp', 'profit', 'openPositionsLen'])
+    fs.appendFileSync(path.join(__dirname, `temp/backtest_result_${result.id}_old.csv`), dataToCsv + '\n')
+  })
   // console.log('total_volume', total_volume)
 })

@@ -91,6 +91,12 @@ class StrategyManagerBase {
       return s.stats()
     })
   }
+
+  getLastBacktestPositions() {
+    return this._list.map(s => {
+      return s.getLastBacktestPositions()
+    })
+  }
 }
 
 module.exports = StrategyManagerBase
