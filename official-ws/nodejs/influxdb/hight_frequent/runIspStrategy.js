@@ -15,14 +15,14 @@ const bitmex = new BitmexManager({
 const strategyManager = new IspStrategyManager()
 
 strategyManager.addNewStrategy({
-  id: 'ISP-strategy-25-3',
+  id: 'ISP-strategy',
   test: false,
   testnet: false,
   apiKey,
   apiSecret,
   amount: 50,
   upThreshold: 2.5,
-  downThreshold: -3,
+  downThreshold: -2.5,
   bookMaxSizeBuy: 5E5,
   bookMaxSizeSell: 5E5,
   database: true,
