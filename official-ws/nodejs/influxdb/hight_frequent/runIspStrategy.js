@@ -4,7 +4,8 @@ var { apiKey, apiSecret } = require('../../strategy/daishu-secret.json')
 const IspStrategyManager = require('./IspStrategy/Manager')
 const { SaveRawJson } = require('../db')
 
-const client = new SaveRawJson()
+const client_orderbook = new SaveRawJson({cacheLen: 400})
+const client_others = new SaveRawJson({cacheLen: 100})
 
 const bitmex = new BitmexManager({
   testnet: false,
@@ -31,11 +32,15 @@ strategyManager.addNewStrategy({
 })
 
 function dataCb(json) {
+  if (json.table === 'orderBookL2_25') {
+    client_orderbook.saveJson(json)
+  } else if (json.table === 'instrument' || json.table === 'trade') {
+    client_others.saveJson(json)
+  }
   strategyManager.listenJson(json)
-  client.saveJson(json)
 }
 
-bitmex.listenInstrument(dataCb)
+bitmex.listenInstrument(dataCb) 
 
 // bitmex.listenTrade(dataCb)
 

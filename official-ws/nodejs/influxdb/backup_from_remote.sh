@@ -18,7 +18,7 @@ echo '下载文件'
 rm -rf ./restore_temp/*
 sftp -r root@$remote_ip:$backup_path ./restore_temp
 
-influxd restore -portable -db raw_data -newdb raw_data_bak ./restore_temp
+influxd restore -portable -db raw_data -newdb raw_data_bak ./restore_temp/backup_raw_data
 
 echo '下载文件结束 请手动执行'
 echo 'USE raw_data_bak'
