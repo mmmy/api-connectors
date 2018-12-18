@@ -1,20 +1,20 @@
 
 const MockData = require('../MockData')
-const TestStrategyManager = require('./IspStrategy/Manager')
+const TestStrategyManager = require('./IspBreakStrategy/Manager')
 const { JSONtoCSV } = require('../util')
 const fs = require('fs')
 const path = require('path')
 
 const manager = new TestStrategyManager()
 manager.addNewStrategy({
-  id: 'test_indicativeSettlePrice-filtered-1-1-40-balance_amount2',
+  id: 'test_IspBreakStrategy-15-10',
   test: true,
-  bookMaxSizeBuy: 4E5,
-  bookMaxSizeSell: 4E5,
-  upThreshold: 1,
-  downThreshold: -1,
+  bookMaxSizeBuy: 0,
+  bookMaxSizeSell: 0,
+  backLen: 15,
+  minTradeInterval: 10,
   amount: 100,
-  balanceAmount: true,
+  balanceAmount: false,
 })
 // manager.addNewStrategy({
 //   id: 'test_indicativeSettlePrice-filtered-2-2-40-old-size',

@@ -17,6 +17,8 @@ class FlowDataStrategyBase {
       ...options
     }
     this._indicativeSettlePrice = 0
+    this._ispList = []                    //[{timestamp, price}]
+    this._lastTradeTime = 0
     this._ob = new OrderBook()
     this._systemTime = 0
     this._orderHistory = []
@@ -140,6 +142,12 @@ class FlowDataStrategyBase {
     if (data0.indicativeSettlePrice) {
       const delta = this._indicativeSettlePrice ? data0.indicativeSettlePrice - this._indicativeSettlePrice : 0
       this._indicativeSettlePrice = data0.indicativeSettlePrice
+      this._ispList.push({
+        timestamp: data0.timestamp,
+        price: data0.indicativeSettlePrice
+      })
+      this.removeOldIsp()
+
       this.onIndicativeSettlePriceChange(delta)
     }
   }
@@ -195,7 +203,7 @@ class FlowDataStrategyBase {
 
   order(order) {
     this._orderHistory.push(order)
-
+    this._lastTradeTime = order.timestamp
     const cb = (error) => {
       console.log('order---', order, error)
       if (this._options.database) {
@@ -230,6 +238,13 @@ class FlowDataStrategyBase {
     }
     if (this._orderCache.shorts.length > maxLen) {
       this._orderCache.shorts.shift()
+    }
+  }
+
+  removeOldIsp() {
+    let maxLen = 200
+    if (this._ispList.length > maxLen) {
+      this._ispList.shift()
     }
   }
 
