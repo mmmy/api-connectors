@@ -161,17 +161,18 @@ class FlowDataStrategyBase {
       if (qtyRate <= 1) {
         return baseMount
       } else {
+        return baseMount
         // 使用更小的相同方向挂单
-        const blanceAmount = Math.round(baseMount / Math.sqrt(qtyRate))
-        return blanceAmount
+        // const blanceAmount = Math.round(baseMount / Math.sqrt(qtyRate))
+        // return blanceAmount
       }
     }
     // 如果持仓很小， 那么使用amount
-    if (qtyRate <= 1) {
+    if (qtyRate <= 6) {
       return baseMount
     } else {
       // 使用更大的反向挂单
-      const blanceAmount = Math.round(Math.sqrt(qtyRate) * baseMount)
+      const blanceAmount = Math.round((qtyRate ** (1/3)) * baseMount)
       return blanceAmount
     }
     return baseMount
