@@ -205,7 +205,7 @@ class FlowDataStrategyBase {
     this._orderHistory.push(order)
     this._lastTradeTime = order.timestamp
     const cb = (error) => {
-      console.log('order---', order.price, order.amount, error)
+      console.log('order---', order.long, order.price, order.amount, error)
       if (this._options.database) {
         this.writeOrder(order, error)
       }
