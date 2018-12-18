@@ -7,24 +7,34 @@ const path = require('path')
 
 const manager = new TestStrategyManager()
 manager.addNewStrategy({
-  id: 'test_indicativeSettlePrice-filtered-1-1-40-balance_amount2',
+  id: 'test_indicativeSettlePrice-filtered-15-15-40-balance1',
   test: true,
   bookMaxSizeBuy: 4E5,
   bookMaxSizeSell: 4E5,
-  upThreshold: 1,
-  downThreshold: -1,
+  upThreshold: 1.5,
+  downThreshold: -1.5,
   amount: 100,
   balanceAmount: true,
 })
 // manager.addNewStrategy({
-//   id: 'test_indicativeSettlePrice-filtered-2-2-40-old-size',
+//   id: 'test_indicativeSettlePrice-filtered-2-2-40-balance1',
 //   test: true,
 //   upThreshold: 2,
 //   downThreshold: -2,
-//   bookMaxSizeBuy: 5E5,
-//   bookMaxSizeSell: 5E5,
+//   bookMaxSizeBuy: 4E5,
+//   bookMaxSizeSell: 4E5,
 //   amount: 100,
-//   balanceAmount: false,
+//   balanceAmount: true,
+// })
+// manager.addNewStrategy({
+//   id: 'test_indicativeSettlePrice-filtered-3-3-40-balance1',
+//   test: true,
+//   upThreshold: 3,
+//   downThreshold: -3,
+//   bookMaxSizeBuy: 4E5,
+//   bookMaxSizeSell: 4E5,
+//   amount: 100,
+//   balanceAmount: true,
 // })
 
 let count = 1

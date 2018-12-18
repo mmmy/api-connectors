@@ -22,13 +22,13 @@ strategyManager.addNewStrategy({
   apiKey,
   apiSecret,
   amount: 50,
-  upThreshold: 2.5,
-  downThreshold: -2.7,
+  upThreshold: 1.5,
+  downThreshold: -1.7,
   bookMaxSizeBuy: 4E5,
   bookMaxSizeSell: 4E5,
   database: true,
   initCheckSystem: true,
-  notify: true,
+  notify: false,
 })
 
 function dataCb(json) {

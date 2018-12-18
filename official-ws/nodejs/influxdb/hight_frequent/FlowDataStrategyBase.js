@@ -171,13 +171,13 @@ class FlowDataStrategyBase {
         return baseMount
       } else {
         return baseMount
-        // 使用更小的相同方向挂单
-        // const balanceAmount = Math.round(baseMount / Math.sqrt(qtyRate))
+        // 使用更小的相同方向挂单, 效果影响很小的
+        // const balanceAmount = Math.round(baseMount / (qtyRate ** (1/3)))
         // return balanceAmount
       }
     }
     // 如果持仓很小， 那么使用amount
-    if (qtyRate <= 6) {
+    if (qtyRate <= 1) {
       return baseMount
     } else {
       // 使用更大的反向挂单
@@ -205,7 +205,7 @@ class FlowDataStrategyBase {
     this._orderHistory.push(order)
     this._lastTradeTime = order.timestamp
     const cb = (error) => {
-      console.log('order---', order, error)
+      console.log('order---', order.price, order.amount, error)
       if (this._options.database) {
         this.writeOrder(order, error)
       }

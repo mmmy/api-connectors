@@ -6,15 +6,46 @@ const fs = require('fs')
 const path = require('path')
 
 const manager = new TestStrategyManager()
+// manager.addNewStrategy({
+//   id: 'test_IspBreakStrategy-15-10',
+//   test: true,
+//   bookMaxSizeBuy: 0,
+//   bookMaxSizeSell: 0,
+//   backLen: 15,
+//   minTradeInterval: 10,
+//   amount: 100,
+//   balanceAmount: false,
+// })
 manager.addNewStrategy({
-  id: 'test_IspBreakStrategy-15-10',
+  id: 'test_IspBreakStrategy-15-10-balanceAmount4',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
   backLen: 15,
   minTradeInterval: 10,
   amount: 100,
-  balanceAmount: false,
+  balanceAmount: true,
+})
+manager.addNewStrategy({
+  id: 'test_IspBreakStrategy-15-10-balanceAmount-size4',
+  test: true,
+  bookMaxSizeBuy: 4E5,
+  bookMaxSizeSell: 4E5,
+  backLen: 15,
+  minTradeInterval: 10,
+  amount: 100,
+  balanceAmount: true,
+})
+
+manager.addNewStrategy({
+  id: 'test_IspBreakStrategy-20-20-balanceAmount-size4',
+  test: true,
+  bookMaxSizeBuy: 4E5,
+  bookMaxSizeSell: 4E5,
+  backLen: 20,
+  minTradeInterval: 20,
+  amount: 100,
+  balanceAmount: true,
 })
 // manager.addNewStrategy({
 //   id: 'test_indicativeSettlePrice-filtered-2-2-40-old-size',
