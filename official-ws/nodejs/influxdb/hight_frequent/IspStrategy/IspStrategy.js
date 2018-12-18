@@ -11,7 +11,7 @@ class TestFlowDataStrategy extends FlowDataStrategyBase {
       if (this.filterOrder(orderObj)) {
         this.order(orderObj)
       } else {
-        console.log('order is filtered', orderObj)
+        // console.log('order is filtered', orderObj)
         if (this._options.database) {
           this.writeOrder(orderObj, null, 'filtered')
         }

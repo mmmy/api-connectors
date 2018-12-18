@@ -7,11 +7,25 @@ const path = require('path')
 
 const manager = new TestStrategyManager()
 manager.addNewStrategy({
-  id: 'test_indicativeSettlePrice-filtered-2-2-40-balance_amount_compare',
+  id: 'test_indicativeSettlePrice-filtered-2-2-40-balance_amount2',
   test: true,
-  upThreshold: 2,
-  downThreshold: -2,
+  bookMaxSizeBuy: 4E5,
+  bookMaxSizeSell: 4E5,
+  upThreshold: 2.5,
+  downThreshold: -2.5,
+  amount: 100,
+  balanceAmount: true,
 })
+// manager.addNewStrategy({
+//   id: 'test_indicativeSettlePrice-filtered-2-2-40-old-size',
+//   test: true,
+//   upThreshold: 2,
+//   downThreshold: -2,
+//   bookMaxSizeBuy: 5E5,
+//   bookMaxSizeSell: 5E5,
+//   amount: 100,
+//   balanceAmount: false,
+// })
 
 let count = 1
 
@@ -49,8 +63,9 @@ mockdata.start()
 
 mockdata.on('end', () => {
   console.log('count', count)
+  // const results = manager.stats()
   const results = manager.getLastBacktestPositions()
-  console.log(results)
+  // console.log(results)
   results.forEach(result => {
     const list = result.positions.map(item => {
       return {
@@ -59,18 +74,9 @@ mockdata.on('end', () => {
       }
     })
     const dataToCsv = JSONtoCSV(list, ['timestamp', 'profit', 'openPositionsLen'])
-    fs.appendFileSync(path.join(__dirname, `temp/backtest_result_${result.id}.csv`), dataToCsv + '\n')
-  })
-  const results1 = manager.stats()
-  results1.forEach(result => {
-    const list = result.positions.map(item => {
-      return {
-        ...item,
-        openPositionsLen: item.openPositions.length
-      }
-    })
-    const dataToCsv = JSONtoCSV(list, ['timestamp', 'profit', 'openPositionsLen'])
-    fs.appendFileSync(path.join(__dirname, `temp/backtest_result_${result.id}_old.csv`), dataToCsv + '\n')
+    const filePath = `temp/backtest_result_${result.id}.csv`
+    fs.writeFileSync(path.join(__dirname, filePath), dataToCsv + '\n')
+    console.log(filePath, 'saved')
   })
   // console.log('total_volume', total_volume)
 })

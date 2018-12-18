@@ -13,6 +13,7 @@ class FlowDataStrategyBase {
       maxCache: 200,
       bookMaxSizeBuy: 5E5,         // 50w, 这个需要做基本市场计算
       bookMaxSizeSell: 5E5,         // 50w, 这个需要做基本市场计算
+      balanceAmount: true,
       ...options
     }
     this._indicativeSettlePrice = 0
@@ -152,7 +153,7 @@ class FlowDataStrategyBase {
 
   }
   // 需要平衡仓位
-  createBlanceAmout(long) {
+  createBalanceAmout(long) {
     const baseMount = this._options.amount || 100
     const positionLong = this._currentQty >= 0
     const qtyRate = Math.abs(this._currentQty) / baseMount
@@ -163,8 +164,8 @@ class FlowDataStrategyBase {
       } else {
         return baseMount
         // 使用更小的相同方向挂单
-        // const blanceAmount = Math.round(baseMount / Math.sqrt(qtyRate))
-        // return blanceAmount
+        // const balanceAmount = Math.round(baseMount / Math.sqrt(qtyRate))
+        // return balanceAmount
       }
     }
     // 如果持仓很小， 那么使用amount
@@ -172,15 +173,15 @@ class FlowDataStrategyBase {
       return baseMount
     } else {
       // 使用更大的反向挂单
-      const blanceAmount = Math.round((qtyRate ** (1/3)) * baseMount)
-      return blanceAmount
+      const balanceAmount = Math.round((qtyRate ** (1/3)) * baseMount)
+      return balanceAmount
     }
     return baseMount
   }
 
   createOrder(long) {
-    const { bookMaxSizeBuy, bookMaxSizeSell } = this._options
-    const amount = this.createBlanceAmout(long)
+    const { bookMaxSizeBuy, bookMaxSizeSell, balanceAmount } = this._options
+    const amount = balanceAmount ? this.createBalanceAmout(long) : this._options.amount
     // bookMaxSize == 0 那么返回level1的 price
     const price = long ? this._ob.getTopBidPrice2(bookMaxSizeBuy) : this._ob.getTopAskPrice2(bookMaxSizeSell)
     const order = {
@@ -350,7 +351,6 @@ class FlowDataStrategyBase {
         timestamp: order.timestamp,
         openPositions: [order]
       }]
-      this._currentQty = order.amount
     } else {
       this._total += 1
       const positions = this._positionList
@@ -411,8 +411,20 @@ class FlowDataStrategyBase {
           })
         }
       }
+      
       this._currentQty = positions[positions.length - 1].openPositions.reduce((q, p) => (q + p.amount), 0)
     }
+    this._currentQty = 0
+    let lastP = this._positionList[this._positionList.length - 1]
+    if (lastP && lastP.openPositions.length > 0) {
+      const isLong = lastP.openPositions[0].long
+      this._currentQty = lastP.openPositions.reduce((q, p) => (q + p.amount), 0) * (isLong ? 1 : -1)
+    }
+    if (this._maxtQty === undefined) {
+      this._maxtQty = 0
+    }
+    this._maxtQty = Math.max(this._maxtQty, Math.abs(this._currentQty))
+    console.log(this._maxtQty)
   }
 
   getLastBacktestPositions() {
