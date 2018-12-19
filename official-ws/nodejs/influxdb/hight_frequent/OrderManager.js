@@ -26,13 +26,18 @@ class OrderManager {
       this.signatureSDK.deleteOrder(orderID).then(json => {
         // this.notify('取消了orderLimit,请看position')
       }).catch(err => {
-        if (cancelTimes < 2) {
-          cancelTimes++
-          setTimeout(() => {
-            cancelFunc()
-          }, 10 * 1000)
+        if (typeof err === 'string' && err.indexOf('Not Found') > -1) {
+          cancelTimes = 2
+          console.log('cancelOrderLimit 不存在', err)
         } else {
-          console.log('cancelOrderLimit 失败', cancelTimes, err)
+          if (cancelTimes < 2) {
+            cancelTimes++
+            setTimeout(() => {
+              cancelFunc()
+            }, 10 * 1000)
+          } else {
+            console.log('cancelOrderLimit 失败', cancelTimes, err)
+          }
         }
       })
     }

@@ -21,7 +21,7 @@ strategyManager.addNewStrategy({
   testnet: false,
   apiKey,
   apiSecret,
-  amount: 50,
+  amount: 100,
   upThreshold: 1.5,
   downThreshold: -1.7,
   bookMaxSizeBuy: 4E5,

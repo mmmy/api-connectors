@@ -10,8 +10,8 @@ const client = new Influx.InfluxDB({
 class MockData {
   constructor(options) {
     this._options = {
-      start_time: '2018-12-10T00:00:00.000Z',
-      // start_time: '2018-12-17T00:00:00.000Z',
+      // start_time: '2018-12-10T00:00:00.000Z',
+      start_time: '2018-12-18T10:00:00.000Z',
       time_long: '2d',
       ...options,
     }
