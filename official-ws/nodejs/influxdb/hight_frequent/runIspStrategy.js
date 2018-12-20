@@ -4,8 +4,8 @@ var { apiKey, apiSecret } = require('../../strategy/daishu-secret.json')
 const IspStrategyManager = require('./IspStrategy/Manager')
 const { SaveRawJson } = require('../db')
 
-const client_orderbook = new SaveRawJson({cacheLen: 400})
-const client_others = new SaveRawJson({cacheLen: 100})
+// const client_orderbook = new SaveRawJson({cacheLen: 400})
+// const client_others = new SaveRawJson({cacheLen: 100})
 
 const bitmex = new BitmexManager({
   testnet: false,
