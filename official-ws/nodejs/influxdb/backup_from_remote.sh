@@ -1,6 +1,6 @@
 
 local_latest_json=`curl -G 'http://127.0.0.1:8086/query?db=raw_data' --data-urlencode 'q=SELECT * FROM json ORDER BY time DESC LIMIT 1'`
-lastest_time=`echo $local_latest_json | grep -o -P '\d{4}-.*?Z'`
+lastest_time=`echo $local_latest_json | grep -o -P '\d{4}-.*?Z(?=")'`
 echo $lastest_time
 
 remote_ip="202.182.125.82"
