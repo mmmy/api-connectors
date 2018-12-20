@@ -199,7 +199,7 @@ class BitmexDB {
         fields: {
           size: item.size,
           price: item.price,
-          price_gap: indicativeSettlePrice && (item.price - indicativeSettlePrice) || 0
+          price_gap: this.isp && (item.price - this.isp) || 0
         },
         tags: {
           action,
