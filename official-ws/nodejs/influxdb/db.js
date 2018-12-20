@@ -187,6 +187,7 @@ class BitmexDB {
       host: 'localhost',
       port: 8086,
     })
+    this.isp = 0
   }
 
   writeTrade(json) {
@@ -219,7 +220,7 @@ class BitmexDB {
         measurement: table,
         fields: {
           price: data0.indicativeSettlePrice,
-          delta: indicativeSettlePrice ? data0.indicativeSettlePrice - indicativeSettlePrice : 0
+          delta: this.isp ? data0.indicativeSettlePrice - this.isp : 0
         },
         tags: {
           action,
@@ -227,6 +228,7 @@ class BitmexDB {
         },
         timestamp: (new Date(data0.timestamp)) * 1E6
       }]).catch(e => console.log('writeInstrument error', e))
+      this.isp = data0.indicativeSettlePrice
     }
   }
 
