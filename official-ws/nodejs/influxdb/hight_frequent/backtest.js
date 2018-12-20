@@ -17,34 +17,37 @@ const manager = new TestStrategyManager()
 //   balanceAmount: true,
 // })
 manager.addNewStrategy({
-  id: 'test_ISP-filtered-25-7-40-balance1-sizebig',
+  id: 'test_ISP-filtered-25-7-0-balance1',
   test: true,
   upThreshold: 2.5,
   downThreshold: -2.7,
-  bookMaxSizeBuy: 5E7,
-  bookMaxSizeSell: 5E7,
+  bookMaxSizeBuy: 5E5,
+  bookMaxSizeSell: 5E5,
   amount: 100,
   balanceAmount: true,
+  maxAmountCount: 100,
 })
 manager.addNewStrategy({
-  id: 'test_ISP-filtered-2-2-40-balance1-sizebig',
+  id: 'test_ISP-filtered-2-2-0-balance1',
   test: true,
   upThreshold: 2,
   downThreshold: -2,
-  bookMaxSizeBuy: 5E7,
-  bookMaxSizeSell: 5E7,
+  bookMaxSizeBuy: 5E5,
+  bookMaxSizeSell: 5E5,
   amount: 100,
   balanceAmount: true,
+  maxAmountCount: 100,
 })
 manager.addNewStrategy({
-  id: 'test_ISP-filtered-3-3-40-balance1-sizebig',
+  id: 'test_ISP-filtered-3-3-0-balance1',
   test: true,
   upThreshold: 3,
   downThreshold: -3,
-  bookMaxSizeBuy: 5E7,
-  bookMaxSizeSell: 5E7,
+  bookMaxSizeBuy: 5E5,
+  bookMaxSizeSell: 5E5,
   amount: 100,
   balanceAmount: true,
+  maxAmountCount: 100,
 })
 
 let count = 1

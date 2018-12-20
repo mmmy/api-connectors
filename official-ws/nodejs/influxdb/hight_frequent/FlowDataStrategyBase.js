@@ -226,7 +226,9 @@ class FlowDataStrategyBase {
   }
 
   order(order) {
-    if (this._currentQty >= this._options.amount * this._options.maxAmountCount) {
+    const isLongPostion = this._currentQty > 0
+    const sameDirection = (isLongPostion && order.long) || (!isLongPostion && !order.long)
+    if (sameDirection && (Math.abs(this._currentQty) >= this._options.amount * this._options.maxAmountCount)) {
       return
     }
     this._lastTradeTime = order.timestamp

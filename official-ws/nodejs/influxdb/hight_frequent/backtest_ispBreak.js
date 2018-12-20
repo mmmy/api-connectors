@@ -7,7 +7,7 @@ const path = require('path')
 
 const manager = new TestStrategyManager()
 // manager.addNewStrategy({
-//   id: 'test_IspBreakStrategy-15-10',
+//   id: 'test_IspBreakStrategy-50-10',
 //   test: true,
 //   bookMaxSizeBuy: 0,
 //   bookMaxSizeSell: 0,
@@ -17,28 +17,28 @@ const manager = new TestStrategyManager()
 //   balanceAmount: false,
 // })
 manager.addNewStrategy({
-  id: 'test_IspBreakStrategy-15-10-balanceAmount4',
+  id: 'test_IspBreakStrategy-200-10-balanceAmount4',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
-  backLen: 150,
+  backLen: 200,
   minTradeInterval: 10,
   amount: 100,
   balanceAmount: true,
 })
 manager.addNewStrategy({
-  id: 'test_IspBreakStrategy-15-10-balanceAmount-size4',
+  id: 'test_IspBreakStrategy-200-10-balanceAmount-size4',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
-  backLen: 150,
+  backLen: 200,
   minTradeInterval: 10,
   amount: 100,
   balanceAmount: true,
 })
 
 manager.addNewStrategy({
-  id: 'test_IspBreakStrategy-20-20-balanceAmount-size4',
+  id: 'test_IspBreakStrategy-200-20-balanceAmount-size4',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,

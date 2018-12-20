@@ -36,7 +36,7 @@ class IspBreakStrategy extends FlowDataStrategyBase {
     }
   }
 
-  filterOrder(order) {
+  filterOrder(order) { // 这个效果不好
     return true
     // const interTime = 10 * 60 * 1000
     const cache = order.long ? this._orderCache.longs : this._orderCache.shorts
