@@ -1,6 +1,6 @@
 
 const BitmexManager = require('../strategy/researchStrategy/BitmexManager')
-const { BitmexDB } = require('./db')
+const { BitmexDB, SaveRawJson } = require('./db')
 
 const bitmex = new BitmexManager()
 const client_raw = new SaveRawJson({cacheLen: 600})
