@@ -44,6 +44,10 @@ class TestFlowDataStrategy extends FlowDataStrategyBase {
     }
     return true
   }
+  // 只减仓
+  isReduceOnly() {
+    return this._options.isReduceOnly
+  }
 }
 
 module.exports = TestFlowDataStrategy

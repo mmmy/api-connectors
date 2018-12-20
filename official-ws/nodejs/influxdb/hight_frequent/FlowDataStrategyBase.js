@@ -181,7 +181,7 @@ class FlowDataStrategyBase {
       return baseMount
     } else {
       // 使用更大的反向挂单
-      const balanceAmount = Math.round((qtyRate ** (1/3)) * baseMount)
+      const balanceAmount = Math.round((qtyRate ** (1 / 3)) * baseMount)
       return balanceAmount
     }
     return baseMount
@@ -220,6 +220,15 @@ class FlowDataStrategyBase {
     if (this._options.test) {
       this.backtest(order)
     }
+  }
+
+  orderReduce() {
+
+  }
+
+  // 只减仓
+  isReduceOnly() {
+    return this._options.isReduceOnly
   }
 
   pushOrderToCache(order) {
@@ -426,7 +435,7 @@ class FlowDataStrategyBase {
           })
         }
       }
-      
+
       this._currentQty = positions[positions.length - 1].openPositions.reduce((q, p) => (q + p.amount), 0)
     }
     this._currentQty = 0

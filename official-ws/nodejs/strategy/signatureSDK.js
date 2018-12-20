@@ -78,6 +78,11 @@ class SignatureSDK {
     const data = {symbol: SYMBOL, orderQty, side, price, ordType: 'Limit', execInst: "ParticipateDoNotInitiate"}
     return this.order(data)
   }
+  // 只减仓
+  orderReduceOnlyLimit(orderQty, side, price) {
+    const data = {symbol: SYMBOL, orderQty, side, price, ordType: 'Limit', execInst: "ParticipateDoNotInitiate,ReduceOnly"}
+    return this.order(data)
+  }
   // 限价止损, 手续费是负数, 你懂的
   orderStopLimit(orderQty, stopPx, side, price) {
     const data = {symbol: SYMBOL, orderQty, stopPx, price, side, ordType: 'StopLimit', execInst:"Close,LastPrice"}
