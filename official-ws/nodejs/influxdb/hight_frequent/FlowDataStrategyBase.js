@@ -2,6 +2,7 @@
 const OrderBook = require('../../strategy/researchOrderbookL2/OrderBookL2Trade')
 const _ = require('lodash')
 const OrderManager = require('./OrderManager')
+const OrderManagerTest = require('./OrderManagerTest')
 const { StrageyDB } = require('../db')
 const notifyPhone = require('../../strategy/notifyPhone').notifyPhone
 
@@ -14,6 +15,7 @@ class FlowDataStrategyBase {
       bookMaxSizeBuy: 5E5,         // 50w, 这个需要做基本市场计算
       bookMaxSizeSell: 5E5,         // 50w, 这个需要做基本市场计算
       balanceAmount: true,
+      maxAmountCount: 10,            // 最大多少倍基础仓位
       ...options
     }
     this._isRunning = true
@@ -23,7 +25,8 @@ class FlowDataStrategyBase {
     this._ob = new OrderBook()
     this._systemTime = 0
     this._orderHistory = []
-    this._orderManager = new OrderManager(this._options)
+    this._orderManager = !this._options.test && new OrderManager(this._options)
+    this._orderManagerTest = new OrderManagerTest(this._options)      // 回测
 
     this._lastOrderBookUpdate = new Date()
     this._lastInstrumentUpdate = new Date()
@@ -139,7 +142,16 @@ class FlowDataStrategyBase {
   }
 
   updateTrade(json) {
-
+    const { data } = json
+    if (this._options.test) {
+      // 获得挂单交易成功了的
+      const tradeOrders = this._orderManagerTest.watchTrade(data)
+      if (this._options.test) {
+        tradeOrders.forEach(order => {
+          this.backtest(order)
+        })
+      }
+    }
   }
 
   updateInstrument(json) {
@@ -214,7 +226,9 @@ class FlowDataStrategyBase {
   }
 
   order(order) {
-    this._orderHistory.push(order)
+    if (this._currentQty >= this._options.amount * this._options.maxAmountCount) {
+      return
+    }
     this._lastTradeTime = order.timestamp
     const cb = (error) => {
       console.log('order---', order.long, order.price, order.amount, error)
@@ -227,10 +241,8 @@ class FlowDataStrategyBase {
     }
     if (!this._options.test) {
       this._orderManager.addAutoCancelOrder(order.amount, order.long, order.price).then(cb).catch(cb)
-    }
-
-    if (this._options.test) {
-      this.backtest(order)
+    } else {
+      this._orderManagerTest.addAutoCancelOrder(order.amount, order.long, order.price, order.timestamp)
     }
   }
   // 市价全平

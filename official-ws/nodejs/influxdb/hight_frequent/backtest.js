@@ -6,36 +6,46 @@ const fs = require('fs')
 const path = require('path')
 
 const manager = new TestStrategyManager()
+// manager.addNewStrategy({
+//   id: 'test_ISP-filtered-15-17-40-balance1',
+//   test: true,
+//   bookMaxSizeBuy: 4E5,
+//   bookMaxSizeSell: 4E5,
+//   upThreshold: 1.5,
+//   downThreshold: -1.7,
+//   amount: 100,
+//   balanceAmount: true,
+// })
 manager.addNewStrategy({
-  id: 'test_indicativeSettlePrice-filtered-15-15-40-balance1',
+  id: 'test_ISP-filtered-25-7-40-balance1-sizebig',
   test: true,
-  bookMaxSizeBuy: 4E5,
-  bookMaxSizeSell: 4E5,
-  upThreshold: 1.5,
-  downThreshold: -1.5,
+  upThreshold: 2.5,
+  downThreshold: -2.7,
+  bookMaxSizeBuy: 5E7,
+  bookMaxSizeSell: 5E7,
   amount: 100,
   balanceAmount: true,
 })
-// manager.addNewStrategy({
-//   id: 'test_indicativeSettlePrice-filtered-2-2-40-balance1',
-//   test: true,
-//   upThreshold: 2,
-//   downThreshold: -2,
-//   bookMaxSizeBuy: 4E5,
-//   bookMaxSizeSell: 4E5,
-//   amount: 100,
-//   balanceAmount: true,
-// })
-// manager.addNewStrategy({
-//   id: 'test_indicativeSettlePrice-filtered-3-3-40-balance1',
-//   test: true,
-//   upThreshold: 3,
-//   downThreshold: -3,
-//   bookMaxSizeBuy: 4E5,
-//   bookMaxSizeSell: 4E5,
-//   amount: 100,
-//   balanceAmount: true,
-// })
+manager.addNewStrategy({
+  id: 'test_ISP-filtered-2-2-40-balance1-sizebig',
+  test: true,
+  upThreshold: 2,
+  downThreshold: -2,
+  bookMaxSizeBuy: 5E7,
+  bookMaxSizeSell: 5E7,
+  amount: 100,
+  balanceAmount: true,
+})
+manager.addNewStrategy({
+  id: 'test_ISP-filtered-3-3-40-balance1-sizebig',
+  test: true,
+  upThreshold: 3,
+  downThreshold: -3,
+  bookMaxSizeBuy: 5E7,
+  bookMaxSizeSell: 5E7,
+  amount: 100,
+  balanceAmount: true,
+})
 
 let count = 1
 

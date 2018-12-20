@@ -8,11 +8,11 @@ class OrderManager {
     this.signatureSDK = new SignatureSDK(this._options)
   }
 
-  addAutoCancelOrder(amount, long, price) {
+  addAutoCancelOrder(amount, long, price, cancelSec) {
     return new Promise((resove, reject) => {
       this.signatureSDK.orderLimit(amount, long ? 'Buy' : 'Sell', price).then(json => {
         resove(null, json)
-        this.cancelOrderLimit(json, long ? 300 : 300)
+        this.cancelOrderLimit(cancelSec || 300)
       }).catch(err => {
         reject(err)
       })
