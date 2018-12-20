@@ -8,7 +8,7 @@ const client = new BitmexDB()
 
 function cb(json) {
   client.listenJson(json)        // 解析
-  client_raw.listenJson(json)   // 原始json
+  client_raw.saveJson(json)   // 原始json
 }
 
 bitmex.listenInstrument(cb)
