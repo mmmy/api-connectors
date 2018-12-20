@@ -17,7 +17,7 @@ const strategy_client = new Influx.InfluxDB({
 // type is string like "filtered"
 const StrageyDB = {
   // 返回的顺序是时间倒序的
-  queryOrders(long, count=200) {
+  queryOrders(long, count = 200) {
     return strategy_client.query(`select * from "order" where ${long ? 'long > 0' : 'long < 0'} order by time desc limit ${count}`)
   },
 
@@ -80,7 +80,7 @@ const StrageyDB = {
       })
     }
   },
-  writeMargin: function(options, margin) {
+  writeMargin: function (options, margin) {
     if (margin) {
       const { walletBalance } = margin
       strategy_client.writePoints([{
@@ -98,7 +98,7 @@ const StrageyDB = {
       })
     }
   },
-  writeExecution: function(options, executions) {
+  writeExecution: function (options, executions) {
     if (executions && executions[0]) {
       let e0 = executions[0]
       let { side, timestamp, price, execType } = e0
@@ -172,12 +172,87 @@ class SaveRawJson {
       })
       this._cache = []
     }
-    
+
     this._lastTime = time
+  }
+}
+
+class BitmexDB {
+  constructor(options) {
+    this._options = {
+      ...options
+    }
+    this._client = new Influx.InfluxDB({
+      database: 'bitmex',
+      host: 'localhost',
+      port: 8086,
+    })
+  }
+
+  writeTrade(json) {
+    const { table, action, data } = json
+    // 所有的timestamp都是同样值
+    const dataToInflux = data.map((item, i) => {
+      return {
+        measurement: table,
+        fields: {
+          size: item.size,
+          price: item.price,
+          price_gap: indicativeSettlePrice && (item.price - indicativeSettlePrice) || 0
+        },
+        tags: {
+          action,
+          side: item.side,
+        },
+        timestamp: (new Date(item.timestamp)) * 1E6
+      }
+    })
+    client.writePoints(dataToInflux).catch(e => console.log('writeTrade error' ,e))
+  }
+
+  writeInstrument(json) {
+    const { table, action, data } = json
+    //indicativeSettlePrice
+    const data0 = data[0]
+    if (data0.indicativeSettlePrice) {
+      client.writePoints([{
+        measurement: table,
+        fields: {
+          price: data0.indicativeSettlePrice,
+          delta: indicativeSettlePrice ? data0.indicativeSettlePrice - indicativeSettlePrice : 0
+        },
+        tags: {
+          action,
+          name: 'indicativeSettlePrice',
+        },
+        timestamp: (new Date(data0.timestamp)) * 1E6
+      }]).catch(e => console.log('writeInstrument error', e))
+    }
+  }
+
+  writeOrderBook() {
+
+  }
+
+  listenJson(json) {
+    const { table, action, data } = json
+    switch (table) {
+      case 'trade':
+        this.writeTrade(json)
+        break
+      case 'instrument':
+        this.writeInstrument(json)
+        break
+      case 'orderBookL2_25':
+        this.writeOrderBook(json)
+      default:
+        break
+    }
   }
 }
 
 module.exports = {
   SaveRawJson,
   StrageyDB,
+  BitmexDB,
 }

@@ -32,11 +32,11 @@ strategyManager.addNewStrategy({
 })
 
 function dataCb(json) {
-  if (json.table === 'orderBookL2_25') {
-    client_orderbook.saveJson(json)
-  } else if (json.table === 'instrument' || json.table === 'trade') {
-    client_others.saveJson(json)
-  }
+  // if (json.table === 'orderBookL2_25') {
+  //   client_orderbook.saveJson(json)
+  // } else if (json.table === 'instrument' || json.table === 'trade') {
+  //   client_others.saveJson(json)
+  // }
   strategyManager.listenJson(json)
 }
 
