@@ -16,3 +16,14 @@ bitmex.listenInstrument(cb)
 bitmex.listenTrade(cb)
 
 bitmex.listenOrderBook(cb)
+
+setTimeout(() => {
+  // systemd 回自动重启
+  const cb = (result) => {
+    console.log('should restart ^&^')
+    console.log(result)
+    process.exit(0)
+  }
+  client_raw.saveCache().then(cb).catch(cb)
+
+}, 2 * 3600 * 1000)  // 每N小时重启一次

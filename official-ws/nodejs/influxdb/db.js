@@ -1,3 +1,4 @@
+const OrderBook = require('../strategy/researchOrderbookL2/OrderBookL2Trade')
 
 const Influx = require('influx')
 var winston = require('winston')
@@ -131,6 +132,8 @@ class SaveRawJson {
     }
     this._lastTime = 0
     this._time_wrongs = 0
+    this._ob = new OrderBook()
+    this._lastOrderBookPartialTime = 0
     this._client = new Influx.InfluxDB({
       database: 'raw_data',
       host: 'localhost',
@@ -144,10 +147,10 @@ class SaveRawJson {
     let time = new Date() * 1E6
     if (time <= this._lastTime) {
       time = this._lastTime + 1E6
-      this._time_wrongs++
-      if (this._time_wrongs % 1E5 === 0) {
-        console.log('time wrong', this._time_wrongs)
-      }
+      // this._time_wrongs++
+      // if (this._time_wrongs % 1E5 === 0) {
+      //   console.log('time wrong', this._time_wrongs)
+      // }
     }
     let record = {
       measurement: 'json',
@@ -161,12 +164,40 @@ class SaveRawJson {
       timestamp: time
     }
     
+    this.pushRecord(record)
+
+    if (table === 'orderBookL2_25') {
+      this._ob.update(json)
+      if (action === 'partial') {
+        this._lastOrderBookPartialTime = new Date()
+      } else {
+        const now = new Date()
+        if (now - this._lastOrderBookPartialTime > 1 * 3600 * 1000) {   // 每过N个小时
+          // 模拟添加一个partial
+          time = time + 1E6
+          this.pushRecord({
+            measurement: 'json',
+            fields: {
+              json_str: JSON.stringify(this._ob._data)
+            },
+            tags: {
+              table,
+              action: 'partial'
+            },
+            timestamp: time
+          })
+          this._lastOrderBookPartialTime = now
+        }
+      }
+    }
+    this._lastTime = time
+  }
+  
+  pushRecord(record) {
     this._cache.push(record)
     if (this._cache.length > this._options.cacheLen) {
       this.saveCache()
     }
-
-    this._lastTime = time
   }
 
   saveCache() {
