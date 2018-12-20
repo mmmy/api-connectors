@@ -160,20 +160,24 @@ class SaveRawJson {
       },
       timestamp: time
     }
-
-    if (this._cache.length < this._options.cacheLen) {
-      this._cache.push(record)
-    } else {
-      this._client.writePoints(this._cache).catch(e => {
-        console.log('--------------------write data error ---------------------------')
-        console.error('write json error', e)
-        // logger.error(e)
-        // console.log(e)
-      })
-      this._cache = []
+    
+    this._cache.push(record)
+    if (this._cache.length > this._options.cacheLen) {
+      this.saveCache()
     }
 
     this._lastTime = time
+  }
+
+  saveCache() {
+    const pro = this._client.writePoints(this._cache).catch(e => {
+      console.log('--------------------write data error ---------------------------')
+      console.error('write json error', e)
+      // logger.error(e)
+      // console.log(e)
+    })
+    this._cache = []
+    return pro
   }
 }
 
