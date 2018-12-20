@@ -207,7 +207,7 @@ class BitmexDB {
         timestamp: (new Date(item.timestamp)) * 1E6
       }
     })
-    client.writePoints(dataToInflux).catch(e => console.log('writeTrade error' ,e))
+    this._client.writePoints(dataToInflux).catch(e => console.log('writeTrade error' ,e))
   }
 
   writeInstrument(json) {
@@ -215,7 +215,7 @@ class BitmexDB {
     //indicativeSettlePrice
     const data0 = data[0]
     if (data0.indicativeSettlePrice) {
-      client.writePoints([{
+      this._client.writePoints([{
         measurement: table,
         fields: {
           price: data0.indicativeSettlePrice,
