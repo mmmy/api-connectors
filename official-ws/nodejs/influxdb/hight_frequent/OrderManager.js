@@ -46,6 +46,14 @@ class OrderManager {
       cancelFunc()
     }, seconds * 1000)
   }
+  // 市价平仓
+  closePositionMarket() {
+    return this.signatureSDK.closePositionMarket()
+  }
+  // 取消所有挂单
+  deleteOrderAll() {
+    return this.signatureSDK.deleteOrderAll()
+  }
 }
 
 module.exports = OrderManager

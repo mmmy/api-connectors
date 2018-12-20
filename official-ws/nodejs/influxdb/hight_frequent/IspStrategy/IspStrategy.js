@@ -3,6 +3,9 @@ const FlowDataStrategyBase = require('../FlowDataStrategyBase')
 
 class TestFlowDataStrategy extends FlowDataStrategyBase {
   onIndicativeSettlePriceChange(delta) {
+    if (!this._isRunning) {
+      return
+    }
     const { upThreshold, downThreshold } = this._options
     const long = delta > upThreshold
     const short = delta < downThreshold

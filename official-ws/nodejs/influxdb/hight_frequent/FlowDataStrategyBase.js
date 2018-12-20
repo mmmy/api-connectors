@@ -16,6 +16,7 @@ class FlowDataStrategyBase {
       balanceAmount: true,
       ...options
     }
+    this._isRunning = true
     this._indicativeSettlePrice = 0
     this._ispList = []                    //[{timestamp, price}]
     this._lastTradeTime = 0
@@ -119,6 +120,14 @@ class FlowDataStrategyBase {
         this._currentQty = currentQty   // 记录当前的仓位,  小于0表示 做空的
       }
     }
+    if (this.isReduceOnly() && this._currentQty < this._options.amount && this._isRunning === true) {
+      this.deleteOrderAll().then(() => {
+        this._isRunning = false
+        this.closePosition().then(() => {
+          this.notifyPhone('position=0')
+        })
+      })
+    }
   }
 
   updateMargin(json) {
@@ -149,6 +158,9 @@ class FlowDataStrategyBase {
       this.removeOldIsp()
 
       this.onIndicativeSettlePriceChange(delta)
+    }
+    if (!this.isReduceOnly()) {
+      this._isRunning = true
     }
   }
 
@@ -221,14 +233,28 @@ class FlowDataStrategyBase {
       this.backtest(order)
     }
   }
+  // 市价全平
+  closePosition() {
+    return new Promise((resove, reject) => {
+      this._orderManager.closePositionMarket().then(resove).catch(() => {
+        setTimeout(() => {
+          this._orderManager.closePositionMarket().then(resove).catch(reject)
+        }, 10 * 1000)
+      })
+    })
+  }
+
+  deleteOrderAll() {
+    return this._orderManager.deleteOrderAll()
+  }
 
   orderReduce() {
 
   }
 
-  // 只减仓
+  // 开始将仓位变为慢慢变为0
   isReduceOnly() {
-    return this._options.isReduceOnly
+    return typeof this._options.isReduceOnly === 'function' ? this._options.isReduceOnly(this) : this._options.isReduceOnly
   }
 
   pushOrderToCache(order) {
@@ -263,89 +289,6 @@ class FlowDataStrategyBase {
 
   writeOrder(order, error, type) {
     StrageyDB.writeOrder(this._options, order, error, type)
-  }
-
-  stats() {
-    let total = this._orderHistory.length
-    let longs = 0
-    const positions = []
-    for (let i = 0; i < total; i++) {
-      const t = this._orderHistory[i]
-      if (positions.length === 0) {
-        positions.push({
-          profit: 0,
-          timestamp: t.timestamp,
-          openPositions: [t]
-        })
-      } else {
-        const preP = positions[positions.length - 1]
-        // console.log('preP', preP.openPositions.length)
-        if (_.uniq(preP.openPositions.map(t => t.long)) > 1) {
-          throw '存在多个方向'
-        }
-        if (preP.openPositions.length === 0) {
-          positions.push({
-            profit: preP.profit,
-            timestamp: t.timestamp,
-            openPositions: [t]
-          })
-        } else {
-          const opLong = preP.openPositions[0].long
-          if (!(t.long ^ opLong)) {                   // 同或运算， 同为true, 或者同为false, side相同
-            positions.push({
-              profit: preP.profit,
-              timestamp: t.timestamp,
-              openPositions: preP.openPositions.concat([t])
-            })
-          } else {
-            let tm = t.amount
-            let newProfit = 0
-            const preOp = preP.openPositions
-            let preOpRest = []
-            for (let i = 0; i < preOp.length; i++) {
-              const item = preOp[i]
-              const reduceAmount = Math.min(tm, item.amount)
-              newProfit += reduceAmount * (t.price - item.price) / item.price * (t.long ? -1 : 1)
-              tm -= reduceAmount
-              if (tm <= 0) {
-                // 计算剩余部分
-                if (item.amount > reduceAmount) {
-                  preOpRest.push({
-                    ...item,
-                    amount: item.amount - reduceAmount
-                  })
-                }
-                preOpRest = preOpRest.concat(preOp.slice(i + 1))
-                break
-              }
-            }
-            if (tm > 0) {
-              if (preOpRest.length > 0) {
-                throw '还有剩余? 算法错误, 请检查'
-              }
-              preOpRest.push({
-                ...t,
-                amount: tm
-              })
-            }
-            positions.push({
-              profit: preP.profit + newProfit,
-              timestamp: t.timestamp,
-              openPositions: preOpRest
-            })
-          }
-        }
-      }
-      if (t.long) {
-        longs++
-      }
-    }
-    return {
-      id: this._options.id,
-      total,
-      longs,
-      positions,
-    }
   }
 
   checkAlive() {

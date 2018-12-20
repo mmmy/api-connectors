@@ -101,6 +101,14 @@ class SignatureSDK {
     const headers = this.getHeaders('DELETE', path, data)
     return requestWidthHeader(url, data, headers, 'delete')
   }
+  // 删除所有挂单
+  deleteOrderAll() {
+    const data = { filter: {} }
+    const path = '/api/v1/order/all'
+    const url = this.getUrl(path)
+    const headers = this.getHeaders('DELETE', path, data)
+    return requestWidthHeader(url, data, headers, 'delete')
+  }
   
   getPosition() {
     const path = '/api/v1/position'
@@ -114,6 +122,10 @@ class SignatureSDK {
     return requestWidthHeader(url, data, headers, 'get')
   }
 
+  closePositionMarket() {
+    const data = {symbol: SYMBOL, ordType: "Market", execInst: "Close" }
+    return this.order(data)
+  }
 }
 
 
