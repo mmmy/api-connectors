@@ -30,11 +30,11 @@ strategyManager.addNewStrategy({
   initCheckSystem: true,
   notify: false,
   maxAmountCount: 4,
-  isReduceOnly: function() {
-    // utc
-    const hour = new Date().getHours()
-    return hour > 12 || hour < 3
-  }
+  // isReduceOnly: function() {
+  //   // utc
+  //   const hour = new Date().getHours()
+  //   return hour > 12 || hour < 3
+  // }
 })
 
 function dataCb(json) {

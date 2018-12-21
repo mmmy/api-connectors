@@ -125,6 +125,7 @@ class FlowDataStrategyBase {
         this._currentQty = currentQty   // 记录当前的仓位,  小于0表示 做空的
       }
     }
+    // 有bug this._currentQty 還沒有初始化
     if (this.isReduceOnly() && this._currentQty < this._options.amount && this._isRunning === true) {
       this.deleteOrderAll().then(() => {
         this._isRunning = false
