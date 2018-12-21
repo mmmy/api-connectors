@@ -24,11 +24,12 @@ strategyManager.addNewStrategy({
   amount: 50,
   upThreshold: 2.5,
   downThreshold: -2.7,
-  bookMaxSizeBuy: 5E5,
-  bookMaxSizeSell: 5E5,
+  bookMaxSizeBuy: 1E6,
+  bookMaxSizeSell: 1E6,
   database: true,
   initCheckSystem: true,
   notify: false,
+  maxAmountCount: 4,
 })
 
 function dataCb(json) {
