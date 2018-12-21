@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="http://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+  <script src="https://cdn.bootcss.com/lodash.js/4.17.10/lodash.min.js"></script>
+  <script type="text/javascript" src="./libForBrowser.js"></script>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+  <style type="text/css">
+    #depth-chart {
+      width: 600px;
+      height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chart-wrapper">
+    <canvas id="depth-chart"></canvas>
+  </div>
+  <div id="slider-range"></div>
+  <div></div>
+  <script src="./chartLib.js"></script>
+  <script src="./libForBrowser.js"></script>
+  <script src="./OrderBookWeb.js"></script>
+  <script src="./BitmexDataManager.js"></script>
+  <script src="./ob_main.js"></script>
+</body>
+</html>
