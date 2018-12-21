@@ -43,6 +43,8 @@ class FlowDataStrategyBase {
       this.initOrdersFromDB()
     }
     console.log({ ...this._options, apiKey: '', apiSecret: '' })
+    this._drawBacks = []                                           // 回测回撤分析
+    this._maxDrawBack = 0
   }
 
   initOrdersFromDB() {
@@ -330,7 +332,8 @@ class FlowDataStrategyBase {
       this._positionList = [{
         profit: 0,
         timestamp: order.timestamp,
-        openPositions: [order]
+        openPositions: [order],
+        drawBack: 0,
       }]
     } else {
       this._total += 1
@@ -343,7 +346,8 @@ class FlowDataStrategyBase {
         positions.push({
           profit: preP.profit,
           timestamp: order.timestamp,
-          openPositions: [order]
+          openPositions: [order],
+          drawBack: preP.drawBack,
         })
       } else {
         const opLong = preP.openPositions[0].long
@@ -352,7 +356,8 @@ class FlowDataStrategyBase {
           positions.push({
             profit: preP.profit,
             timestamp: t.timestamp,
-            openPositions: preP.openPositions.concat([t])
+            openPositions: preP.openPositions.concat([t]),
+            drawBack: preP.drawBack
           })
         } else {
           let tm = t.amount
@@ -385,15 +390,22 @@ class FlowDataStrategyBase {
               amount: tm
             })
           }
+          let back = preP.drawBack + newProfit
+          back = Math.min(0, back)
           positions.push({
             profit: preP.profit + newProfit,
             timestamp: t.timestamp,
-            openPositions: preOpRest
+            openPositions: preOpRest,
+            drawBack: back
           })
         }
       }
 
-      this._currentQty = positions[positions.length - 1].openPositions.reduce((q, p) => (q + p.amount), 0)
+      const positionLen = positions.length
+      const lastPosition = positions[positionLen - 1]
+      this._currentQty = lastPosition.openPositions.reduce((q, p) => (q + p.amount), 0)
+      this._maxDrawBack = Math.min(lastPosition.drawBack, this._maxDrawBack)
+      console.log(this._maxDrawBack)
     }
     this._currentQty = 0
     let lastP = this._positionList[this._positionList.length - 1]
@@ -405,7 +417,8 @@ class FlowDataStrategyBase {
       this._maxtQty = 0
     }
     this._maxtQty = Math.max(this._maxtQty, Math.abs(this._currentQty))
-    console.log(this._maxtQty)
+    // console.log(this._maxtQty)
+    
   }
 
   getLastBacktestPositions() {
