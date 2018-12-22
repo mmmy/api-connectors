@@ -1,5 +1,6 @@
 
 const OrderBook = require('../../strategy/researchOrderbookL2/OrderBookL2Trade')
+const Candles = require('../../strategy/Candles')
 const _ = require('lodash')
 const OrderManager = require('./OrderManager')
 const OrderManagerTest = require('./OrderManagerTest')
@@ -36,6 +37,8 @@ class FlowDataStrategyBase {
     }
     this._currentQty = 0
 
+    this._candles1m = new Candles()            // 1分钟K线
+
     if (this._options.initCheckSystem) {
       this.initCheckSystem()
     }
@@ -45,6 +48,7 @@ class FlowDataStrategyBase {
     console.log({ ...this._options, apiKey: '', apiSecret: '' })
     this._drawBacks = []                                           // 回测回撤分析
     this._maxDrawBack = 0
+    
   }
 
   initOrdersFromDB() {
