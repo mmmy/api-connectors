@@ -288,8 +288,33 @@ class BitmexDB {
   }
 }
 
+const kline_client = new Influx.InfluxDB({
+  host: 'localhost',
+  database: 'bitmex_kline',
+  port: 8086
+})
+const BitmexKlineDB = {
+  writeKline: function(binSize, list) {
+    const dataPoints = list.map(kline => ({
+      measurement: 'kline',
+      tags: {
+        binSize
+      },
+      fields: {
+        ...kline
+      },
+      timestamp: new Date(kline.timestamp) * 1E6
+    }))
+    return kline_client.writePoints(dataPoints)
+  },
+  getLastKline: function(binSize) {
+    return kline_client.query(`select * from kline where binSize='${binSize}' order by time desc limit 1`)
+  }
+}
+
 module.exports = {
   SaveRawJson,
   StrageyDB,
   BitmexDB,
+  BitmexKlineDB
 }

@@ -17,35 +17,35 @@ const manager = new TestStrategyManager()
 //   balanceAmount: false,
 // })
 manager.addNewStrategy({
-  id: 'test_IspBreakStrategy-150-10-balanceAmount4',
+  id: 'test_IspBreakStrategy-150-300-balanceAmount',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
   backLen: 150,
-  minTradeInterval: 10,
+  minTradeInterval: 300,
   amount: 100,
   balanceAmount: true,
 })
 manager.addNewStrategy({
-  id: 'test_IspBreakStrategy-150-10-balanceAmount-size4',
+  id: 'test_IspBreakStrategy-150-600-balanceAmount',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
   backLen: 150,
-  minTradeInterval: 10,
+  minTradeInterval: 600,
   amount: 100,
   balanceAmount: true,
 })
 
 manager.addNewStrategy({
-  id: 'test_IspBreakStrategy-150-20-balanceAmount-size4',
+  id: 'test_IspBreakStrategy-150-600',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
   backLen: 150,
-  minTradeInterval: 20,
+  minTradeInterval: 600,
   amount: 100,
-  balanceAmount: true,
+  balanceAmount: false,
 })
 // manager.addNewStrategy({
 //   id: 'test_indicativeSettlePrice-filtered-2-2-40-old-size',

@@ -208,7 +208,7 @@ class FlowDataStrategyBase {
       return baseMount
     } else {
       // 使用更大的反向挂单
-      const balanceAmount = Math.round((qtyRate ** (1 / 3)) * baseMount)
+      const balanceAmount = Math.round((qtyRate ** (1 / 2)) * baseMount)
       return balanceAmount
     }
     return baseMount
