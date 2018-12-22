@@ -99,6 +99,9 @@ class FlowDataStrategyBase {
       case 'execution':
         this.updateExecution(json)
         break
+      case 'tradeBin1m':
+        this.updateTradeBin1m(json)
+        break
       default:
         break
     }
@@ -431,6 +434,15 @@ class FlowDataStrategyBase {
       id: this._options.id,
       positions: this._positionList
     }
+  }
+  // 1分钟K线数据
+  setCandles1mHistory(list) {
+    this._candles1m.setHistoryData(list)
+  }
+
+  updateTradeBin1m(json) {
+    this._candles1m.updateLastHistory(json.data[0])
+    this._candles1m.calcStochRsiSignal()
   }
 }
 

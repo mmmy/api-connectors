@@ -44,6 +44,7 @@ function Candles(options) {
   this._latestCandle = null
   this._maxLength = 400
   this._mayTrendSignal = { long: false, short: false }
+  this._stochRsiSignal = { long: false, short: false }
 }
 
 Candles.prototype.setOptions = function(options) {
@@ -81,7 +82,7 @@ Candles.prototype.updateLastHistory = function(data) {
 
   this.removeOldData()
   // 计算缓存 信号
-  this._mayTrendSignal = this.mayTrendReverseSignal()
+  // this._mayTrendSignal = this.mayTrendReverseSignal()
   // 开始新的candle
   this._latestCandle && this._latestCandle.reset()
 }
@@ -487,6 +488,37 @@ Candles.prototype.getMayTrendSignal = function() {
 
 Candles.prototype.isReady = function() {
   return this._histories.length > 100 && this._latestCandle
+}
+// 计算最近的高点低点信息（极值）弃用
+Candles.prototype.canculateTopBottomOffest = function(points=4) {
+  
+}
+
+Candles.prototype.calcStochRsiSignal = function(rsiPeriod, stochasticPeriod, kPeriod, dPeriod) {
+  //[{stochRSI, k, d}]
+  const result = signal.StochasticRsi(this.getCandles(false), rsiPeriod, stochasticPeriod, kPeriod, dPeriod)
+  const len = result.length
+  let long = false
+  let short = false
+  if (len > 0) {
+    const r0 = result[len - 1]
+    const r1 = result[len - 2]
+    // k线金叉
+    if (r0.k >= r0.d && r1.k < r1.d) {
+      long = true
+    } else if (r0.k <= r0.d && r1.k > r1.d) {
+      short = true
+    }
+  }
+  this._stochRsiSignal = {
+    long,
+    short,
+  }
+  return this._stochRsiSignal
+}
+
+Candles.prototype.getStochRsiSignal = function() {
+  return this._stochRsiSignal()
 }
 
 module.exports = Candles

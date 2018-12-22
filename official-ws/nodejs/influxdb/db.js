@@ -293,6 +293,7 @@ const kline_client = new Influx.InfluxDB({
   database: 'bitmex_kline',
   port: 8086
 })
+
 const BitmexKlineDB = {
   writeKline: function(binSize, list) {
     const dataPoints = list.map(kline => ({
@@ -309,6 +310,10 @@ const BitmexKlineDB = {
   },
   getLastKline: function(binSize) {
     return kline_client.query(`select * from kline where binSize='${binSize}' order by time desc limit 1`)
+  },
+  getKlines: function(binSize, endTime, count=200) {
+    endTime = new Date(endTime).toISOString()
+    return kline_client.query(`select * from kline where binSize='${binSize}' and time <= '${endTime}' order by time desc limit ${count}`)
   }
 }
 

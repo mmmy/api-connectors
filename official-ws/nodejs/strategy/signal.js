@@ -4,6 +4,7 @@ var BB = technicalindicators.BollingerBands
 var MACD = technicalindicators.MACD
 var SMA = technicalindicators.SMA
 var PSAR = require('../lib/PSAR').PSAR
+var StochasticRsi = technicalindicators.StochasticRSI
 // var jStat = require('jStat')
 
 function parseKline(kline) {
@@ -93,6 +94,19 @@ exports.RSI = function (kline, len=14) {
     return lastVs
     // console.log(result.slice(result.length - 10))
 }
+
+exports.StochasticRsi = function(kline, rsiPeriod=14, stochasticPeriod=14, kPeriod=3, dPeriod=3) {
+    const { T, O, H, L, C, V } = parseKline(kline)
+    var result = StochasticRsi.calculate({
+        values: C,
+        rsiPeriod,
+        stochasticPeriod,
+        kPeriod,
+        dPeriod,
+    })
+    return result
+}
+
 // 200条K线以上？？
 exports.PasrSignal = function (kline, start=0.02, step=0.02, max=0.11) {
     const { T, O, H, L, C, V } = parseKline(kline)
@@ -254,5 +268,40 @@ exports.highestLowestHighLow = function(kline, barsLen) {
     return {
         maxHigh,
         minLow
+    }
+}
+// 弃用
+exports.canculateTopBottomPoints = function(kline, count) {
+    const len = kline.length
+    // 高点确定的半径
+    const searchR = 10
+    const points = []
+    let highestH
+    let lowestL
+    let offset = 0
+    for (var i=0; i<len; i++) {
+        const middleIndex = len - 1 - i
+        if (middleIndex === 0) {
+            break
+        }
+        const k = kline[middleIndex]
+        let startIndex = middleIndex - searchR
+        let endIndex = middleIndex + searchR
+        startIndex = Math.max(startIndex, 0)  // 最少为0
+        endIndex = Math.min(endIndex, len - 1)  // 最大为len-1
+        let highs = []
+        let lows = []
+        kline.slice(startIndex, endIndex).map(k => {
+            highs.push(k.high)
+            lows.push(k.low)
+        })
+        if (k.high === Math.max.apply(null, highs)) {
+            points.push({
+                index: i,
+                kline: k
+            })
+        } else if (false) {
+
+        }
     }
 }
