@@ -153,6 +153,7 @@ class FlowDataStrategyBase {
 
   updateTrade(json) {
     const { data } = json
+    this._systemTime = new Date(data[0].timestamp)
     if (this._options.test) {
       // 获得挂单交易成功了的
       const tradeOrders = this._orderManagerTest.watchTrade(data)
@@ -441,8 +442,10 @@ class FlowDataStrategyBase {
   }
 
   updateTradeBin1m(json) {
+    console.log(this._systemTime)
+    console.log(json.data[0].timestamp)
     this._candles1m.updateLastHistory(json.data[0])
-    this._candles1m.calcStochRsiSignal()
+    const signal = this._candles1m.calcStochRsiSignal()
   }
 }
 

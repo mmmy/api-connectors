@@ -1,6 +1,6 @@
 
 const StategyManagerBase = require('../StrategyManagerBase')
-const Strategy = require('./IspBreakStrategy')
+const Strategy = require('./StochRsiStrategy')
 
 class Manager extends StategyManagerBase {
   addNewStrategy(options) {

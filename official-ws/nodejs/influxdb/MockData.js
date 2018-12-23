@@ -1,5 +1,15 @@
 
 const Influx = require('influx')
+const { BitmexKlineDB } = require('./db')
+
+const parseCandle = k => ({
+  timestamp: k.time.toISOString(),
+  open: k.open,
+  close: k.close,
+  high: k.high,
+  low: k.low,
+  volume: k.volume,
+})
 
 const client = new Influx.InfluxDB({
   database: 'raw_data',
@@ -17,6 +27,10 @@ class MockData {
     }
     this._events = {}
     console.log('Moca data from', this._options.start_time)
+    this._systmeTime = 0
+    this._kline1m = []
+    this._candleCb = {}
+    this._histCandleCb = {}
   }
   listenOrderBook(cb) {
     this._obCb = cb
@@ -26,6 +40,10 @@ class MockData {
   }
   listenInstrument(cb) {
     this._insCb = cb
+  }
+  listenCandle({ binSize, count }, histCb, cb) {
+    this._histCandleCb[binSize] = histCb
+    this._candleCb[binSize] = cb
   }
   createWhereClause() {
     const { start_time, time_long } = this._options
@@ -71,21 +89,66 @@ class MockData {
 
   sendData(row) {
     const { action, table, json_str } = row
+    const data = JSON.parse(json_str)
     const json = {
       table,
       action,
-      data: JSON.parse(json_str)
+      data
     }
-    if (table == 'orderBookL2_25' && this._obCb) {
-      this._obCb(json)
-    } else if (table == 'trade' && this._tdCb) {
-      this._tdCb(json)
-    } else if (table == 'instrument' && this._insCb) {
-      this._insCb(json)
+    let d0 = data[0]
+    if (d0.timestamp) {
+      this._systmeTime = new Date(d0.timestamp)
+    }
+
+    // 模拟发送k线数据
+    if (this._candleCb['1m']) {
+      const candle1m0 = this._kline1m[0]
+      // 模拟交易所k线数据延迟
+      if (this._systmeTime - +new Date(candle1m0.timestamp) > 3 * 1000) {
+        this._candleCb['1m']({
+          table: 'tradeBin1m',
+          action: 'update',
+          data: [candle1m0]
+        })
+        this._kline1m.shift()
+      }
+    }
+
+    switch (table) {
+      case 'orderBookL2_25':
+        this._obCb && this._obCb(json)
+        break
+      case 'trade' :
+        this._tdCb && this._tdCb(json)
+        break
+      case 'instrument':
+        this._insCb && this._insCb(json)
+        break
+      // case 'tradeBin1m':
+      //   this._candleCb['1m'] && this._candleCb['1m'](json)
+      //   break
+      default:
+        break
+    }
+  }
+
+  async initCandles() {
+    //1.初始化历史Kline
+    if (this._histCandleCb['1m']) {
+      const lastTime1m = +new Date(this._options.start_time) - 60 * 1000
+      let histKline1m = await BitmexKlineDB.getHistoryKlines('1m', lastTime1m, 200)
+      histKline1m = histKline1m.reverse().map(parseCandle)
+      this._histCandleCb['1m'](histKline1m)
+    }
+    if (this._candleCb['1m']) {
+      let kline1m = await BitmexKlineDB.getKlinesByRange('1m', this._options.start_time, null, this._options.time_long)
+      kline1m = kline1m.reverse().map(parseCandle)
+      this._kline1m = kline1m
     }
   }
 
   async start(pageSize = 1E5) {
+    await this.initCandles()
     const whereClause = this.createWhereClause()    
     const countResult = await this.queryCount()
     const total = countResult[0].count_json_str

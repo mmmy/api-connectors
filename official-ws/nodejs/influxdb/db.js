@@ -311,9 +311,20 @@ const BitmexKlineDB = {
   getLastKline: function(binSize) {
     return kline_client.query(`select * from kline where binSize='${binSize}' order by time desc limit 1`)
   },
-  getKlines: function(binSize, endTime, count=200) {
+  getHistoryKlines: function(binSize, endTime, count=200) {
     endTime = new Date(endTime).toISOString()
     return kline_client.query(`select * from kline where binSize='${binSize}' and time <= '${endTime}' order by time desc limit ${count}`)
+  },
+  getKlinesByRange: function(binSize, startTime, endTime, after='2d') {
+    startTime = new Date(startTime).toISOString()
+    let endWhere = ''
+    if (endTime) {
+      endWhere = `and time < '${new Date(endTime).toISOString()}'`
+    } else if (after) {
+      endWhere = `and time < '${startTime}' + ${after}`
+    }
+    const query = `select * from kline where binSize='${binSize}' and time >= '${startTime}' ${endWhere} order by time`
+    return kline_client.query(query)
   }
 }
 

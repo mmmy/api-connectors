@@ -17,6 +17,10 @@ class StrategyManagerBase {
     this.applyStrategyFunc('listenJson', arguments)
   }
 
+  setCandles1mHistory() {
+    this.applyStrategyFunc('setCandles1mHistory', arguments)
+  }
+
   getStragetiesInfo() {
     const list = this._list.map(item => {
       return {

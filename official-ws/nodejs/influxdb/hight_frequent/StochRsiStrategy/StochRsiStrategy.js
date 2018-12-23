@@ -3,6 +3,7 @@ const FlowDataStrategyBase = require('../FlowDataStrategyBase')
 
 class StochRsiStrategy extends FlowDataStrategyBase {
   onIndicativeSettlePriceChange(delta) {
+    return
     const { backLen, minTradeInterval } = this._options
     const prices = this._ispList.slice(-backLen).map(item => item.price)
     if (prices.length !== backLen) {
