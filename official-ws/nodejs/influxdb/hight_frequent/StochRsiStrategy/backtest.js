@@ -30,7 +30,7 @@ manager.addNewStrategy({
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
   amount: 100,
-  balanceAmount: true,
+  balanceAmount: false,
   maxAmountCount: 100,
   stochRsi: {
     rsiPeriod: 150,
@@ -47,7 +47,7 @@ manager.addNewStrategy({
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
   amount: 100,
-  balanceAmount: true,
+  balanceAmount: false,
   maxAmountCount: 100,
   stochRsi: {
     rsiPeriod: 200,
