@@ -2,6 +2,23 @@
 const FlowDataStrategyBase = require('../FlowDataStrategyBase')
 
 class StochRsiStrategy extends FlowDataStrategyBase {
+  onUpdateOrderBook() {
+    const { minTradeInterval } = this._options
+    const stochRsiSignals = this._candles1m.getStochRsiSignals()
+    const systemTime = new Date(this._systemTime)
+    if (systemTime - new Date(this._lastTradeTime) < minTradeInterval * 1000) {
+      return
+    }
+    if (stochRsiSignals.length > 0) {
+      const lastestS = stochRsiSignals[stochRsiSignals.length - 1]
+      if (systemTime - new Date(lastestS.timestamp) < 10 * 1000) {
+        if (lastestS.long || lastestS.short) {
+          const orderObj = this.createOrder(lastestS.long)
+          this.order(orderObj)
+        }
+      }
+    }
+  }
   onIndicativeSettlePriceChange(delta) {
     return
     const { backLen, minTradeInterval } = this._options

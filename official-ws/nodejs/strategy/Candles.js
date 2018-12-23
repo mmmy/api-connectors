@@ -44,7 +44,7 @@ function Candles(options) {
   this._latestCandle = null
   this._maxLength = 400
   this._mayTrendSignal = { long: false, short: false }
-  this._stochRsiSignal = { long: false, short: false }
+  this._stochRsiSignals = []      // { long: false, short: false, timestamp: 0 }
 }
 
 Candles.prototype.setOptions = function(options) {
@@ -494,7 +494,7 @@ Candles.prototype.canculateTopBottomOffest = function(points=4) {
   
 }
 
-Candles.prototype.calcStochRsiSignal = function(rsiPeriod, stochasticPeriod, kPeriod, dPeriod) {
+Candles.prototype.calcStochRsiSignal = function(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, timestamp) {
   //[{stochRSI, k, d}]
   const result = signal.StochasticRsi(this.getCandles(false), rsiPeriod, stochasticPeriod, kPeriod, dPeriod)
   const len = result.length
@@ -510,15 +510,22 @@ Candles.prototype.calcStochRsiSignal = function(rsiPeriod, stochasticPeriod, kPe
       short = true
     }
   }
-  this._stochRsiSignal = {
+  const info = {
     long,
     short,
+    timestamp,
   }
-  return this._stochRsiSignal
+  if (long || short) {
+    this._stochRsiSignals.push(info)
+    if (this._stochRsiSignals.length > 200) {
+      this._stochRsiSignals.shift()
+    }
+  }
+  return info
 }
 
-Candles.prototype.getStochRsiSignal = function() {
-  return this._stochRsiSignal()
+Candles.prototype.getStochRsiSignals = function() {
+  return this._stochRsiSignals
 }
 
 module.exports = Candles

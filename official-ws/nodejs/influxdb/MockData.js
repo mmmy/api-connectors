@@ -22,7 +22,7 @@ class MockData {
     this._options = {
       // start_time: '2018-12-10T00:00:00.000Z',     // 2d
       start_time: '2018-12-20T05:09:54.920Z',
-      time_long: '2d',
+      time_long: '5d',
       ...options,
     }
     this._events = {}
@@ -47,7 +47,7 @@ class MockData {
   }
   createWhereClause() {
     const { start_time, time_long } = this._options
-    return `where time > '${start_time}' and time <= '${start_time}' + ${time_long}`
+    return `where time >= '${start_time}' and time < '${start_time}' + ${time_long}`
   }
   queryCount() {
     const whereClause = this.createWhereClause()
@@ -104,7 +104,7 @@ class MockData {
     if (this._candleCb['1m']) {
       const candle1m0 = this._kline1m[0]
       // 模拟交易所k线数据延迟
-      if (this._systmeTime - +new Date(candle1m0.timestamp) > 3 * 1000) {
+      if (candle1m0 && this._systmeTime - +new Date(candle1m0.timestamp) > 3 * 1000) {
         this._candleCb['1m']({
           table: 'tradeBin1m',
           action: 'update',
@@ -136,13 +136,13 @@ class MockData {
     //1.初始化历史Kline
     if (this._histCandleCb['1m']) {
       const lastTime1m = +new Date(this._options.start_time) - 60 * 1000
-      let histKline1m = await BitmexKlineDB.getHistoryKlines('1m', lastTime1m, 200)
+      let histKline1m = await BitmexKlineDB.getHistoryKlines('1m', lastTime1m, 400)
       histKline1m = histKline1m.reverse().map(parseCandle)
       this._histCandleCb['1m'](histKline1m)
     }
     if (this._candleCb['1m']) {
       let kline1m = await BitmexKlineDB.getKlinesByRange('1m', this._options.start_time, null, this._options.time_long)
-      kline1m = kline1m.reverse().map(parseCandle)
+      kline1m = kline1m.map(parseCandle)
       this._kline1m = kline1m
     }
   }

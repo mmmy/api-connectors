@@ -17,6 +17,12 @@ class FlowDataStrategyBase {
       bookMaxSizeSell: 5E5,         // 50w, 这个需要做基本市场计算
       balanceAmount: true,
       maxAmountCount: 10,            // 最大多少倍基础仓位
+      stochRsi: {
+        rsiPeriod: 14,
+        stochasticPeriod: 14,
+        kPeriod: 3,
+        dPeriod: 3,
+      },
       ...options
     }
     this._isRunning = true
@@ -121,6 +127,11 @@ class FlowDataStrategyBase {
     }
 
     this._ob.update(json)
+    this.onUpdateOrderBook()
+  }
+
+  onUpdateOrderBook() {
+    
   }
 
   updatePosition(json) {
@@ -442,10 +453,9 @@ class FlowDataStrategyBase {
   }
 
   updateTradeBin1m(json) {
-    console.log(this._systemTime)
-    console.log(json.data[0].timestamp)
     this._candles1m.updateLastHistory(json.data[0])
-    const signal = this._candles1m.calcStochRsiSignal()
+    const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
+    this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
   }
 }
 

@@ -7,16 +7,55 @@ const path = require('path')
 
 const manager = new TestStrategyManager()
 
+// manager.addNewStrategy({
+//   id: 'stochRsi-3-20',
+//   test: true,
+//   bookMaxSizeBuy: 0,
+//   bookMaxSizeSell: 0,
+//   amount: 100,
+//   balanceAmount: true,
+//   maxAmountCount: 100,
+//   stochRsi: {
+//     rsiPeriod: 20,
+//     stochasticPeriod: 20,
+//     kPeriod: 3,
+//     dPeriod: 3,
+//   },
+//   minTradeInterval: 70
+// })
+
 manager.addNewStrategy({
-  id: 'test_ISP-filtered-25-7-0-balance1',
+  id: 'stochRsi-150-100-2-2',
   test: true,
-  upThreshold: 2.5,
-  downThreshold: -2.7,
-  bookMaxSizeBuy: 5E5,
-  bookMaxSizeSell: 5E5,
+  bookMaxSizeBuy: 0,
+  bookMaxSizeSell: 0,
   amount: 100,
   balanceAmount: true,
   maxAmountCount: 100,
+  stochRsi: {
+    rsiPeriod: 150,
+    stochasticPeriod: 100,
+    kPeriod: 2,
+    dPeriod: 2,
+  },
+  minTradeInterval: 70
+})
+
+manager.addNewStrategy({
+  id: 'stochRsi-150-150-3',
+  test: true,
+  bookMaxSizeBuy: 0,
+  bookMaxSizeSell: 0,
+  amount: 100,
+  balanceAmount: true,
+  maxAmountCount: 100,
+  stochRsi: {
+    rsiPeriod: 200,
+    stochasticPeriod: 200,
+    kPeriod: 3,
+    dPeriod: 3,
+  },
+  minTradeInterval: 70
 })
 
 let count = 1
