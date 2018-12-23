@@ -42,7 +42,7 @@ manager.addNewStrategy({
 })
 
 manager.addNewStrategy({
-  id: 'stochRsi-150-150-3',
+  id: 'stochRsi-200-200-3',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
@@ -50,8 +50,8 @@ manager.addNewStrategy({
   balanceAmount: false,
   maxAmountCount: 100,
   stochRsi: {
-    rsiPeriod: 200,
-    stochasticPeriod: 200,
+    rsiPeriod: 150,
+    stochasticPeriod: 150,
     kPeriod: 3,
     dPeriod: 3,
   },
