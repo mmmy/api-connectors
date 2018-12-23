@@ -17,7 +17,7 @@ const manager = new TestStrategyManager()
 //   balanceAmount: true,
 // })
 manager.addNewStrategy({
-  id: 'test_ISP-filtered-25-7-0-balance1',
+  id: 'test_ISP-filtered-25-7-0-closeoropen',
   test: true,
   upThreshold: 2.5,
   downThreshold: -2.7,
@@ -26,9 +26,10 @@ manager.addNewStrategy({
   amount: 100,
   balanceAmount: true,
   maxAmountCount: 100,
+  closeOrOpen: true,
 })
 manager.addNewStrategy({
-  id: 'test_ISP-filtered-2-2-0-balance1',
+  id: 'test_ISP-filtered-2-2-0-closeoropen',
   test: true,
   upThreshold: 2,
   downThreshold: -2,
@@ -37,9 +38,10 @@ manager.addNewStrategy({
   amount: 100,
   balanceAmount: true,
   maxAmountCount: 100,
+  closeOrOpen: true,
 })
 manager.addNewStrategy({
-  id: 'test_ISP-filtered-3-3-0-balance1',
+  id: 'test_ISP-filtered-3-3-0-closeoropen',
   test: true,
   upThreshold: 3,
   downThreshold: -3,
@@ -48,6 +50,7 @@ manager.addNewStrategy({
   amount: 100,
   balanceAmount: true,
   maxAmountCount: 100,
+  closeOrOpen: true,
 })
 
 let count = 1

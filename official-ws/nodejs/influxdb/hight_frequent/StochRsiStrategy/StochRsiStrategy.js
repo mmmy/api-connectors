@@ -14,7 +14,12 @@ class StochRsiStrategy extends FlowDataStrategyBase {
       if (systemTime - new Date(lastestS.timestamp) < 10 * 1000) {
         if (lastestS.long || lastestS.short) {
           const orderObj = this.createOrder(lastestS.long)
-          this.order(orderObj)
+          if (!orderObj.price) {
+            return
+          }
+          if (orderObj.amount > 0) {
+            this.order(orderObj)
+          }
         }
       }
     }

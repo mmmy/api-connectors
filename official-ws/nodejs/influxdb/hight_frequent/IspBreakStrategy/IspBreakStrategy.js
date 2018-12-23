@@ -20,6 +20,9 @@ class IspBreakStrategy extends FlowDataStrategyBase {
         // console.log('minTradeInterval out')
         return
       }
+      if (!orderObj.price) {
+        return
+      }
       if (this.filterOrder(orderObj)) {
         this.order(orderObj)
       } else {

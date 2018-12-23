@@ -25,7 +25,7 @@ const manager = new TestStrategyManager()
 // })
 
 manager.addNewStrategy({
-  id: 'stochRsi-150-100-2-2',
+  id: 'stochRsi-150-100-2-2-pingcang',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
@@ -38,11 +38,12 @@ manager.addNewStrategy({
     kPeriod: 2,
     dPeriod: 2,
   },
-  minTradeInterval: 70
+  minTradeInterval: 70,
+  closeOrOpen: true,
 })
 
 manager.addNewStrategy({
-  id: 'stochRsi-200-200-3',
+  id: 'stochRsi-200-200-3-pingcang',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
@@ -55,7 +56,8 @@ manager.addNewStrategy({
     kPeriod: 3,
     dPeriod: 3,
   },
-  minTradeInterval: 70
+  minTradeInterval: 70,
+  closeOrOpen: true,
 })
 
 let count = 1

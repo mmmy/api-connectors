@@ -35,6 +35,7 @@ manager.addNewStrategy({
   minTradeInterval: 600,
   amount: 100,
   balanceAmount: true,
+  closeOrOpen: true,
 })
 
 manager.addNewStrategy({
@@ -46,6 +47,7 @@ manager.addNewStrategy({
   minTradeInterval: 600,
   amount: 100,
   balanceAmount: false,
+  closeOrOpen: true,
 })
 // manager.addNewStrategy({
 //   id: 'test_indicativeSettlePrice-filtered-2-2-40-old-size',

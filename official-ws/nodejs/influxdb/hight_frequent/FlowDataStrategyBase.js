@@ -16,7 +16,7 @@ class FlowDataStrategyBase {
       bookMaxSizeBuy: 5E5,         // 50w, 这个需要做基本市场计算
       bookMaxSizeSell: 5E5,         // 50w, 这个需要做基本市场计算
       balanceAmount: true,
-      maxAmountCount: 10,            // 最大多少倍基础仓位
+      maxAmountCount: 1000,            // 最大多少倍基础仓位
       stochRsi: {
         rsiPeriod: 14,
         stochasticPeriod: 14,
@@ -233,11 +233,31 @@ class FlowDataStrategyBase {
     return baseMount
   }
 
+  createCloseOrOpenAmount(long) {
+    if (this._currentQty === 0) {
+      return this._options.amount
+    } else {
+      const isLongPostion = this._currentQty > 0
+      const sameDirection = (isLongPostion && long) || (!isLongPostion && !long)
+      // 方向相同可以加仓,但是要考虑是否有利
+      if (sameDirection) {
+        return 0
+      }
+      return Math.abs(this._currentQty) + this._options.amount
+    }
+ 
+  }
+
   createOrder(long) {
-    const { bookMaxSizeBuy, bookMaxSizeSell, balanceAmount } = this._options
-    const amount = balanceAmount ? this.createBalanceAmout(long) : this._options.amount
+    const { bookMaxSizeBuy, bookMaxSizeSell, balanceAmount, closeOrOpen } = this._options
+    let amount = balanceAmount ? this.createBalanceAmout(long) : this._options.amount
+    if (closeOrOpen) {
+      amount = this.createCloseOrOpenAmount(long)
+    }
     // bookMaxSize == 0 那么返回level1的 price
+    // price 可能为undefined
     const price = long ? this._ob.getTopBidPrice2(bookMaxSizeBuy) : this._ob.getTopAskPrice2(bookMaxSizeSell)
+    
     const order = {
       long,
       amount,
