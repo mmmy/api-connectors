@@ -13,7 +13,7 @@ BitmexDataManager.prototype.listenJson = function(json, index) {
   const { table, action, data } = json
   switch(table) {
     case 'orderBookL2_25':
-      this.updateOrderBook(json)
+      this.updateOrderBook(json, index)
       break
     default:
       break
@@ -46,15 +46,23 @@ BitmexDataManager.prototype.getOrderBookByIndex = function(index) {
   return this._orderbookHistory[index]
 }
 // 根据原始数据的索引获取 interval 秒之前的交易数据
-BitmexDataManager.prototype.getTrades = function(index, seconds) {
+BitmexDataManager.prototype.getTrades = function(index, seconds = 5) {
   let endTime = null
   let trades = []
   for (i = index; i >= 0; i--) {
     const json = this._originData[i]
     if (json.table === 'trade') {
-      
+      const data = json.data
+      trades.unshift(data)
+      if (!endTime) {
+        endTime = new Date(json.data[0].timestamp)
+      }
+      if (endTime - new Date(data[0].timestamp) > seconds * 1000) {
+        break
+      }
     }
   }
+  return trades
 }
 
 function BitmexDataDB() {

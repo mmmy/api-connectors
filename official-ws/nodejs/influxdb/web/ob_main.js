@@ -13,17 +13,26 @@ function initData(from, to) {
   })
 }
 
-initData('2018-12-20T05:09:54.920Z', '2018-12-20T06:09:54.920Z')
+// initData('2018-12-20T05:09:54.920Z', '2018-12-20T08:22:54.920Z')
+initData('2018-12-20T05:09:54.920Z', '2018-12-20T08:25:25.920Z')
   .then(() => {
+    $("#slider-range").slider({
+      max: bm._orderbookHistory.length - 1
+    })
     setDrawIndex(0)
   })
 
 function setDrawIndex(index) {
   const ob = bm.getOrderBookByIndex(index)
   drawDepthChart(ob && ob.book || [])
+
   if (ob) {
     let index = ob.index
-    const trades = bm.getTrades(index, interval)
+    const trades = bm.getTrades(index, 5)
+    if (trades.length > 0) {
+      const time = trades[trades.length - 1][0].timestamp
+      console.log(time)
+    }
   }
 }
 
@@ -49,6 +58,7 @@ $(function () {
       // }
       // _saveConfig()
       $("#index").val(v0);
+      // console.log(v0)
       setDrawIndex(v0)
     }
   })

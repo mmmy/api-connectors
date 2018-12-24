@@ -174,26 +174,6 @@ class FlowDataStrategyBase {
         })
       }
     }
-    if (!this._tradeCount) {
-      this._tradeCount = 1
-      this._bookMark = 0
-      this._buyPrices = []
-    }
-    this._tradeCount ++
-    let bid0 = this._ob.getTopBidPrice2(0)
-    let ask0 = this._ob.getTopAskPrice2(0)
-    let bid1 = this._ob.getTopBidPrice2(1E4)
-    let ask1 = this._ob.getTopAskPrice2(1E4)
-    let bid2 = this._ob.getTopBidPrice2(1E5)
-    let ask2 = this._ob.getTopAskPrice2(1E5)
-    let bid3 = this._ob.getTopBidPrice2(1E6)
-    let ask3 = this._ob.getTopAskPrice2(1E6)
-    if ((ask0 - bid0 === 0.5) && bid0 === bid1 && (bid0 - bid3) ===0.5 && (ask1 - ask0) > 1) {
-      this._buyPrices.push(bid0)
-      this._buyPrices = _.uniq(this._buyPrices)
-      this._bookMark ++
-      console.log('statas', this._bookMark, this._bookMark / this._tradeCount, bid0, 'count', this._buyPrices.length)
-    }
   }
 
   updateInstrument(json) {
@@ -465,7 +445,7 @@ class FlowDataStrategyBase {
       const lastPosition = positions[positionLen - 1]
       this._currentQty = lastPosition.openPositions.reduce((q, p) => (q + p.amount), 0)
       this._maxDrawBack = Math.min(lastPosition.drawBack, this._maxDrawBack)
-      // console.log(this._maxDrawBack)
+      console.log(this._maxDrawBack)
     }
     this._currentQty = 0
     let lastP = this._positionList[this._positionList.length - 1]
