@@ -112,6 +112,7 @@ mockdata.on('end', () => {
     const dataToCsv = JSONtoCSV(list, ['timestamp', 'profit', 'openPositionsLen'])
     const filePath = `temp/backtest_result_${result.id}.csv`
     fs.writeFileSync(path.join(__dirname, filePath), dataToCsv + '\n')
+    console.log('pro', list[list.length - 1].profit)
     console.log(filePath, 'saved')
   })
   // console.log('total_volume', total_volume)

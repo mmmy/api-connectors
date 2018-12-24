@@ -1,10 +1,16 @@
 
 class OrderManagerTest {
-  constructor(options) {
+  constructor(options, orderbook) {
     this._options = {
       ...options
     }
     this._orders = []
+    this.state = {
+
+    }
+    this._ob = orderbook
+    this._overOrder = 0
+    this._totalOrder = 0
   }
 
   addAutoCancelOrder(amount, long, price, timestamp, cancelSec) {
@@ -15,6 +21,27 @@ class OrderManagerTest {
       timestamp: timestamp + 1000, // 加上1s
       cancelTime: cancelSec ? (timestamp + cancelSec * 1000) : 0   // 0表示不过期
     })
+  }
+
+  addOrderUntilTrade(amount, long, price, timestamp, cancelSec) {
+    const oldOrder = long ? this.getBuyOrder()[0] : this.getSellOrder()[0]
+    this._totalOrder ++
+    if(oldOrder) {
+      this._overOrder ++
+      console.log('overOrder', this._overOrder, this._overOrder / this._totalOrder)
+      oldOrder.amount = amount
+      oldOrder.price = price
+      oldOrder.timestamp = timestamp,
+      oldOrder.cancelTime = cancelSec ? (timestamp + cancelSec * 1000) : 0
+    } else {
+      this._orders.push({
+        amount,
+        long,
+        price,
+        timestamp: timestamp + 1000, // 加上1s
+        cancelTime: cancelSec ? (timestamp + cancelSec * 1000) : 0   // 0表示不过期
+      })
+    }
   }
   // 返回已成交的 order
   watchTrade(trades) {
@@ -52,7 +79,41 @@ class OrderManagerTest {
       }
     })
     this._orders = restOrders
+    this.adjustOrderForTrade()
     return tradeOrders
+  }
+
+  getBuyOrder() {
+    return this._orders.filter(o => o.long)
+  }
+
+  getSellOrder() {
+    return this._orders.filter(o => !o.long)
+  }
+
+  hasBuyOrder() {
+    return this.getBuyOrder().length > 0
+  }
+
+  hasSellOrder() {
+    return this.getSellOrder().length > 0
+  }
+
+  adjustOrderForTrade() {
+    const buyOrders = this.getBuyOrder()
+    const sellOrders = this.getSellOrder()
+    if (buyOrders.length > 0) {
+      const bidPrice = this._ob.getTopBidPrice2(0)     // 可能有错误
+      buyOrders.forEach(o => {
+        o.price = Math.max(o.price, bidPrice)
+      })
+    }
+    if (sellOrders.length > 0) {
+      const askPrice = this._ob.getTopAskPrice2(0)
+      sellOrders.forEach(o => {
+        o.price = Math.min(o.price, askPrice)
+      })
+    }
   }
 }
 

@@ -27,19 +27,19 @@ manager.addNewStrategy({
   balanceAmount: true,
 })
 manager.addNewStrategy({
-  id: 'test_IspBreakStrategy-150-600-balanceAmount',
+  id: 'test_IspBreakStrategy-150-600-closeOrOpen',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
   backLen: 150,
   minTradeInterval: 600,
   amount: 100,
-  balanceAmount: true,
+  balanceAmount: false,
   closeOrOpen: true,
 })
 
 manager.addNewStrategy({
-  id: 'test_IspBreakStrategy-150-600',
+  id: 'test_IspBreakStrategy-150-600-closeOrOpen',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,

@@ -26,7 +26,7 @@ manager.addNewStrategy({
   amount: 100,
   balanceAmount: true,
   maxAmountCount: 100,
-  closeOrOpen: true,
+  // closeOrOpen: true,
 })
 manager.addNewStrategy({
   id: 'test_ISP-filtered-2-2-0-closeoropen',
@@ -38,7 +38,7 @@ manager.addNewStrategy({
   amount: 100,
   balanceAmount: true,
   maxAmountCount: 100,
-  closeOrOpen: true,
+  // closeOrOpen: true,
 })
 manager.addNewStrategy({
   id: 'test_ISP-filtered-3-3-0-closeoropen',
@@ -50,7 +50,7 @@ manager.addNewStrategy({
   amount: 100,
   balanceAmount: true,
   maxAmountCount: 100,
-  closeOrOpen: true,
+  // closeOrOpen: true,
 })
 
 let count = 1
