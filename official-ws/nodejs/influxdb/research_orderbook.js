@@ -64,7 +64,7 @@ let _sellBookCount = 0
 let _sellPrices = []
 
 const AFTER_SECONDS = 150
-const LONG = false
+const LONG = true
 
 function recordAfterP(list, trades, seconds = 60) {
   if (trades.length === 0) {
@@ -97,12 +97,14 @@ function tradeTest(json) {
       const len = _buyPrices.length
       const lastB = _buyPrices[len - 1]
       if (len === 0 || (lastB.price !== bid0 && (new Date(d0.timestamp) - new Date(lastB.t)) > 30 * 1000)) {
-        _buyPrices.push({
-          side: 1,
-          p: bid0,
-          t: d0.timestamp,
-          afterPs: [],
-        })
+        if (isLowVolume()) {
+          _buyPrices.push({
+            side: 1,
+            p: bid0,
+            t: d0.timestamp,
+            afterPs: [],
+          })
+        }
       }
       // _buyPrices = _.uniqBy(_buyPrices, 'p')
       _buyBookCount++
@@ -161,7 +163,8 @@ function orderBookTrade(json, symbol, tableName) {
 
 // const bitmex = new BitmexManager()
 const bitmex = new MockData()
-
+let volume24h = 0
+let volumePerMinute = 0
 bitmex.listenInstrument((json) => {
   // data[0].volume24h
   const { table, action, data } = json
@@ -170,12 +173,35 @@ bitmex.listenInstrument((json) => {
   if (data0.indicativeSettlePrice) {
     indicativeSettlePrice = data0.indicativeSettlePrice
   }
+  if (data0.volume24h) {
+    volume24h = data0.volume24h
+    volumePerMinute = volume24h / 1440
+  }
   // console.log(data.length)
 })
 
 bitmex.listenTrade(orderBookTrade)
 
 bitmex.listenOrderBook(orderBookTrade)
+
+let candle1m = []
+
+function isLowVolume() {
+  const lastCandle = candle1m[candle1m.length - 1]
+  const len = 10
+  const last10Candles = candle1m.slice(-len)
+  last10CandlesPV = last10Candles.reduce((sum, c) => sum + c.volume, 0) / len
+  return (lastCandle.volume < volumePerMinute * 2) && (last10CandlesPV < volumePerMinute * 2)
+}
+bitmex.listenCandle({ binSize:'1m', count: 200 }, historyList => {
+  candle1m = historyList
+}, (json) => {
+  const candle = json.data[0]
+  candle1m.push(candle)
+  if (candle1m.length > 200) {
+    candle1m.shift()
+  }
+})
 
 bitmex.start()
 bitmex.on('end', () => {
