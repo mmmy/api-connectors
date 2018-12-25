@@ -37,6 +37,7 @@ class OrderManagerTest {
       this._orders.push({
         amount,
         long,
+        firstPrice: price,
         price,
         timestamp: timestamp + 1000, // 加上1s
         cancelTime: cancelSec ? (timestamp + cancelSec * 1000) : 0   // 0表示不过期
@@ -70,10 +71,13 @@ class OrderManagerTest {
     const restOrders = []     // 剩余
     const tradeOrders = []    // 已经成交的
     orders.forEach(o => {
-      if (o.long && o.price > minSellPrice) {
-        tradeOrders.push(o)
-      } else if (!o.long && o.price < maxBuyPrice) {
-        tradeOrders.push(o)
+      if ((o.long && o.price > minSellPrice) || (!o.long && o.price < maxBuyPrice)) {
+        tradeOrders.push({
+          ...o,
+          tradeTime: currentTime,
+          timeSpent: (currentTime - new Date(o.timestamp))/ 1000,
+          priceDiff: o.price - o.firstPrice
+        })
       } else {
         restOrders.push(o)
       }

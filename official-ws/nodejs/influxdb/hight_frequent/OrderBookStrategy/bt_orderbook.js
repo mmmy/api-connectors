@@ -15,9 +15,20 @@ manager.addNewStrategy({
   amount: 100,
   balanceAmount: true,
   maxAmountCount: 100,
-  minTradeInterval: 70,
+  minTradeInterval: 20,
   closeOrOpen: true,
 })
+// manager.addNewStrategy({
+//   id: 'orderbok-first-balance',
+//   test: true,
+//   bookMaxSizeBuy: 0,
+//   bookMaxSizeSell: 0,
+//   amount: 100,
+//   balanceAmount: true,
+//   maxAmountCount: 100,
+//   minTradeInterval: 70,
+//   // closeOrOpen: true,
+// })
 let count = 0
 function cb(json) {
   const { action, table, data } = json
@@ -56,7 +67,7 @@ mockdata.on('end', () => {
         openPositionsLen: item.openPositions.length
       }
     })
-    const dataToCsv = JSONtoCSV(list, ['timestamp', 'profit', 'openPositionsLen'])
+    const dataToCsv = JSONtoCSV(list, ['timestamp', 'profit', 'openPositionsLen', 'priceDiff', 'timeSpent'])
     const filePath = `temp/backtest_result_${result.id}.csv`
     fs.writeFileSync(path.join(__dirname, filePath), dataToCsv + '\n')
     console.log('pro', list[list.length - 1].profit)

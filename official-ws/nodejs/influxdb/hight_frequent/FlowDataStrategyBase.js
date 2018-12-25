@@ -174,6 +174,11 @@ class FlowDataStrategyBase {
         })
       }
     }
+    this.onTrade()
+  }
+
+  onTrade() {
+    
   }
 
   updateInstrument(json) {
@@ -370,8 +375,8 @@ class FlowDataStrategyBase {
     if (!this._positionList) {
       this._total = 1
       this._positionList = [{
+        ...order,
         profit: 0,
-        timestamp: order.timestamp,
         openPositions: [order],
         drawBack: 0,
       }]
@@ -384,8 +389,8 @@ class FlowDataStrategyBase {
       }
       if (preP.openPositions.length === 0) {
         positions.push({
+          ...order,
           profit: preP.profit,
-          timestamp: order.timestamp,
           openPositions: [order],
           drawBack: preP.drawBack,
         })
@@ -394,8 +399,8 @@ class FlowDataStrategyBase {
         const t = order
         if (!(t.long ^ opLong)) {                   // 同或运算， 同为true, 或者同为false, side相同
           positions.push({
+            ...order,
             profit: preP.profit,
-            timestamp: t.timestamp,
             openPositions: preP.openPositions.concat([t]),
             drawBack: preP.drawBack
           })
@@ -433,8 +438,8 @@ class FlowDataStrategyBase {
           let back = preP.drawBack + newProfit
           back = Math.min(0, back)
           positions.push({
+            ...order,
             profit: preP.profit + newProfit,
-            timestamp: t.timestamp,
             openPositions: preOpRest,
             drawBack: back
           })

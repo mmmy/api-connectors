@@ -2,7 +2,7 @@
 const FlowDataStrategyBase = require('../FlowDataStrategyBase')
 
 class OrderBookStrategy extends FlowDataStrategyBase {
-  onUpdateOrderBook() {
+  onTrade() {
     const { minTradeInterval } = this._options
     const systemTime = new Date(this._systemTime)
     if (systemTime - new Date(this._lastTradeTime) < minTradeInterval * 1000) {
@@ -14,16 +14,16 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     let ask1 = this._ob.getTopAskPrice2(1E4)
     // let bid2 = this._ob.getTopBidPrice2(1E5)
     // let ask2 = this._ob.getTopAskPrice2(1E5)
-    let bid3 = this._ob.getTopBidPrice2(1E6)
+    let bid3 = this._ob.getTopBidPrice2(5E5)
     let ask3 = this._ob.getTopAskPrice2(1E6)
     if ((ask0 - bid0 === 0.5) && (bid0 - bid3) === 0 && (ask1 - ask0) > 1) {
-      const orderObj = this.createOrder(false)
-      this.order(orderObj)
-    }
-    if ((ask0 - bid0 === 0.5) && (ask0 - ask3) === 0 && (bid0 - bid1) > 1) {
       const orderObj = this.createOrder(true)
       this.order(orderObj)
     }
+    // if ((ask0 - bid0 === 0.5) && (ask0 - ask3) === 0 && (bid0 - bid1) > 1) {
+    //   const orderObj = this.createOrder(false)
+    //   this.order(orderObj)
+    // }
   }
 
   onIndicativeSettlePriceChange(delta) {
