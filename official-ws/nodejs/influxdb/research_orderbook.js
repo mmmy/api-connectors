@@ -85,8 +85,8 @@ function tradeTest(json) {
   _tradeCount++
   let bid0 = ob.getTopBidPrice2(0)
   let ask0 = ob.getTopAskPrice2(0)
-  let bid1 = ob.getTopBidPrice2(1E4)
-  let ask1 = ob.getTopAskPrice2(1E4)
+  let bid1 = ob.getTopBidPrice2(2E4)
+  let ask1 = ob.getTopAskPrice2(2E4)
   // let bid2 = ob.getTopBidPrice2(1E5)
   // let ask2 = ob.getTopAskPrice2(1E5)
   let bid3 = ob.getTopBidPrice2(5E5)
@@ -188,10 +188,10 @@ let candle1m = []
 
 function isLowVolume() {
   const lastCandle = candle1m[candle1m.length - 1]
-  const len = 10
+  const len = 5
   const last10Candles = candle1m.slice(-len)
   last10CandlesPV = last10Candles.reduce((sum, c) => sum + c.volume, 0) / len
-  return (lastCandle.volume < volumePerMinute * 2) && (last10CandlesPV < volumePerMinute * 2)
+  return (lastCandle.volume < volumePerMinute * 1.5) && (last10CandlesPV < volumePerMinute * 1.5)
 }
 bitmex.listenCandle({ binSize:'1m', count: 200 }, historyList => {
   candle1m = historyList
@@ -223,7 +223,7 @@ bitmex.on('end', () => {
   console.log('avgHigh', avgHigh, 'sumHigh', sumHigh, 'timeAvgHigh', timeAvgHigh)
   console.log('avgLow', avgLow, 'sumLow', sumLow, 'timeAvgLow', timeAvgLow)
 
-  const filePath = `./temp/research_orderbook_${LONG ? 'LONG' : 'SHORT'}_${AFTER_SECONDS}.csv`
+  const filePath = `./temp/research_orderbook_volumefilter_${LONG ? 'LONG' : 'SHORT'}_${AFTER_SECONDS}.csv`
   const csvStr = JSONtoCSV(list, ['t', 'p', 'diffHigh', 'timeHigh', 'diffLow', 'timeLow'])
   fs.writeFileSync(path.join(__dirname, filePath), csvStr)
   console.log('data end...')
