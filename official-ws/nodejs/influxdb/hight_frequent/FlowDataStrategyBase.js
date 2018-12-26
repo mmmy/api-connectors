@@ -1,5 +1,6 @@
 
 const OrderBook = require('../../strategy/researchOrderbookL2/OrderBookL2Trade')
+const AccountOrder = require('./AccountOrder')
 const Candles = require('../../strategy/Candles')
 const _ = require('lodash')
 const OrderManager = require('./OrderManager')
@@ -30,6 +31,7 @@ class FlowDataStrategyBase {
     this._ispList = []                    //[{timestamp, price}]
     this._lastTradeTime = 0
     this._ob = new OrderBook()
+    this._accountOrder = new AccountOrder()
     this._systemTime = 0
     this._orderHistory = []
     this._orderManager = !this._options.test && new OrderManager(this._options, this._ob)
@@ -107,6 +109,9 @@ class FlowDataStrategyBase {
         break
       case 'tradeBin1m':
         this.updateTradeBin1m(json)
+        break
+      case 'order':
+        this.updateAccountOrder(json)
         break
       default:
         break
@@ -481,6 +486,23 @@ class FlowDataStrategyBase {
     this._candles1m.updateLastHistory(json.data[0])
     const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
+  }
+
+  updateAccountOrder(json) {
+    this._accountOrder.update(json)
+    console.log(this._accountOrder)
+  }
+  // 定时任务
+  initInterval() {
+    this._interval = setInterval(() => {
+      this.checkAccount()
+    }, 5000)
+  }
+  // 定时检查账户是否安全，比如有没有止损委托
+  checkAccount() {
+    if (this._options.checkAccount) {
+      // TODO:
+    }
   }
 }
 
