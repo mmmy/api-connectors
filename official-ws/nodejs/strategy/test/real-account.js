@@ -12,7 +12,7 @@ var aa = new Account({
   shortProfit: 50
 })
 const d1 = new Date()
-aa.orderLimit(3000, true, 2000).then((json) => {
+aa.signatureSDK.orderStop(100, 9000, 'Buy').then((json) => {
   console.log('时间差', new Date(json.timestamp) - d1)
   console.log(json)
   // console.log(aa)
