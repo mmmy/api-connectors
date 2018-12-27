@@ -14,9 +14,15 @@
   <script src="https://code.highcharts.com/highcharts.js"></script>
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
   <style type="text/css">
-    #depth-chart {
-      width: 600px;
-      height: 300px;
+    .chart-wrapper {
+      width: 800px;
+      height: 400px;
+    }
+    #slider-range {
+      margin-bottom: 10px;
+    }
+    td {
+      border: 1px solid #777;
     }
   </style>
 </head>
@@ -25,6 +31,15 @@
     <canvas id="depth-chart"></canvas>
   </div>
   <div id="slider-range"></div>
+  <div>
+    <button id="pre">&lt;</button>
+    <button id="next">&gt;</button>
+  </div>
+  <div>
+    <table id="orderbook-actions">
+      <tbody></tbody>
+    </table>
+  </div>
   <div></div>
   <script src="./chartLib.js"></script>
   <script src="./libForBrowser.js"></script>

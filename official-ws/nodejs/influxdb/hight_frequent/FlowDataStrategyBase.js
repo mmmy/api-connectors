@@ -1,6 +1,7 @@
 
 const OrderBook = require('../../strategy/researchOrderbookL2/OrderBookL2Trade')
 const AccountOrder = require('./AccountOrder')
+const AccountPosition = require('./AccountPosition')
 const Candles = require('../../strategy/Candles')
 const _ = require('lodash')
 const OrderManager = require('./OrderManager')
@@ -32,6 +33,7 @@ class FlowDataStrategyBase {
     this._lastTradeTime = 0
     this._ob = new OrderBook()
     this._accountOrder = new AccountOrder()
+    this._accountPosition = new AccountPosition()
     this._systemTime = 0
     this._orderHistory = []
     this._orderManager = !this._options.test && new OrderManager(this._options, this._ob)
@@ -159,6 +161,9 @@ class FlowDataStrategyBase {
         })
       })
     }
+    this._accountPosition.update(json)
+    // console.log('++++++++++++++++++++++++++++ position')
+    // console.log(this._accountPosition._data)
   }
 
   updateMargin(json) {
@@ -500,6 +505,7 @@ class FlowDataStrategyBase {
 
   updateAccountOrder(json) {
     this._accountOrder.update(json)
+    console.log('-------------------------------- order')
     console.log(this._accountOrder)
   }
 

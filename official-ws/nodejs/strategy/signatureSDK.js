@@ -93,6 +93,14 @@ class SignatureSDK {
     const data = {symbol: SYMBOL, orderQty, side, stopPx, price, ordType: 'LimitIfTouched', execInst:"Close,LastPrice"}
     return this.order(data)
   }
+
+  // 更新一个订单，需要传入{orderId: , ... }， 可以修改orderQty, price等
+  updateOrder(params) {
+    var path = '/api/v1/order'
+    const url = this.getUrl(path)
+    const headers = this.getHeaders('PUT', path, params)
+    return requestWidthHeader(url, params, headers, 'put')
+  }
   
   deleteOrder(orderID) {
     const data = { orderID }

@@ -21,7 +21,7 @@ Chart.plugins.register({
           var x = chart.data.labels[index]
           // Just naively convert to string for now
           var dataString = dataset.data[index];
-          var isMiddle = dataString && dataset.data[index + 1] === null
+          var isMiddle = dataString && (dataset.data[index + 1] === null || dataset.data[index - 1] === null)
           if (isMiddle) {
             ctx.fillStyle = isMiddle ? 'rgb(255, 99, 132)' : 'rgb(0, 0, 0)';
             dataString =  (dataString / 1E6).toFixed(3) + 'M'
