@@ -5,8 +5,8 @@ var Account = require('../Account')
 var aa = new Account({
   apiKey,
   apiSecret,
-  test: false,
-  testnet: true,
+  test: true,
+  testnet: false,
   profit: 62,
   loss: -40,
   shortProfit: 50
