@@ -13,7 +13,7 @@ var aa = new Account({
 })
 const d1 = new Date()
 // 大概会有1秒钟的时差
-aa.signatureSDK.orderStop(100, 9000, 'Buy').then((json) => {
+aa.signatureSDK.orderLimit(100, 'Buy', 9000).then((json) => {
   console.log('时间差', new Date(json.timestamp) - d1)
   console.log(json)
   // console.log(aa)

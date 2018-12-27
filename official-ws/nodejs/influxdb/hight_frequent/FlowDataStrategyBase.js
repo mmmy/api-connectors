@@ -162,8 +162,8 @@ class FlowDataStrategyBase {
       })
     }
     this._accountPosition.update(json)
-    console.log('++++++++++++++++++++++++++++ position')
-    console.log(this._accountPosition._data)
+    // console.log('++++++++++++++++++++++++++++ position')
+    // console.log(this._accountPosition._data)
   }
 
   updateMargin(json) {
