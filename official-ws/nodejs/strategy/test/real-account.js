@@ -1,4 +1,4 @@
-var { apiKey, apiSecret } = require('../test-secret.json')
+var { apiKey, apiSecret } = require('../daishu-secret.json')
 
 var Account = require('../Account')
 
