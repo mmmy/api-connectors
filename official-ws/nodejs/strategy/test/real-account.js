@@ -1,17 +1,18 @@
-var { apiKey, apiSecret } = require('../daishu-secret.json')
+var { apiKey, apiSecret } = require('../test-secret.json')
 
 var Account = require('../Account')
 
 var aa = new Account({
   apiKey,
   apiSecret,
-  test: true,
-  testnet: false,
+  test: false,
+  testnet: true,
   profit: 62,
   loss: -40,
   shortProfit: 50
 })
 const d1 = new Date()
+// 大概会有1秒钟的时差
 aa.signatureSDK.orderStop(100, 9000, 'Buy').then((json) => {
   console.log('时间差', new Date(json.timestamp) - d1)
   console.log(json)
