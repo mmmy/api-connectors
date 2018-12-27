@@ -46,7 +46,7 @@ function statisticAndSave(positions, prefix) {
   console.log('avgHigh', avgHigh, 'sumHigh', sumHigh, 'timeAvgHigh', timeAvgHigh)
   console.log('avgLow', avgLow, 'sumLow', sumLow, 'timeAvgLow', timeAvgLow)
   const filePath = `./temp/research_orderbook_from_file_${prefix}.csv`
-  const csvStr = JSONtoCSV(list, ['t', 'p', 'diffHigh', 'timeHigh', 'diffLow', 'timeLow', 'levelsTime1', 'levelsTime2', 'levelsTime3', 'levelsTime4'])
+  const csvStr = JSONtoCSV(list, ['t', 'p', 'diffHigh', 'timeHigh', 'diffLow', 'timeLow', 'levelsTime1', 'levelsTime2', 'levelsTime3', 'levelsTime4', 'levelsTime5', 'levelsTime6'])
   fs.writeFileSync(path.join(__dirname, filePath), csvStr)
 
 }

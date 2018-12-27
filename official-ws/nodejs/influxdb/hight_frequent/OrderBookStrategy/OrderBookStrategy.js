@@ -105,8 +105,8 @@ class OrderBookStrategy extends FlowDataStrategyBase {
   }
 
   research(signal, json) {
-    const researchLong = true
-    const researchShort = false
+    const researchLong = false
+    const researchShort = true
     const { bid0, ask0 } = signal
     this._tradeCount++
     const { data } = json
