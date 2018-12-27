@@ -22,7 +22,7 @@ class MockData {
     this._options = {
       // start_time: '2018-12-10T00:00:00.000Z',     // 2d
       start_time: '2018-12-20T05:09:54.920Z',
-      time_long: '4d',
+      time_long: '7d',
       ...options,
     }
     this._events = {}

@@ -7,6 +7,7 @@ const MockData = require('./MockData')
 const fs = require('fs')
 const path = require('path')
 const { JSONtoCSV } = require('./util')
+const { exec } = require('child_process')
 
 const client = new Influx.InfluxDB({
   database: 'bitmex',
@@ -63,8 +64,8 @@ let _buyPrices = []
 let _sellBookCount = 0
 let _sellPrices = []
 
-const AFTER_SECONDS = 150
-const LONG = true
+const AFTER_SECONDS = 180
+const LONG = false
 
 function recordAfterP(list, trades, seconds = 60) {
   if (trades.length === 0) {
@@ -85,18 +86,18 @@ function tradeTest(json) {
   _tradeCount++
   let bid0 = ob.getTopBidPrice2(0)
   let ask0 = ob.getTopAskPrice2(0)
-  let bid1 = ob.getTopBidPrice2(2E4)
-  let ask1 = ob.getTopAskPrice2(2E4)
+  let bid1 = ob.getTopBidPrice2(volumePerMinute / 60 * 0.618)   // volumePerMinute / 60 / 2
+  let ask1 = ob.getTopAskPrice2(volumePerMinute / 60 * 0.618)
   // let bid2 = ob.getTopBidPrice2(1E5)
   // let ask2 = ob.getTopAskPrice2(1E5)
-  let bid3 = ob.getTopBidPrice2(5E5)
-  let ask3 = ob.getTopAskPrice2(5E5)
+  let bid3 = ob.getTopBidPrice2(volumePerMinute/2 * 0.5)       // 0.5 - 0.618
+  let ask3 = ob.getTopAskPrice2(volumePerMinute/2 * 0.5)
   const d0 = data[0]
   if (LONG) {
     if ((ask0 - bid0 === 0.5) && (bid0 - bid3) === 0 && (ask1 - ask0) > 1) {
       const len = _buyPrices.length
       const lastB = _buyPrices[len - 1]
-      if (len === 0 || (lastB.price !== bid0 && (new Date(d0.timestamp) - new Date(lastB.t)) > 30 * 1000)) {
+      if (len === 0 || (lastB.price !== bid0 && (new Date(d0.timestamp) - new Date(lastB.t)) > 120 * 1000)) {
         if (isLowVolume()) {
           _buyPrices.push({
             side: 1,
@@ -116,13 +117,15 @@ function tradeTest(json) {
     if ((ask0 - bid0 === 0.5) && (ask0 - ask3) === 0 && (bid0 - bid1) > 1) {
       const len = _sellPrices.length
       const lastS = _sellPrices[len - 1]
-      if (len === 0 || (lastS.price !== ask0 && (new Date(d0.timestamp) - new Date(lastS.t)) > 30 * 1000)) {
-        _sellPrices.push({
-          side: -1,
-          p: ask0,
-          t: d0.timestamp,
-          afterPs: [],
-        })
+      if (len === 0 || (lastS.price !== ask0 && (new Date(d0.timestamp) - new Date(lastS.t)) > 120 * 1000)) {
+        if (isLowVolume()) {
+          _sellPrices.push({
+            side: -1,
+            p: ask0,
+            t: d0.timestamp,
+            afterPs: [],
+          })
+        }
       }
       _sellBookCount++
       console.log('sell', _sellBookCount, _sellBookCount / _tradeCount, ask0, 'count', _sellPrices.length, d0.timestamp)
@@ -193,7 +196,7 @@ function isLowVolume() {
   last10CandlesPV = last10Candles.reduce((sum, c) => sum + c.volume, 0) / len
   return (lastCandle.volume < volumePerMinute * 1.5) && (last10CandlesPV < volumePerMinute * 1.5)
 }
-bitmex.listenCandle({ binSize:'1m', count: 200 }, historyList => {
+bitmex.listenCandle({ binSize: '1m', count: 200 }, historyList => {
   candle1m = historyList
 }, (json) => {
   const candle = json.data[0]
@@ -219,7 +222,7 @@ bitmex.on('end', () => {
   } = transform(LONG ? _buyPrices : _sellPrices)
 
   console.log(list.slice(-1))
-  console.log(`${AFTER_SECONDS} long len`, list.length)
+  console.log(`${LONG ? 'LONG' : 'SHORT'}_SEC:${AFTER_SECONDS} long len`, list.length)
   console.log('avgHigh', avgHigh, 'sumHigh', sumHigh, 'timeAvgHigh', timeAvgHigh)
   console.log('avgLow', avgLow, 'sumLow', sumLow, 'timeAvgLow', timeAvgLow)
 
@@ -227,6 +230,7 @@ bitmex.on('end', () => {
   const csvStr = JSONtoCSV(list, ['t', 'p', 'diffHigh', 'timeHigh', 'diffLow', 'timeLow'])
   fs.writeFileSync(path.join(__dirname, filePath), csvStr)
   console.log('data end...')
+  exec('msg * go')
 })
 
 function transform(positions) {
