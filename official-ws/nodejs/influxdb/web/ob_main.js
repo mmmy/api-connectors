@@ -14,7 +14,7 @@ function initData(from, to) {
 }
 
 // initData('2018-12-20T05:09:54.920Z', '2018-12-20T08:22:54.920Z')
-initData('2018-12-20T05:09:54.920Z', '2018-12-20T08:25:25.920Z')
+initData('2018-12-20T05:09:54.920Z', '2018-12-20T06:25:25.920Z')
   .then(() => {
     $("#slider-range").slider({
       max: bm._orderbookHistory.length - 1
@@ -33,6 +33,9 @@ function setDrawIndex(index) {
       const time = trades[trades.length - 1][0].timestamp
       console.log(time)
     }
+    const orderbookUpdates = bm.getOrderBookActions(index)
+    console.log(orderbookUpdates)
+    updateOrderbookTable(orderbookUpdates)
   }
 }
 
@@ -42,7 +45,7 @@ $(function () {
     range: true,
     min: 0,
     max: 1000,
-    values: [0, 1000],
+    values: [0, 10000],
     slide: function (event, ui) {
       var v0 = ui.values[0],
         v1 = ui.values[1]
@@ -62,4 +65,29 @@ $(function () {
       setDrawIndex(v0)
     }
   })
+
+  function stepRange(next) {
+    var $range = $("#slider-range")
+    var cur = $range.slider('values', 0)
+    var nextV = next ? cur + 1 : (cur - 1)
+    $range.slider('values', 0, nextV)
+    setDrawIndex(nextV)
+  }
+
+  $('#next').on('click', function() {
+    stepRange(true)
+  })
+  
+  $('#pre').on('click', function() {
+    stepRange(false)
+  })
+  
 })
+
+function updateOrderbookTable(updates) {
+  var $tableBody = $('#orderbook-actions tbody')
+  const trs = updates.map(u => {
+    return `<tr><td>${u.time}</td><td>${u.action}</td><td>${JSON.stringify(u.data)}</td></tr>`
+  }).join('')
+  $tableBody.empty().append(trs)
+}

@@ -1,4 +1,9 @@
 
+function xbtPriceFromID(id) {
+	const instrumentIdx = 88
+	const tickSize = 0.01
+	return ((1e8 * instrumentIdx) - id) * tickSize
+}
 
 function BitmexDataManager(options) {
   this._options = {
@@ -63,6 +68,21 @@ BitmexDataManager.prototype.getTrades = function(index, seconds = 5) {
     }
   }
   return trades
+}
+
+BitmexDataManager.prototype.getOrderBookActions = function(index, count=2) {
+  const updates = []
+  for (i = index; i >= 0; i--) {
+    if (updates.length >= count) {
+      break
+    }
+    const json = this._originData[i]
+    if (json.table === 'orderBookL2_25') {
+      json.data.forEach(d => d.price = xbtPriceFromID(d.id))
+      updates.push(json)
+    }
+  }
+  return updates
 }
 
 function BitmexDataDB() {

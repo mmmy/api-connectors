@@ -11,11 +11,13 @@ var aa = new Account({
   loss: -40,
   shortProfit: 50
 })
-
-// aa.orderLimit(7470, true, 2000).then((json) => {
-//   // console.log(json)
-//   // console.log(aa)
-// })
+const d1 = new Date()
+aa.orderLimit(3000, true, 2000).then((json) => {
+  console.log('时间差', new Date(json.timestamp) - d1)
+  console.log(json)
+  // console.log(aa)
+})
+console.log(d1.toISOString())
 
 // setTimeout(() => {
 //   console.log(aa)
@@ -28,6 +30,6 @@ var aa = new Account({
 //   console.log(json)
 // })
 
-aa.signatureSDK.closePositionMarket().then(json => {
-  console.log(json)
-})
+// aa.signatureSDK.closePositionMarket().then(json => {
+//   console.log(json)
+// })
