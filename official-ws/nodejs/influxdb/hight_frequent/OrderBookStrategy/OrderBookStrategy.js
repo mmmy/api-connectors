@@ -66,8 +66,12 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     // if (systemTime - new Date(this._lastTradeTime) < minTradeInterval * 1000) {
     //   return
     // }
-    const signal = this._canculateOrderBookSignal(json)
-    this.research(signal, json)
+    if (this._options.test) {
+      const signal = this._canculateOrderBookSignal(json)
+      this.research(signal, json)
+    } else {
+      
+    }
     // if (signal.long) {
     //   const orderObj = this.createOrder(true)
     //   this.order(orderObj)
