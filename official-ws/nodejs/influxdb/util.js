@@ -21,7 +21,7 @@ function statisticPositions(positions) {
 
     let levelsTime = []
     const levelsPrice = []
-    for (let i=1; i<5; i++) {
+    for (let i=1; i<7; i++) {
       levelsPrice.push(side > 0 ? (p + 0.5 * i) : (p - 0.5 * i))
     }
 
@@ -63,6 +63,8 @@ function statisticPositions(positions) {
       levelsTime2: levelsTime[1],
       levelsTime3: levelsTime[2],
       levelsTime4: levelsTime[3],
+      levelsTime5: levelsTime[4],
+      levelsTime6: levelsTime[5],
     }
   })
   const sumHigh = list.reduce((s, item) => s + item.diffHigh, 0)
