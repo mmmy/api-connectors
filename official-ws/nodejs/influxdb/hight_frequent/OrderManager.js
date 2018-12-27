@@ -1,10 +1,11 @@
 const SignatureSDK = require('../../strategy/signatureSDK')
 
 class OrderManager {
-  constructor(options) {
+  constructor(options, orderBook) {
     this._options = {
       ...options
     }
+    this._ob = orderBook
     this.signatureSDK = new SignatureSDK(this._options)
   }
 

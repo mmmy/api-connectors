@@ -56,7 +56,9 @@ class FlowDataStrategyBase {
     console.log({ ...this._options, apiKey: '', apiSecret: '' })
     this._drawBacks = []                                           // 回测回撤分析
     this._maxDrawBack = 0
-    
+
+    this._volume24h = 0
+    this._volumePerMinute = 0
   }
 
   initOrdersFromDB() {
@@ -136,7 +138,7 @@ class FlowDataStrategyBase {
   }
 
   onUpdateOrderBook() {
-    
+
   }
 
   updatePosition(json) {
@@ -179,11 +181,11 @@ class FlowDataStrategyBase {
         })
       }
     }
-    this.onTrade()
+    this.onTrade(json)
   }
 
-  onTrade() {
-    
+  onTrade(json) {
+
   }
 
   updateInstrument(json) {
@@ -192,6 +194,12 @@ class FlowDataStrategyBase {
     if (data0) {
       this._systemTime = new Date(data0.timestamp)
     }
+    // 记录交易额
+    if (data0.volume24h) {
+      this._volume24h = data0.volume24h
+      this._volumePerMinute = data0.volume24h / 1440
+    }
+    //indicativeSettlePrice
     if (data0.indicativeSettlePrice) {
       const delta = this._indicativeSettlePrice ? data0.indicativeSettlePrice - this._indicativeSettlePrice : 0
       this._indicativeSettlePrice = data0.indicativeSettlePrice
@@ -203,6 +211,7 @@ class FlowDataStrategyBase {
 
       this.onIndicativeSettlePriceChange(delta)
     }
+    // 暂时无用
     if (!this.isReduceOnly()) {
       this._isRunning = true
     }
@@ -255,7 +264,7 @@ class FlowDataStrategyBase {
       }
       return Math.abs(this._currentQty) + this._options.amount
     }
- 
+
   }
 
   createOrder(long) {
@@ -267,7 +276,7 @@ class FlowDataStrategyBase {
     // bookMaxSize == 0 那么返回level1的 price
     // price 可能为undefined
     const price = long ? this._ob.getTopBidPrice2(bookMaxSizeBuy) : this._ob.getTopAskPrice2(bookMaxSizeSell)
-    
+
     const order = {
       long,
       amount,
@@ -468,7 +477,7 @@ class FlowDataStrategyBase {
     }
     this._maxtQty = Math.max(this._maxtQty, Math.abs(this._currentQty))
     // console.log(this._maxtQty)
-    
+
   }
 
   getLastBacktestPositions() {
@@ -484,25 +493,18 @@ class FlowDataStrategyBase {
 
   updateTradeBin1m(json) {
     this._candles1m.updateLastHistory(json.data[0])
-    const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
-    this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
+    // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
+    // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
+
   }
 
   updateAccountOrder(json) {
     this._accountOrder.update(json)
     console.log(this._accountOrder)
   }
-  // 定时任务
-  initInterval() {
-    this._interval = setInterval(() => {
-      this.checkAccount()
-    }, 5000)
-  }
-  // 定时检查账户是否安全，比如有没有止损委托
-  checkAccount() {
-    if (this._options.checkAccount) {
-      // TODO:
-    }
+
+  hasPosition() {
+    return this._currentQty !== 0
   }
 }
 
