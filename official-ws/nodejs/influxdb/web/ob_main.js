@@ -33,7 +33,7 @@ function setDrawIndex(index) {
       const time = trades[trades.length - 1][0].timestamp
       console.log(time)
     }
-    const orderbookUpdates = bm.getOrderBookActions(index)
+    const orderbookUpdates = bm.getOrderBookActions(index, 4)
     console.log(orderbookUpdates)
     updateOrderbookTable(orderbookUpdates)
   }
