@@ -92,8 +92,8 @@ class OrderManager {
           console.log(res)
           console.log('start auto adjust order')
           this.startAutoAdjustOrder()
-        }).catch(() => {
-          console.log('grab order error time out')
+        }).catch(e => {
+          console.log('grab order error time out', e)
           this.state.openingSignal = null
         })
       }
@@ -103,7 +103,10 @@ class OrderManager {
   startGrabOrderLimit(long, price) {
     const maxTimes = 10
     const amount = this._options.amount
-    let times = 1
+    let times = 0
+    let lastOrderTime = new Date()
+    const miniInterval = 1000             // 1秒
+
     const tryFunc = (successCb, failureCb) => {
       if (times >= maxTimes) {
         failureCb()
@@ -114,16 +117,21 @@ class OrderManager {
           successCb(json, times)
         } else {
           times++
+          console.log('startGrabOrderLimit times --', times, 'ordStatus', json.ordStatus)
+          const now = new Date()
           setTimeout(() => {
             tryFunc(successCb, failureCb)
-          }, 0)
+          }, Math.max(miniInterval - now + lastOrderTime, 0))
+          lastOrderTime = now
         }
       }).catch(err => {
         console.error(err)
         times++
+        const now = new Date()
         setTimeout(() => {
           tryFunc(successCb, failureCb)
-        }, 0)
+        }, Math.max(miniInterval - now + lastOrderTime, 0))
+        lastOrderTime = now
       })
     }
     return new Promise((resove, reject) => tryFunc(resove, reject))
