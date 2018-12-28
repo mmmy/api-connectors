@@ -139,10 +139,15 @@ class OrderManager {
       if (new Date() >= stopTime) {
         // 超时了取消order
         if (order1) {
-          this.signatureSDK.deleteOrder(order1.orderID)
-          console.log('auto adjust order time out: cancel order')
+          this.signatureSDK.deleteOrder(order1.orderID).then(json => {
+            console.log('auto adjust order time out: cancel order success')
+            this.stopAutoAdjustOrder()
+          }).catch(e => {
+            console.log('auto adjust order time out: cancel order failed and retry after 5 seconds...')
+          })
+        } else {
+          this.stopAutoAdjustOrder()
         }
-        this.stopAutoAdjustOrder()
       } else {
         if (order1) {
           const endPrice = long ? (ask0 + 0.5) : (bid0 - 0.5)        // 0.5的差异
