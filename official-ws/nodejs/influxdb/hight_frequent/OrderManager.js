@@ -134,6 +134,7 @@ class OrderManager {
       const stopTime = +new Date(timestamp) + this._options.openLastingSeconds * 1000
       const accountOrders = this.getAccountLimitOrders(long)
       const order1 = accountOrders[0]
+      const currentQty = this.getCurrentPositionQty()
 
       if (new Date() >= stopTime) {
         // 超时了取消order
@@ -149,7 +150,7 @@ class OrderManager {
           if (long ? (price >= endPrice) : (price <= endPrice)) {
             return
           }
-          const obPrice = long ? this._ob.getTopBidPrice2(0) : this._ob.getTopAskPrice2(0)
+          const obPrice = long ? Math.min(endPrice, this._ob.getTopBidPrice2(0)) : Math.max(endPrice, this._ob.getTopAskPrice2(0))
           if (long ? (price < obPrice) : (price > obPrice)) {
             this.signatureSDK.updateOrder({
               orderID: order1.orderID,
@@ -159,8 +160,12 @@ class OrderManager {
             })
           }
         } else {
-          console.warn('warning: has no order ?')
-          stopAutoAdjustOrder()
+          if (currentQty === 0) {
+            console.warn('warning: has no order ?')
+          } else {
+            console.log('order filled success')
+          }
+          this.stopAutoAdjustOrder()
         }
       }
     }, 5 * 1000)
