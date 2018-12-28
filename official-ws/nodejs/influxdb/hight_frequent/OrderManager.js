@@ -120,18 +120,22 @@ class OrderManager {
           times++
           console.log('startGrabOrderLimit times --', times, 'ordStatus', json.ordStatus)
           const now = new Date()
+          const delay = miniInterval - (now - lastOrderTime)
+          console.log('delay+++++++++++', delay)
+          lastOrderTime = now
           setTimeout(() => {
             tryFunc(successCb, failureCb)
-          }, Math.max(miniInterval - now + lastOrderTime, 0))
-          lastOrderTime = now
+          }, Math.max(delay, 0))
         }
       }).catch(err => {
         console.error(err)
         times++
         const now = new Date()
+        const delay = miniInterval - (now - lastOrderTime)
+        lastOrderTime = now
         setTimeout(() => {
           tryFunc(successCb, failureCb)
-        }, Math.max(miniInterval - now + lastOrderTime, 0))
+        }, Math.max(delay, 0))
         lastOrderTime = now
       })
     }
