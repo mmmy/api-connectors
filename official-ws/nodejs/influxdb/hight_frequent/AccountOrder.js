@@ -21,7 +21,7 @@ class AccountOrder {
 
   update(json) {
     this._data = DeltaParse.onAction(json.action, json.table, 'XBTUSD', this._CLIENT, json)
-    // .filter(item => item.ordStatus !== 'Canceled')
+    .filter(item => item.ordStatus !== 'Canceled')
   }
 
   hasOrder() {
