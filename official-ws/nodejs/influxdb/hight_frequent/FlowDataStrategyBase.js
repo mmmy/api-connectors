@@ -169,7 +169,7 @@ class FlowDataStrategyBase {
   updateMargin(json) {
     const { action, data } = json
     const data0 = data[0]
-    if (data[0].walletBalance) {
+    if (data[0].walletBalance && this._options.database) {
       StrageyDB.writeMargin(this._options, data[0])
     }
   }
@@ -224,7 +224,9 @@ class FlowDataStrategyBase {
 
   updateExecution(json) {
     const { data } = json
-    StrageyDB.writeExecution(this._options, data)
+    if (this._options.database) {
+      StrageyDB.writeExecution(this._options, data)
+    }
   }
 
   onIndicativeSettlePriceChange(delta) {
@@ -368,7 +370,9 @@ class FlowDataStrategyBase {
   }
 
   writeOrder(order, error, type) {
-    StrageyDB.writeOrder(this._options, order, error, type)
+    if (this._options.database) {
+      StrageyDB.writeOrder(this._options, order, error, type)
+    }
   }
 
   checkAlive() {

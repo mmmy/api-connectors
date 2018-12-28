@@ -26,7 +26,7 @@ class AccountPosition {
   }
 
   getCurrentQty() {
-    return this.getCurrentQty().currentQty || 0
+    return this.getPosition().currentQty || 0
   }
   // 如果为null, 为空仓
   getCostPrice() {
