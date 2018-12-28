@@ -239,7 +239,7 @@ class OrderManager {
               console.log('currentQty is 0 and delete stop order failed', e)
             })
             // 数量或者价格不对, 重新设置
-          } else if (orderQty !== Math.abs(currentQty) || stopPx !== targetStopPx) {
+          } else if (orderQty < Math.abs(currentQty) || stopPx !== targetStopPx) {
             this.signatureSDK.updateOrder({
               orderID: stopOrder1.orderID,
               stopPx: targetStopPx,
