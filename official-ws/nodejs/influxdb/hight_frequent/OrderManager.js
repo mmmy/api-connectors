@@ -107,6 +107,7 @@ class OrderManager {
     const tryFunc = (successCb, failureCb) => {
       if (times >= maxTimes) {
         failureCb()
+        return
       }
       this.signatureSDK.orderLimit(amount, long ? 'Buy' : 'Sell', price).then(json => {
         if (json.ordStatus === 'New') {

@@ -29,6 +29,13 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     this._sellBookCount = 0
     this._buyBookCount = 0
     this.AFTER_SECONDS = 180
+    this._orderManager._openPosition({
+      long: true,
+      short: false,
+      ask0: 4000,
+      bid0: 3000,
+      timestamp: new Date()
+    })
   }
 
   _canculateOrderBookSignal(json) {
