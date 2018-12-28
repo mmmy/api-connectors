@@ -92,8 +92,8 @@ class OrderManager {
           console.log(res)
           console.log('start auto adjust order')
           this.startAutoAdjustOrder()
-        }).catch(e => {
-          console.log('grab order error time out', e)
+        }).catch(() => {
+          console.log('grab order error time out')
           this.state.openingSignal = null
         })
       }
@@ -105,7 +105,7 @@ class OrderManager {
     const amount = this._options.amount
     let times = 0
     let lastOrderTime = new Date()
-    const miniInterval = 1000             // 1秒
+    const miniInterval = 5000             // 1秒
 
     const tryFunc = (successCb, failureCb) => {
       if (times >= maxTimes) {
