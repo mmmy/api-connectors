@@ -112,6 +112,7 @@ class OrderManager {
         failureCb()
         return
       }
+      console.log('time interval', (new Date() - lastOrderTime) / 1000)
       this.signatureSDK.orderLimit(amount, long ? 'Buy' : 'Sell', price).then(json => {
         if (json.ordStatus === 'New') {
           successCb(json, times)
