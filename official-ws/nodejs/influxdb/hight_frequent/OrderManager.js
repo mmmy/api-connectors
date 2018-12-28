@@ -255,9 +255,11 @@ class OrderManager {
             this.state.orderingStop = false
           }
         } else {            // 新增一个stopOrder
+          const qty = Math.abs(currentQty)
+          console.log(qty)
           this.signatureSDK.orderStop({
             stopPx: targetStopPx,
-            orderQty: Math.abs(currentQty),
+            orderQty: qty,
             side: longPosition ? 'Sell' : 'Buy',
           }).then(json => {
             console.log('add a stop order success at', targetStopPx)

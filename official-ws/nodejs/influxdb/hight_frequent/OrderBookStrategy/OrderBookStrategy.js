@@ -91,7 +91,7 @@ class OrderBookStrategy extends FlowDataStrategyBase {
   initInterval() {
     this._interval = setInterval(() => {
       this.autoOrderStop()
-    }, 1000)
+    }, 3000)
   }
   // 定时检查账户是否安全，没有止损委托
   autoOrderStop() {
