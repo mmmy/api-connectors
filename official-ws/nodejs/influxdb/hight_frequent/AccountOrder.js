@@ -6,10 +6,16 @@ class AccountOrder {
       ...options
     }
     this._data = []
-  
+    // 由于首次可能不是action=partial, 导致永远不能更新的bug
     this._CLIENT = {
-      _data: {},
-      _keys: {}
+      _data: {
+        order: {
+          'XBTUSD': []
+        }
+      },
+      _keys: {
+        order: ["orderID"]
+      }
     }
   }
 
