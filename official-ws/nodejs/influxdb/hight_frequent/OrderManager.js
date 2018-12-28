@@ -256,7 +256,7 @@ class OrderManager {
           }
         } else {            // 新增一个stopOrder
           this.signatureSDK.orderStop({
-            stopPx,
+            stopPx: targetStopPx,
             orderQty: Math.abs(currentQty),
             side: longPosition ? 'Sell' : 'Buy',
           }).then(json => {
