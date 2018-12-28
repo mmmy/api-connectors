@@ -260,10 +260,10 @@ class OrderManager {
             orderQty: Math.abs(currentQty),
             side: longPosition ? 'Sell' : 'Buy',
           }).then(json => {
-            console.log('add a stop order success at', stopPx, 'orderQty', orderQty)
+            console.log('add a stop order success at', targetStopPx)
             this.state.orderingStop = false
           }).catch(e => {
-            console.log('add a stop order error at', stopPx, 'orderQty', orderQty, e)
+            console.log('add a stop order error at', targetStopPx, e)
             this.state.orderingStop = false
           })
         }
