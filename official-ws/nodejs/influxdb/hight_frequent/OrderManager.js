@@ -105,14 +105,13 @@ class OrderManager {
     const amount = this._options.amount
     let times = 0
     let lastOrderTime = new Date()
-    const miniInterval = 5000             // 1秒
+    const miniInterval = 1000             // 1秒
 
     const tryFunc = (successCb, failureCb) => {
       if (times >= maxTimes) {
         failureCb()
         return
       }
-      console.log('time interval', (new Date() - lastOrderTime))
       this.signatureSDK.orderLimit(amount, long ? 'Buy' : 'Sell', price).then(json => {
         if (json.ordStatus === 'New') {
           successCb(json, times)
