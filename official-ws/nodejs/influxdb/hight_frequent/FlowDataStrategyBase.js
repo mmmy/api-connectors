@@ -36,7 +36,7 @@ class FlowDataStrategyBase {
     this._accountPosition = new AccountPosition()
     this._systemTime = 0
     this._orderHistory = []
-    this._orderManager = !this._options.test && new OrderManager(this._options, this._ob)
+    this._orderManager = !this._options.test && new OrderManager(this._options, this._ob, this._accountPosition, this._accountOrder)
     this._orderManagerTest = new OrderManagerTest(this._options, this._ob)      // 回测
 
     this._lastOrderBookUpdate = new Date()

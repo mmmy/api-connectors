@@ -17,6 +17,18 @@ class AccountOrder {
     this._data = DeltaParse.onAction(json.action, json.table, 'XBTUSD', this._CLIENT, json)
     .filter(item => item.ordStatus !== 'Canceled')
   }
+
+  hasOrder() {
+    return this._data.length > 0
+  }
+
+  getLimitOrders(long) {
+    return this._data.filter(o => o.side === (long ? 'Buy' : 'Sell'))
+  }
+
+  getStopOrders() {
+    return this._data.filter(o => o.ordType === 'Stop')
+  }
 }
 
 module.exports = AccountOrder

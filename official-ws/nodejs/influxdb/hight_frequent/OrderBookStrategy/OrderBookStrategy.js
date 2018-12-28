@@ -37,8 +37,8 @@ class OrderBookStrategy extends FlowDataStrategyBase {
 
     let bid0 = this._ob.getTopBidPrice2(0)
     let ask0 = this._ob.getTopAskPrice2(0)
-    let bid1 = this._ob.getTopBidPrice2(volumePerMinute / 60 * 0.618)   // volumePerMinute / 60 / 2
-    let ask1 = this._ob.getTopAskPrice2(volumePerMinute / 60 * 0.618)
+    let bid1 = this._ob.getTopBidPrice2(volumePerMinute / 60 * 0.382)   // volumePerMinute / 60 / 2
+    let ask1 = this._ob.getTopAskPrice2(volumePerMinute / 60 * 0.382)
     // let bid2 = this._ob.getTopBidPrice2(1E5)
     // let ask2 = this._ob.getTopAskPrice2(1E5)
     let bid3 = this._ob.getTopBidPrice2(volumePerMinute / 2 * 0.5)       // 0.5 - 0.618
@@ -47,16 +47,17 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     let long = false
     let short = false
 
-    if ((ask0 - bid0 === 0.5) && (bid0 - bid3) === 0 && (ask1 - ask0) > 1) {
+    if ((ask0 - bid0 === 0.5) && (bid0 - bid3) === 0 && (ask1 - ask0) > 0.5) {
       long = true
-    } else if ((ask0 - bid0 === 0.5) && (ask0 - ask3) === 0 && (bid0 - bid1) > 1) {
+    } else if ((ask0 - bid0 === 0.5) && (ask0 - ask3) === 0 && (bid0 - bid1) > 0.5) {
       short = true
     }
     return {
       long,
       short,
       bid0,
-      ask0
+      ask0,
+      timestamp: d0.timestamp,
     }
   }
 
@@ -66,11 +67,12 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     // if (systemTime - new Date(this._lastTradeTime) < minTradeInterval * 1000) {
     //   return
     // }
+    const signal = this._canculateOrderBookSignal(json)
+
     if (this._options.test) {
-      const signal = this._canculateOrderBookSignal(json)
       this.research(signal, json)
     } else {
-      
+      this._orderManager.listenOrderBookSignal(signal)
     }
     // if (signal.long) {
     //   const orderObj = this.createOrder(true)
@@ -88,13 +90,13 @@ class OrderBookStrategy extends FlowDataStrategyBase {
   // 定时任务
   initInterval() {
     this._interval = setInterval(() => {
-      this.checkAccount()
-    }, 5000)
+      this.autoOrderStop()
+    }, 1000)
   }
-  // 定时检查账户是否安全，比如有没有止损委托
-  checkAccount() {
-    if (this._options.checkAccount) {
-      // TODO:
+  // 定时检查账户是否安全，没有止损委托
+  autoOrderStop() {
+    if (this._options.autoOrderStop) {
+      this._orderManager.orderStopIfNeed(8)
     }
   }
 
@@ -109,8 +111,8 @@ class OrderBookStrategy extends FlowDataStrategyBase {
   }
 
   research(signal, json) {
-    const researchLong = false
-    const researchShort = true
+    const researchLong = true
+    const researchShort = false
     const { bid0, ask0 } = signal
     this._tradeCount++
     const { data } = json

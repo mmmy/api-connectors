@@ -18,7 +18,7 @@ class AccountPosition {
   }
 
   hasPosition() {
-    return this._data.length > 0
+    return !!(this.currentQty() && this.getCostPrice())
   }
 
   getPosition() {
