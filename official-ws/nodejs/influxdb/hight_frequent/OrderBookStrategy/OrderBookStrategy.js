@@ -48,9 +48,9 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     let short = false
 
     if ((ask0 - bid0 === 0.5) && (bid0 - bid3) === 0 && (ask1 - ask0) > 0.5) {
-      // long = true
+      long = true
     } else if ((ask0 - bid0 === 0.5) && (ask0 - ask3) === 0 && (bid0 - bid1) > 0.5) {
-      // short = true
+      short = true
     }
     return {
       long,

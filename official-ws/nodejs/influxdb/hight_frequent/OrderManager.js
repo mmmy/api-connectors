@@ -255,7 +255,7 @@ class OrderManager {
             this.state.orderingStop = false
           }
         } else {            // 新增一个stopOrder
-          const qty = Math.abs(currentQty)
+          const qty = Math.max(Math.abs(currentQty), this._options.amount * 2) // 这个大一点没有关系
           console.log(qty)
           this.signatureSDK.orderStop(qty, targetStopPx, longPosition ? 'Sell' : 'Buy').then(json => {
             console.log('add a stop order success at', targetStopPx)
