@@ -1,6 +1,6 @@
 const BitmexManager = require('../../../strategy/researchStrategy/BitmexManager')
-var { apiKey, apiSecret } = require('../../../strategy/test-secret.json')
-// var { apiKey, apiSecret } = require('../../strategy/daishu-secret.json')
+// var { apiKey, apiSecret } = require('../../../strategy/test-secret.json')
+var { apiKey, apiSecret } = require('../../strategy/daishu-secret.json')
 const OrderBookStrategyManager = require('./Manager')
 const { SaveRawJson } = require('../../db')
 
@@ -8,7 +8,7 @@ const { SaveRawJson } = require('../../db')
 // const client_others = new SaveRawJson({cacheLen: 100})
 
 const bitmex = new BitmexManager({
-  testnet: true,
+  testnet: false,
   apiKeyID: apiKey,
   apiKeySecret: apiSecret
 })
@@ -18,10 +18,10 @@ const strategyManager = new OrderBookStrategyManager()
 strategyManager.addNewStrategy({
   id: 'ob-strategy',
   test: false,
-  testnet: true,
+  testnet: false,
   apiKey,
   apiSecret,
-  amount: 1000,
+  amount: 100,
   database: false,
   initCheckSystem: true,
   notify: true,
