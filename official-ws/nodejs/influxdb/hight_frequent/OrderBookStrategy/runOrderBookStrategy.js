@@ -21,7 +21,7 @@ strategyManager.addNewStrategy({
   testnet: false,
   apiKey,
   apiSecret,
-  amount: 100,
+  amount: 20,
   database: false,
   initCheckSystem: true,
   notify: true,
