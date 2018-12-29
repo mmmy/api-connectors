@@ -81,7 +81,6 @@ class OrderManager {
           this._closePosition()
         }
       } else {
-        console.log('SIGNAL: open position')
         this._openPosition(signal)
       }
     }
@@ -92,6 +91,7 @@ class OrderManager {
     const { long, short, bid0, ask0, timestamp } = signal
     if (long || short) {
       if (!this.state.openingSignal) {
+        console.log('SIGNAL: open position')
         this._postionStartTime = new Date(timestamp)
         this.state.openingSignal = signal
         const price = long ? ask0 : bid0                 // 注意这里
