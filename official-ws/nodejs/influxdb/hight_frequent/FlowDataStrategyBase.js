@@ -509,7 +509,7 @@ class FlowDataStrategyBase {
 
   updateAccountOrder(json) {
     this._accountOrder.update(json)
-    console.log('-------------------------------- order update')
+    console.log('account order update ordStatus', json.data[0] && json.data[0].ordStatus, 'type', json.data[0] && json.data[0].type)
     // console.log(json)
     // console.log(this._accountOrder)
   }
