@@ -338,6 +338,7 @@ class OrderManager {
     }
     this._closePositionInterval = setInterval(() => {
       if (!this.hasPosition()) {
+        console.log('CLOSE: position has closed')
         this._stopClosePosition()
         return
       }
@@ -369,7 +370,8 @@ class OrderManager {
       const targetSide = longPosition ? 'Sell' : 'Buy'
       const targetAmount = Math.max(Math.abs(currentQty), this._options.amount)
       if (!stopOrder) {
-        console.log('CLOSE:try request a reduce only order')
+        const costPrice = this.getCurrentCostPrice()
+        console.log(`CLOSE:try request a reduce only order, longPosition:${longPosition}, ${costPrice} ===> ${targetPrice}, profit:${longPosition ? (targetPrice - costPrice) : (costPrice - targetPrice) }`)
         this.signatureSDK.orderReduceOnlyLimit(
           targetAmount,
           targetSide,
