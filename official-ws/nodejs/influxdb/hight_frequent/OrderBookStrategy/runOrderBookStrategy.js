@@ -1,6 +1,6 @@
 const BitmexManager = require('../../../strategy/researchStrategy/BitmexManager')
 // var { apiKey, apiSecret } = require('../../../strategy/test-secret.json')
-var { apiKey, apiSecret } = require('../../strategy/daishu-secret.json')
+var { apiKey, apiSecret } = require('../../../strategy/daishu-secret.json')
 const OrderBookStrategyManager = require('./Manager')
 const { SaveRawJson } = require('../../db')
 
