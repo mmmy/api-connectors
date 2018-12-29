@@ -93,9 +93,7 @@ class OrderManager {
     if (long || short) {
       if (!this.state.openingSignal) {
         console.log('SIGNAL: open position\n')
-        if (this._options.notify) {
-          notifyPhone(`start open ${long}`)
-        }
+        this.notify(`start open ${long}`)
         this._postionStartTime = new Date(timestamp)
         this.state.openingSignal = signal
         const price = long ? ask0 : bid0                 // 注意这里
@@ -377,7 +375,8 @@ class OrderManager {
       const targetAmount = Math.max(Math.abs(currentQty), this._options.amount)
       if (!stopOrder) {
         const costPrice = this.getCurrentCostPrice()
-        console.log(`CLOSE:try request a reduce only order, longPosition:${longPosition}, ${costPrice} ===> ${targetPrice}, profit:${longPosition ? (targetPrice - costPrice) : (costPrice - targetPrice) }`)
+        console.log(`CLOSE:try request a reduce only order, longPosition:${longPosition}, ${costPrice} ===> ${targetPrice}, profit:${longPosition ? (targetPrice - costPrice) : (costPrice - targetPrice)}`)
+        this.notify(`${longPosition} ${costPrice} ==> ${targetPrice} profit:${longPosition ? (targetPrice - costPrice) : (costPrice - targetPrice)}`)
         this.signatureSDK.orderReduceOnlyLimit(
           targetAmount,
           targetSide,
@@ -416,6 +415,12 @@ class OrderManager {
           this.state.updatingClosePosition = false
         }
       }
+    }
+  }
+
+  notify(msg) {
+    if (this._options.notify) {
+      notifyPhone(msg)
     }
   }
 }
