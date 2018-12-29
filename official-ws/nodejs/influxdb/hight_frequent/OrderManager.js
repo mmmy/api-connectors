@@ -4,7 +4,7 @@ class OrderManager {
   constructor(options, orderBook, accountPosition, accountOrder) {
     this._options = {
       secondsForClose1: 90,                        // 第一个持仓最大时间,如果仓位有利,那么平仓
-      secondsForClose2: 130,                       // 第二个, 平仓最后开始时间
+      secondsForClose2: 150,                       // 第二个, 平仓最后开始时间
       openLastingSeconds: 30,
       ...options
     }
