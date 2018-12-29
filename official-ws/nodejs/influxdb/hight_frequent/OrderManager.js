@@ -3,7 +3,8 @@ const SignatureSDK = require('../../strategy/signatureSDK')
 class OrderManager {
   constructor(options, orderBook, accountPosition, accountOrder) {
     this._options = {
-      secondsForClose: 130,
+      secondsForClose1: 90,                        // 第一个持仓最大时间,如果仓位有利,那么平仓
+      secondsForClose2: 130,                       // 第二个, 平仓最后开始时间
       openLastingSeconds: 30,
       ...options
     }
@@ -17,9 +18,9 @@ class OrderManager {
       openingSignal: null,
       closing: false,
       orderingStop: false,
+      updatingClosePosition: false,                   // 正在更新close position
     }
-    this._lastBuyOpenTime = null
-    this._lastSellOpenTime = null
+    this._postionStartTime = 0
   }
 
   addAutoCancelOrder(amount, long, price, cancelSec) {
@@ -73,17 +74,23 @@ class OrderManager {
     const { long, short } = signal
     if (long || short) {
       if (this.hasPosition()) {
-
+        const currentQty = this.getCurrentPositionQty()
+        const longPosition = currentQty > 0
+        if ((long && !longPosition) || (short && longPosition)) {
+          this._closePosition()
+        }
       } else {
         this._openPosition(signal)
       }
     }
+    this.tryStartCloseByTime()
   }
 
   _openPosition(signal) {
-    const { long, short, bid0, ask0 } = signal
+    const { long, short, bid0, ask0, timestamp } = signal
     if (long || short) {
       if (!this.state.openingSignal) {
+        this._postionStartTime = new Date(timestamp)
         this.state.openingSignal = signal
         const price = long ? ask0 : bid0                 // 注意这里
         console.log('startGrabOrderLimit', long, price)
@@ -223,6 +230,10 @@ class OrderManager {
     return this._accountOrder.hasOrder()
   }
 
+  getReduceOnlyCloseOrders() {
+    return this._accountOrder.getReduceOnlyOrders()
+  }
+
   orderStopIfNeed(deltaPrice = 8) {
     if (!this.state.orderingStop) {
       this.state.orderingStop = true
@@ -287,6 +298,112 @@ class OrderManager {
             console.log('add a stop order error at', targetStopPx, e)
             this.state.orderingStop = false
           })
+        }
+      }
+    }
+  }
+  // 
+  tryStartCloseByTime() {
+    const { secondsForClose1, secondsForClose2 } = this._options
+    if (this.hasPosition() && this._postionStartTime > 0 && !this.isClosing()) {
+      const now = new Date()
+      const timePassed = now - this._postionStartTime
+      if (secondsForClose1 && (timePassed > secondsForClose1 * 1000)) {
+        const bid0 = this._ob.getTopBidPrice2(0)
+        const ask0 = this._ob.getTopAskPrice2(0)
+        const longPosition = this.getCurrentPositionQty() > 0
+        if (ask0 - bid0 === 0.5) {
+          const costPrice = this.getCurrentCostPrice()
+          const winP = 3  //$3
+          const isWin = longPosition ? (bid0 - costPrice >= winP) : (costPrice - ask0 >= winP)
+          if (isWin) {
+            console.log(`time has pass ${secondsForClose1}s position:${longPosition} costPrice:${costPrice} and price now is ${longPosition ? bid0 : ask0} is win, so close position`)
+            this._closePosition()
+          }
+        }
+      }
+      // 无条件开始平仓
+      if (secondsForClose2 && (timePassed > secondsForClose2 * 1000)) {
+        console.log(`时间已过${secondsForClose2}无条件开始平仓`)
+        this._closePosition()
+      }
+    }
+  }
+
+  _closePosition() {
+    if (this._closePositionInterval) {
+      return
+    }
+    this._closePositionInterval = setInterval(() => {
+      if (!this.hasPosition()) {
+        this._stopClosePosition()
+        return
+      }
+      this.updateClosePosition()
+    }, 3000)
+  }
+
+  _stopClosePosition() {
+    clearInterval(this._closePositionInterval)
+    this._closePositionInterval = null
+  }
+
+  isClosing() {
+    return !!this._closePositionInterval
+  }
+
+  updateClosePosition() {
+    const stopOrder = this.getReduceOnlyCloseOrders()[0]
+    const currentQty = this.getCurrentPositionQty()
+
+    if (this.state.updatingClosePosition) {
+      return
+    }
+    // 注意里面的每一个逻辑里面都要updatingClosePosition = false, 否则可能导致整个逻辑只能执行一次
+    if (currentQty !== 0) {
+      this.state.updatingClosePosition = true               // 防止重复请求
+      const longPosition = currentQty > 0
+      const targetPrice = longPosition ? (this._ob.getTopBidPrice2(0) + 0.5) : (this._ob.getTopAskPrice2(0) - 0.5)
+      const targetSide = longPosition ? 'Sell' : 'Buy'
+      const targetAmount = Math.max(Math.abs(currentQty), this._openPosition.amount)
+      if (!stopOrder) {
+        console.log('try request a reduce only order')
+        this.signatureSDK.orderReduceOnlyLimit(
+          targetAmount,
+          targetSide,
+          targetPrice
+        ).then(json => {
+          console.log('create a reduce only close order success')
+          this.state.updatingClosePosition = false
+        }).catch(e => {
+          console.log('create a reduce only close order failed', e)
+          this.state.updatingClosePosition = false
+        })
+      } else {
+        const { price, side, orderQty, orderID } = stopOrder
+        if (side !== targetSide) {
+          console.log('stop order is wrong side should delete', side)
+          this.signatureSDK.deleteOrder(orderID).then(json => {
+            this.state.updatingClosePosition = false
+            console.log('delete success')
+          }).catch(e => {
+            this.state.updatingClosePosition = false
+            console.log('delete failed', e)
+          })
+        } else if (orderQty < targetAmount || price !== targetPrice) {
+          this.signatureSDK.updateOrder({
+            orderID,
+            price: targetPrice,
+            orderQty: targetAmount,
+          }).then(json => {
+            console.log('OK update stop order to', targetPrice, targetAmount)
+            this.state.updatingClosePosition = false
+          }).catch(e => {
+            this.state.updatingClosePosition = false
+            console.log('ERROR update stop order to', targetPrice, targetAmount, e)
+          })
+        } else {
+          this.state.updatingClosePosition = false
         }
       }
     }

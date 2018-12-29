@@ -35,6 +35,10 @@ class AccountOrder {
   getStopOrders() {
     return this._data.filter(o => o.ordType === 'Stop')
   }
+
+  getReduceOnlyOrders() {
+    return this._data.filter(o => o.execInst && o.execInst.indexOf('ReduceOnly') > -1)
+  }
 }
 
 module.exports = AccountOrder
