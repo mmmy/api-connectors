@@ -103,7 +103,7 @@ class OrderBookStrategy extends FlowDataStrategyBase {
   // 定时检查账户是否安全，没有止损委托
   autoOrderStop() {
     if (this._options.autoOrderStop) {
-      this._orderManager.orderStopIfNeed(8)
+      this._orderManager.orderStopIfNeed(9)
     }
   }
 

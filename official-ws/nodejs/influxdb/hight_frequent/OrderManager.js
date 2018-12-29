@@ -163,7 +163,7 @@ class OrderManager {
         }
       } else {
         if (order1) {
-          const endPrice = long ? (ask0 + 0.5) : (bid0 - 0.5)        // 0.5的差异
+          const endPrice = long ? (ask0 + 1) : (bid0 - 1)        // 0.5的差异
           const { price } = order1
           if (long ? (price >= endPrice) : (price <= endPrice)) {
             return
