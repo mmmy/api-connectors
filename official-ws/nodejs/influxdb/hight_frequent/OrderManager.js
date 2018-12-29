@@ -1,4 +1,5 @@
 const SignatureSDK = require('../../strategy/signatureSDK')
+const { notifyPhone } = require('../../strategy/notifyPhone')
 
 class OrderManager {
   constructor(options, orderBook, accountPosition, accountOrder) {
@@ -92,6 +93,9 @@ class OrderManager {
     if (long || short) {
       if (!this.state.openingSignal) {
         console.log('SIGNAL: open position\n')
+        if (this._options.notify) {
+          notifyPhone(`start open ${long}`)
+        }
         this._postionStartTime = new Date(timestamp)
         this.state.openingSignal = signal
         const price = long ? ask0 : bid0                 // 注意这里
