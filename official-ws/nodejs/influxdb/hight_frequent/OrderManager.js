@@ -182,14 +182,14 @@ class OrderManager {
               orderID: order1.orderID,
               price: obPrice
             }).then(json => {
-              console.log('updateOrder success', price, '-->', obPrice)
+              console.log('OPEN: updateOrder success', price, '-->', obPrice)
             })
           }
         } else {
           if (currentQty === 0) {
             console.warn('warning: has no order ?')
           } else {
-            console.log('order filled success')
+            console.log('OPEN: order filled success')
           }
           this.stopAutoAdjustOrder()
         }
@@ -293,10 +293,10 @@ class OrderManager {
           const qty = Math.max(Math.abs(currentQty), this._options.amount * 2) // 这个大一点没有关系
           console.log(qty)
           this.signatureSDK.orderStop(qty, targetStopPx, longPosition ? 'Sell' : 'Buy').then(json => {
-            console.log('add a stop order success at', targetStopPx)
+            console.log('add a stop order success at', targetStopPx, qty)
             this.state.orderingStop = false
           }).catch(e => {
-            console.log('add a stop order error at', targetStopPx, e)
+            console.log('add a stop order error at', targetStopPx, qty, e)
             this.state.orderingStop = false
           })
         }
@@ -366,7 +366,7 @@ class OrderManager {
       const longPosition = currentQty > 0
       const targetPrice = longPosition ? (this._ob.getTopBidPrice2(0) + 0.5) : (this._ob.getTopAskPrice2(0) - 0.5)
       const targetSide = longPosition ? 'Sell' : 'Buy'
-      const targetAmount = Math.max(Math.abs(currentQty), this._openPosition.amount)
+      const targetAmount = Math.max(Math.abs(currentQty), this._options.amount)
       if (!stopOrder) {
         console.log('try request a reduce only order')
         this.signatureSDK.orderReduceOnlyLimit(
