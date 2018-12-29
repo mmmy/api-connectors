@@ -163,6 +163,7 @@ class OrderManager {
         if (order1) {
           this.signatureSDK.deleteOrder(order1.orderID).then(json => {
             console.log('auto adjust order time out: cancel order success')
+            console.log('currentQty', currentQty)
             this.stopAutoAdjustOrder()
           }).catch(e => {
             console.log('auto adjust order time out: cancel order failed and retry after 5 seconds...')
@@ -191,6 +192,7 @@ class OrderManager {
             console.warn('warning: has no order ?')
           } else {
             console.log('OPEN: order filled success')
+            console.log('currentQty', currentQty)
           }
           this.stopAutoAdjustOrder()
         }
