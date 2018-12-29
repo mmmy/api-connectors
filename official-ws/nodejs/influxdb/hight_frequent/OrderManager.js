@@ -81,6 +81,7 @@ class OrderManager {
           this._closePosition()
         }
       } else {
+        console.log('SIGNAL: open position')
         this._openPosition(signal)
       }
     }
@@ -94,15 +95,14 @@ class OrderManager {
         this._postionStartTime = new Date(timestamp)
         this.state.openingSignal = signal
         const price = long ? ask0 : bid0                 // 注意这里
-        console.log('startGrabOrderLimit', long, price)
+        console.log('OPEN startGrabOrderLimit', long, price)
         const d0 = new Date()
         this.startGrabOrderLimit(long, price).then((res, times) => {
-          console.log('grab order success, times:', times, 'and spent', (new Date() - d0) / 1000)
-          console.log(res)
-          console.log('start auto adjust order')
+          console.log('OPEN grab order success, times:', times, 'and spent', (new Date() - d0) / 1000)
+          // console.log(res)
           this.startAutoAdjustOrder()
         }).catch(() => {
-          console.log('grab order error time out spent', (new Date() - d0) / 1000)
+          console.log('OPEN grab order error time out spent', (new Date() - d0) / 1000)
           this.state.openingSignal = null
         })
       }
@@ -151,6 +151,7 @@ class OrderManager {
   }
 
   startAutoAdjustOrder() {
+    console.log('OPEN start auto adjust order')
     this._adjustOrderInterval = setInterval(() => {
       const { timestamp, long, bid0, ask0 } = this.state.openingSignal
       const stopTime = +new Date(timestamp) + this._options.openLastingSeconds * 1000
@@ -162,11 +163,11 @@ class OrderManager {
         // 超时了取消order
         if (order1) {
           this.signatureSDK.deleteOrder(order1.orderID).then(json => {
-            console.log('auto adjust order time out: cancel order success')
-            console.log('currentQty', currentQty)
+            console.log('OPEN auto adjust order time out: cancel order success')
+            console.log('OPEN currentQty', currentQty)
             this.stopAutoAdjustOrder()
           }).catch(e => {
-            console.log('auto adjust order time out: cancel order failed and retry after 5 seconds...')
+            console.log('OPEN auto adjust order time out: cancel order failed and retry after 5 seconds...')
           })
         } else {
           this.stopAutoAdjustOrder()
@@ -192,7 +193,7 @@ class OrderManager {
             console.warn('warning: has no order ?')
           } else {
             console.log('OPEN: order filled success')
-            console.log('currentQty', currentQty)
+            console.log('OPEN: currentQty', currentQty)
           }
           this.stopAutoAdjustOrder()
         }
