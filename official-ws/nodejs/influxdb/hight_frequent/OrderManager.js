@@ -368,28 +368,28 @@ class OrderManager {
       const targetSide = longPosition ? 'Sell' : 'Buy'
       const targetAmount = Math.max(Math.abs(currentQty), this._options.amount)
       if (!stopOrder) {
-        console.log('try request a reduce only order')
+        console.log('CLOSE:try request a reduce only order')
         this.signatureSDK.orderReduceOnlyLimit(
           targetAmount,
           targetSide,
           targetPrice
         ).then(json => {
-          console.log('create a reduce only close order success')
+          console.log('CLOSE: create a reduce only close order success')
           this.state.updatingClosePosition = false
         }).catch(e => {
-          console.log('create a reduce only close order failed', e)
+          console.log('CLOSE: create a reduce only close order failed', e)
           this.state.updatingClosePosition = false
         })
       } else {
         const { price, side, orderQty, orderID } = stopOrder
         if (side !== targetSide) {
-          console.log('stop order is wrong side should delete', side)
+          console.log('CLOSE: stop order is wrong side should delete', side)
           this.signatureSDK.deleteOrder(orderID).then(json => {
             this.state.updatingClosePosition = false
-            console.log('delete success')
+            console.log('CLOSE: delete success')
           }).catch(e => {
             this.state.updatingClosePosition = false
-            console.log('delete failed', e)
+            console.log('CLOSE: delete failed', e)
           })
         } else if (orderQty < targetAmount || price !== targetPrice) {
           this.signatureSDK.updateOrder({
@@ -397,11 +397,11 @@ class OrderManager {
             price: targetPrice,
             orderQty: targetAmount,
           }).then(json => {
-            console.log('OK update stop order to', targetPrice, targetAmount)
+            console.log('CLOSE: (OK) update stop order to', targetPrice, targetAmount)
             this.state.updatingClosePosition = false
           }).catch(e => {
             this.state.updatingClosePosition = false
-            console.log('ERROR update stop order to', targetPrice, targetAmount, e)
+            console.log('CLOSE: (ERROR) update stop order to', targetPrice, targetAmount, e)
           })
         } else {
           this.state.updatingClosePosition = false
