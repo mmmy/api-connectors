@@ -242,7 +242,6 @@ class OrderManager {
   }
 
   orderStopIfNeed(deltaPrice = 8) {
-    console.log('orderStopIfNeed')
     if (!this.state.orderingStop) {
       this.state.orderingStop = true
       const stopOrders = this._accountOrder.getStopOrders()
@@ -252,7 +251,6 @@ class OrderManager {
 
       // 暂时不删除不必要的stop order, 因为order stop的存在没有关系
       if (currentQty === 0) {
-        console.log('currentQty === 0')
         this.state.orderingStop = false
         // if (stopOrder1) {
         //   this.signatureSDK.deleteOrder(stopOrder1.orderID).then(json => {
