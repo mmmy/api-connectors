@@ -94,13 +94,14 @@ class OrderManager {
         this.state.openingSignal = signal
         const price = long ? ask0 : bid0                 // 注意这里
         console.log('startGrabOrderLimit', long, price)
+        const d0 = new Date()
         this.startGrabOrderLimit(long, price).then((res, times) => {
-          console.log('grab order success, times:', times)
+          console.log('grab order success, times:', times, 'and spent', (new Date() - d0) / 1000)
           console.log(res)
           console.log('start auto adjust order')
           this.startAutoAdjustOrder()
         }).catch(() => {
-          console.log('grab order error time out')
+          console.log('grab order error time out spent', (new Date() - d0) / 1000)
           this.state.openingSignal = null
         })
       }
@@ -124,10 +125,10 @@ class OrderManager {
           successCb(json, times)
         } else {
           times++
-          console.log('startGrabOrderLimit times --', times, 'ordStatus', json.ordStatus)
+          // console.log('startGrabOrderLimit times --', times, 'ordStatus', json.ordStatus)
           const now = new Date()
           const delay = miniInterval - (now - lastOrderTime)
-          console.log('delay+++++++++++', delay)
+          // console.log('delay+++++++++++', delay)
           lastOrderTime = now
           setTimeout(() => {
             tryFunc(successCb, failureCb)
