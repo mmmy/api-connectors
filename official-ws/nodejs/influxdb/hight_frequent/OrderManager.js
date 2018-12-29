@@ -77,6 +77,7 @@ class OrderManager {
         const currentQty = this.getCurrentPositionQty()
         const longPosition = currentQty > 0
         if ((long && !longPosition) || (short && longPosition)) {
+          console.log(`SIGNAL: current position is long:${longPosition} and signal is long:${long}, so start close position`)
           this._closePosition()
         }
       } else {
