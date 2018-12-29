@@ -269,9 +269,6 @@ class OrderManager {
         let targetStopPx = costPrice + (longPosition ? (-deltaPrice) : deltaPrice)
         targetStopPx = Math.round(targetStopPx * 2) / 2  // 0.5的整数倍
         
-        console.log('currentQty ', currentQty)
-        console.log('-----------------------------')
-        console.log(stopOrder1)
         if (stopOrder1) {
           const { orderQty, stopPx } = stopOrder1
           // 方向有误 应该删除
