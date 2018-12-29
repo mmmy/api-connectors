@@ -91,7 +91,7 @@ class OrderManager {
     const { long, short, bid0, ask0, timestamp } = signal
     if (long || short) {
       if (!this.state.openingSignal) {
-        console.log('SIGNAL: open position')
+        console.log('SIGNAL: open position\n')
         this._postionStartTime = new Date(timestamp)
         this.state.openingSignal = signal
         const price = long ? ask0 : bid0                 // 注意这里
@@ -164,7 +164,7 @@ class OrderManager {
         if (order1) {
           this.signatureSDK.deleteOrder(order1.orderID).then(json => {
             console.log('OPEN auto adjust order time out: cancel order success')
-            console.log('OPEN currentQty', currentQty)
+            console.log('OPEN currentQty', currentQty, '\n')
             this.stopAutoAdjustOrder()
           }).catch(e => {
             console.log('OPEN auto adjust order time out: cancel order failed and retry after 5 seconds...')
@@ -190,10 +190,10 @@ class OrderManager {
           }
         } else {
           if (currentQty === 0) {
-            console.warn('warning: has no order ?')
+            console.warn('warning: has no order ?\n')
           } else {
             console.log('OPEN: order filled success')
-            console.log('OPEN: currentQty', currentQty)
+            console.log('OPEN: currentQty', currentQty, '\n')
           }
           this.stopAutoAdjustOrder()
         }
@@ -272,10 +272,10 @@ class OrderManager {
           if ((currentQty > 0 && stopOrder1.side === 'Buy') || (currentQty < 0 && stopOrder1.side === 'Sell')) {
             this.signatureSDK.deleteOrder(stopOrder1.orderID).then(json => {
               this.state.orderingStop = false
-              console.log('currentQty is 0 and delete stop order success')
+              console.log('STOP: currentQty is 0 and delete stop order success')
             }).catch(e => {
               this.state.orderingStop = false
-              console.log('currentQty is 0 and delete stop order failed', e)
+              console.log('STOP: currentQty is 0 and delete stop order failed', e)
             })
             // 数量或者价格不对, 重新设置
           } else if (orderQty < Math.abs(currentQty) || stopPx !== targetStopPx) {
@@ -284,10 +284,10 @@ class OrderManager {
               stopPx: targetStopPx,
               orderQty: Math.abs(currentQty),
             }).then(json => {
-              console.log('update stop order success')
+              console.log('STOP: update stop order success')
               this.state.orderingStop = false
             }).catch(e => {
-              console.log('update stop order failed', e)
+              console.log('STOP: update stop order failed\n', e)
               this.state.orderingStop = false
             })
           } else {
@@ -295,12 +295,11 @@ class OrderManager {
           }
         } else {            // 新增一个stopOrder
           const qty = Math.max(Math.abs(currentQty), this._options.amount * 2) // 这个大一点没有关系
-          console.log(qty)
           this.signatureSDK.orderStop(qty, targetStopPx, longPosition ? 'Sell' : 'Buy').then(json => {
-            console.log('add a stop order success at', targetStopPx, qty)
+            console.log('STOP: add a stop order success at', targetStopPx, qty)
             this.state.orderingStop = false
           }).catch(e => {
-            console.log('add a stop order error at', targetStopPx, qty, e)
+            console.log('STOP: add a stop order error at', targetStopPx, qty, e)
             this.state.orderingStop = false
           })
         }
@@ -341,7 +340,7 @@ class OrderManager {
     }
     this._closePositionInterval = setInterval(() => {
       if (!this.hasPosition()) {
-        console.log('CLOSE: position has closed')
+        console.log('CLOSE: position has closed\n')
         this._stopClosePosition()
         return
       }
