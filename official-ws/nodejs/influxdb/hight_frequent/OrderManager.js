@@ -329,7 +329,7 @@ class OrderManager {
       }
       // 无条件开始平仓
       if (secondsForClose2 && (timePassed > secondsForClose2 * 1000)) {
-        console.log(`时间已过${secondsForClose2}无条件开始平仓`)
+        console.log(`时间已过${secondsForClose2}s 开始无条件开始平仓`)
         this._closePosition()
       }
     }
