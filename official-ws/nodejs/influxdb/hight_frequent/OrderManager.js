@@ -84,6 +84,7 @@ class OrderManager {
       } else {
         this._openPosition(signal)
       }
+      this.updateOpeningSignal(signal)
     }
     this.tryStartCloseByTime()
   }
@@ -176,7 +177,7 @@ class OrderManager {
         }
       } else {
         if (order1) {
-          const endPrice = long ? (ask0 + 1) : (bid0 - 1)        // 0.5的差异
+          const endPrice = long ? (ask0 + 2) : (bid0 - 2)        // $2的差异
           const { price } = order1
           if (long ? (price >= endPrice) : (price <= endPrice)) {
             return
@@ -207,6 +208,10 @@ class OrderManager {
     clearInterval(this._adjustOrderInterval)
     this._adjustOrderInterval = null
     this.state.openingSignal = null
+  }
+  // 当前处于opening，有时需要刷新信号
+  updateOpeningSignal(signal) {
+    // 方向相同，那么刷新当前时间
   }
 
   stopOpening() {
