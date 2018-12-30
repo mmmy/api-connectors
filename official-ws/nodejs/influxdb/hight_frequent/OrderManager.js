@@ -350,6 +350,7 @@ class OrderManager {
       if (!this.hasPosition()) {
         console.log('CLOSE: position has closed\n')
         this._stopClosePosition()
+        // 清除止损订单等等
         this.signatureSDK.deleteOrderAll()
         return
       }

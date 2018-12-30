@@ -22,7 +22,7 @@ strategyManager.addNewStrategy({
   apiKey,
   apiSecret,
   amount: 20,
-  database: false,
+  database: true,
   initCheckSystem: true,
   notify: true,
   autoOrderStop: true,
