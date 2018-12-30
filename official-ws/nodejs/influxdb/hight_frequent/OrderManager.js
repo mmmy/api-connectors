@@ -350,6 +350,7 @@ class OrderManager {
       if (!this.hasPosition()) {
         console.log('CLOSE: position has closed\n')
         this._stopClosePosition()
+        this.signatureSDK.deleteOrderAll()
         return
       }
       this.updateClosePosition()
