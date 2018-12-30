@@ -77,7 +77,8 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     const signal = this._canculateOrderBookSignal(json)
 
     if (this._options.test) {
-      this.research(signal, json)
+      // this.research(signal, json)
+      this.updateBacktest(signal)
     } else {
       this._orderManager.listenOrderBookSignal(signal)
     }
@@ -187,6 +188,16 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     if (this._sells.length > 0) {
       fs.writeFileSync(path.join(__dirname, sellPath), JSON.stringify(this._sells))
       console.log(sellPath, '已保存')
+    }
+  }
+
+  updateBacktest(signal) {
+    const { long, short } = signal
+    if (long || short) {
+      const orderObj = this.createOrder(long)
+      if (orderObj.price && orderObj.amount > 0) {
+        this.order(orderObj)
+      }
     }
   }
 }
