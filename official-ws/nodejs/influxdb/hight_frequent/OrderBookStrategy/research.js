@@ -1,6 +1,6 @@
 const Influx = require('influx')
 const OrderBook = require('../../../strategy/researchOrderbookL2/OrderBookL2Trade')
-const OrderBookStrategy = require('./OrderBookStrategy')
+const OrderBookStrategy = require('./OrderBookStrategy2')
 const _ = require('lodash')
 const MockData = require('../../MockData')
 const fs = require('fs')
@@ -18,7 +18,7 @@ const strategy = new OrderBookStrategy({
   database: false,
   initCheckSystem: false,
   notify: false,
-  maxAmountCount: 4,
+  maxAmountCount: 40,
 })
 
 function dataCb(json) {
@@ -49,15 +49,18 @@ bitmex.on('end', () => {
     sumLow,
     avgLow,
     timeSumLow,
-    timeAvgLow
+    timeAvgLow,
+    sumProfit,
+    avgProfit,
   } = LONG ? buys : sells
   console.log(list.slice(-1))
   console.log(`${LONG ? 'LONG' : 'SHORT'}_SEC:${strategy.AFTER_SECONDS} long len`, list.length)
   console.log('avgHigh', avgHigh, 'sumHigh', sumHigh, 'timeAvgHigh', timeAvgHigh)
   console.log('avgLow', avgLow, 'sumLow', sumLow, 'timeAvgLow', timeAvgLow)
+  console.log('sumProfit', sumProfit, 'avgProfit', avgProfit)
 
-  const filePath = `./temp/research_orderbook_volumefilter_${LONG ? 'LONG' : 'SHORT'}_${strategy.AFTER_SECONDS}.csv`
-  const csvStr = JSONtoCSV(list, ['t', 'p', 'diffHigh', 'timeHigh', 'diffLow', 'timeLow'])
+  const filePath = `./temp/research_orderbook_volumefilter3_${LONG ? 'LONG' : 'SHORT'}_${strategy.AFTER_SECONDS}.csv`
+  const csvStr = JSONtoCSV(list, ['t', 'p', 'diffHigh', 'timeHigh', 'diffLow', 'timeLow', 'lastPrice', 'profit'])
   fs.writeFileSync(path.join(__dirname, filePath), csvStr)
   console.log('data end...')
   strategy.stop()

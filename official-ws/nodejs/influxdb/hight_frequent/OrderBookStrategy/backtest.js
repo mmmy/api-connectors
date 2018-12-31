@@ -25,15 +25,15 @@ const manager = new TestStrategyManager()
 // })
 
 manager.addNewStrategy({
-  id: 'ob-trategy-back-test',
+  id: 'ob-trategy-back-test-2',
   test: true,
   bookMaxSizeBuy: 0,
   bookMaxSizeSell: 0,
   amount: 100,
   balanceAmount: false,
   maxAmountCount: 100,
-  // minTradeInterval: 70,
-  closeOrOpen: false,
+  minTradeInterval: 60,
+  closeOrOpen: true,
 })
 
 let count = 1

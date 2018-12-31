@@ -51,6 +51,14 @@ function statisticPositions(positions) {
       }
     }
 
+    const lastTrade = item.afterPs[item.afterPs.length - 1]
+    let lastPrice = null
+    let profit = null
+    if (lastTrade) {
+      lastPrice = lastTrade.price
+      profit = side > 0 ? (lastPrice - item.p) : (item.p - lastPrice)
+    }
+
     const diffHigh = maxPTrade.price - item.p
     const diffLow = minPTrade.price - item.p
     return {
@@ -58,6 +66,8 @@ function statisticPositions(positions) {
       diffHigh,
       timeHigh: (new Date(maxPTrade.timestamp) - t) / 1000,
       diffLow,
+      lastPrice,
+      profit,
       timeLow: (new Date(minPTrade.timestamp) - t) / 1000,
       levelsTime1: levelsTime[0],
       levelsTime2: levelsTime[1],
@@ -76,6 +86,9 @@ function statisticPositions(positions) {
   const avgLow = sumLow / list.length
   const timeSumLow = list.reduce((s, item) => s + item.timeLow, 0)
   const timeAvgLow = timeSumLow / list.length
+
+  const sumProfit = list.reduce((s, item) => s + item.profit, 0)
+  const avgProfit = sumProfit / list.length
   return {
     list,
     sumHigh,
@@ -85,7 +98,9 @@ function statisticPositions(positions) {
     sumLow,
     avgLow,
     timeSumLow,
-    timeAvgLow
+    timeAvgLow,
+    sumProfit,
+    avgProfit,
   }
 }
 

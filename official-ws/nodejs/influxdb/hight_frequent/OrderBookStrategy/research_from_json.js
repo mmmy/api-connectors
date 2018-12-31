@@ -8,7 +8,7 @@ const path = require('path')
 const { JSONtoCSV } = require('../../util')
 const { statisticPositions } = require('../../util')
 
-const id = 'orderbook-research'
+const id = 'orderbook-research_profit'
 
 const buyPath = `./temp/${id}_buys.json`
 const sellPath = `./temp/${id}_sells.json`
@@ -39,14 +39,19 @@ function statisticAndSave(positions, prefix) {
     sumLow,
     avgLow,
     timeSumLow,
-    timeAvgLow
+    timeAvgLow,
+    sumProfit,
+    avgProfit,
   } = statisticPositions(positions)
   console.log(list.slice(-1))
   console.log(`${prefix}_SEC, long len:`, list.length)
   console.log('avgHigh', avgHigh, 'sumHigh', sumHigh, 'timeAvgHigh', timeAvgHigh)
   console.log('avgLow', avgLow, 'sumLow', sumLow, 'timeAvgLow', timeAvgLow)
+  console.log('avgLow', avgLow, 'sumLow', sumLow, 'timeAvgLow', timeAvgLow)
+  console.log('sumProfit', sumProfit, 'avgProfit', avgProfit)
+
   const filePath = `./temp/research_orderbook_from_file_${prefix}.csv`
-  const csvStr = JSONtoCSV(list, ['t', 'p', 'diffHigh', 'timeHigh', 'diffLow', 'timeLow', 'levelsTime1', 'levelsTime2', 'levelsTime3', 'levelsTime4', 'levelsTime5', 'levelsTime6'])
+  const csvStr = JSONtoCSV(list, ['t', 'p', 'diffHigh', 'timeHigh', 'diffLow', 'timeLow', 'profit', 'levelsTime1', 'levelsTime2', 'levelsTime3', 'levelsTime4', 'levelsTime5', 'levelsTime6'])
   fs.writeFileSync(path.join(__dirname, filePath), csvStr)
 
 }

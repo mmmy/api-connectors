@@ -18,7 +18,7 @@ function recordAfterP(list, trades, seconds = 60) {
   }
 }
 
-class OrderBookStrategy extends FlowDataStrategyBase {
+class OrderBookStrategy2 extends FlowDataStrategyBase {
   constructor(options) {
     super(options)
     this.initInterval()
@@ -28,7 +28,7 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     this._tradeCount = 0
     this._sellBookCount = 0
     this._buyBookCount = 0
-    this.AFTER_SECONDS = 180
+    this.AFTER_SECONDS = 150
     // this._orderManager._openPosition({
     //   long: true,
     //   short: false,
@@ -46,17 +46,17 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     let ask0 = this._ob.getTopAskPrice2(0)
     let bid1 = this._ob.getTopBidPrice2(volumePerMinute / 60 * 0.382)   // volumePerMinute / 60 / 2
     let ask1 = this._ob.getTopAskPrice2(volumePerMinute / 60 * 0.382)
-    // let bid2 = this._ob.getTopBidPrice2(1E5)
-    // let ask2 = this._ob.getTopAskPrice2(1E5)
+    let bid2 = this._ob.getTopBidPrice2(volumePerMinute / 2 * 0.5 * 0.4)
+    let ask2 = this._ob.getTopAskPrice2(volumePerMinute / 2 * 0.5 * 0.4)
     let bid3 = this._ob.getTopBidPrice2(volumePerMinute / 2 * 0.5)       // 0.5 - 0.618
     let ask3 = this._ob.getTopAskPrice2(volumePerMinute / 2 * 0.5)
     const d0 = data[0]
     let long = false
     let short = false
 
-    if ((ask0 - bid0 === 0.5) && (bid0 - bid3) === 0 && (ask1 - ask0) > 0.5) {
+    if ((ask0 - bid0 === 0.5) && (bid0 - bid3) <= 0.5 && (ask3 - ask0) > 5) {
       long = true
-    } else if ((ask0 - bid0 === 0.5) && (ask0 - ask3) === 0 && (bid0 - bid1) > 0.5) {
+    } else if ((ask0 - bid0 === 0.5) && (ask0 - ask3) <= 0.5 && (bid0 - bid3) > 5) {
       short = true
     }
     return {
@@ -77,8 +77,8 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     const signal = this._canculateOrderBookSignal(json)
 
     if (this._options.test) {
-      // this.research(signal, json)
-      this.updateBacktest(signal)
+      this.research(signal, json)
+      // this.updateBacktest(signal)
     } else {
       this._orderManager.listenOrderBookSignal(signal)
     }
@@ -207,4 +207,4 @@ class OrderBookStrategy extends FlowDataStrategyBase {
   }
 }
 
-module.exports = OrderBookStrategy
+module.exports = OrderBookStrategy2
