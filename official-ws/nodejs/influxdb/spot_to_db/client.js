@@ -6,10 +6,14 @@ const okspotUri = "wss://real.okex.com:10440/ws/v1"
 
 function createOkClient(uri, options, params, handleData) {
   const wsClient = new WebSocketClient(options);
+  let _interval = null
 
   wsClient.onopen = function() {
     console.log('okex Connection opened.')
     wsClient.send(JSON.stringify(params))
+    _interval = setInterval(() => {
+      wsClient.send(JSON.stringify({'event':'ping'}))
+    }, 30 * 1000)
   }
   wsClient.onclose = function(code) {
     console.log('okex Connection closed.')
@@ -27,6 +31,7 @@ function createOkClient(uri, options, params, handleData) {
   }
   wsClient.onend = function() {
     console.log('okex Connection onend.')
+    clearInterval(_interval)
   }
   wsClient.open(uri)
   return wsClient
