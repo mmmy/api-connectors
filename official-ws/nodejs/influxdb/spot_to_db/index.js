@@ -89,7 +89,7 @@ if (options.okex) {
   //[{"channel":"ok_sub_spot_btc_usdt_deals","data":[["818723474","3770.6901","0.0027393","14:21:08","bid"]],"binary":0}]
   const okSpotClient = createOkSpotClient(options, params, function(jsonStr) {
     const json = JSON.parse(jsonStr)
-    json.forEach(data => {
+    json.length > 0 && json.forEach(data => {
       switch (data.channel) {
         case 'ok_sub_spot_btc_usdt_deals':
           dbClient.writeOKexTrades('BTCUSDT', data.data)
