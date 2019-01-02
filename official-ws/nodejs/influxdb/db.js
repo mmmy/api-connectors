@@ -163,7 +163,7 @@ class SaveRawJson {
       },
       timestamp: time
     }
-    
+
     this.pushRecord(record)
 
     if (table === 'orderBookL2_25') {
@@ -192,7 +192,7 @@ class SaveRawJson {
     }
     this._lastTime = time
   }
-  
+
   pushRecord(record) {
     this._cache.push(record)
     if (this._cache.length > this._options.cacheLen) {
@@ -243,7 +243,7 @@ class BitmexDB {
         timestamp: (new Date(item.timestamp)) * 1E6
       }
     })
-    this._client.writePoints(dataToInflux).catch(e => console.log('writeTrade error' ,e))
+    this._client.writePoints(dataToInflux).catch(e => console.log('writeTrade error', e))
   }
 
   writeInstrument(json) {
@@ -295,7 +295,7 @@ const kline_client = new Influx.InfluxDB({
 })
 
 const BitmexKlineDB = {
-  writeKline: function(binSize, list) {
+  writeKline: function (binSize, list) {
     const dataPoints = list.map(kline => ({
       measurement: 'kline',
       tags: {
@@ -308,14 +308,14 @@ const BitmexKlineDB = {
     }))
     return kline_client.writePoints(dataPoints)
   },
-  getLastKline: function(binSize) {
+  getLastKline: function (binSize) {
     return kline_client.query(`select * from kline where binSize='${binSize}' order by time desc limit 1`)
   },
-  getHistoryKlines: function(binSize, endTime, count=400) {
+  getHistoryKlines: function (binSize, endTime, count = 400) {
     endTime = new Date(endTime).toISOString()
     return kline_client.query(`select * from kline where binSize='${binSize}' and time <= '${endTime}' order by time desc limit ${count}`)
   },
-  getKlinesByRange: function(binSize, startTime, endTime, after='2d') {
+  getKlinesByRange: function (binSize, startTime, endTime, after = '2d') {
     startTime = new Date(startTime).toISOString()
     let endWhere = ''
     if (endTime) {
@@ -328,9 +328,100 @@ const BitmexKlineDB = {
   }
 }
 
+class SpotDB {
+  constructor(options) {
+    this._options = {
+      maxCacheSeconds: 30
+    }
+
+    this._cache = []
+
+    this._client = new Influx.InfluxDB({
+      database: 'spot',
+      host: 'localhost',
+      port: 8086,
+    })
+
+    this._lastWriteTime = new Date()
+  }
+
+  writeBitfinexTrades(symbol, trades) {
+    const dataPoints = trades.map(trade => ({ //{id, mts, amount, price}
+      measurement: 'trades',
+      tags: {
+        exchange: 'bitfinex',
+        symbol,
+      },
+      fields: {
+        amount: trade.amount,
+        price: trade.price
+      },
+      timestamp: new Date(trade.mts) * 1E6
+    }))
+    this.updateCache(dataPoints)
+  }
+
+  writeOKexTrades(symbol, trades) {
+    const dataPoints = trades.map(trade => ({ //{id, mts, amount, price}
+      measurement: 'trades',
+      tags: {
+        exchange: 'okex',
+        symbol,
+      },
+      fields: {
+        amount: trade[2] * (trade[4] === 'bid' ? 1 : -1),
+        price: +trade[1]
+      },
+      timestamp: new Date() * 1E6
+    }))
+    this.updateCache(dataPoints)
+  }
+  /*
+  {
+    "e": "trade",     // Event type
+    "E": 123456789,   // Event time
+    "s": "BNBBTC",    // Symbol
+    "t": 12345,       // Trade ID
+    "p": "0.001",     // Price
+    "q": "100",       // Quantity
+    "b": 88,          // Buyer order ID
+    "a": 50,          // Seller order ID
+    "T": 123456785,   // Trade time
+    "m": true,        // Is the buyer the market maker?
+    "M": true         // Ignore
+  }
+  */
+  writeBinanceTrades(symbol, trades) {
+    const dataPoints = trades.map(trade => ({ //{id, mts, amount, price}
+      measurement: 'trades',
+      tags: {
+        exchange: 'binance',
+        symbol,
+      },
+      fields: {
+        amount: +trade.q * (trade.m ? 1 : -1),
+        price: +trade.p
+      },
+      timestamp: new Date(trade.E) * 1E6
+    }))
+    this.updateCache(dataPoints)
+  }
+
+  updateCache(points) {
+    this._cache = this._cache.concat(points)
+    const now = new Date()
+    if (now - this._lastWriteTime > this._options.maxCacheSeconds * 1000) {
+      this._client.writePoints(this._cache)
+      this._cache = []
+      this._lastWriteTime = now
+    }
+  }
+}
+
 module.exports = {
   SaveRawJson,
   StrageyDB,
   BitmexDB,
-  BitmexKlineDB
+  BitmexKlineDB,
+  SpotDB,
 }

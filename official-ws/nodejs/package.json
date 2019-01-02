@@ -20,6 +20,7 @@
   "author": "Samuel Reed <samuel.trace.reed@gmail.com> (http://strml.net/)",
   "license": "MIT",
   "dependencies": {
+    "binance-api-node": "^0.8.15",
     "bitfinex-api-node": "^2.0.0-beta.1",
     "body-parser": "^1.18.3",
     "debug": "^2.6.6",
@@ -30,6 +31,7 @@
     "mocha": "^5.2.0",
     "moment": "^2.22.2",
     "moment-timezone": "^0.5.21",
+    "pako": "^1.0.7",
     "progress": "^2.0.0",
     "should": "^13.2.1",
     "socks-proxy-agent": "^4.0.1",

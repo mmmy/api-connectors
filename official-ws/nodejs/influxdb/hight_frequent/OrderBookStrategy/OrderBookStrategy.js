@@ -28,7 +28,7 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     this._tradeCount = 0
     this._sellBookCount = 0
     this._buyBookCount = 0
-    this.AFTER_SECONDS = 180
+    this.AFTER_SECONDS = 50
     // this._orderManager._openPosition({
     //   long: true,
     //   short: false,
@@ -77,8 +77,8 @@ class OrderBookStrategy extends FlowDataStrategyBase {
     const signal = this._canculateOrderBookSignal(json)
 
     if (this._options.test) {
-      // this.research(signal, json)
-      this.updateBacktest(signal)
+      this.research(signal, json)
+      // this.updateBacktest(signal)
     } else {
       this._orderManager.listenOrderBookSignal(signal)
     }
