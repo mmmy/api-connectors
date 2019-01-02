@@ -215,7 +215,8 @@ class SaveRawJson {
 class BitmexDB {
   constructor(options) {
     this._options = {
-      ...options
+      maxCacheSeconds: 60,
+      ...options,
     }
     this._client = new Influx.InfluxDB({
       database: 'bitmex',
@@ -223,6 +224,7 @@ class BitmexDB {
       port: 8086,
     })
     this.isp = 0
+    this._lastWriteTime = new Date()
   }
 
   writeTrade(json) {
@@ -243,7 +245,7 @@ class BitmexDB {
         timestamp: (new Date(item.timestamp)) * 1E6
       }
     })
-    this._client.writePoints(dataToInflux).catch(e => console.log('writeTrade error', e))
+    this.updateCache(dataToInflux)
   }
 
   writeInstrument(json) {
@@ -251,7 +253,7 @@ class BitmexDB {
     //indicativeSettlePrice
     const data0 = data[0]
     if (data0.indicativeSettlePrice) {
-      this._client.writePoints([{
+      this.updateCache([{
         measurement: table,
         fields: {
           price: data0.indicativeSettlePrice,
@@ -262,13 +264,23 @@ class BitmexDB {
           name: 'indicativeSettlePrice',
         },
         timestamp: (new Date(data0.timestamp)) * 1E6
-      }]).catch(e => console.log('writeInstrument error', e))
+      }])
       this.isp = data0.indicativeSettlePrice
     }
   }
 
   writeOrderBook() {
 
+  }
+
+  updateCache(points) {
+    this._cache = this._cache.concat(points)
+    const now = new Date()
+    if (now - this._lastWriteTime > this._options.maxCacheSeconds * 1000) {
+      this._client.writePoints(this._cache).catch(e => console.log('write error', e))
+      this._cache = []
+      this._lastWriteTime = now
+    }
   }
 
   listenJson(json) {
