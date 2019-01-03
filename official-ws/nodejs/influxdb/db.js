@@ -215,7 +215,7 @@ class SaveRawJson {
 class BitmexDB {
   constructor(options) {
     this._options = {
-      maxCacheSeconds: 60,
+      maxCacheSeconds: 30,
       ...options,
     }
     this._client = new Influx.InfluxDB({
@@ -235,7 +235,7 @@ class BitmexDB {
     const d0 = data[0]
     const t0 = new Date(d0.timestamp)
     if (t0 > this._lastTradeSaveTime) {
-      this._lastTradeSaveTime = t0
+      this._lastTradeSaveTime = +t0
     }
     const dataToInflux = data.map((item, i) => {
       this._lastTradeSaveTime += i * 1             // 1ms
