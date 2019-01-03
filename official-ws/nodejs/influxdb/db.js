@@ -226,6 +226,7 @@ class BitmexDB {
     this.isp = 0
     this._lastWriteTime = new Date()
     this._lastTradeSaveTime = 0
+    this._cache = []
   }
 
   writeTrade(json) {
