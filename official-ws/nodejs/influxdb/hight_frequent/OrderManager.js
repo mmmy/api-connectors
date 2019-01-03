@@ -82,11 +82,25 @@ class OrderManager {
           this._closePosition()
         }
       } else {
-        this._openPosition(signal)
+        if (this.canOpen()) {
+          this._openPosition(signal)
+        }
       }
       this.updateOpeningSignal(signal)
     }
     this.tryStartCloseByTime()
+  }
+
+  canOpen() {
+    const { disabledHours } = this._options
+    if(disabledHours && disabledHours.length > 0) {
+      const now = new Date()
+      const hours = now.getUTCHours()
+      if (disabledHours.some(range => hours >= range[0] && hours <= range[1])) {
+        return false
+      }
+    }
+    return true
   }
 
   _openPosition(signal) {

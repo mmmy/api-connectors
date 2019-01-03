@@ -26,8 +26,9 @@ strategyManager.addNewStrategy({
   initCheckSystem: true,
   notify: true,
   autoOrderStop: true,
-  secondsForClose1: 120,
+  secondsForClose1: 100,
   secondsForClose2: 170,
+  disabledHours: [[0, 0], [14, 23]],            //utc hour, beijing: 9-21
   // isReduceOnly: function() {
   //   // utc
   //   const hour = new Date().getHours()
