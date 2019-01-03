@@ -225,12 +225,19 @@ class BitmexDB {
     })
     this.isp = 0
     this._lastWriteTime = new Date()
+    this._lastTradeSaveTime = 0
   }
 
   writeTrade(json) {
     const { table, action, data } = json
     // 所有的timestamp都是同样值
+    const d0 = data[0]
+    const t0 = new Date(d0.timestamp)
+    if (t0 > this._lastTradeSaveTime) {
+      this._lastTradeSaveTime = t0
+    }
     const dataToInflux = data.map((item, i) => {
+      this._lastTradeSaveTime += i * 1             // 1ms
       return {
         measurement: table,
         fields: {
@@ -242,7 +249,7 @@ class BitmexDB {
           action,
           side: item.side,
         },
-        timestamp: (new Date(item.timestamp)) * 1E6
+        timestamp: this._lastTradeSaveTime * 1E6
       }
     })
     this.updateCache(dataToInflux)
