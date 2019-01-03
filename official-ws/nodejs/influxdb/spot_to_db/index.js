@@ -4,7 +4,7 @@ const _ = require('lodash')
 var SocksProxyAgent = require('socks-proxy-agent');
 var agent = new SocksProxyAgent('socks://127.0.0.1:1080');
 const BFX = require('bitfinex-api-node')
-const { createOkSpotClient, createBinanceClient } = require('./client')
+const { createOkSpotClient, createBinanceClient, createHuobiClient } = require('./client')
 const { SpotDB } = require('../db')
 
 const dbClient = new SpotDB()
@@ -15,6 +15,7 @@ const options = {
   okex: true,
   binance: true,
   database: true,
+  huobi: true,
 }
 
 if (options.bitfinex) {
@@ -109,7 +110,7 @@ if (options.okex) {
 if (options.binance) {
   const streams = ['btcusdt@trade', 'ethusdt@trade', 'adausdt@trade']
   //{"stream":"btcusdt@trade","data":{"e":"trade","E":1546417273191,"s":"BTCUSDT","t":91829771,"p":"3783.48000000","q":"0.00277500","b":223587689,"a":223587688,"T":1546417273198,"m":false,"M":true}}
-  const ss = createBinanceClient(options, function(json) {
+  const ss = createBinanceClient(streams, options, function(json) {
     switch(json.stream) {
       case 'btcusdt@trade':
         dbClient.writeBinanceTrades('BTCUSDT', [json.data])
@@ -121,6 +122,31 @@ if (options.binance) {
         dbClient.writeBinanceTrades('ADAUSDT', [json.data])
       default:
         break
+    }
+  })
+}
+
+if (options.huobi) {
+  const subs = [{
+    sub: "market.btcusdt.trade.detail"
+  }, {
+    sub: "market.ethusdt.trade.detail"
+  }]
+  //{"ch":"market.ethusdt.trade.detail","ts":1546500340552,"tick":{"id":40575194810,"ts":1546500340423,"data":[{"amount":0.9215,"ts":1546500340423,"id":4.057519481021109e+21,"price":151.52,"direction":"buy"}]}}
+  const ss = createHuobiClient(subs, options, function(json) {
+    // console.log(JSON.stringify(json))
+    if (json && json.ch) {
+      const data = json.tick.data
+      switch (json.ch) {
+        case 'market.btcusdt.trade.detail':
+          dbClient.writeHuobiTrades('BTCUSDT', data)
+          break
+        case 'market.ethusdt.trade.detail':
+          dbClient.writeHuobiTrades('ETHUSDT', data)
+          break
+        default:
+          break
+      }
     }
   })
 }

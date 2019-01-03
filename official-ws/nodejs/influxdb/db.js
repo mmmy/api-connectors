@@ -351,7 +351,7 @@ const BitmexKlineDB = {
 class SpotDB {
   constructor(options) {
     this._options = {
-      maxCacheSeconds: 30
+      maxCacheSeconds: 35
     }
 
     this._cache = []
@@ -371,9 +371,10 @@ class SpotDB {
       tags: {
         exchange: 'bitfinex',
         symbol,
+        side: trade.amount > 0 ? 'buy' : 'sell'
       },
       fields: {
-        amount: trade.amount,
+        amount: Math.abs(trade.amount),
         price: trade.price
       },
       timestamp: new Date(trade.mts) * 1E6
@@ -387,9 +388,10 @@ class SpotDB {
       tags: {
         exchange: 'okex',
         symbol,
+        side: trade[4] === 'bid' ? 'buy' : 'sell'
       },
       fields: {
-        amount: trade[2] * (trade[4] === 'bid' ? 1 : -1),
+        amount: trade[2],
         price: +trade[1]
       },
       timestamp: new Date() * 1E6
@@ -417,12 +419,30 @@ class SpotDB {
       tags: {
         exchange: 'binance',
         symbol,
+        side: trade.m ? 'buy' : 'sell'
       },
       fields: {
         amount: +trade.q * (trade.m ? 1 : -1),
         price: +trade.p
       },
       timestamp: new Date(trade.E) * 1E6
+    }))
+    this.updateCache(dataPoints)
+  }
+
+  writeHuobiTrades(symbol, trades) {
+    const dataPoints = trades.map(trade => ({ //{id, ts, amount, price, direction: buy or sell}
+      measurement: 'trades',
+      tags: {
+        exchange: 'huobi',
+        symbol,
+        side: trade.direction
+      },
+      fields: {
+        amount: +trade.amount,
+        price: +trade.price
+      },
+      timestamp: new Date(trade.ts) * 1E6
     }))
     this.updateCache(dataPoints)
   }
