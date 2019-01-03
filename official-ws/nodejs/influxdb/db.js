@@ -371,11 +371,11 @@ class SpotDB {
       tags: {
         exchange: 'bitfinex',
         symbol,
-        side: trade.amount > 0 ? 'buy' : 'sell'
+        side: +trade.amount > 0 ? 'buy' : 'sell'
       },
       fields: {
-        amount: Math.abs(trade.amount),
-        price: trade.price
+        amount: Math.abs(+trade.amount),
+        price: +trade.price
       },
       timestamp: new Date(trade.mts) * 1E6
     }))
@@ -391,7 +391,7 @@ class SpotDB {
         side: trade[4] === 'bid' ? 'buy' : 'sell'
       },
       fields: {
-        amount: trade[2],
+        amount: +trade[2],
         price: +trade[1]
       },
       timestamp: new Date() * 1E6
@@ -422,7 +422,7 @@ class SpotDB {
         side: trade.m ? 'buy' : 'sell'
       },
       fields: {
-        amount: +trade.q * (trade.m ? 1 : -1),
+        amount: +trade.q,
         price: +trade.p
       },
       timestamp: new Date(trade.E) * 1E6
