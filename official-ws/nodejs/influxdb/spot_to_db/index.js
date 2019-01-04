@@ -4,7 +4,7 @@ const _ = require('lodash')
 var SocksProxyAgent = require('socks-proxy-agent');
 var agent = new SocksProxyAgent('socks://127.0.0.1:1080');
 const BFX = require('bitfinex-api-node')
-const { createOkSpotClient, createBinanceClient, createHuobiClient } = require('./client')
+const { createOkSpotClient, createBinanceClient, createHuobiClient, createCoinbaseClient } = require('./client')
 const { SpotDB } = require('../db')
 
 const dbClient = new SpotDB()
@@ -16,6 +16,7 @@ const options = {
   binance: true,
   database: true,
   huobi: true,
+  coinbase: true,
 }
 
 if (options.bitfinex) {
@@ -27,19 +28,19 @@ if (options.bitfinex) {
       packetWDDelay: 10 * 1000
     }
   })
-  
+
   const bfxClient = bfx.ws(2, {
     manageOrderBooks: true,
     transform: true
   })
-  
+
   bfxClient.on('open', () => {
     console.log('bitfinex Connection opened.')
     bfxClient.subscribeOrderBook('tBTCUSD', 'P0', '25')
     bfxClient.subscribeTrades('tBTCUSD')
     bfxClient.subscribeTrades('tETHUSD')
   })
-  
+
   // [{id, mts, amount, price}]
   bfxClient.onTrades({ symbol: 'tBTCUSD' }, trades => {
     // console.log('trades, len', trades.length)
@@ -52,7 +53,7 @@ if (options.bitfinex) {
     // console.log(trades)
     dbClient.writeBitfinexTrades('ETHUSDT', trades)
   })
-  
+
   bfxClient.onOrderBook({ symbol: 'tBTCUSD' }, (ob) => {
     var data = {
       midPrice: ob.midPrice(),
@@ -63,14 +64,14 @@ if (options.bitfinex) {
     // console.log(`trades: ${dataStr}`)
     // ws.readyState == WebSocket.OPEN && ws.send(dataStr);
   })
-  
+
   bfxClient.open()
   // handle errors here. If no 'error' callback is attached. errors will crash the client.
   bfxClient.on('error', e => {
     console.error('bitfinex error')
     console.error(e)
   });
-  
+
   bfxClient.on('close', () => console.log('bitfinex Connection closed.'));
 }
 
@@ -88,7 +89,7 @@ if (options.okex) {
     channel: 'ok_sub_spot_btc_usdt_ticker'
   }]
   //[{"channel":"ok_sub_spot_btc_usdt_deals","data":[["818723474","3770.6901","0.0027393","14:21:08","bid"]],"binary":0}]
-  const okSpotClient = createOkSpotClient(options, params, function(jsonStr) {
+  const okSpotClient = createOkSpotClient(options, params, function (jsonStr) {
     const json = JSON.parse(jsonStr)
     json.length > 0 && json.forEach(data => {
       switch (data.channel) {
@@ -110,8 +111,8 @@ if (options.okex) {
 if (options.binance) {
   const streams = ['btcusdt@trade', 'ethusdt@trade', 'adausdt@trade']
   //{"stream":"btcusdt@trade","data":{"e":"trade","E":1546417273191,"s":"BTCUSDT","t":91829771,"p":"3783.48000000","q":"0.00277500","b":223587689,"a":223587688,"T":1546417273198,"m":false,"M":true}}
-  const ss = createBinanceClient(streams, options, function(json) {
-    switch(json.stream) {
+  const ss = createBinanceClient(streams, options, function (json) {
+    switch (json.stream) {
       case 'btcusdt@trade':
         dbClient.writeBinanceTrades('BTCUSDT', [json.data])
         break
@@ -133,7 +134,7 @@ if (options.huobi) {
     sub: "market.ethusdt.trade.detail"
   }]
   //{"ch":"market.ethusdt.trade.detail","ts":1546500340552,"tick":{"id":40575194810,"ts":1546500340423,"data":[{"amount":0.9215,"ts":1546500340423,"id":4.057519481021109e+21,"price":151.52,"direction":"buy"}]}}
-  const ss = createHuobiClient(subs, options, function(json) {
+  const ss = createHuobiClient(subs, options, function (json) {
     // console.log(JSON.stringify(json))
     if (json && json.ch) {
       const data = json.tick.data
@@ -146,6 +147,65 @@ if (options.huobi) {
           break
         default:
           break
+      }
+    }
+  })
+}
+
+if (options.coinbase) {
+  const params = {
+    "type": "subscribe",
+    "product_ids": [
+      "BTC-USD",
+      "ETH-USD"
+    ],
+    "channels": [
+      {
+        "name": "ticker",
+        "product_ids": [
+          "BTC-USD",
+          "ETH-USD"
+        ]
+      }
+    ]
+  }
+  /*
+  { type: 'ticker',
+  sequence: 7740219303,
+  product_id: 'BTC-USD',
+  price: '3802.57000000',
+  open_24h: '3871.50000000',
+  volume_24h: '8182.5012603',
+  low_24h: '3752.98000000',
+  high_24h: '3881.57000000',
+  volume_30d: '463136.85819831',
+  best_bid: '3802.57',
+  best_ask: '3803.45',
+  side: 'sell',
+  time: '2019-01-04T03:55:01.155000Z',
+  trade_id: 57147352,
+  last_size: '0.06202829' }
+
+  { type: 'ticker',
+  sequence: 7740718949,
+  product_id: 'BTC-USD',
+  price: '3798.22000000',
+  open_24h: '3861.98000000',
+  volume_24h: '8423.80220885',
+  low_24h: '3752.98000000',
+  high_24h: '3862.81000000',
+  volume_30d: '463119.97174515',
+  best_bid: '3798.21',
+  best_ask: '3798.22' }
+  */
+  const ss = createCoinbaseClient(params, options, function (json) {
+    // console.log('new -----')
+    // console.log(json)
+    if (json && json.type === 'ticker') {
+      if (json.side) {
+        // console.log('wrong data?')
+        // console.log(json)        
+        dbClient.writeCoinbaseTrades(json.product_id, [json])
       }
     }
   })

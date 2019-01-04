@@ -447,6 +447,23 @@ class SpotDB {
     this.updateCache(dataPoints)
   }
 
+  writeCoinbaseTrades(symbol, trades) {
+    const dataPoints = trades.map(trade => ({ //{time, last_size, price, side: buy or sell}
+      measurement: 'trades',
+      tags: {
+        exchange: 'coinbase',
+        symbol,
+        side: trade.side
+      },
+      fields: {
+        amount: +trade.last_size,
+        price: +trade.price
+      },
+      timestamp: new Date(trade.time) * 1E6
+    }))
+    this.updateCache(dataPoints)
+  }
+
   updateCache(points) {
     this._cache = this._cache.concat(points)
     const now = new Date()

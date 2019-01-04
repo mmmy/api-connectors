@@ -37,10 +37,14 @@ function createOkClient(uri, options, params, handleData) {
   return wsClient
 }
 
-function createCommonClient(name, uri, options, handleData) {
+function createCommonClient(name, uri, params, options, handleData) {
   const wsClient = new WebSocketClient(options);
   wsClient.onopen = function () {
     console.log(`${name} Connection onopen.`)
+    if (params) {
+      console.log(`${name} send params`, params)
+      wsClient.send(JSON.stringify(params))
+    }
   }
   wsClient.onmessage = function (rawData) {
     handleData(JSON.parse(rawData))
@@ -64,7 +68,7 @@ function createCommonClient(name, uri, options, handleData) {
 
 function createBinanceClient(streams, options, handleData) {
   const uri = 'wss://stream.binance.com:9443/stream?streams=' + streams.join('/')
-  return createCommonClient('binance', uri, options, handleData)
+  return createCommonClient('binance', uri, null, options, handleData)
 }
 
 function createHitbtcClient(symbol, options, handleData) {
@@ -122,3 +126,8 @@ exports.createOkSpotClient = function (options, params, handleData) {
 
 exports.createBinanceClient = createBinanceClient
 exports.createHuobiClient = createHuobiClient
+
+exports.createCoinbaseClient = function(params, options, handleData) {
+  const uri = 'wss://ws-feed.pro.coinbase.com'
+  return createCommonClient('coinbase', uri, params, options, handleData)
+}
