@@ -463,6 +463,23 @@ class SpotDB {
     }))
     this.updateCache(dataPoints)
   }
+  
+  writeBitstampTrades(symbol, trades) {
+    const dataPoints = trades.map(trade => ({ //{timestamp, amount, price, type: 0 or 1}
+      measurement: 'trades',
+      tags: {
+        exchange: 'bitstamp',
+        symbol,
+        side: trade.type == 1 ? 'sell' : 'buy'
+      },
+      fields: {
+        amount: +trade.amount,
+        price: +trade.price
+      },
+      timestamp: new Date(+trade.timestamp * 1000) * 1E6
+    }))
+    this.updateCache(dataPoints)
+  }
 
   updateCache(points) {
     this._cache = this._cache.concat(points)

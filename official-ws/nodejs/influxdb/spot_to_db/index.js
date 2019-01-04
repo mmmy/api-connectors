@@ -6,17 +6,19 @@ var agent = new SocksProxyAgent('socks://127.0.0.1:1080');
 const BFX = require('bitfinex-api-node')
 const { createOkSpotClient, createBinanceClient, createHuobiClient, createCoinbaseClient } = require('./client')
 const { SpotDB } = require('../db')
+const Pusher = require('pusher-js')
 
 const dbClient = new SpotDB()
 
 const options = {
   ...args,
+  database: true,
   bitfinex: true,
   okex: true,
   binance: true,
-  database: true,
   huobi: true,
   coinbase: true,
+  bitstamp: true,
 }
 
 if (options.bitfinex) {
@@ -204,9 +206,36 @@ if (options.coinbase) {
     if (json && json.type === 'ticker') {
       if (json.side) {
         // console.log('wrong data?')
-        // console.log(json)        
-        dbClient.writeCoinbaseTrades(json.product_id, [json])
+        // console.log(json)
+        let symbol = json.product_id
+        if (symbol.indexOf('-USD')) {
+          symbol = symbol.replace('-USD', 'USDT')
+        }
+        dbClient.writeCoinbaseTrades(symbol, [json])
       }
     }
+  })
+}
+
+if (options.bitstamp) {
+  const pusher = new Pusher('de504dc5763aeef9ff52')
+  const tradesChannel = pusher.subscribe('live_trades')
+  const tradesChannelEth = pusher.subscribe('live_trades_ethusd')
+  /*
+  { amount: 1,
+  buy_order_id: 2673985763,
+  sell_order_id: 2673987830,
+  amount_str: '1.00000000',
+  price_str: '154.04',
+  timestamp: '1546585487',
+  price: 154.04,
+  type: 1,
+  id: 80997270 }
+  */
+  tradesChannel.bind('trade', function (data) {
+    dbClient.writeBitstampTrades('BTCUSDT', [data])
+  })
+  tradesChannelEth.bind('trade', function (data) {
+    dbClient.writeBitstampTrades('ETHUSDT', [data])
   })
 }
