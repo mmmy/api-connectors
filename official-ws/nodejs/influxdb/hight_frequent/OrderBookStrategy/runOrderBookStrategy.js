@@ -24,7 +24,7 @@ strategyManager.addNewStrategy({
   amount: 20,
   database: true,
   initCheckSystem: true,
-  notify: true,
+  notify: false,
   autoOrderStop: true,
   secondsForClose1: 100,
   secondsForClose2: 170,
