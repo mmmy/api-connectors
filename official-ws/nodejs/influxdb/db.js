@@ -419,7 +419,7 @@ class SpotDB {
       tags: {
         exchange: 'binance',
         symbol,
-        side: trade.m ? 'buy' : 'sell'
+        side: trade.m ? 'sell' : 'buy'
       },
       fields: {
         amount: +trade.q,
