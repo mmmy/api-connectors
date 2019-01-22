@@ -238,7 +238,7 @@ class BitmexDB {
       this._lastTradeSaveTime = +t0
     }
     const dataToInflux = data.map((item, i) => {
-      this._lastTradeSaveTime += i * 1             // 1ms
+      this._lastTradeSaveTime += 1             // 1ms
       return {
         measurement: table,
         fields: {
