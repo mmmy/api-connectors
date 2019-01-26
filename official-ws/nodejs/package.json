@@ -20,6 +20,7 @@
   "author": "Samuel Reed <samuel.trace.reed@gmail.com> (http://strml.net/)",
   "license": "MIT",
   "dependencies": {
+    "@sentry/node": "^4.5.3",
     "binance-api-node": "^0.8.15",
     "bitfinex-api-node": "^2.0.0-beta.1",
     "body-parser": "^1.18.3",
