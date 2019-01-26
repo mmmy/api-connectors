@@ -1,3 +1,5 @@
+const Sentry = require('@sentry/node')
+Sentry.init({ dsn: 'https://2a880250027e4b20a88c65b85127edd2@sentry.io/1380172' })
 
 const BitmexManager = require('../strategy/researchStrategy/BitmexManager')
 const { BitmexDB, SaveRawJson } = require('./db')
