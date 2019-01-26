@@ -124,6 +124,10 @@ exports.createOkSpotClient = function (options, params, handleData) {
   return createOkClient(okspotUri, options, params, handleData)
 }
 
+exports.createOkFutureClient = function (options, params, handleData) {
+  return createOkClient(okfutureUri, options, params, handleData)
+}
+
 exports.createBinanceClient = createBinanceClient
 exports.createHuobiClient = createHuobiClient
 

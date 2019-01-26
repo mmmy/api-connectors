@@ -4,7 +4,7 @@ const _ = require('lodash')
 var SocksProxyAgent = require('socks-proxy-agent');
 var agent = new SocksProxyAgent('socks://127.0.0.1:1080');
 const BFX = require('bitfinex-api-node')
-const { createOkSpotClient, createBinanceClient, createHuobiClient, createCoinbaseClient } = require('./client')
+const { createOkSpotClient, createBinanceClient, createHuobiClient, createCoinbaseClient, createOkFutureClient } = require('./client')
 const { SpotDB } = require('../db')
 const Pusher = require('pusher-js')
 
@@ -15,6 +15,7 @@ const options = {
   database: true,
   bitfinex: true,
   okex: true,
+  okex_future: true,
   binance: true,
   huobi: true,
   coinbase: true,
@@ -109,9 +110,28 @@ if (options.okex) {
     // console.log(jsonStr)
   })
 }
+// ok 期货
+if (options.okex_future) {
+  const futureParams = [{
+    event: 'addChannel',
+    channel: 'ok_sub_futureusd_btc_trade_quarter'
+  }]
+  createOkFutureClient(options, futureParams, function (jsonStr) {
+    const json = JSON.parse(jsonStr)
+    json.length > 0 && json.forEach(data => {
+      switch (data.channel) {
+        case 'ok_sub_futureusd_btc_trade_quarter':
+          dbClient.writeOKexTrades('BTC_QUARTER', data.data)
+          break
+        default:
+          break
+      }
+    })
+  })
+}
 
 if (options.binance) {
-  const streams = ['btcusdt@trade', 'ethusdt@trade', 'adausdt@trade']
+  const streams = ['btcusdt@trade', 'ethusdt@trade', 'adausdt@trade', 'xrpusdt@trade']
   //{"stream":"btcusdt@trade","data":{"e":"trade","E":1546417273191,"s":"BTCUSDT","t":91829771,"p":"3783.48000000","q":"0.00277500","b":223587689,"a":223587688,"T":1546417273198,"m":false,"M":true}}
   const ss = createBinanceClient(streams, options, function (json) {
     switch (json.stream) {
@@ -123,6 +143,10 @@ if (options.binance) {
         break
       case 'adausdt@trade':
         dbClient.writeBinanceTrades('ADAUSDT', [json.data])
+        break
+      case 'adausdt@trade':
+        dbClient.writeBinanceTrades('XRPUSDT', [json.data])
+        break
       default:
         break
     }
@@ -221,6 +245,7 @@ if (options.bitstamp) {
   const pusher = new Pusher('de504dc5763aeef9ff52')
   const tradesChannel = pusher.subscribe('live_trades')
   const tradesChannelEth = pusher.subscribe('live_trades_ethusd')
+  const tradesChannelXrp = pusher.subscribe('live_trades_xrpusd')
   /*
   { amount: 1,
   buy_order_id: 2673985763,
@@ -237,5 +262,8 @@ if (options.bitstamp) {
   })
   tradesChannelEth.bind('trade', function (data) {
     dbClient.writeBitstampTrades('ETHUSDT', [data])
+  })
+  tradesChannelXrp.bind('trade', function (data) {
+    dbClient.writeBitstampTrades('XRPUSDT', [data])
   })
 }

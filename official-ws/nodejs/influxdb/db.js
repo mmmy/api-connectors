@@ -383,7 +383,8 @@ class SpotDB {
   }
 
   writeOKexTrades(symbol, trades) {
-    const dataPoints = trades.map(trade => ({ //{id, mts, amount, price}
+    const date = +new Date()
+    const dataPoints = trades.map((trade, i) => ({ //{id, mts, amount, price}
       measurement: 'trades',
       tags: {
         exchange: 'okex',
@@ -394,10 +395,11 @@ class SpotDB {
         amount: +trade[2],
         price: +trade[1]
       },
-      timestamp: new Date() * 1E6
+      timestamp: (date + i) * 1E6
     }))
     this.updateCache(dataPoints)
   }
+  
   /*
   {
     "e": "trade",     // Event type
