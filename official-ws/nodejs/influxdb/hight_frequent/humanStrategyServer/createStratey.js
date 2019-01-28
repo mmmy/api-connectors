@@ -1,6 +1,6 @@
-const BitmexManager = require('../../strategy/researchStrategy/BitmexManager')
+const BitmexManager = require('../../../strategy/researchStrategy/BitmexManager')
 // var { apiKey, apiSecret } = require('../../strategy/daishu-secret.json')
-var { apiKey, apiSecret } = require('../../strategy/test-secret.json')
+var { apiKey, apiSecret } = require('../../../strategy/test-secret.json')
 
 const HumanStrategy = require('./HumanStrategy')
 /**
