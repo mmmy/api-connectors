@@ -24,7 +24,8 @@ const StrageyDB = {
 
   writeOrder: function (options, order, error, type) {
     let tags = {
-      id: options.id
+      id: options.id,
+      user: options.user || '',
     }
     if (typeof error === 'string') {
       try {
@@ -71,7 +72,8 @@ const StrageyDB = {
       strategy_client.writePoints([{
         measurement: 'position',
         tags: {
-          id: options.id
+          id: options.id,
+          user: options.user || '',
         },
         fields,
         timestamp: new Date(position.timestamp) * 1E6
@@ -87,7 +89,8 @@ const StrageyDB = {
       strategy_client.writePoints([{
         measurement: 'margin',
         tags: {
-          id: options.id
+          id: options.id,
+          user: options.user || '',
         },
         fields: {
           walletBalance
@@ -110,6 +113,7 @@ const StrageyDB = {
           tags: {
             side,
             id: options.id,
+            user: options.user || '',
           },
           fields: {
             price,
