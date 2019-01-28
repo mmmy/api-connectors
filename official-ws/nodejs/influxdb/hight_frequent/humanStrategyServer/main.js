@@ -4,3 +4,4 @@ var { apiKey, apiSecret } = require('../../strategy/test-secret.json')
 
 const createStratey = require('./createStratey')
 
+createStratey() 
