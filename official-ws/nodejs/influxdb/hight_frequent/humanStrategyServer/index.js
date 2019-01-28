@@ -1,0 +1,2 @@
+
+const strategy = require('./initStrategy')
