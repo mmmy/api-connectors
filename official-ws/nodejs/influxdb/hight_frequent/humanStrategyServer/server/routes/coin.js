@@ -12,9 +12,9 @@ router.get('/', function(req, res, next) {
   })
 });
 
-router.get('/user', function(req, res, next)) {
+router.get('/user', function(req, res, next) {
 
-}
+})
 
 router.post('/action', function(req, res, next) {
   
