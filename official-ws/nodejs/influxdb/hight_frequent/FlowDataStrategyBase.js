@@ -85,7 +85,12 @@ class FlowDataStrategyBase {
   }
 
   getOptions() {
-    return this._options
+    let options = {
+      ...this._options
+    }
+    delete options.apiKey
+    delete options.apiSecret
+    return options
   }
 
   listenJson(json) {
@@ -516,6 +521,18 @@ class FlowDataStrategyBase {
 
   hasPosition() {
     return this._currentQty !== 0
+  }
+
+  getAccountPosition() {
+    return this._accountPosition.getPosition()
+  }
+
+  getAccountOrders() {
+    return this._accountOrder.getCurrentOrders()
+  }
+
+  getOrderManager() {
+    return this._orderManager
   }
 }
 

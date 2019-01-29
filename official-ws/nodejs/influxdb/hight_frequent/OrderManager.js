@@ -62,14 +62,6 @@ class OrderManager {
       cancelFunc()
     }, seconds * 1000)
   }
-  // 市价平仓
-  closePositionMarket() {
-    return this.signatureSDK.closePositionMarket()
-  }
-  // 取消所有挂单
-  deleteOrderAll() {
-    return this.signatureSDK.deleteOrderAll()
-  }
 
   listenOrderBookSignal(signal) {
     const { long, short } = signal
@@ -93,7 +85,7 @@ class OrderManager {
 
   canOpen() {
     const { disabledHours } = this._options
-    if(disabledHours && disabledHours.length > 0) {
+    if (disabledHours && disabledHours.length > 0) {
       const now = new Date()
       const hours = now.getUTCHours()
       if (disabledHours.some(range => hours >= range[0] && hours <= range[1])) {
@@ -283,11 +275,11 @@ class OrderManager {
         //   this.state.orderingStop = false
         // }
       } else if (currentQty !== 0) {
-        
+
         const longPosition = currentQty > 0
         let targetStopPx = costPrice + (longPosition ? (-deltaPrice) : deltaPrice)
         targetStopPx = Math.round(targetStopPx * 2) / 2  // 0.5的整数倍
-        
+
         if (stopOrder1) {
           const { orderQty, stopPx } = stopOrder1
           // 方向有误 应该删除
@@ -444,6 +436,19 @@ class OrderManager {
     if (this._options.notify) {
       notifyPhone(msg)
     }
+  }
+
+  // 市价平仓
+  closePositionMarket() {
+    return this.signatureSDK.closePositionMarket()
+  }
+  // 取消所有挂单
+  deleteOrderAll() {
+    return this.signatureSDK.deleteOrderAll()
+  }
+
+  getSignatureSDK() {
+    return this.signatureSDK
   }
 }
 
