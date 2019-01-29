@@ -14,7 +14,7 @@ const HumanStrategy = require('./HumanStrategy')
  */
 module.exports = function createStratey(options) {
   const strategy = new HumanStrategy({
-    id: 'humaun-strategy',
+    id: 'human-strategy',
     user: 'yq',
     test: true,
     testnet: true,
@@ -39,7 +39,7 @@ module.exports = function createStratey(options) {
   bitmex.listenPosition(dataCb)
 
   bitmex.listenMargin(dataCb)
-
+  bitmex.listenOrder(dataCb)
   bitmex.listenExecution(dataCb)
   // 为了保持和bitmex的连接
   bitmex.listenInstrument(() => {})

@@ -79,6 +79,6 @@ module.exports = class StrategyUserManager {
   }
 
   findStrategyByUser(user) {
-    return this._list.fill(s => s.getOptions().user === user)[0]
+    return this._list.filter(s => s.getOptions().user === user)[0]
   }
 }
