@@ -129,7 +129,7 @@ class FlowDataStrategyBase {
 
   updateOrderBook(json) {
     const { action } = json
-    if (action === 'partial') {
+    if (this._options.test && action === 'partial') {
       json.keys = ['symbol', 'id', 'side']
       json.types = {
         symbol: 'symbol',
