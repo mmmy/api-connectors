@@ -4,7 +4,7 @@ const { apiKey, apiSecret } = require('../../../../strategy/test-secret.json')
 
 const StrategyUserManager = require('../StrategyUserManager')
 const manager = new StrategyUserManager()
-
+// 注意，要有个main: true, 这个用来接收orderbook等信息。
 manager.addStrategy({
   user: 'yq',
   test: false,
@@ -12,6 +12,7 @@ manager.addStrategy({
   apiKey,
   apiSecret,
   database: false,
+  main: true,
 })
 
 module.exports = manager

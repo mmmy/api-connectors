@@ -41,8 +41,12 @@ module.exports = function createStratey(options) {
   bitmex.listenMargin(dataCb)
   bitmex.listenOrder(dataCb)
   bitmex.listenExecution(dataCb)
-  // 为了保持和bitmex的连接
-  bitmex.listenInstrument(() => {})
+  if (options.main) {
+    bitmex.listenOrderBook(dataCb)
+  } else {
+    // 为了保持和bitmex的连接, 也可以send {ping}
+    bitmex.listenInstrument(() => {})
+  }
   
   return strategy
 }

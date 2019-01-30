@@ -139,4 +139,19 @@ router.post('/update_order', function(req, res, next) {
   })
 })
 
+router.get('/xbtusd_depth', function(req, res, next) {
+  const { level } = req.query
+  manager.getBidAsk(level).then(list => {
+    res.send({
+      result: true,
+      data: list,
+    })
+  }).catch(e => {
+    res.status(500).send({
+      result: false,
+      info: e,
+    })
+  })
+})
+
 module.exports = router

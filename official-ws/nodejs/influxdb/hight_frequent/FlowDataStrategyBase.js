@@ -534,6 +534,10 @@ class FlowDataStrategyBase {
   getOrderManager() {
     return this._orderManager
   }
+
+  getBidAsk(level = 1) {
+    return this._ob.getDepth(level)
+  }
 }
 
 module.exports = FlowDataStrategyBase
