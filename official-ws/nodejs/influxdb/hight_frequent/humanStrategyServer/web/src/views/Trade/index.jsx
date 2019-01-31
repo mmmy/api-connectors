@@ -2,6 +2,20 @@ import React from 'react'
 import axios from 'axios'
 
 import './index.css'
+
+function formatPosition(val, key, position) {
+  switch(key) {
+    case 'realisedPnl':
+    case 'unrealisedPnl':
+    case 'realisedGrossPnl':
+      return (val / 1E8).toFixed(4)
+    case 'unrealisedPnlPcnt':
+      return (val * position.leverage * 100).toFixed(3) + '%'
+    default:
+      return val
+  }
+}
+
 export default class Trade extends React.Component {
   constructor(props) {
     super(props)
@@ -23,10 +37,19 @@ export default class Trade extends React.Component {
         {
           users.map((user, i) => {
             const { options, position, orders, form, pending } = user
+            const positionKeys = ['leverage', 'currentQty', 'avgCostPrice', 'realisedGrossPnl', 'realisedPnl', 'unrealisedPnl', 'unrealisedPnlPcnt']
             return <div className="user-row">
               <div>user: {user.options.user}</div>
               <div className="account clearfix">
-                <span className="item">position: {position.currentQty}</span>
+                <table>
+                  <tbody>
+                    {positionKeys.map(key => {
+                      const val = position[key]
+                      const format = formatPosition(val, key, position)
+                      return <tr><td>{key}</td><td>{format}</td></tr>
+                    })}
+                  </tbody>
+                </table>
               </div>
               <div className="actions">
                 <div>
