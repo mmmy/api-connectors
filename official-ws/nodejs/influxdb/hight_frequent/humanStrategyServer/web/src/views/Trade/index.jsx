@@ -41,6 +41,8 @@ export default class Trade extends React.Component {
         {
           users.map((user, i) => {
             const { options, position, orders, form, pending } = user
+            // 检查止损是否设置正常
+            const orderStopValide = this.checkStop(i)
             const positionKeys = ['leverage', 'currentQty', 'avgCostPrice', 'realisedGrossPnl', 'realisedPnl', 'unrealisedPnl', 'unrealisedPnlPcnt']
             return <div className="user-row">
               <div>user: {user.options.user}</div>
@@ -73,6 +75,7 @@ export default class Trade extends React.Component {
                   <thead><tr>
                     <th></th>
                     <th>qty</th>
+                    <th>price</th>
                     <th>类型</th>
                     <th>状态</th>
                     <th>剩余</th>
@@ -80,11 +83,12 @@ export default class Trade extends React.Component {
                   </tr></thead>
                   <tbody>
                     {
-                      orders.filter(o => o.ordType !== 'Stop').map(order => {
+                      orders.filter(o => o.ordType !== 'Stop').map((order, j) => {
                         const isBuy = order.side === 'Buy'
                         return <tr>
                           <td><button onClick={this.handleDelOrder.bind(this, i, order)}>Del</button></td>
-                          <td className={isBuy ? 'green' : 'red'}>{order.orderQty * (isBuy ? 1 : -1)}</td>
+                          <td style={{cursor:'pointer'}} title="点击修改" className={isBuy ? 'green' : 'red'} onClick={this.handleUpdateOrder.bind(this, i, order, 'orderQty')}>{order.orderQty * (isBuy ? 1 : -1)}</td>
+                          <td style={{cursor:'pointer'}} title="点击修改" onClick={this.handleUpdateOrder.bind(this, i, order, 'price')}>{order.price}</td>
                           <td>{order.ordType}</td>
                           <td>{order.ordStatus}</td>
                           <td className={isBuy ? 'green' : 'red'}>{order.leavesQty * (isBuy ? 1 : -1)}</td>
@@ -110,7 +114,11 @@ export default class Trade extends React.Component {
                 <button disabled={pending} onClick={this.handleOrderMarket.bind(this, i)}>Order Market</button>
               </div>
               <hr />
-              <div className="title">Stop Orders</div>
+              <div className="title">Stop Orders 
+                {
+                  !orderStopValide && <span className="red">!!止损设置有误</span>
+                }
+              </div>
               <div>
                 <table>
                   <thead><tr>
@@ -127,8 +135,8 @@ export default class Trade extends React.Component {
                       orders.filter(o => o.ordType === 'Stop').map(order => {
                         return <tr>
                           <td><button onClick={this.handleDelOrder.bind(this, i, order)}>Del</button></td>
-                          <td className={order.side == 'Buy' ? 'green' : 'red'}>{order.orderQty}</td>
-                          <td>{order.stopPx}</td>
+                          <td style={{cursor: 'pointer'}} title="点击修改" className={order.side == 'Buy' ? 'green' : 'red'} onClick={this.handleUpdateOrder.bind(this, i, order, 'orderQty')}>{order.orderQty}</td>
+                          <td style={{cursor: 'pointer'}} title="点击修改" onClick={this.handleUpdateOrder.bind(this, i, order, 'stopPx')}>{order.stopPx}</td>
                           <td>{order.price || '市价'}</td>
                           <td>{order.ordStatus}</td>
                           <td>{order.leavesQty}</td>
@@ -296,7 +304,7 @@ export default class Trade extends React.Component {
     if (window.confirm(info)) {
       userData.pending = true
       this.setState({})
-      axios.post('api/coin/order_stop', {user, qty: stop_qty, side: stop_side, stopPx: stop_price}).then(({status, data}) => {
+      axios.post('api/coin/order_stop', { user, qty: stop_qty, side: stop_side, stopPx: stop_price }).then(({ status, data }) => {
         userData.pending = false
         if (status === 200 && data.result) {
           alert('order stop success')
@@ -376,8 +384,60 @@ export default class Trade extends React.Component {
     }
   }
 
+  handleUpdateOrder(index, order, key) {
+    var userData = this.state.users[index]
+    const { user } = userData.options
+    const oldValue = order[key]
+    const newVal = window.prompt(`${user} update order: ${key}`, oldValue)
+    if (newVal) {
+      const newOrder = {
+        orderID: order.orderID,
+        [key]: newVal
+      }
+      userData.pending = true
+      this.setState({})
+      axios.post('api/coin/update_order', {user, params: newOrder}).then(({status, data}) => {
+        userData.pending = false
+        if (status === 200 && data.result) {
+          alert('修改成功')
+          this.fetchUserList()
+        } else {
+          this.pushLog(data.info)
+        }
+      }).catch(e => {
+        userData.pending = false
+        this.pushLog(e)
+      })
+    }
+  }
+
   pushLog(info) {
     this.state.logs.push(info)
     this.setState({})
+  }
+
+  checkStop(index) {
+    var userData = this.state.users[index]
+    if (this.hasPostion(index)) {
+      const isbuyPosition = userData.position.currentQty > 0
+      let totalQty = 0
+      userData.orders.forEach(o => {
+        const side = isbuyPosition ? 'Sell' : 'Buy'
+        if (o.ordType === 'Stop' && o.side === side) {
+          totalQty += o.orderQty
+        }
+      })
+      if (totalQty >= Math.abs(userData.position.currentQty)) {
+        return true
+      }
+    } else {
+      return true
+    }
+    return false
+  }
+
+  hasPostion(index) {
+    var userData = this.state.users[index]
+    return userData.position.currentQty != 0
   }
 }
