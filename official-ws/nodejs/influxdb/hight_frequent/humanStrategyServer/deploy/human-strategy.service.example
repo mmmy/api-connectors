@@ -2,7 +2,8 @@
 Description=human strategy
 
 [Service]
-ExecStart=NODE_ENV=production /usr/bin/node /root/workspace/api-connectors/official-ws/nodejs/influxdb/hight_frequent/humanStrategyServer/server/bin/www --noProxy
+Environment="ONDE_ENV=production"
+ExecStart=/usr/bin/node /root/workspace/api-connectors/official-ws/nodejs/influxdb/hight_frequent/humanStrategyServer/server/bin/www --noProxy
 WorkingDirectory=/root/workspace
 Restart=always
 
