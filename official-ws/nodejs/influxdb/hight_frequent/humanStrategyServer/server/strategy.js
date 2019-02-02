@@ -1,6 +1,7 @@
 
 const { apiKey, apiSecret } = require('../../../../strategy/test-secret.json')
 // var { apiKey, apiSecret } = require('../../../strategy/daishu-secret.json')
+const isProduction = process.env.NODE_ENV === 'production'
 
 const StrategyUserManager = require('../StrategyUserManager')
 const manager = new StrategyUserManager()
@@ -11,7 +12,7 @@ manager.addStrategy({
   testnet: true,
   apiKey,
   apiSecret,
-  database: false,
+  database: isProduction,
   main: true,
 })
 
