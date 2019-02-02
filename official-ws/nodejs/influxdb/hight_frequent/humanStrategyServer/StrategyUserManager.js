@@ -55,7 +55,22 @@ module.exports = class StrategyUserManager {
   }
   // auto_price, 获得最优的price
   orderLimit(user, orderQty, side, price, auto_price) {
-    return new Promise.reject('此接口还没完完成')
+    if (!price && auto_price) {
+      return Promise.reject('auto_price 参数还没完完成')
+    }
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return strategy.getOrderManager().getSignatureSDK().orderLimit(orderQty, side, price)
+  }
+
+  orderStop(user, orderQty, stopPx, side) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return strategy.getOrderManager().getSignatureSDK().orderStop(orderQty, stopPx, side)
   }
 
   deleteOrder(user, orderID) {

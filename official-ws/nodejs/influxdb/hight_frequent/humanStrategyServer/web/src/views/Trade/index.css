@@ -1,13 +1,42 @@
 
 .trade-container {
-  margin: 0 20px;
+  margin: 0 10px;
 }
 
 .user-row {
   border: 1px dashed #aaa;
   padding: 10px;
+  position: relative;
+}
+
+.pending-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  text-align: center;
+  z-index: 2;
 }
 
 .actions {
 
+}
+
+table {
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #aaa;
+  padding: 2px 5px;
+}
+
+.green {
+  color: #4aa165;
+}
+
+.red {
+  color: #d16547;
 }
