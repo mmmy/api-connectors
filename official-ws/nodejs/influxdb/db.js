@@ -513,23 +513,33 @@ class SpotDB {
   calcAmountSignal() {
     const tradePoints = this._watchCache
     this._watchCache = []
-    let buyTotal = 0, sellTotal = 0, maxBuy = 0, maxSell = 0
+    let buyTotal = 0, sellTotal = 0, maxBuy = 0, maxSell = 0, maxBuyExchange = '', maxSellExchange = ''
     try {
       tradePoints.forEach(point => {
         const side = point.tags.side
         const amount = point.fields.amount
         if (side === 'buy') {
           buyTotal += amount
-          maxBuy = Math.max(amount, maxBuy)
+          if (amount > maxBuy) {
+            maxBuy = amount
+            maxBuyExchange = point.tags.exchange
+          }
         } else {
           sellTotal += amount
-          maxSell = Math.max(amount, maxSell)
+          if (amount > maxSell) {
+            maxSell = amount
+            maxSellExchange = point.tags.exchange
+          }
         }
       })
       let message = 'Amount Alert:\n'
       let alert = false
-      if (maxBuy > 100 || maxSell > 100) {
-        message += '有瞬间超过100大单\n'
+      if (maxBuy > 100) {
+        message += `${maxBuyExchange}有瞬间${maxBuy}买单\n`
+        alert = true
+      }
+      if (maxSell > 100) {
+        message += `${maxSellExchange}有瞬间${maxSell}卖单\n`
         alert = true
       }
       if (buyTotal > 500 || sellTotal > 500) {
