@@ -1,4 +1,5 @@
 const OrderBook = require('../strategy/researchOrderbookL2/OrderBookL2Trade')
+const { notifyPhone } = require('../strategy/notifyPhone')
 
 const Influx = require('influx')
 var winston = require('winston')
@@ -367,6 +368,12 @@ class SpotDB {
     })
 
     this._lastWriteTime = new Date()
+    // 缓存,监控,然后notifyphone
+    this._watchInterval = 20 // s
+    this._watchCache = []
+    this._watchInterval = setInterval(() => {
+      this.calcAmountSignal()
+    }, this._watchInterval * 1000)
   }
 
   writeBitfinexTrades(symbol, trades) {
@@ -494,6 +501,47 @@ class SpotDB {
       this._client.writePoints(this._cache)
       this._cache = []
       this._lastWriteTime = now
+    }
+    this.watchTrades(points)
+  }
+
+  watchTrades(points) {
+    const btcTradePoints = points.filter(p => p.measurement === 'trades' && p.tags.symbol === 'BTCUSDT')
+    this._watchCache = this._watchCache.concat(btcTradePoints)
+  }
+
+  calcAmountSignal() {
+    const tradePoints = this._watchCache
+    this._watchCache = []
+    let buyTotal = 0, sellTotal = 0, maxBuy = 0, maxSell = 0
+    try {
+      tradePoints.forEach(point => {
+        const side = point.tags.side
+        const amount = point.fields.amount
+        if (side === 'buy') {
+          buyTotal += amount
+          maxBuy = Math.max(amount, maxBuy)
+        } else {
+          sellTotal += amount
+          maxSell = Math.max(amount, maxSell)
+        }
+      })
+      let message = 'Amount Alert:\n'
+      let alert = false
+      if (maxBuy > 100 || maxSell > 100) {
+        message += '有瞬间超过100大单\n'
+        alert = true
+      }
+      if (buyTotal > 500 || sellTotal > 500) {
+        message += `${this._watchInterval}s内 >500`
+        alert = true
+      }
+      if (alert === true) {
+        notifyPhone(message)
+      }
+    } catch(e) {
+      console.log('calcAmountSignal error')
+      console.log(e)
     }
   }
 }
