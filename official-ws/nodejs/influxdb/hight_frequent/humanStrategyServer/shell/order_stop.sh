@@ -1,13 +1,7 @@
 . ./common.sh
 
 base_url="http://202.182.125.82:3004"
-if [[ $ORDER_TYPE == "Limit" ]]; then
-path="/api/coin/order_limit"
-echo "Order Limit"
-else
-path="/api/coin/order_market"
-echo "Order Market"
-fi
+path="/api/coin/order_stop"
 
 select side in "Buy" "Sell";
 do
@@ -17,23 +11,19 @@ else
   echo 'error! choose 1 or 2'
 fi
 done
+
 read -p "qty: " qty
 
-if [ $ORDER_TYPE == "Limit" ]; then
-read -p "price: " price
-fi
+read -p "stop price: " stopPx
 
 printf "\n"
 echo '-----confirm------'
-confirm "$side $qty $price to $path"
+confirm "Order Stop $side $qty @ $stopPx to $path"
 [ $? == '0' ] && echo 'canceled and exit' && exit
 
 user="yq"
-if [ $ORDER_TYPE == "Limit" ]; then
-json="{\"user\":\"$user\",\"side\":\"$side\",\"qty\":$qty,\"price\":$price}"
-else
-json="{\"user\":\"$user\",\"side\":\"$side\",\"qty\":$qty}"
-fi
+json="{\"user\":\"$user\",\"side\":\"$side\",\"qty\":$qty,\"stopPx\":$stopPx}"
+
 echo $json
 
 res=`curl -H "Content-Type:application/json" -X POST --data $json $base_url$path`
