@@ -276,6 +276,7 @@ class BitmexDB {
         tags: {
           action,
           name: 'indicativeSettlePrice',
+          symbol: data0.symbol
         },
         timestamp: (new Date(data0.timestamp)) * 1E6
       }])
