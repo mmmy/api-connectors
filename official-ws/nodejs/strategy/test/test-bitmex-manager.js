@@ -16,9 +16,9 @@ const bitmex = new BitmexManager({
   apiKeySecret: apiSecret
 })
 
-bitmex.listenOrderBook(function(data, symbol, tableName) {
-  console.log(symbol, tableName)
-  // console.log(data)
+bitmex.listenInstrument(function(data, symbol, tableName) {
+  // console.log(symbol, tableName)
+  console.log(data)
   // obManager.updateOrderbook(data)
 }, 'ETHUSD')
 

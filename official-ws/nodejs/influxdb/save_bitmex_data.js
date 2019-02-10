@@ -23,6 +23,7 @@ bitmex.listenOrderBook(cb)
 
 // ETH
 bitmex.listenTrade(cb, 'ETHUSD')
+bitmex.listenInstrument(cb, 'ETHUSD')
 /*
 setTimeout(() => {
   // systemd 回自动重启
