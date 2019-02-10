@@ -369,11 +369,11 @@ class SpotDB {
 
     this._lastWriteTime = new Date()
     // 缓存,监控,然后notifyphone
-    this._watchInterval = 20 // s
+    this._watchTime = 20 // s
     this._watchCache = []
     this._watchInterval = setInterval(() => {
       this.calcAmountSignal()
-    }, this._watchInterval * 1000)
+    }, this._watchTime * 1000)
   }
 
   writeBitfinexTrades(symbol, trades) {
@@ -543,7 +543,7 @@ class SpotDB {
         alert = true
       }
       if (buyTotal > 500 || sellTotal > 500) {
-        message += `${this._watchInterval}s内 >500`
+        message += `${this._watchTime}s内 Buy:${buyTotal} Sell:${sellTotal}`
         alert = true
       }
       if (alert === true) {
