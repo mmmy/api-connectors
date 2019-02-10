@@ -5,14 +5,14 @@ const BitmexManager = require('../strategy/researchStrategy/BitmexManager')
 const { BitmexDB, SaveRawJson } = require('./db')
 
 const bitmex = new BitmexManager()
-const client_raw = new SaveRawJson({cacheLen: 600})
+// const client_raw = new SaveRawJson({cacheLen: 600})
 const client = new BitmexDB()
 
 function cb(json, symbol, tableName) {
   client.listenJson(json)        // 解析, XBTUSD, ETHUSD
-  if (symbol === 'XBTUSD') {
-    client_raw.saveJson(json)   // 原始json
-  }
+  // if (symbol === 'XBTUSD') {
+  //   client_raw.saveJson(json)   // 原始json
+  // }
 }
 
 bitmex.listenInstrument(cb)
