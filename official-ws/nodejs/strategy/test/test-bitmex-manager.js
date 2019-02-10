@@ -16,9 +16,11 @@ const bitmex = new BitmexManager({
   apiKeySecret: apiSecret
 })
 
-// bitmex.listenOrderBook(function(data) {
-//   obManager.updateOrderbook(data)
-// })
+bitmex.listenOrderBook(function(data, symbol, tableName) {
+  console.log(symbol, tableName)
+  // console.log(data)
+  // obManager.updateOrderbook(data)
+}, 'ETHUSD')
 
 // bitmex.listenCandle({binSize: '5m'}, function(list) {
 //   obManager.setCandleHistory('5m', list)
@@ -30,9 +32,9 @@ const bitmex = new BitmexManager({
 //   // console.log(data)
 // })
 
-bitmex.listenPosition(function(data) {
-  console.log(data)
-})
+// bitmex.listenPosition(function(data) {
+//   console.log(data)
+// }, 'ETHUSD')
 
 // bitmex.listenMargin(function(json) {
 //   console.log(json)

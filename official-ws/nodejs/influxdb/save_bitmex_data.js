@@ -8,9 +8,11 @@ const bitmex = new BitmexManager()
 const client_raw = new SaveRawJson({cacheLen: 600})
 const client = new BitmexDB()
 
-function cb(json) {
-  client.listenJson(json)        // 解析
-  client_raw.saveJson(json)   // 原始json
+function cb(json, symbol, tableName) {
+  client.listenJson(json)        // 解析, XBTUSD, ETHUSD
+  if (symbol === 'XBTUSD') {
+    client_raw.saveJson(json)   // 原始json
+  }
 }
 
 bitmex.listenInstrument(cb)
@@ -18,6 +20,9 @@ bitmex.listenInstrument(cb)
 bitmex.listenTrade(cb)
 
 bitmex.listenOrderBook(cb)
+
+// ETH
+bitmex.listenTrade(cb, 'ETHUSD')
 /*
 setTimeout(() => {
   // systemd 回自动重启

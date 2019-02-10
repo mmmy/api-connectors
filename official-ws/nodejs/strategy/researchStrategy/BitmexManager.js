@@ -51,18 +51,18 @@ class BitmexManager {
   /* 
    
   */
-  listenOrderBook(cb) {
-    this._client.addStream('XBTUSD', 'orderBookL2_25', function (data, symbol, tableName) {
+  listenOrderBook(cb, symbol) {
+    this._client.addStream(symbol || 'XBTUSD', 'orderBookL2_25', function (data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
 
-  listenCandle({ binSize, count }, histCb, cb) {
-    bitmextSdk.getTradeHistory({ symbol: 'XBTUSD', binSize, count: count || 200 }).then(json => {
+  listenCandle({ binSize, count }, histCb, cb, symbol) {
+    bitmextSdk.getTradeHistory({ symbol: symbol || 'XBTUSD', binSize, count: count || 200 }).then(json => {
       json = JSON.parse(json)
       const list = json.reverse()
       histCb(list)
-      this._client.addStream('XBTUSD', `tradeBin${binSize}`, function (data, symbol, tableName) {
+      this._client.addStream(symbol || 'XBTUSD', `tradeBin${binSize}`, function (data, symbol, tableName) {
         cb(data, symbol, tableName)
       })
     })
@@ -112,44 +112,44 @@ class BitmexManager {
          homeNotional: 0.0898915,
          foreignNotional: 370 } ] }
   */
-  listenTrade(cb) {
-    this._client.addStream('XBTUSD', 'trade', function (data, symbol, tableName) {
+  listenTrade(cb, symbol) {
+    this._client.addStream(symbol || 'XBTUSD', 'trade', function (data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
   // data { indicativeSettlePrice指数价格, openInterest未平仓合约数, openValue未平仓合约价值 }
-  listenInstrument(cb) {
-    this._client.addStream('XBTUSD', 'instrument', function(data, symbol, tableName) {
+  listenInstrument(cb, symbol) {
+    this._client.addStream(symbol || 'XBTUSD', 'instrument', function(data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
 
-  listenPosition(cb) {
-    this._client.addStream('XBTUSD', 'position', function(data, symbol, tableName) {
+  listenPosition(cb, symbol) {
+    this._client.addStream(symbol || 'XBTUSD', 'position', function(data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
 
-  listenExecution(cb) {
-    this._client.addStream('XBTUSD', 'execution', function(data, symbol, tableName) {
+  listenExecution(cb, symbol) {
+    this._client.addStream(symbol || 'XBTUSD', 'execution', function(data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
   // data {walletBalance, marginBalance} /1E8
-  listenMargin(cb) {
-    this._client.addStream('XBTUSD', 'margin', function(data, symbol, tableName) {
+  listenMargin(cb, symbol) {
+    this._client.addStream(symbol || 'XBTUSD', 'margin', function(data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
 
-  listenOrder(cb) {
-    this._client.addStream('XBTUSD', 'order', function(data, symbol, tableName) {
+  listenOrder(cb, symbol) {
+    this._client.addStream(symbol || 'XBTUSD', 'order', function(data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
 
-  listenQuote(cb) {
-    this._client.addStream('XBTUSD', 'quote', function(data, symbol, tableName) {
+  listenQuote(cb, symbol) {
+    this._client.addStream(symbol || 'XBTUSD', 'quote', function(data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }

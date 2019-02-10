@@ -254,6 +254,7 @@ class BitmexDB {
         tags: {
           action,
           side: item.side,
+          symbol: item.symbol,
         },
         timestamp: this._lastTradeSaveTime * 1E6
       }

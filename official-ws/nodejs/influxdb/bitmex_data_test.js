@@ -57,7 +57,7 @@ function orderBookTrade(json) {
   ob.update(json)
 }
 
-function testGetPrices2(json) {
+function testGetPrices2(json, symbol, tableName) {
   const { table, action, data } = json
   ob.update(json)
   let minSize = 10E6  // 50W = 5E5
