@@ -50,6 +50,27 @@ router.post('/order_limit', function(req, res, next) {
     })
   })
 })
+// 只减仓
+router.post('/order_reduce_only_limit', function(req, res, next) {
+  const { user, qty, side, price } = req.body
+  if (!qty || !side || !price) {
+    res.send({
+      result: false,
+      info: '缺少 qty, side, price 参数',
+    })
+  }
+  manager.orderReduceOnlyLimit(user, qty, side, price).then(json => {
+    res.send({
+      result: true,
+      data: json
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e,
+    })
+  })
+})
 
 router.post('/order_market', function(req, res, next) {
   const { user, qty, side } = req.body

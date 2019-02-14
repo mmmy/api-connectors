@@ -65,6 +65,14 @@ module.exports = class StrategyUserManager {
     return strategy.getOrderManager().getSignatureSDK().orderLimit(orderQty, side, price)
   }
 
+  orderReduceOnlyLimit(user, orderQty, side, price) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return strategy.getOrderManager().getSignatureSDK().orderReduceOnlyLimit(orderQty, side, price)
+  }
+
   orderStop(user, orderQty, stopPx, side) {
     const strategy = this.findStrategyByUser(user)
     if (!strategy) {

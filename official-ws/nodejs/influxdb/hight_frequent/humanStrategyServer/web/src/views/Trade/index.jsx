@@ -89,7 +89,7 @@ export default class Trade extends React.Component {
                           <td><button onClick={this.handleDelOrder.bind(this, i, order)}>Del</button></td>
                           <td style={{cursor:'pointer'}} title="点击修改" className={isBuy ? 'green' : 'red'} onClick={this.handleUpdateOrder.bind(this, i, order, 'orderQty')}>{order.orderQty * (isBuy ? 1 : -1)}</td>
                           <td style={{cursor:'pointer'}} title="点击修改" onClick={this.handleUpdateOrder.bind(this, i, order, 'price')}>{order.price}</td>
-                          <td>{order.ordType}</td>
+                          <td>{order.ordType}{order.execInst.indexOf('ReduceOnly') > -1 ? '只减仓' : ''}</td>
                           <td>{order.ordStatus}</td>
                           <td className={isBuy ? 'green' : 'red'}>{order.leavesQty * (isBuy ? 1 : -1)}</td>
                           <td>{new Date(order.timestamp).toLocaleString()}</td>
@@ -109,6 +109,7 @@ export default class Trade extends React.Component {
               </div>
               <div style={{ marginBottom: '10px' }}>
                 <label>P:</label><input value={form.order_price} style={{ width: '100px' }} type="number" onChange={this.handleInputChangeFormData.bind(this, i, 'order_price')} /><button onClick={this.handleOrderLimit.bind(this, i)} disabled={pending || !form.order_price}>Order Limit</button>
+                <input type="checkbox" id="reduce-only-checkbox" checked={form.reduce_only} style={{marginLeft: '10px'}} onChange={this.handleChangeCheckbox.bind(this, i, 'reduce_only')}/><label for="reduce-only-checkbox">reduce only</label>
               </div>
               <div>
                 <button disabled={pending} onClick={this.handleOrderMarket.bind(this, i)}>Order Market</button>
@@ -212,6 +213,7 @@ export default class Trade extends React.Component {
             item.form = {
               order_side: 'Buy', order_qty: 100, pending: false, order_price: null,
               stop_side: 'Sell', stop_qty: 1000, stop_price: null,
+              reduce_only: false,
             }
             return item
           }),
@@ -243,15 +245,24 @@ export default class Trade extends React.Component {
     this.setState({})
   }
 
+  handleChangeCheckbox(index, key, e) {
+    this.state.users[index].form[key] = e.target.checked
+    this.setState({})    
+  }
+
   handleOrderLimit(index) {
     var userData = this.state.users[index]
     const user = userData.options.user
-    const { order_side, order_qty, order_price } = userData.form
-    var info = `${user}\n ${order_side} ${order_qty} at ${order_price}`
+    const { order_side, order_qty, order_price, reduce_only } = userData.form
+    var info = `${user}\n ${order_side} ${order_qty} at ${order_price} ${reduce_only ? '只减仓' : ''}`
     if (window.confirm(info)) {
       userData.pending = true
       this.setState({})
-      axios.post('/api/coin/order_limit', {
+      let path = '/api/coin/order_limit'
+      if (reduce_only) {
+        path = '/api/coin/order_reduce_only_limit'
+      }
+      axios.post(path, {
         user,
         qty: order_qty,
         side: order_side,
@@ -259,7 +270,12 @@ export default class Trade extends React.Component {
       }).then(({ status, data }) => {
         userData.pending = false
         if (status === 200 && data.result) {
-          alert('success!')
+          let isCaceled = false
+          if (data.data && data.data.ordStatus === "Canceled") {
+            this.pushLog(data.data.text)
+            isCaceled = true
+          }
+          alert(`success! ${isCaceled ? 'but Canceled 详细请看日志' : ''}`)
           this.fetchUserList()
         } else {
           this.pushLog(data.info)
