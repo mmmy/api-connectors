@@ -5,12 +5,9 @@ class AccountOrder {
     this._options = {
       ...options
     }
-    this._data = []
-    // 由于首次可能不是action=partial, 导致永远不能更新的bug
     this._CLIENT = {
       _data: {
         order: {
-          'XBTUSD': []
         }
       },
       _keys: {
@@ -18,30 +15,50 @@ class AccountOrder {
       }
     }
   }
-
-  update(json) {
-    this._data = DeltaParse.onAction(json.action, json.table, 'XBTUSD', this._CLIENT, json)
-    .filter(item => ['Canceled', 'Filled'].indexOf(item.ordStatus) === -1)
+  
+  update(json, symbol) {
+    symbol = symbol || 'XBTUSD'
+    // 由于首次可能不是action=partial, 导致永远不能更新的bug
+    if (!this._CLIENT._data.order[symbol]) {
+      this._CLIENT._data.order[symbol] = []
+    }
+    DeltaParse.onAction(json.action, json.table, symbol, this._CLIENT, json)
+    // console.log('account order test', symbol, this.getOrders(symbol).length)
   }
 
-  hasOrder() {
-    return this._data.length > 0
+  getOrders(symbol = 'XBTUSD') {
+     return this._CLIENT._data.order[symbol].filter(item => ['Canceled', 'Filled'].indexOf(item.ordStatus) === -1)
   }
 
-  getLimitOrders(long) {
-    return this._data.filter(o => o.side === (long ? 'Buy' : 'Sell'))
+  hasOrder(symbol = 'XBTUSD') {
+    return this.getOrders(symbol).length > 0
   }
 
-  getStopOrders() {
-    return this._data.filter(o => o.ordType === 'Stop')
+  getLimitOrders(long, symbol = 'XBTUSD') {
+    return this.getOrders(symbol).filter(o => o.side === (long ? 'Buy' : 'Sell'))
   }
 
-  getReduceOnlyOrders() {
-    return this._data.filter(o => o.execInst && o.execInst.indexOf('ReduceOnly') > -1)
+  getStopOrders(symbol = 'XBTUSD') {
+    return this.getOrders(symbol).filter(o => o.ordType === 'Stop')
   }
 
-  getCurrentOrders() {
-    return this._data
+  getReduceOnlyOrders(symbol = 'XBTUSD') {
+    return this.getOrders(symbol).filter(o => o.execInst && o.execInst.indexOf('ReduceOnly') > -1)
+  }
+
+  getCurrentOrders(symbol = 'XBTUSD') {
+    return this.getOrders(symbol)
+  }
+
+  getAllOrders() {
+    let allOrders = []
+    for (let key in this._CLIENT._data.order) {
+      let orders = this.getOrders(key)
+      if (orders.length > 0) {
+        allOrders = allOrders.concat(orders)
+      }
+    }
+    return allOrders
   }
 }
 

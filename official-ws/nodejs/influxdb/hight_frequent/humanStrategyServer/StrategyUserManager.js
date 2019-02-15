@@ -35,12 +35,12 @@ module.exports = class StrategyUserManager {
   getAllUsersAccount() {
     const users = this._list.map(strategy => {
       const options = strategy.getOptions()
-      const orders = strategy.getAccountOrders()
-      const position = strategy.getAccountPosition()
+      const orders = strategy.getAccountAllOrders()
+      const positions = strategy.getAccountAllPositions()
       return {
         options,
         orders,
-        position
+        positions
       }
     })
     return users
