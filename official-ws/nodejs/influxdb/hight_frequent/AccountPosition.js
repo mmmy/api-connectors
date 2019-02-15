@@ -45,6 +45,7 @@ class AccountPosition {
         allPositions.push(this.getPosition(key))
       }
     }
+    return allPositions
   }
 }
 

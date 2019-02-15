@@ -105,7 +105,7 @@ class FlowDataBase {
       }
     }
     // TODO: update margin
-    this._ob.update(json)
+    // this._ob.update(json)
     this.onUpdateOrderBook()
   }
 
@@ -239,8 +239,8 @@ class FlowDataBase {
 
   }
 
-  updateAccountOrder(json) {
-    this._accountOrder.update(json)
+  updateAccountOrder(json, symbol) {
+    this._accountOrder.update(json, symbol)
     // console.log('BTM: account order update', json.action, '[ordStatus]', json.data[0] && json.data[0].ordStatus, '[ordType]', json.data[0] && json.data[0].ordType)
     // console.log(json)
     // console.log(this._accountOrder)

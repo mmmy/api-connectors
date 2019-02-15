@@ -42,3 +42,8 @@ bitmex.listenPosition(dataCb, "*")
 // bitmex.listenExecution(dataCb)
 
 bitmex.listenOrder(dataCb, "*")
+
+setInterval(() => {
+  console.log(strategy.getAccountAllOrders().length)
+  
+}, 5000)

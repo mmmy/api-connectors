@@ -46,15 +46,15 @@ module.exports = class StrategyUserManager {
     return users
   }
 
-  orderMarket(user, orderQty, side="Buy") {
+  orderMarket(user, symbol, orderQty, side="Buy") {
     const strategy = this.findStrategyByUser(user)
     if (!strategy) {
       return Promise.reject(`${user} strategy not exist`)
     }
-    return strategy.getOrderManager().getSignatureSDK().orderMarket(orderQty, side)
+    return strategy.getOrderManager().getSignatureSDK().orderMarket(symbol, orderQty, side)
   }
   // auto_price, 获得最优的price
-  orderLimit(user, orderQty, side, price, auto_price) {
+  orderLimit(user, symbol, orderQty, side, price, auto_price) {
     if (!price && auto_price) {
       return Promise.reject('auto_price 参数还没完完成')
     }
@@ -62,23 +62,23 @@ module.exports = class StrategyUserManager {
     if (!strategy) {
       return Promise.reject(`${user} strategy not exist`)
     }
-    return strategy.getOrderManager().getSignatureSDK().orderLimit(orderQty, side, price)
+    return strategy.getOrderManager().getSignatureSDK().orderLimit(symbol, orderQty, side, price)
   }
 
-  orderReduceOnlyLimit(user, orderQty, side, price) {
+  orderReduceOnlyLimit(user, symbol, orderQty, side, price) {
     const strategy = this.findStrategyByUser(user)
     if (!strategy) {
       return Promise.reject(`${user} strategy not exist`)
     }
-    return strategy.getOrderManager().getSignatureSDK().orderReduceOnlyLimit(orderQty, side, price)
+    return strategy.getOrderManager().getSignatureSDK().orderReduceOnlyLimit(symbol, orderQty, side, price)
   }
 
-  orderStop(user, orderQty, stopPx, side) {
+  orderStop(user, symbol, orderQty, stopPx, side) {
     const strategy = this.findStrategyByUser(user)
     if (!strategy) {
       return Promise.reject(`${user} strategy not exist`)
     }
-    return strategy.getOrderManager().getSignatureSDK().orderStop(orderQty, stopPx, side)
+    return strategy.getOrderManager().getSignatureSDK().orderStop(symbol, orderQty, stopPx, side)
   }
 
   deleteOrder(user, orderID) {
@@ -97,12 +97,12 @@ module.exports = class StrategyUserManager {
     return strategy.getOrderManager().getSignatureSDK().deleteOrderAll()
   }
 
-  closePositionMarket(user) {
+  closePositionMarket(user, symbol) {
     const strategy = this.findStrategyByUser(user)
     if (!strategy) {
       return Promise.reject(`${user} strategy not exist`)
     }
-    return strategy.getOrderManager().getSignatureSDK().closePositionMarket()
+    return strategy.getOrderManager().getSignatureSDK().closePositionMarket(symbol)
   }
 
   findStrategyByUser(user) {
@@ -116,7 +116,7 @@ module.exports = class StrategyUserManager {
     }
     return strategy.getOrderManager().getSignatureSDK().updateOrder(params)
   }
-
+  // todo: 此接口还有问题
   getBidAsk(level) {
     const mainStrategy = this.getMainStrategy()
     if (!mainStrategy) {

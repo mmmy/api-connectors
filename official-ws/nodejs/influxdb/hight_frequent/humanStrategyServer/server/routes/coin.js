@@ -26,11 +26,11 @@ router.get('/user', function(req, res, next) {
 })
 
 router.post('/order_limit', function(req, res, next) {
-  const { user, qty, side, price, auto_price } = req.body
-  if (!qty || !side) {
+  const { user, symbol, qty, side, price, auto_price } = req.body
+  if (!symbol || !qty || !side) {
     res.send({
       result: false,
-      info: '缺少 qty, side 参数',
+      info: '缺少symbol qty, side 参数',
     })
   } else if (!price && !auto_price) {
     res.send({
@@ -38,7 +38,7 @@ router.post('/order_limit', function(req, res, next) {
       info: 'price 或者 auto_price（bool）至少需要一个',
     })
   }
-  manager.orderLimit(user, qty, side, price, auto_price).then(json => {
+  manager.orderLimit(user, symbol, qty, side, price, auto_price).then(json => {
     res.send({
       result: true,
       data: json
@@ -52,14 +52,14 @@ router.post('/order_limit', function(req, res, next) {
 })
 // 只减仓
 router.post('/order_reduce_only_limit', function(req, res, next) {
-  const { user, qty, side, price } = req.body
-  if (!qty || !side || !price) {
+  const { user, symbol, qty, side, price } = req.body
+  if (!symbol || !qty || !side || !price) {
     res.send({
       result: false,
-      info: '缺少 qty, side, price 参数',
+      info: '缺少symbol qty, side, price 参数',
     })
   }
-  manager.orderReduceOnlyLimit(user, qty, side, price).then(json => {
+  manager.orderReduceOnlyLimit(user, symbol, qty, side, price).then(json => {
     res.send({
       result: true,
       data: json
@@ -73,15 +73,15 @@ router.post('/order_reduce_only_limit', function(req, res, next) {
 })
 
 router.post('/order_market', function(req, res, next) {
-  const { user, qty, side } = req.body
-  if (!qty || !side) {
+  const { user, symbol, qty, side } = req.body
+  if (!symbol || !qty || !side) {
     res.send({
       result: false,
-      info: '缺少 qty, side 参数'
+      info: '缺少symbol qty, side 参数'
     })
     return
   }
-  manager.orderMarket(user, qty, side).then(json => {
+  manager.orderMarket(user, symbol, qty, side).then(json => {
     res.send({
       result: true,
       data: json,
@@ -131,8 +131,14 @@ router.post('/delete_order', function(req, res, next) {
 })
 
 router.post('/close_position', function(req, res, next) {
-  const { user } = req.body
-  manager.closePositionMarket(user).then(json => {
+  const { user, symbol } = req.body
+  if (!symbol) {
+    res.send({
+      result: false,
+      info: '缺少参数symbol'
+    })
+  }
+  manager.closePositionMarket(user, symbol).then(json => {
     res.send({
       result: true,
       data: json
@@ -181,14 +187,14 @@ router.get('/xbtusd_depth', function(req, res, next) {
 })
 
 router.post('/order_stop', function(req, res, next) {
-  const { user, qty, side, stopPx } = req.body
-  if (!qty && !side && !stopPx) {
+  const { user, symbol, qty, side, stopPx } = req.body
+  if (!symbol || !qty && !side && !stopPx) {
     res.send({
       result: false,
-      info: '缺少qty, side, stopPx参数'
+      info: '缺少symbol, qty, side, stopPx参数'
     })
   }
-  manager.orderStop(user, qty, stopPx, side).then(json => {
+  manager.orderStop(user, symbol, qty, stopPx, side).then(json => {
     res.send({
       result: true,
       data: json

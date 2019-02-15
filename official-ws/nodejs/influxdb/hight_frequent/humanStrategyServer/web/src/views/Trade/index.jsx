@@ -16,6 +16,18 @@ function formatPosition(val, key, position) {
   }
 }
 
+const positionKeyText = {
+  'leverage': '倍',
+  'currentQty': 'Qty',
+  'avgCostPrice': 'Price',
+  'realisedGrossPnl': 'rG Pnl',
+  'realisedPnl': 'r Pnl',
+  'unrealisedPnl': 'ur Pnl',
+  'unrealisedPnlPcnt': 'ur Pnl%'
+}
+
+const supportSymbols = ['XBTUSD', 'ETHUSD', 'XRPH19']
+
 export default class Trade extends React.Component {
   constructor(props) {
     super(props)
@@ -40,33 +52,45 @@ export default class Trade extends React.Component {
       <div>
         {
           users.map((user, i) => {
-            const { options, position, orders, form, pending } = user
+            const { options, positions, orders, form, pending } = user
             // 检查止损是否设置正常
             const orderStopValide = this.checkStop(i)
-            const positionKeys = ['leverage', 'currentQty', 'avgCostPrice', 'realisedGrossPnl', 'realisedPnl', 'unrealisedPnl', 'unrealisedPnlPcnt']
+            const positionKeys = ['symbol', 'leverage', 'currentQty', 'avgCostPrice', 'unrealisedPnl', 'unrealisedPnlPcnt', 'realisedGrossPnl', 'realisedPnl']
             return <div className="user-row">
               <div>user: {user.options.user}</div>
               <div className="account clearfix">
-                <table>
+                <table style={{ fontSize: '12px' }}>
+                  <thead>
+                    <tr>
+                      {[<th></th>].concat(positionKeys.map(key => <th>{positionKeyText[key] || key}</th>))}
+                    </tr>
+                  </thead>
                   <tbody>
-                    {positionKeys.map(key => {
-                      const val = position[key]
-                      const format = formatPosition(val, key, position)
-                      let cn = ''
-                      if (['currentQty', 'realisedGrossPnl', 'realisedPnl', 'unrealisedPnl', 'unrealisedPnlPcnt'].indexOf(key) > -1) {
-                        if (val > 0) {
-                          cn = 'green'
-                        } else if (val < 0) {
-                          cn = 'red'
-                        }
-                      }
-                      return <tr><td>{key}</td><td className={cn}>{format}</td></tr>
-                    })}
+                    {
+                      positions.map(position => {
+                        return <tr>
+                          {
+                            [
+                              <td><button style={{ margin: "5px 2px" }} onClick={this.handleClosePosition.bind(this, i, position)}>Close</button></td>
+                            ].concat(positionKeys.map(key => {
+                              const val = position[key]
+                              const format = formatPosition(val, key, position)
+                              let cn = ''
+                              if (['currentQty', 'realisedGrossPnl', 'realisedPnl', 'unrealisedPnl', 'unrealisedPnlPcnt'].indexOf(key) > -1) {
+                                if (val > 0) {
+                                  cn = 'green'
+                                } else if (val < 0) {
+                                  cn = 'red'
+                                }
+                              }
+                              return <td className={cn}>{format}</td>
+                            }))}
+                        </tr>
+                      })
+                    }
+
                   </tbody>
                 </table>
-              </div>
-              <div>
-                <button onClick={this.handleClosePosition.bind(this, i)} disabled={pending}>Close Position</button>
               </div>
               <hr />
               <div className="title">Orders</div>
@@ -74,6 +98,7 @@ export default class Trade extends React.Component {
                 <table>
                   <thead><tr>
                     <th></th>
+                    <th>symbol</th>
                     <th>qty</th>
                     <th>price</th>
                     <th>类型</th>
@@ -87,8 +112,9 @@ export default class Trade extends React.Component {
                         const isBuy = order.side === 'Buy'
                         return <tr>
                           <td><button onClick={this.handleDelOrder.bind(this, i, order)}>Del</button></td>
-                          <td style={{cursor:'pointer'}} title="点击修改" className={isBuy ? 'green' : 'red'} onClick={this.handleUpdateOrder.bind(this, i, order, 'orderQty')}>{order.orderQty * (isBuy ? 1 : -1)}</td>
-                          <td style={{cursor:'pointer'}} title="点击修改" onClick={this.handleUpdateOrder.bind(this, i, order, 'price')}>{order.price}</td>
+                          <td>{order.symbol}</td>
+                          <td style={{ cursor: 'pointer' }} title="点击修改" className={isBuy ? 'green' : 'red'} onClick={this.handleUpdateOrder.bind(this, i, order, 'orderQty')}>{order.orderQty * (isBuy ? 1 : -1)}</td>
+                          <td style={{ cursor: 'pointer' }} title="点击修改" onClick={this.handleUpdateOrder.bind(this, i, order, 'price')}>{order.price}</td>
                           <td>{order.ordType}{order.execInst.indexOf('ReduceOnly') > -1 ? '只减仓' : ''}</td>
                           <td>{order.ordStatus}</td>
                           <td className={isBuy ? 'green' : 'red'}>{order.leavesQty * (isBuy ? 1 : -1)}</td>
@@ -101,6 +127,9 @@ export default class Trade extends React.Component {
               </div>
               <div>OrderBook: ({obBuy && (obBuy.size / 1E3 + 'k')})<span className="green">{obBuy && obBuy.price}</span> : <sapn className="red">{obSell && obSell.price}</sapn>({obSell && (obSell.size / 1E3 + 'k')})</div>
               <div style={{ marginBottom: '10px' }}>
+                <select value={form.order_symbol} onChange={this.handleSelectChangeFormData.bind(this, i, 'order_symbol')}>
+                  {supportSymbols.map(s => <option value={s}>{s}</option>)}
+                </select>
                 <select value={form.order_side} onChange={this.handleSelectChangeFormData.bind(this, i, 'order_side')}>
                   <option value="Buy">Buy</option>
                   <option value="Sell">Sell</option>
@@ -109,13 +138,13 @@ export default class Trade extends React.Component {
               </div>
               <div style={{ marginBottom: '10px' }}>
                 <label>P:</label><input value={form.order_price} style={{ width: '100px' }} type="number" onChange={this.handleInputChangeFormData.bind(this, i, 'order_price')} /><button onClick={this.handleOrderLimit.bind(this, i)} disabled={pending || !form.order_price}>Order Limit</button>
-                <input type="checkbox" id="reduce-only-checkbox" checked={form.reduce_only} style={{marginLeft: '10px'}} onChange={this.handleChangeCheckbox.bind(this, i, 'reduce_only')}/><label for="reduce-only-checkbox">reduce only</label>
+                <input type="checkbox" id="reduce-only-checkbox" checked={form.reduce_only} style={{ marginLeft: '10px' }} onChange={this.handleChangeCheckbox.bind(this, i, 'reduce_only')} /><label for="reduce-only-checkbox">reduce only</label>
               </div>
               <div>
                 <button disabled={pending} onClick={this.handleOrderMarket.bind(this, i)}>Order Market</button>
               </div>
               <hr />
-              <div className="title">Stop Orders 
+              <div className="title">Stop Orders
                 {
                   !orderStopValide && <span className="red">!!止损设置有误</span>
                 }
@@ -124,6 +153,7 @@ export default class Trade extends React.Component {
                 <table>
                   <thead><tr>
                     <th></th>
+                    <th>symbol</th>
                     <th>数量</th>
                     <th>触发P</th>
                     <th>止损P</th>
@@ -136,8 +166,9 @@ export default class Trade extends React.Component {
                       orders.filter(o => o.ordType === 'Stop').map(order => {
                         return <tr>
                           <td><button onClick={this.handleDelOrder.bind(this, i, order)}>Del</button></td>
-                          <td style={{cursor: 'pointer'}} title="点击修改" className={order.side == 'Buy' ? 'green' : 'red'} onClick={this.handleUpdateOrder.bind(this, i, order, 'orderQty')}>{order.orderQty}</td>
-                          <td style={{cursor: 'pointer'}} title="点击修改" onClick={this.handleUpdateOrder.bind(this, i, order, 'stopPx')}>{order.stopPx}</td>
+                          <td>{order.symbol}</td>
+                          <td style={{ cursor: 'pointer' }} title="点击修改" className={order.side == 'Buy' ? 'green' : 'red'} onClick={this.handleUpdateOrder.bind(this, i, order, 'orderQty')}>{order.orderQty}</td>
+                          <td style={{ cursor: 'pointer' }} title="点击修改" onClick={this.handleUpdateOrder.bind(this, i, order, 'stopPx')}>{order.stopPx}</td>
                           <td>{order.price || '市价'}</td>
                           <td>{order.ordStatus}</td>
                           <td>{order.leavesQty}</td>
@@ -150,6 +181,9 @@ export default class Trade extends React.Component {
               </div>
               <div>
                 <div style={{ marginBottom: '10px' }}>
+                  <select value={form.stop_symbol} onChange={this.handleSelectChangeFormData.bind(this, i, 'stop_symbol')}>
+                    {supportSymbols.map(s => <option value={s}>{s}</option>)}
+                  </select>
                   <select value={form.stop_side} onChange={this.handleSelectChangeFormData.bind(this, i, 'stop_side')}>
                     <option value="Buy">Buy</option>
                     <option value="Sell">Sell</option>
@@ -214,6 +248,8 @@ export default class Trade extends React.Component {
               order_side: 'Buy', order_qty: 100, pending: false, order_price: null,
               stop_side: 'Sell', stop_qty: 1000, stop_price: null,
               reduce_only: false,
+              order_symbol: 'XBTUSD',
+              stop_symbol: 'XBTUSD',
             }
             return item
           }),
@@ -247,14 +283,14 @@ export default class Trade extends React.Component {
 
   handleChangeCheckbox(index, key, e) {
     this.state.users[index].form[key] = e.target.checked
-    this.setState({})    
+    this.setState({})
   }
 
   handleOrderLimit(index) {
     var userData = this.state.users[index]
     const user = userData.options.user
-    const { order_side, order_qty, order_price, reduce_only } = userData.form
-    var info = `${user}\n ${order_side} ${order_qty} at ${order_price} ${reduce_only ? '只减仓' : ''}`
+    const { order_side, order_qty, order_price, reduce_only, order_symbol } = userData.form
+    var info = `${user}\n ${order_symbol} ${order_side} ${order_qty} at ${order_price} ${reduce_only ? '只减仓' : ''}`
     if (window.confirm(info)) {
       userData.pending = true
       this.setState({})
@@ -264,6 +300,7 @@ export default class Trade extends React.Component {
       }
       axios.post(path, {
         user,
+        symbol: order_symbol,
         qty: order_qty,
         side: order_side,
         price: order_price,
@@ -289,14 +326,17 @@ export default class Trade extends React.Component {
 
   handleOrderMarket(index) {
     var userData = this.state.users[index]
-    var info = `${userData.options.user}\n ${userData.form.order_side} ${userData.form.order_qty} Market?`
+    const user = userData.options.user
+    const { order_side, order_qty, order_symbol } = userData.form
+    var info = `${user}\n ${order_symbol} ${order_side} ${order_qty} Market?`
     if (window.confirm(info)) {
       userData.pending = true
       this.setState({})
       axios.post('/api/coin/order_market', {
-        user: userData.options.user,
-        qty: userData.form.order_qty,
-        side: userData.form.order_side,
+        user: user,
+        symbol: order_symbol,
+        qty: order_qty,
+        side: order_side,
       }).then(({ status, data }) => {
         userData.pending = false
         if (status === 200 && data.result) {
@@ -315,12 +355,12 @@ export default class Trade extends React.Component {
   handleOrderStop(index) {
     var userData = this.state.users[index]
     const user = userData.options.user
-    const { stop_side, stop_qty, stop_price } = userData.form
-    var info = `${user} order stop market?\n ${stop_side} ${stop_qty} at ${stop_price}?`
+    const { stop_side, stop_qty, stop_price, stop_symbol } = userData.form
+    var info = `${user} order stop market?\n ${stop_symbol} ${stop_side} ${stop_qty} at ${stop_price}?`
     if (window.confirm(info)) {
       userData.pending = true
       this.setState({})
-      axios.post('api/coin/order_stop', { user, qty: stop_qty, side: stop_side, stopPx: stop_price }).then(({ status, data }) => {
+      axios.post('api/coin/order_stop', { user, symbol: stop_symbol, qty: stop_qty, side: stop_side, stopPx: stop_price }).then(({ status, data }) => {
         userData.pending = false
         if (status === 200 && data.result) {
           alert('order stop success')
@@ -379,14 +419,15 @@ export default class Trade extends React.Component {
     }
   }
 
-  handleClosePosition(index) {
+  handleClosePosition(index, position) {
     var userData = this.state.users[index]
     const { user } = userData.options
-    const info = `user: ${user}, close position market?`
+    const symbol = position.symbol
+    const info = `user: ${user}, close position ${symbol} market?`
     if (window.confirm(info)) {
       userData.pending = true
       this.setState({})
-      axios.post('api/coin/close_position', { user }).then(({ status, data }) => {
+      axios.post('api/coin/close_position', { user, symbol, }).then(({ status, data }) => {
         userData.pending = false
         if (status === 200 && data.result) {
           alert('close postion success')
@@ -412,7 +453,7 @@ export default class Trade extends React.Component {
       }
       userData.pending = true
       this.setState({})
-      axios.post('api/coin/update_order', {user, params: newOrder}).then(({status, data}) => {
+      axios.post('api/coin/update_order', { user, params: newOrder }).then(({ status, data }) => {
         userData.pending = false
         if (status === 200 && data.result) {
           alert('修改成功')
@@ -434,6 +475,7 @@ export default class Trade extends React.Component {
 
   checkStop(index) {
     var userData = this.state.users[index]
+    return false
     if (this.hasPostion(index)) {
       const isbuyPosition = userData.position.currentQty > 0
       let totalQty = 0

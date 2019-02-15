@@ -56,41 +56,41 @@ class SignatureSDK {
     return requestWidthHeader(url, params, headers, 'post')
   }
 
-  orderMarket(orderQty, side="Buy") {
-    const data = {symbol: SYMBOL, orderQty, side, ordType:"Market"}
+  orderMarket(symbol, orderQty, side="Buy") {
+    const data = {symbol: symbol, orderQty, side, ordType:"Market"}
     return this.order(data)
   }
   // 市价止损 , 所有市价 手续费太高0.075%
   //{"ordType":"Stop","stopPx":6520,"orderQty":1000,"side":"Buy","execInst":"Close,LastPrice","symbol":"XBTUSD","text":"Submission from testnet.bitmex.com"}
-  orderStop(orderQty, stopPx, side) {
-    const data = {symbol: SYMBOL, orderQty, stopPx, side, ordType:"Stop", execInst:"Close,LastPrice"}
+  orderStop(symbol, orderQty, stopPx, side) {
+    const data = {symbol: symbol, orderQty, stopPx, side, ordType:"Stop", execInst:"Close,LastPrice"}
     return this.order(data)
   }
   // 市价止盈
   //{"ordType":"MarketIfTouched","stopPx":6400,"orderQty":1000,"side":"Buy","execInst":"Close,LastPrice","symbol":"XBTUSD","text":"Submission from testnet.bitmex.com"}
-  orderMarketTouched(orderQty, stopPx, side) {
-    const data = {symbol: SYMBOL, orderQty, stopPx, side, ordType:"MarketIfTouched", execInst:"Close,LastPrice"}
+  orderMarketTouched(symbol, orderQty, stopPx, side) {
+    const data = {symbol: symbol, orderQty, stopPx, side, ordType:"MarketIfTouched", execInst:"Close,LastPrice"}
     return this.order(data)
   }
   // 限价手续费是-0.025%, 所以最好买入用orderLimit, displayQty: 0, 隐藏订单, 不显示到orderbook, 但是要收手续费
   // "ParticipateDoNotInitiate" : 一定返佣 否则系统会取消订单
-  orderLimit(orderQty, side, price) {
-    const data = {symbol: SYMBOL, orderQty, side, price, ordType: 'Limit', execInst: "ParticipateDoNotInitiate"}
+  orderLimit(symbol, orderQty, side, price) {
+    const data = {symbol: symbol, orderQty, side, price, ordType: 'Limit', execInst: "ParticipateDoNotInitiate"}
     return this.order(data)
   }
   // 只减仓
-  orderReduceOnlyLimit(orderQty, side, price) {
-    const data = {symbol: SYMBOL, orderQty, side, price, ordType: 'Limit', execInst: "ParticipateDoNotInitiate,ReduceOnly"}
+  orderReduceOnlyLimit(symbol, orderQty, side, price) {
+    const data = {symbol: symbol, orderQty, side, price, ordType: 'Limit', execInst: "ParticipateDoNotInitiate,ReduceOnly"}
     return this.order(data)
   }
   // 限价止损, 手续费是负数, 你懂的
-  orderStopLimit(orderQty, stopPx, side, price) {
-    const data = {symbol: SYMBOL, orderQty, stopPx, price, side, ordType: 'StopLimit', execInst:"Close,LastPrice"}
+  orderStopLimit(symbol, orderQty, stopPx, side, price) {
+    const data = {symbol: symbol, orderQty, stopPx, price, side, ordType: 'StopLimit', execInst:"Close,LastPrice"}
     return this.order(data)
   }
   // 限价止盈, 手续费是负数
-  orderProfitLimitTouched(orderQty, stopPx, side, price) {
-    const data = {symbol: SYMBOL, orderQty, side, stopPx, price, ordType: 'LimitIfTouched', execInst:"Close,LastPrice"}
+  orderProfitLimitTouched(symbol, orderQty, stopPx, side, price) {
+    const data = {symbol: symbol, orderQty, side, stopPx, price, ordType: 'LimitIfTouched', execInst:"Close,LastPrice"}
     return this.order(data)
   }
 
@@ -118,20 +118,20 @@ class SignatureSDK {
     return requestWidthHeader(url, data, headers, 'delete')
   }
   
-  getPosition() {
+  getPosition(symbol) {
     const path = '/api/v1/position'
     const url = this.getUrl(path)
     const data = {
       filter: {
-        symbol: 'XBTUSD'
+        symbol
       }
     }
     const headers = this.getHeaders('GET', path, data)
     return requestWidthHeader(url, data, headers, 'get')
   }
 
-  closePositionMarket() {
-    const data = {symbol: SYMBOL, ordType: "Market", execInst: "Close" }
+  closePositionMarket(symbol) {
+    const data = {symbol: symbol, ordType: "Market", execInst: "Close" }
     return this.order(data)
   }
 }

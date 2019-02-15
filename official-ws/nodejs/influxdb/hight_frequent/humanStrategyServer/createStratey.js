@@ -28,19 +28,19 @@ module.exports = function createStratey(options) {
     apiKeyID: options.apiKey,
     apiKeySecret: options.apiSecret
   })
-  function dataCb(json) {
+  function dataCb(json, symbol) {
     // if (json.table === 'orderBookL2_25') {
     //   client_orderbook.saveJson(json)
     // } else if (json.table === 'instrument' || json.table === 'trade') {
     //   client_others.saveJson(json)
     // }
-    strategy.listenJson(json)
+    strategy.listenJson(json, symbol)
   }
-  bitmex.listenPosition(dataCb)
+  bitmex.listenPosition(dataCb, "*")
 
-  bitmex.listenMargin(dataCb)
-  bitmex.listenOrder(dataCb)
-  bitmex.listenExecution(dataCb)
+  bitmex.listenMargin(dataCb, "*")
+  bitmex.listenOrder(dataCb, "*")
+  // bitmex.listenExecution(dataCb)
   if (options.main) {
     bitmex.listenOrderBook(dataCb)
   } else {
