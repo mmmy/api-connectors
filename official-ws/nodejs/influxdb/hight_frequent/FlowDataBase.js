@@ -2,6 +2,7 @@
 // const OrderBook = require('../../strategy/researchOrderbookL2/OrderBookL2Trade')
 const AccountOrder = require('./AccountOrder')
 const AccountPosition = require('./AccountPosition')
+const AccountQuote = require('./AccountQuote')
 const Candles = require('../../strategy/Candles')
 const _ = require('lodash')
 const OrderManager = require('./OrderManager')
@@ -27,6 +28,7 @@ class FlowDataBase {
     this._ispList = []                    //[{timestamp, price}]
     this._accountOrder = new AccountOrder()
     this._accountPosition = new AccountPosition()
+    this._accountQuote = new AccountQuote()
     this._systemTime = 0
     this._orderManager = !this._options.test && new OrderManager(this._options, this._ob, this._accountPosition, this._accountOrder)
     this._orderManagerTest = new OrderManagerTest(this._options, this._ob)      // 回测
@@ -87,6 +89,9 @@ class FlowDataBase {
       case 'order':
         this.updateAccountOrder(json, symbol)
         break
+      case 'quote':
+        this.updateQuote(json, symbol)
+        break
       default:
         break
     }
@@ -117,6 +122,10 @@ class FlowDataBase {
     this._accountPosition.update(json, symbol)
     // console.log('++++++++++++++++++++++++++++ position')
     // console.log(this._accountPosition._data)
+  }
+
+  updateQuote(json, symbol) {
+    this._accountQuote.update(json, symbol)
   }
 
   updateMargin(json) {
@@ -272,6 +281,14 @@ class FlowDataBase {
 
   getBidAsk(level = 1) {
     return this._ob.getDepth(level)
+  }
+
+  getAllLatestQuote() {
+    return this._accountQuote.getAllLatestQuote()
+  }
+
+  getLatestQuote(symbol) {
+    return this._accountQuote.getLatestQuote(symbol)
   }
 }
 

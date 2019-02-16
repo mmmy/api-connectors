@@ -55,12 +55,20 @@ module.exports = class StrategyUserManager {
   }
   // auto_price, 获得最优的price
   orderLimit(user, symbol, orderQty, side, price, auto_price) {
-    if (!price && auto_price) {
-      return Promise.reject('auto_price 参数还没完完成')
-    }
     const strategy = this.findStrategyByUser(user)
     if (!strategy) {
       return Promise.reject(`${user} strategy not exist`)
+    }
+    if (auto_price) {
+      const mainStrategy = this.getMainStrategy()
+      if (!mainStrategy) {
+        return Promise.reject('main strategy not exist')
+      }
+      const quote = mainStrategy.getLatestQuote(symbol)
+      if (!quote) {
+        return Promise.reject(`${symbol}'s quote not exit`)
+      }
+      price = side == 'Buy' ? quote.bidPrice : quote.askPrice
     }
     return strategy.getOrderManager().getSignatureSDK().orderLimit(symbol, orderQty, side, price)
   }
@@ -123,6 +131,14 @@ module.exports = class StrategyUserManager {
       return Promise.reject('main strategy not exist')
     }
     return Promise.resolve(mainStrategy.getBidAsk(level))
+  }
+
+  getAllLatestQuote() {
+    const mainStrategy = this.getMainStrategy()
+    if (!mainStrategy) {
+      return Promise.reject('main strategy not exist')
+    }
+    return Promise.resolve(mainStrategy.getAllLatestQuote())
   }
 
   getMainStrategy() {

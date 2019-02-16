@@ -170,7 +170,7 @@ router.post('/update_order', function(req, res, next) {
     })
   })
 })
-
+// TODO: 此接口暂时有问题
 router.get('/xbtusd_depth', function(req, res, next) {
   const { level } = req.query
   manager.getBidAsk(level).then(list => {
@@ -182,6 +182,20 @@ router.get('/xbtusd_depth', function(req, res, next) {
     res.send({
       result: false,
       info: e,
+    })
+  })
+})
+
+router.get('/all_quotes', function(req, res, next) {
+  manager.getAllLatestQuote().then(list => {
+    res.send({
+      result: true,
+      data: list
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
     })
   })
 })

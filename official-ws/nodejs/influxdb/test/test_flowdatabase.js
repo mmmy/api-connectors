@@ -37,13 +37,14 @@ const bitmex = new BitmexManager({
 
 bitmex.listenInstrument(dataCb, "*")
 
-bitmex.listenPosition(dataCb, "*")
+// bitmex.listenPosition(dataCb, "*")
 
 // bitmex.listenExecution(dataCb)
 
-bitmex.listenOrder(dataCb, "*")
+// bitmex.listenOrder(dataCb, "*")
+bitmex.listenQuote(dataCb, 'XBTUSD')
 
-setInterval(() => {
-  console.log(strategy.getAccountAllOrders().length)
+// setInterval(() => {
+//   console.log(strategy.getAccountAllOrders().length)
   
-}, 5000)
+// }, 5000)

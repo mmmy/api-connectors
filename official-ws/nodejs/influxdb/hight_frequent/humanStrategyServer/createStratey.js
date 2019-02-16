@@ -42,7 +42,10 @@ module.exports = function createStratey(options) {
   bitmex.listenOrder(dataCb, "*")
   // bitmex.listenExecution(dataCb)
   if (options.main) {
-    bitmex.listenOrderBook(dataCb)
+    // bitmex.listenOrderBook(dataCb)
+    bitmex.listenQuote(dataCb, 'XBTUSD')
+    bitmex.listenQuote(dataCb, 'ETHUSD')
+    bitmex.listenQuote(dataCb, 'XRPH19')
   } else {
     // 为了保持和bitmex的连接, 也可以send {ping}
     bitmex.listenInstrument(() => {})
