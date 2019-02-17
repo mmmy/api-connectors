@@ -1,6 +1,6 @@
 
 const { apiKey, apiSecret } = require('../../../../strategy/test-secret.json')
-var daishu = require('../../../strategy/daishu-secret.json')
+var daishu = require('../../../../strategy/daishu-secret.json')
 const isProduction = process.env.NODE_ENV === 'production'
 
 const StrategyUserManager = require('../StrategyUserManager')
