@@ -2,6 +2,8 @@
 
 base_url="http://202.182.125.82:3004"
 path="/api/coin/order_stop"
+printf 'Order Stop\n'
+read_symbol
 
 select side in "Buy" "Sell";
 do
@@ -18,11 +20,11 @@ read -p "stop price: " stopPx
 
 printf "\n"
 echo '-----confirm------'
-confirm "Order Stop $side $qty @ $stopPx to $path"
+confirm "Order Stop $symbol $side $qty @ $stopPx to $path"
 [ $? == '0' ] && echo 'canceled and exit' && exit
 
 user="yq"
-json="{\"user\":\"$user\",\"side\":\"$side\",\"qty\":$qty,\"stopPx\":$stopPx}"
+json="{\"user\":\"$user\",\"symbol\":\"$symbol\",\"side\":\"$side\",\"qty\":$qty,\"stopPx\":$stopPx}"
 
 echo $json
 

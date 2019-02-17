@@ -5,9 +5,11 @@ path="/api/coin/close_position"
 
 user="yq"
 
-data="{\"user\":\"$user\"}"
+read_symbol
 
-confirm "Close Position ?"
+data="{\"user\":\"$user\",\"symbol\":\"$symbol\"}"
+
+confirm "$user: $symbol Close Position ?"
 [ $? == '0' ] && echo 'Canceled and Exit' && exit
 
 res=`curl -H "Content-Type:Application/json" -X POST --data $data $base_url$path`

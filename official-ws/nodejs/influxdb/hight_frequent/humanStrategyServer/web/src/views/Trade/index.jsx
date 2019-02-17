@@ -172,14 +172,15 @@ export default class Trade extends React.Component {
                   <tbody>
                     {
                       orders.filter(o => o.ordType === 'Stop').map(order => {
+                        const isBuy = order.side === 'Buy'
                         return <tr>
                           <td><button onClick={this.handleDelOrder.bind(this, i, order)}>Del</button></td>
                           <td>{order.symbol}</td>
-                          <td style={{ cursor: 'pointer' }} title="点击修改" className={order.side == 'Buy' ? 'green' : 'red'} onClick={this.handleUpdateOrder.bind(this, i, order, 'orderQty')}>{order.orderQty}</td>
+                          <td style={{ cursor: 'pointer' }} title="点击修改" className={order.side == 'Buy' ? 'green' : 'red'} onClick={this.handleUpdateOrder.bind(this, i, order, 'orderQty')}>{order.orderQty * (isBuy ? 1 : -1)}</td>
                           <td style={{ cursor: 'pointer' }} title="点击修改" onClick={this.handleUpdateOrder.bind(this, i, order, 'stopPx')}>{order.stopPx}</td>
                           <td>{order.price || '市价'}</td>
                           <td>{order.ordStatus}</td>
-                          <td>{order.leavesQty}</td>
+                          <td className={isBuy ? 'green' : 'red'}>{order.leavesQty * (isBuy ? 1 : -1)}</td>                          
                           <td>{new Date(order.timestamp).toLocaleString()}</td>
                         </tr>
                       })

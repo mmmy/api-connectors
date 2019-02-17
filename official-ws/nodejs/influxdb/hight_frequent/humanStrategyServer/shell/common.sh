@@ -21,3 +21,16 @@ print_result() {
         printf "\e[91mFALURE \!\!\e[0m\n"
     fi
 }
+
+read_symbol() {
+    echo "select a symbol";
+    select symbol in "XBTUSD" "ETHUSD" "XRPH19";
+    do
+    if [ ! -z "$symbol" ]; then
+    break
+    else
+    echo 'error! choose one'
+    fi
+    done
+    # $1="$symbol"
+}

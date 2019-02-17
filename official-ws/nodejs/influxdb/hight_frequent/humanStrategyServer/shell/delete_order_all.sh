@@ -7,7 +7,7 @@ user="yq"
 
 data="{\"user\":\"$user\"}"
 
-confirm "Delete Order All ?"
+confirm "$user: Delete Order All ?"
 [ $? == '0' ] && echo 'Canceled and Exit' && exit
 
 res=`curl -H "Content-Type:Application/json" -X POST --data $data $base_url$path`

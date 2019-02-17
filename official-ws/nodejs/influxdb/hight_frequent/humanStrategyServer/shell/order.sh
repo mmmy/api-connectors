@@ -9,6 +9,8 @@ path="/api/coin/order_market"
 echo "Order Market"
 fi
 
+read_symbol
+
 select side in "Buy" "Sell";
 do
 if [ ! -z "$side" ]; then
@@ -20,19 +22,29 @@ done
 read -p "qty: " qty
 
 if [ $ORDER_TYPE == "Limit" ]; then
-read -p "price: " price
+read -p "price(-1 -> auto_price):" price
 fi
 
-printf "\n"
-echo '-----confirm------'
-confirm "$side $qty $price to $path"
-[ $? == '0' ] && echo 'canceled and exit' && exit
+auto_price='false'
+if [ $price == '-1' ]; then
+auto_price='true'
+fi
 
 user="yq"
+
+printf "\n"
+msg="$user: $symbol $side $qty $price to $path"
+if [ $auto_price == 'true' ]; then
+msg="$user: $symbol $side $qty auto_price to $path"
+fi
+echo '-----confirm------'
+confirm "$msg"
+[ $? == '0' ] && echo 'canceled and exit' && exit
+
 if [ $ORDER_TYPE == "Limit" ]; then
-json="{\"user\":\"$user\",\"side\":\"$side\",\"qty\":$qty,\"price\":$price}"
+json="{\"user\":\"$user\",\"symbol\":\"$symbol\",\"side\":\"$side\",\"qty\":$qty,\"price\":$price,\"auto_price\":$auto_price}"
 else
-json="{\"user\":\"$user\",\"side\":\"$side\",\"qty\":$qty}"
+json="{\"user\":\"$user\",\"symbol\":\"$symbol\",\"side\":\"$side\",\"qty\":$qty}"
 fi
 echo $json
 
