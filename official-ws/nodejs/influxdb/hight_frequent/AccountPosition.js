@@ -6,13 +6,17 @@ class AccountPosition {
     }
 
     this._CLIENT = {
-      _data: {},
+      _data: { position: {} },
       _keys: {}
     }
   }
 
   update(json, symbol) {
     symbol = symbol || 'XBTUSD'
+    // 由于首次可能不是action=partial, 导致永远不能更新的bug
+    if (!this._CLIENT._data.position[symbol]) {
+      this._CLIENT._data.position[symbol] = []
+    }
     let _data = DeltaParse.onAction(json.action, json.table, symbol, this._CLIENT, json)
     // console.log('account position test', symbol, this.getCostPrice(symbol))
   }
