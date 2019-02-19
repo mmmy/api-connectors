@@ -3,6 +3,7 @@
 const AccountOrder = require('./AccountOrder')
 const AccountPosition = require('./AccountPosition')
 const AccountQuote = require('./AccountQuote')
+const BitmexCandleManager = require('./BitmexCandleManager')
 const Candles = require('../../strategy/Candles')
 const _ = require('lodash')
 const OrderManager = require('./OrderManager')
@@ -37,7 +38,7 @@ class FlowDataBase {
 
     this._currentQty = 0
 
-    this._candles1m = new Candles()            // 1分钟K线
+    this._candles1h = new BitmexCandleManager()
 
     if (this._options.initCheckSystem) {
       this.initCheckSystem()
@@ -84,7 +85,7 @@ class FlowDataBase {
         // this.updateExecution(json, symbol)
         break
       case 'tradeBin1m':
-        this.updateTradeBin1m(json, symbol)
+        this.updateTradeBin1h(json, symbol)
         break
       case 'order':
         this.updateAccountOrder(json, symbol)
@@ -236,16 +237,15 @@ class FlowDataBase {
     }, 5 * 60 * 1000)
   }
 
-  // 1分钟K线数据
-  setCandles1mHistory(list) {
-    this._candles1m.setHistoryData(list)
+  // 1小时K线数据
+  setCandles1hHistory(list, symbol) {
+    this._candles1h.setHistoryData(list, symbol)
   }
 
-  updateTradeBin1m(json) {
-    this._candles1m.updateLastHistory(json.data[0])
+  updateTradeBin1h(json, symbol) {
+    this._candles1h.update(json.data[0], symbol)
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
-
   }
 
   updateAccountOrder(json, symbol) {

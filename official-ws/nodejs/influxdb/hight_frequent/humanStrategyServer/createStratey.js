@@ -43,13 +43,17 @@ module.exports = function createStratey(options) {
   // bitmex.listenExecution(dataCb)
   if (options.main) {
     // bitmex.listenOrderBook(dataCb)
-    bitmex.listenQuote(dataCb, 'XBTUSD')
-    bitmex.listenQuote(dataCb, 'ETHUSD')
-    bitmex.listenQuote(dataCb, 'XRPH19')
+    ['XBTUSD', 'ETHUSD', 'ADAH19', 'XRPH19'].forEach(symbol => {
+      bitmex.listenQuote(dataCb, symbol)
+      // 1小时K线
+      bitmex.listenCandle({ binSize: '1h', count: 200 }, list => {
+        strategy.setCandles1hHistory(list, symbol)
+      }, dataCb, symbol)
+    })
   } else {
     // 为了保持和bitmex的连接, 也可以send {ping}
-    bitmex.listenInstrument(() => {})
+    bitmex.listenInstrument(() => { })
   }
-  
+
   return strategy
 }

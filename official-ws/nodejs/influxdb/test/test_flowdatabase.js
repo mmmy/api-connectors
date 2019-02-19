@@ -27,6 +27,14 @@ function dataCb(json, symbol) {
   //   client_others.saveJson(json)
   // }
   strategy.listenJson(json, symbol)
+  if (json.table === 'tradeBin1m') {
+    const signal = strategy._candles1h.calcMacdDepartSignal(symbol)
+    if (signal.long) {
+      console.log(symbol, 'signal long')
+    } else if (signal.short) {
+      console.log(symbol, 'signal short')
+    }
+  }
 }
 
 const bitmex = new BitmexManager({
@@ -35,14 +43,22 @@ const bitmex = new BitmexManager({
   apiKeySecret: apiSecret
 })
 
-bitmex.listenInstrument(dataCb, "*")
+// bitmex.listenInstrument(dataCb, "*")
 
 // bitmex.listenPosition(dataCb, "*")
 
 // bitmex.listenExecution(dataCb)
 
 // bitmex.listenOrder(dataCb, "*")
-bitmex.listenQuote(dataCb, 'XBTUSD')
+const symbols = ['XBTUSD', 'ETHUSD', 'ADAH19', 'XRPH19']
+symbols.forEach(symbol => {
+  bitmex.listenQuote(dataCb, symbol)
+  // 1小时K线
+  bitmex.listenCandle({ binSize: '1m', count: 200 }, list => {
+    strategy.setCandles1hHistory(list, symbol)
+  }, dataCb, symbol)
+})
+// bitmex.listenQuote(dataCb, 'XBTUSD')
 
 // setInterval(() => {
 //   console.log(strategy.getAccountAllOrders().length)

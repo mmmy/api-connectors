@@ -11,30 +11,30 @@ function RealTimeCandle(price) {
   }
 }
 // 开始下个k线数据, 那么新K线继承上个close 的价格
-RealTimeCandle.prototype.reset = function() {
+RealTimeCandle.prototype.reset = function () {
   var price = this._data.close
   this._data.open = price
   this._data.high = price
   this._data.low = price
 }
 
-RealTimeCandle.prototype.mergeHighLow = function(candle) {
+RealTimeCandle.prototype.mergeHighLow = function (candle) {
   this._data.high = Math.max(this._data.high, candle.high)
   this._data.low = Math.min(this._data.low, candle.low)
 }
 
-RealTimeCandle.prototype.setOpen = function(open) {
+RealTimeCandle.prototype.setOpen = function (open) {
   this._data.open = open
 }
 
-RealTimeCandle.prototype.update = function(price) {
+RealTimeCandle.prototype.update = function (price) {
   this._data.close = price
   this._data.high = Math.max(this._data.high, price)
   this._data.low = Math.min(this._data.low, price)
   this._data.timestamp = new Date()
 }
 
-RealTimeCandle.prototype.getCandle = function() {
+RealTimeCandle.prototype.getCandle = function () {
   return Object.assign({}, this._data)
 }
 
@@ -47,7 +47,7 @@ function Candles(options) {
   this._stochRsiSignals = []      // { long: false, short: false, timestamp: 0 }
 }
 
-Candles.prototype.setOptions = function(options) {
+Candles.prototype.setOptions = function (options) {
   this._options = {
     smaFastLen: 29,
     smaSlowLen: 50,
@@ -59,15 +59,15 @@ Candles.prototype.setOptions = function(options) {
   }
 }
 
-Candles.prototype.getOptions = function() {
+Candles.prototype.getOptions = function () {
   return this._options
 }
 
-Candles.prototype.setHistoryData = function(list) {
+Candles.prototype.setHistoryData = function (list) {
   this._histories = list
 }
 // 这是用来订阅 某时间级别的数据调用的
-Candles.prototype.updateLastHistory = function(data) {
+Candles.prototype.updateLastHistory = function (data) {
   var len = this._histories.length
   var lastData = this._histories[len - 1]
   var time = +new Date(data.timestamp)
@@ -87,7 +87,7 @@ Candles.prototype.updateLastHistory = function(data) {
   this._latestCandle && this._latestCandle.reset()
 }
 
-Candles.prototype.removeOldData = function() {
+Candles.prototype.removeOldData = function () {
   // 去掉多余数据
   if (this._histories.length > this._maxLength) {
     this._histories.shift()
@@ -95,10 +95,10 @@ Candles.prototype.removeOldData = function() {
 }
 
 // 检验时间是否正常
-Candles.prototype.checkData = function() {
+Candles.prototype.checkData = function () {
   var _histories = this._histories
   var timeIntervals = []
-  for(var i=1; i<_histories.length; i++) {
+  for (var i = 1; i < _histories.length; i++) {
     var interval = new Date(_histories[i].timestamp) - new Date(_histories[i - 1].timestamp)
     if (interval < 0) {
       throw 'Candles: 顺序不对'
@@ -127,49 +127,49 @@ Candles.prototype.checkData = function() {
        homeNotional: 0.0602162,
        foreignNotional: 404 } ] } 
 */
-Candles.prototype.updateRealTimeCandle = function(data) {
+Candles.prototype.updateRealTimeCandle = function (data) {
   this.initLatestCandle(data.price)
   this._latestCandle.update(data.price)
 }
 
-Candles.prototype.initLatestCandle = function(price) {
+Candles.prototype.initLatestCandle = function (price) {
   this._latestCandle = this._latestCandle || new RealTimeCandle(price)
 }
 
-Candles.prototype.bollSignalSeries = function(realTime) {
+Candles.prototype.bollSignalSeries = function (realTime) {
   var klines = this.getCandles(realTime)
   const bbSignal = signal.BBSignalSeries(klines)
   return bbSignal
 }
 
-Candles.prototype.bollSignal = function(realTime) {
+Candles.prototype.bollSignal = function (realTime) {
   var data = this.getCandles(realTime)
   var bbSignal = signal.BollingerBandsSignal(data)
   // console.log(bbSignal)
   return bbSignal
 }
 
-Candles.prototype.rsiSignal = function(realTime, len) {
+Candles.prototype.rsiSignal = function (realTime, len) {
   var data = this.getCandles(realTime)
   var rsis = signal.RSI(data, len)
   // console.log('rsi', rsi)
   return rsis
 }
 // 也许开始趋势反转, 这个根据历史数据
-Candles.prototype.mayTrendReverseSignal = function() {
+Candles.prototype.mayTrendReverseSignal = function () {
   const bbSignal = this.bollSignal()
   const rsis = this.rsiSignal()
   const lastRsi = rsis[rsis.length - 1]
   const lastRsi2 = rsis[rsis.length - 2]
   let long = false,
-      short = false
+    short = false
   // if (bbSignal.short && lastRsi < lastRsi2 && lastRsi < 28) {
   if (bbSignal.short && lastRsi < 29) {
-  // if (bbSignal.short && lastRsi < 29) {
+    // if (bbSignal.short && lastRsi < 29) {
     long = true
-  // } else if (bbSignal.long && lastRsi > lastRsi2 && lastRsi > 72) {
+    // } else if (bbSignal.long && lastRsi > lastRsi2 && lastRsi > 72) {
   } else if (bbSignal.long && lastRsi > 71) {
-  // } else if (bbSignal.long && lastRsi > 71) {
+    // } else if (bbSignal.long && lastRsi > 71) {
     short = true
   }
 
@@ -179,29 +179,29 @@ Candles.prototype.mayTrendReverseSignal = function() {
   }
 }
 // 注意要先调用上面的, 在用这个
-Candles.prototype.isReversed = function(maySignal) {
+Candles.prototype.isReversed = function (maySignal) {
   const rsis = this.rsiSignal(true)
   const lastRsi = rsis[rsis.length - 1]
   const lastRsi2 = rsis[rsis.length - 2]
   let long = false,
-      short = false
+    short = false
 
-  if (maySignal.long && lastRsi - lastRsi2 > 2 ) {
-  // if (maySignal.long && lastRsi > 30 ) {
+  if (maySignal.long && lastRsi - lastRsi2 > 2) {
+    // if (maySignal.long && lastRsi > 30 ) {
     long = true
   } else if (maySignal.short && lastRsi - lastRsi2 < -2) {
-  // } else if (maySignal.short && lastRsi < 70) {
+    // } else if (maySignal.short && lastRsi < 70) {
     short = true
   }
 
   return { long, short }
 }
 
-Candles.prototype.macdTrendSignal = function(realTime = true) {
+Candles.prototype.macdTrendSignal = function (realTime = true) {
   var klines = this.getCandles(realTime)
   const macds = signal.MacdSignal(klines)
   let long = false,
-      short = false
+    short = false
 
   if (macds.length > 5) {
     const lastMacd = macds[macds.length - 1]
@@ -209,11 +209,11 @@ Candles.prototype.macdTrendSignal = function(realTime = true) {
     const lastMacd3 = macds[macds.length - 3]
     const lastMacd4 = macds[macds.length - 4]
     long = lastMacd.MACD > lastMacd2.MACD
-              // && lastMacd2.MACD > lastMacd3.MACD
-              // && lastMacd3.MACD > lastMacd4.MACD
+    // && lastMacd2.MACD > lastMacd3.MACD
+    // && lastMacd3.MACD > lastMacd4.MACD
     short = lastMacd.MACD < lastMacd2.MACD
-              // && lastMacd2.MACD < lastMacd3.MACD
-              // && lastMacd3.MACD < lastMacd4.MACD
+    // && lastMacd2.MACD < lastMacd3.MACD
+    // && lastMacd3.MACD < lastMacd4.MACD
   }
 
   return {
@@ -223,15 +223,73 @@ Candles.prototype.macdTrendSignal = function(realTime = true) {
   // console.log(macds)
   // console.log(long)
 }
+// MACD 背离信号
+Candles.prototype.macdDepartSignal = function (realTime = false) {
+  var klines = this.getCandles(realTime)
+  let macds = signal.MacdSignal(klines)
+  let long = false,
+    short = false
+
+  let backLen = 90
+  let isCurrentHighest = this.isCurrentHighestLowestClose(true, backLen)
+  let isCurrentLowest = this.isCurrentHighestLowestClose(false, backLen)
+  if (isCurrentHighest || isCurrentLowest) {
+    macds = macds.slice(-backLen)
+    let maxMacd, minMacd
+    if (macds.length > 0) {
+      const currentMacd = macds[macds.length - 1].MACD
+      macds.forEach((macd, i) => {
+        const MACD = macd.MACD
+        if (i === 0) {
+          maxMacd = MACD
+          minMacd = MACD
+        } else {
+          maxMacd = Math.max(maxMacd, MACD)
+          minMacd = Math.min(minMacd, MACD)
+        }
+      })
+      if (isCurrentHighest && (currentMacd * 1.1 < maxMacd)) {
+        short = true
+      } else if (isCurrentLowest && (currentMacd * 1.1 > minMacd)) { } {
+        long = true
+      }
+    }
+  }
+
+  return {
+    long,
+    short
+  }
+}
+// 判断当前k线的收盘价是最近最高的
+Candles.prototype.isCurrentHighestLowestClose = function (isHighest, backlen) {
+  const len = this._histories.length
+  if (len < backlen) {
+    return false
+  }
+  const currentClose = this._histories[len - 1].close
+  for (let i = 1; i < backlen; i++) {
+    const candle = this._histories[len - i - 1]
+    if (candle) {
+      if (isHighest && candle.close > currentClose) {
+        return false
+      } else if (!isHighest && candle.close < currentClose) {
+        return false
+      }
+    }
+  }
+  return true
+}
+
 // 抛物线转向计算
-Candles.prototype.sarSignal = function(realTime) {
+Candles.prototype.sarSignal = function (realTime) {
   var klines = this.getCandles(realTime)
   var sarSignal = signal.PasrSignal(klines, this._options.sarStart, this._options.sarStep, this._options.sarMax)
   // list of bool for longs
   return sarSignal.signals
 }
 // 计算快线sma 和 慢线sma的 各种指标
-Candles.prototype.smaSignal = function(realTime) {
+Candles.prototype.smaSignal = function (realTime) {
   var klines = this.getCandles(realTime)
   smaSignal = signal.SmaSignal(klines, this._options.smaFastLen, this._options.smaSlowLen)
   // 详见signal.js
@@ -239,7 +297,7 @@ Candles.prototype.smaSignal = function(realTime) {
 }
 
 // sar he sma 策略, 初步论证在tradingview上
-Candles.prototype.sarSmaSignal = function(realTime) {
+Candles.prototype.sarSmaSignal = function (realTime) {
   const sarS = this.sarSignal(realTime)
   const sarSLen = sarS.length
   // 注意 :按照tradingview 上的回测 来, 需要等一个bar!
@@ -298,19 +356,19 @@ Candles.prototype.sarSmaSignal = function(realTime) {
   }
 }
 // len = 50, 1min 最佳
-Candles.prototype.getMinMaxClose = function(len, realTime) {
+Candles.prototype.getMinMaxClose = function (len, realTime) {
   var klines = this.getCandles(realTime)
   return signal.highestLowestClose(klines, len)
 }
 // 1min sar ma, len: 50, max: 70, min: 30
-Candles.prototype.minMaxCloseFilter = function(len, max, min) {
+Candles.prototype.minMaxCloseFilter = function (len, max, min) {
   const { minClose, maxClose } = this.getMinMaxClose(len, false)
   const diff = maxClose - minClose
   return diff > min && diff < max
 }
 
 
-Candles.prototype.priceRateFilter = function(len, rateMin, rateMax=2) {
+Candles.prototype.priceRateFilter = function (len, rateMin, rateMax = 2) {
   const lastCandle = this.getHistoryCandle(1)
   const { minClose, maxClose } = this.getMinMaxClose(len, false)
   const pMin = minClose + (maxClose - minClose) * rateMin
@@ -318,12 +376,12 @@ Candles.prototype.priceRateFilter = function(len, rateMin, rateMax=2) {
   return lastCandle.close >= pMin && lastCandle.close <= pMax
 }
 
-Candles.prototype.getMinMaxHighLow = function(len, realTime) {
+Candles.prototype.getMinMaxHighLow = function (len, realTime) {
   var klines = this.getCandles(realTime)
   return signal.highestLowestHighLow(klines, len)
 }
 
-Candles.prototype.priceRateFilterHighLow = function(len, rateMin, rateMax=2) {
+Candles.prototype.priceRateFilterHighLow = function (len, rateMin, rateMax = 2) {
   const lastCandle = this.getHistoryCandle(1)
   const { minLow, maxHigh } = this.getMinMaxHighLow(len, false)
   const pMin = minLow + (maxHigh - minLow) * rateMin
@@ -332,7 +390,7 @@ Candles.prototype.priceRateFilterHighLow = function(len, rateMin, rateMax=2) {
 }
 
 // 主要是为了确认 在backOffset bar 之前是上涨或者下跌趋势, 方法之一是用布林带
-Candles.prototype.barsIsInTrend = function(realTime, long, backOffset, bars) {
+Candles.prototype.barsIsInTrend = function (realTime, long, backOffset, bars) {
   const { signals } = this.bollSignalSeries(realTime) // [1, 0, -1] 三种值
   const sLen = signals.length // sLen 100
   if (backOffset + bars > sLen) {
@@ -340,7 +398,7 @@ Candles.prototype.barsIsInTrend = function(realTime, long, backOffset, bars) {
     return false
   }
   let result = true
-  for (var i=0; i<bars; i++) {
+  for (var i = 0; i < bars; i++) {
     const v = signals[sLen - 1 - backOffset - i]
     // 是否是上升趋势
     if (long && v === -1) {
@@ -355,12 +413,12 @@ Candles.prototype.barsIsInTrend = function(realTime, long, backOffset, bars) {
 }
 
 // 找到最近的RSI 顶部或者底部 的k线数
-Candles.prototype.barsLastRsiOverTrade = function(realTime, len=14, bottom=30, top=70) {
+Candles.prototype.barsLastRsiOverTrade = function (realTime, len = 14, bottom = 30, top = 70) {
   const rsis = this.rsiSignal(realTime, len)
   let rsiLen = rsis.length
   let atBottom = true
   let index = -1
-  for (var i=rsiLen - 1; i>=0; i--) {
+  for (var i = rsiLen - 1; i >= 0; i--) {
     const rsiV = rsis[i]
     if (rsiV < bottom) {
       atBottom = true
@@ -379,7 +437,7 @@ Candles.prototype.barsLastRsiOverTrade = function(realTime, len=14, bottom=30, t
 }
 // realTime = false !!
 // 适用于震荡市, 超跌, 超买之后的反弹, 利用rsi 和布林带组合, 这里的默认参数适合1min
-Candles.prototype.rsiBbReverseSignal = function(realTime, efficientBars=10, continuousTrendBars=40) {
+Candles.prototype.rsiBbReverseSignal = function (realTime, efficientBars = 10, continuousTrendBars = 40) {
   let long = false
   let short = false
   // const efficientBars = 10  //信号过去了10bar, 我们认为无效了
@@ -388,7 +446,7 @@ Candles.prototype.rsiBbReverseSignal = function(realTime, efficientBars=10, cont
   const { atBottom, bars } = this.barsLastRsiOverTrade(realTime, 10, 20, 80) // bars 最小是 1
   if (bars < efficientBars) {
     const lastCandle = this.getHistoryCandle(1)
-    const signalCandle = this.getHistoryCandle(bars) 
+    const signalCandle = this.getHistoryCandle(bars)
     // may reverse to long
     if (atBottom) {
       //TODO 当前闭合K线的close价格已经超过信号线的 (open close) 最高值(这个很重要), 表明趋势已经反转
@@ -396,7 +454,7 @@ Candles.prototype.rsiBbReverseSignal = function(realTime, efficientBars=10, cont
       if (isCloseBreakUp) {
         // 而且之前的(40)根bar一直在跌, 这个一般作为过滤器
         const isLastBarsIsShort = this.barsIsInTrend(realTime, false, efficientBars, continuousTrendBars)
-        if(isLastBarsIsShort) {
+        if (isLastBarsIsShort) {
           long = true
         }
       }
@@ -418,7 +476,7 @@ Candles.prototype.rsiBbReverseSignal = function(realTime, efficientBars=10, cont
 }
 
 // 用于sma交叉策略
-Candles.prototype.smaCrossSignal = function() {
+Candles.prototype.smaCrossSignal = function () {
   if (this._histories.length < this._options.smaSlowLen + 2) {
     return {
       long: false,
@@ -444,7 +502,7 @@ Candles.prototype.smaCrossSignal = function() {
   }
 }
 // 计算效率更高
-Candles.prototype.smaCrossSignalFast = function() {
+Candles.prototype.smaCrossSignalFast = function () {
   if (this._histories.length < this._options.smaSlowLen + 2) {
     return {
       long: false,
@@ -461,40 +519,40 @@ Candles.prototype.smaCrossSignalFast = function() {
 }
 
 // 一般是实时的
-Candles.prototype.priceIsAboveSma = function() {
+Candles.prototype.priceIsAboveSma = function () {
   var klines = this.getCandles(true)
   return signal.PriceAboveSma(klines, this._options.smaFilterLen)
 }
 
-Candles.prototype.getLastHistoryClose = function() {
+Candles.prototype.getLastHistoryClose = function () {
   return this._histories[this._histories.length - 1].close
 }
 // 从最后一个开始索引
-Candles.prototype.getHistoryCandle = function(bars) {
+Candles.prototype.getHistoryCandle = function (bars) {
   return this._histories[this._histories.length - bars]
 }
 // 获取 _histories 的最后一个close
-Candles.prototype.getLastHistoryClose = function() {
+Candles.prototype.getLastHistoryClose = function () {
   return this.getHistoryCandle(1).close
 }
 
-Candles.prototype.getCandles = function(realTime) {
+Candles.prototype.getCandles = function (realTime) {
   return realTime ? this._histories.concat([this._latestCandle.getCandle()]) : this._histories
 }
 
-Candles.prototype.getMayTrendSignal = function() {
+Candles.prototype.getMayTrendSignal = function () {
   return this._mayTrendSignal
 }
 
-Candles.prototype.isReady = function() {
+Candles.prototype.isReady = function () {
   return this._histories.length > 100 && this._latestCandle
 }
 // 计算最近的高点低点信息（极值）弃用
-Candles.prototype.canculateTopBottomOffest = function(points=4) {
-  
+Candles.prototype.canculateTopBottomOffest = function (points = 4) {
+
 }
 
-Candles.prototype.calcStochRsiSignal = function(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, timestamp) {
+Candles.prototype.calcStochRsiSignal = function (rsiPeriod, stochasticPeriod, kPeriod, dPeriod, timestamp) {
   //[{stochRSI, k, d}]
   const result = signal.StochasticRsi(this.getCandles(false), rsiPeriod, stochasticPeriod, kPeriod, dPeriod)
   const len = result.length
@@ -524,7 +582,7 @@ Candles.prototype.calcStochRsiSignal = function(rsiPeriod, stochasticPeriod, kPe
   return info
 }
 
-Candles.prototype.getStochRsiSignals = function() {
+Candles.prototype.getStochRsiSignals = function () {
   return this._stochRsiSignals
 }
 

@@ -38,7 +38,7 @@ exports.MacdSignal = function (kline) {
         SimpleMAOscillator: false,
         SimpleMASignal: false
     })
-    var lastVs = result.slice(-10)
+    var lastVs = result.slice(-200)
     return lastVs
 }
 
