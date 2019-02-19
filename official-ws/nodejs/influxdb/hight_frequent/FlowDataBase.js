@@ -84,7 +84,7 @@ class FlowDataBase {
       case 'execution':
         // this.updateExecution(json, symbol)
         break
-      case 'tradeBin1m':
+      case 'tradeBin1h':
         this.updateTradeBin1h(json, symbol)
         break
       case 'order':
@@ -246,6 +246,12 @@ class FlowDataBase {
     this._candles1h.update(json.data[0], symbol)
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
+    const signal = this._candles1h.calcMacdDepartSignal(symbol)
+    if (signal.long) {
+      notifyPhone(`${symbol} MacdDepartSignal Long`)
+    } else if (signal.short) {
+      notifyPhone(`${symbol} MacdDepartSignal Short`)
+    }
   }
 
   updateAccountOrder(json, symbol) {
