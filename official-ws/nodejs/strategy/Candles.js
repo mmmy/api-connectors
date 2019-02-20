@@ -238,6 +238,7 @@ Candles.prototype.macdDepartSignal = function (realTime = false) {
     let maxMacd, minMacd
     if (macds.length > 0) {
       const currentMacd = macds[macds.length - 1].MACD
+      // console.log(currentMacd)
       macds.forEach((macd, i) => {
         const MACD = macd.MACD
         if (i === 0) {
@@ -250,7 +251,7 @@ Candles.prototype.macdDepartSignal = function (realTime = false) {
       })
       if (isCurrentHighest && (currentMacd * 1.1 < maxMacd)) {
         short = true
-      } else if (isCurrentLowest && (currentMacd * 1.1 > minMacd)) { } {
+      } else if (isCurrentLowest && (currentMacd * 1.1 > minMacd)) {
         long = true
       }
     }

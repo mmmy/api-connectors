@@ -1,5 +1,5 @@
 
-var m5Data = require('../data/5m.json').reverse()
+var m5Data = require('../data/data1h.json').reverse()
 const Candels = require('../Candles')
 
 var c = new Candels()
@@ -11,15 +11,24 @@ c.setOptions({
   smaSlowLen: 88,
 })
 
+const startIndex = 100
+
 var len = m5Data.length
 
-m5Data =m5Data.slice(0, len - 1)
+c.setHistoryData(m5Data.slice(0, startIndex))
 
-c.setHistoryData(m5Data)
-
+m5Data.slice(startIndex - 1).forEach(candle => {
+  c.updateLastHistory(candle)
+  let signal = c.macdDepartSignal()
+  if (signal.long) {
+    console.log('long', candle.timestamp)
+  } else if (signal.short) {
+    console.log('short', candle.timestamp)
+  }
+})
 // test ok
 // console.log(c.sarSignal())
 // test ok
 // c.smaSignal()
 
-console.log(c.smaCrossSignal())
+// console.log(c.smaCrossSignal())
