@@ -31,6 +31,10 @@ class BitmexCandleManager {
   calcMacdDepartSignal(symbol) {
     return this._candles[symbol].macdDepartSignal()
   }
+
+  getHistoryCandle(symbol) {
+    return this._candles[symbol].getHistoryCandle(1)
+  }
 }
 
 module.exports = BitmexCandleManager

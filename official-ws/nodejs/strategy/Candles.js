@@ -528,7 +528,7 @@ Candles.prototype.getLastHistoryClose = function () {
   return this._histories[this._histories.length - 1].close
 }
 // 从最后一个开始索引
-Candles.prototype.getHistoryCandle = function (bars) {
+Candles.prototype.getHistoryCandle = function (bars=1) {
   return this._histories[this._histories.length - bars]
 }
 // 获取 _histories 的最后一个close
