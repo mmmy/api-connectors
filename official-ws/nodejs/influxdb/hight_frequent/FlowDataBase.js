@@ -248,7 +248,7 @@ class FlowDataBase {
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
     const signal = this._candles1h.calcMacdDepartSignal(symbol)
     const candle = this._candles1h.getHistoryCandle(symbol)
-    notifyPhone(`${symbol} ${candle.time} ${candle.close}`)
+    // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long) {
       notifyPhone(`${symbol} MacdDepartSignal Long`)
     } else if (signal.short) {
