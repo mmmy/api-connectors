@@ -39,6 +39,7 @@ class FlowDataBase {
     this._currentQty = 0
 
     this._candles1h = new BitmexCandleManager()
+    this._candles5m = new BitmexCandleManager()
 
     if (this._options.initCheckSystem) {
       this.initCheckSystem()
@@ -80,6 +81,9 @@ class FlowDataBase {
         break
       case 'margin':
         this.updateMargin(json, symbol)
+        break
+      case 'tradeBin5m':
+        this.updateTradeBin5m(json, symbol)
         break
       case 'execution':
         // this.updateExecution(json, symbol)
@@ -242,17 +246,36 @@ class FlowDataBase {
     this._candles1h.setHistoryData(list, symbol)
   }
 
+  // 5m
+  setCandles5mHistory(list, symbol) {
+    this._candles5m.setHistoryData(list, symbol)
+  }
+
   updateTradeBin1h(json, symbol) {
     this._candles1h.update(json.data[0], symbol)
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
     const signal = this._candles1h.calcMacdDepartSignal(symbol)
-    const candle = this._candles1h.getHistoryCandle(symbol)
+    // const candle = this._candles1h.getHistoryCandle(symbol)
     // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long) {
-      notifyPhone(`${symbol} MacdDepartSignal Long`)
+      notifyPhone(`${symbol} 1h MacdDepartSignal Long`)
     } else if (signal.short) {
-      notifyPhone(`${symbol} MacdDepartSignal Short`)
+      notifyPhone(`${symbol} 1h MacdDepartSignal Short`)
+    }
+  }
+
+  updateTradeBin5m(json, symbol) {
+    this._candles5m.update(json.data[0], symbol)
+    // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
+    // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
+    const signal = this._candles5m.calcMacdDepartSignal(symbol)
+    const signal1 = this._candles5m.calcMacdDepartSignal(symbol, 1)
+    // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
+    if (signal.long && signal1.long) {
+      notifyPhone(`${symbol} 5m MacdDepartSignal Long`)
+    } else if (signal.short && signal1.short) {
+      notifyPhone(`${symbol} 5m MacdDepartSignal Short`)
     }
   }
 

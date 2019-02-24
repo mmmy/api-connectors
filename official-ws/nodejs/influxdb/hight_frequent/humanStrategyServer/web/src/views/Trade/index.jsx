@@ -26,7 +26,7 @@ const positionKeyText = {
   'unrealisedPnlPcnt': 'ur Pnl%'
 }
 
-const supportSymbols = ['XBTUSD', 'ETHUSD', 'XRPH19']
+const supportSymbols = ['XBTUSD', 'ETHUSD', 'ADAH19', 'XRPH19', 'ETHH19', 'EOSH19', 'LTCH19', 'TRXH19', 'BCHH19']
 
 export default class Trade extends React.Component {
   constructor(props) {

@@ -50,6 +50,13 @@ module.exports = function createStratey(options) {
         strategy.setCandles1hHistory(list, symbol)
       }, dataCb, symbol)
     })
+
+    ['XBTUSD', 'ETHUSD', 'ADAH19', 'EOSH19'].forEach(symbol => {
+      // 5m
+      bitmex.listenCandle({ binSize: '5m', count: 200 }, list => {
+        strategy.setCandles5mHistory(list, symbol)
+      }, dataCb, symbol)
+    })
   } else {
     // 为了保持和bitmex的连接, 也可以send {ping}
     bitmex.listenInstrument(() => { })

@@ -224,15 +224,15 @@ Candles.prototype.macdTrendSignal = function (realTime = true) {
   // console.log(long)
 }
 // MACD 背离信号
-Candles.prototype.macdDepartSignal = function (realTime = false) {
-  var klines = this.getCandles(realTime)
+Candles.prototype.macdDepartSignal = function (realTime = false, offset = 0) {
+  var klines = this.getCandles(realTime, offset)
   let macds = signal.MacdSignal(klines)
   let long = false,
     short = false
 
   let backLen = 90
-  let isCurrentHighest = this.isCurrentHighestLowestClose(true, backLen)
-  let isCurrentLowest = this.isCurrentHighestLowestClose(false, backLen)
+  let isCurrentHighest = this.isCurrentHighestLowestClose(true, backLen, offset)
+  let isCurrentLowest = this.isCurrentHighestLowestClose(false, backLen, offset)
   if (isCurrentHighest || isCurrentLowest) {
     macds = macds.slice(-backLen)
     let maxMacd, minMacd
@@ -263,14 +263,15 @@ Candles.prototype.macdDepartSignal = function (realTime = false) {
   }
 }
 // 判断当前k线的收盘价是最近最高的
-Candles.prototype.isCurrentHighestLowestClose = function (isHighest, backlen) {
-  const len = this._histories.length
+Candles.prototype.isCurrentHighestLowestClose = function (isHighest, backlen, offset) {
+  let histories = this.getCandles(false, offset)
+  const len = histories.length
   if (len < backlen) {
     return false
   }
-  const currentClose = this._histories[len - 1].close
+  const currentClose = histories[len - 1].close
   for (let i = 1; i < backlen; i++) {
-    const candle = this._histories[len - i - 1]
+    const candle = histories[len - i - 1]
     if (candle) {
       if (isHighest && candle.close > currentClose) {
         return false
@@ -537,8 +538,12 @@ Candles.prototype.getLastHistoryClose = function () {
   return this.getHistoryCandle(1).close
 }
 
-Candles.prototype.getCandles = function (realTime) {
-  return realTime ? this._histories.concat([this._latestCandle.getCandle()]) : this._histories
+Candles.prototype.getCandles = function (realTime, offset) {
+  let candles = realTime ? this._histories.concat([this._latestCandle.getCandle()]) : this._histories
+  if (offset > 0) {
+    candles = candles.slice(0, candles.length - offset)
+  }
+  return candles
 }
 
 Candles.prototype.getMayTrendSignal = function () {
