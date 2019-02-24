@@ -51,7 +51,8 @@ module.exports = function createStratey(options) {
       }, dataCb, symbol)
     })
 
-    ['XBTUSD', 'ETHUSD', 'ADAH19', 'EOSH19'].forEach(symbol => {
+    let symbols5m = ['XBTUSD', 'ETHUSD', 'ADAH19', 'EOSH19']
+    symbols5m.forEach(symbol => {
       // 5m
       bitmex.listenCandle({ binSize: '5m', count: 200 }, list => {
         strategy.setCandles5mHistory(list, symbol)
