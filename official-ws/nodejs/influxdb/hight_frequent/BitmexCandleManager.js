@@ -28,8 +28,8 @@ class BitmexCandleManager {
     }
   }
 
-  calcMacdDepartSignal(symbol, offset) {
-    return this._candles[symbol].macdDepartSignal(false, offset)
+  calcMacdDepartSignal(symbol, len, offset) {
+    return this._candles[symbol].macdDepartSignal(false, len, offset)
   }
 
   getHistoryCandle(symbol) {

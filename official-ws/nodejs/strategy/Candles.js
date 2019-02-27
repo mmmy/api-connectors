@@ -224,13 +224,13 @@ Candles.prototype.macdTrendSignal = function (realTime = true) {
   // console.log(long)
 }
 // MACD 背离信号
-Candles.prototype.macdDepartSignal = function (realTime = false, offset = 0) {
+Candles.prototype.macdDepartSignal = function (realTime = false, len = 90, offset = 0) {
   var klines = this.getCandles(realTime, offset)
   let macds = signal.MacdSignal(klines)
   let long = false,
     short = false
 
-  let backLen = 90
+  let backLen = len
   let isCurrentHighest = this.isCurrentHighestLowestClose(true, backLen, offset)
   let isCurrentLowest = this.isCurrentHighestLowestClose(false, backLen, offset)
   if (isCurrentHighest || isCurrentLowest) {
