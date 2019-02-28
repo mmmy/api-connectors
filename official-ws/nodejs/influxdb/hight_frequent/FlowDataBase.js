@@ -258,7 +258,7 @@ class FlowDataBase {
     this._candles1h.update(json.data[0], symbol)
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
-    const signal = this._candles1h.calcMacdDepartSignal(symbol)
+    const signal = this._candles1h.calcMacdDepartSignal(symbol, 90)
     // const candle = this._candles1h.getHistoryCandle(symbol)
     // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long) {
@@ -272,8 +272,8 @@ class FlowDataBase {
     this._candles5m.update(json.data[0], symbol)
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
-    const signal = this._candles5m.calcMacdDepartSignal(symbol)
-    const signal1 = this._candles5m.calcMacdDepartSignal(symbol, 1)
+    const signal = this._candles5m.calcMacdDepartSignal(symbol, 144)
+    const signal1 = this._candles5m.calcMacdDepartSignal(symbol, 144, 1)
     // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long && signal1.long) {
       notifyPhone(`${symbol} 5m MacdDepartSignal Long`)

@@ -1,6 +1,7 @@
 
 const { apiKey, apiSecret } = require('../../../../strategy/test-secret.json')
-var daishu = require('../../../../strategy/daishu-secret.json')
+// var daishu = require('../../../../strategy/daishu-secret.json')
+var qq = require('../../../../strategy/secret.json')
 const isProduction = process.env.NODE_ENV === 'production'
 
 const StrategyUserManager = require('../StrategyUserManager')
@@ -10,8 +11,8 @@ manager.addStrategy({
   user: 'yq',
   test: false,
   testnet: isProduction ? false : true,
-  apiKey: isProduction ? daishu.apiKey : apiKey,
-  apiSecret: isProduction ? daishu.apiSecret : apiSecret,
+  apiKey: isProduction ? qq.apiKey : apiKey,
+  apiSecret: isProduction ? qq.apiSecret : apiSecret,
   database: isProduction,
   main: true,
 })
