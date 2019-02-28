@@ -3,6 +3,7 @@
 const AccountOrder = require('./AccountOrder')
 const AccountPosition = require('./AccountPosition')
 const AccountQuote = require('./AccountQuote')
+const AccountMargin = require('./AccountMargin')
 const BitmexCandleManager = require('./BitmexCandleManager')
 const Candles = require('../../strategy/Candles')
 const _ = require('lodash')
@@ -30,6 +31,7 @@ class FlowDataBase {
     this._accountOrder = new AccountOrder()
     this._accountPosition = new AccountPosition()
     this._accountQuote = new AccountQuote()
+    this._accountMargin = new AccountMargin()
     this._systemTime = 0
     this._orderManager = !this._options.test && new OrderManager(this._options, this._ob, this._accountPosition, this._accountOrder)
     this._orderManagerTest = new OrderManagerTest(this._options, this._ob)      // 回测
@@ -139,6 +141,7 @@ class FlowDataBase {
     if (data[0].walletBalance && this._options.database) {
       StrageyDB.writeMargin(this._options, data[0])
     }
+    this._accountMargin.update(json)
   }
 
   updateTrade(json, symbol) {
@@ -320,6 +323,10 @@ class FlowDataBase {
 
   getLatestQuote(symbol) {
     return this._accountQuote.getLatestQuote(symbol)
+  }
+
+  getAccountMargin() {
+    return this._accountMargin.getMargin()
   }
 }
 

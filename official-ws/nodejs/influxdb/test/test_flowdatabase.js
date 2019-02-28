@@ -43,24 +43,26 @@ const bitmex = new BitmexManager({
   apiKeySecret: apiSecret
 })
 
-// bitmex.listenInstrument(dataCb, "*")
+bitmex.listenInstrument(dataCb, "*")
 
 // bitmex.listenPosition(dataCb, "*")
 
 // bitmex.listenExecution(dataCb)
 
 // bitmex.listenOrder(dataCb, "*")
-const symbols = ['XBTUSD', 'ETHUSD', 'ADAH19', 'XRPH19']
-symbols.forEach(symbol => {
-  bitmex.listenQuote(dataCb, symbol)
-  // 1小时K线
-  bitmex.listenCandle({ binSize: '1m', count: 200 }, list => {
-    strategy.setCandles1hHistory(list, symbol)
-  }, dataCb, symbol)
-})
+// const symbols = ['XBTUSD', 'ETHUSD', 'ADAH19', 'XRPH19']
+// symbols.forEach(symbol => {
+//   bitmex.listenQuote(dataCb, symbol)
+//   // 1小时K线
+//   bitmex.listenCandle({ binSize: '1m', count: 200 }, list => {
+//     strategy.setCandles1hHistory(list, symbol)
+//   }, dataCb, symbol)
+// })
+
+bitmex.listenMargin(dataCb)
 // bitmex.listenQuote(dataCb, 'XBTUSD')
 
-// setInterval(() => {
-//   console.log(strategy.getAccountAllOrders().length)
+setInterval(() => {
+  console.log(strategy.getAccountMargin())
   
-// }, 5000)
+}, 5000)

@@ -37,10 +37,12 @@ module.exports = class StrategyUserManager {
       const options = strategy.getOptions()
       const orders = strategy.getAccountAllOrders()
       const positions = strategy.getAccountAllPositions()
+      const margin = strategy.getAccountMargin()
       return {
         options,
         orders,
-        positions
+        margin,
+        positions,
       }
     })
     return users
@@ -143,5 +145,13 @@ module.exports = class StrategyUserManager {
 
   getMainStrategy() {
     return this._list.filter(s => s.getOptions().main)[0]
+  }
+
+  getAccountMargin() {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return Promise.resolve(strategy.getAccountMargin())
   }
 }
