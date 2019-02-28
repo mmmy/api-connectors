@@ -3,7 +3,7 @@ local_latest_json=`curl -G 'http://127.0.0.1:8086/query?db=raw_data' --data-urle
 lastest_time=`echo $local_latest_json | grep -o -P '\d{4}-.*?Z(?=")'`
 echo $lastest_time
 
-remote_ip="202.182.125.82"
+remote_ip="139.180.203.107"
 backup_path="/root/workspace/backup_raw_data"
 echo $backup_path
 echo "执行备份raw_data start at $lastest_time"

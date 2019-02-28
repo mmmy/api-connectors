@@ -1,6 +1,6 @@
 . ./common.sh
 
-base_url="http://202.182.125.82:3004"
+base_url="http://139.180.203.107:3004"
 if [[ $ORDER_TYPE == "Limit" ]]; then
 path="/api/coin/order_limit"
 echo "Order Limit"

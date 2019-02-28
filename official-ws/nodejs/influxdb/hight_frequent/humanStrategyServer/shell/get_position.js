@@ -1,6 +1,6 @@
 // nodejs v8
 const http = require('http')
-const base_url="http://202.182.125.82:3004"
+const base_url="http://139.180.203.107:3004"
 const path="/api/coin"
 
 const POSITION_KEYS = ['leverage', 'currentQty', 'avgCostPrice', 'unrealisedPnl', 'unrealisedPnlPcnt', 'realisedPnl', 'realisedGrossPnl']

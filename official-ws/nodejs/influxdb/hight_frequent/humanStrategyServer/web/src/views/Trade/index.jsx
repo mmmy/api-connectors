@@ -50,12 +50,13 @@ export default class Trade extends React.Component {
       <div>
         {
           users.map((user, i) => {
-            const { options, positions, orders, form, pending } = user
+            const { options, positions, margin, orders, form, pending } = user
+            const { walletBalance, availableMargin } = margin || {}
             // 检查止损是否设置正常
             const orderStopValideMsg = this.checkStop(i)
             const positionKeys = ['symbol', 'leverage', 'currentQty', 'avgCostPrice', 'unrealisedPnl', 'unrealisedPnlPcnt', 'realisedGrossPnl', 'realisedPnl']
             return <div className="user-row">
-              <div>user: {user.options.user}</div>
+              <div>user: {user.options.user} ({(availableMargin / 1E8).toFixed(3)}/{(walletBalance / 1E8).toFixed(3)})</div>
               <div className="account clearfix">
                 <table style={{ fontSize: '12px' }}>
                   <thead>

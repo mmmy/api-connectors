@@ -1,5 +1,5 @@
 # 暂时弃用
-base_url="http://202.182.125.82:3004"
+base_url="http://139.180.203.107:3004"
 path="/api/coin"
 
 if [ "$ORDER_ENV" == "production" ]; then
