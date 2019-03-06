@@ -89,6 +89,7 @@ module.exports = class StrategyUserManager {
       return Promise.reject(`${user} strategy not exist`)
     }
     if (!stopPx && offset) {
+      offset = +offset
       const mainStrategy = this.getMainStrategy()
       if (!mainStrategy) {
         return Promise.reject('main strategy not exist')
@@ -97,7 +98,7 @@ module.exports = class StrategyUserManager {
       if (!quote) {
         return Promise.reject(`${symbol}'s quote not exit`)
       }
-      stopPx = side == 'Buy' ? quote.askPrice : quote.bidPrice
+      stopPx = side == 'Buy' ? (quote.askPrice + offset) : (quote.bidPrice - offset)
     }
     return strategy.getOrderManager().getSignatureSDK().orderStop(symbol, orderQty, stopPx, side)
   }
@@ -164,5 +165,13 @@ module.exports = class StrategyUserManager {
       return Promise.reject(`${user} strategy not exist`)
     }
     return Promise.resolve(strategy.getAccountMargin())
+  }
+
+  changeLeverage(user, symbol, leverage) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return strategy.getOrderManager().getSignatureSDK().changeLeverage(symbol, leverage)
   }
 }
