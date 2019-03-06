@@ -3,14 +3,14 @@ var router = express.Router();
 const manager = require('../strategy')
 
 // return user list
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
   res.send({
     result: true,
     items: manager.getAllUsersAccount()
   })
 });
 
-router.get('/user', function(req, res, next) {
+router.get('/user', function (req, res, next) {
   const { user } = req.query
   if (!user) {
     res.send({
@@ -25,7 +25,7 @@ router.get('/user', function(req, res, next) {
   })
 })
 
-router.post('/order_limit', function(req, res, next) {
+router.post('/order_limit', function (req, res, next) {
   const { user, symbol, qty, side, price, auto_price } = req.body
   if (!symbol || !qty || !side) {
     res.send({
@@ -51,7 +51,7 @@ router.post('/order_limit', function(req, res, next) {
   })
 })
 // 只减仓
-router.post('/order_reduce_only_limit', function(req, res, next) {
+router.post('/order_reduce_only_limit', function (req, res, next) {
   const { user, symbol, qty, side, price } = req.body
   if (!symbol || !qty || !side || !price) {
     res.send({
@@ -72,7 +72,7 @@ router.post('/order_reduce_only_limit', function(req, res, next) {
   })
 })
 
-router.post('/order_market', function(req, res, next) {
+router.post('/order_market', function (req, res, next) {
   const { user, symbol, qty, side } = req.body
   if (!symbol || !qty || !side) {
     res.send({
@@ -94,7 +94,7 @@ router.post('/order_market', function(req, res, next) {
   })
 })
 
-router.post('/delete_order_all', function(req, res, next) {
+router.post('/delete_order_all', function (req, res, next) {
   const { user } = req.body
   manager.deleteOrderAll(user).then(json => {
     res.send({
@@ -109,7 +109,7 @@ router.post('/delete_order_all', function(req, res, next) {
   })
 })
 
-router.post('/delete_order', function(req, res, next) {
+router.post('/delete_order', function (req, res, next) {
   const { user, order_id } = req.body
   if (!order_id) {
     res.send({
@@ -130,7 +130,7 @@ router.post('/delete_order', function(req, res, next) {
   })
 })
 
-router.post('/close_position', function(req, res, next) {
+router.post('/close_position', function (req, res, next) {
   const { user, symbol } = req.body
   if (!symbol) {
     res.send({
@@ -156,7 +156,7 @@ router.post('/close_position', function(req, res, next) {
  *  orderID is required
  * }
  */
-router.post('/update_order', function(req, res, next) {
+router.post('/update_order', function (req, res, next) {
   const { user, params } = req.body
   manager.updateOrder(user, params).then(json => {
     res.send({
@@ -171,7 +171,7 @@ router.post('/update_order', function(req, res, next) {
   })
 })
 // TODO: 此接口暂时有问题
-router.get('/xbtusd_depth', function(req, res, next) {
+router.get('/xbtusd_depth', function (req, res, next) {
   const { level } = req.query
   manager.getBidAsk(level).then(list => {
     res.send({
@@ -186,7 +186,7 @@ router.get('/xbtusd_depth', function(req, res, next) {
   })
 })
 
-router.get('/all_quotes', function(req, res, next) {
+router.get('/all_quotes', function (req, res, next) {
   manager.getAllLatestQuote().then(list => {
     res.send({
       result: true,
@@ -200,15 +200,21 @@ router.get('/all_quotes', function(req, res, next) {
   })
 })
 
-router.post('/order_stop', function(req, res, next) {
-  const { user, symbol, qty, side, stopPx } = req.body
-  if (!symbol || !qty && !side && !stopPx) {
+router.post('/order_stop', function (req, res, next) {
+  const { user, symbol, qty, side, stopPx, offset } = req.body
+  if (!symbol || !qty && !side) {
     res.send({
       result: false,
-      info: '缺少symbol, qty, side, stopPx参数'
+      info: '缺少symbol, qty, side参数'
     })
   }
-  manager.orderStop(user, symbol, qty, stopPx, side).then(json => {
+  if (!stopPx && !offset) {
+    res.send({
+      result: false,
+      info: 'stopPx adn offset, at last one'
+    })
+  }
+  manager.orderStop(user, symbol, qty, stopPx, side, offset).then(json => {
     res.send({
       result: true,
       data: json
