@@ -168,6 +168,10 @@ export default class Trade extends React.Component {
               <div>
                 <button disabled={pending} onClick={this.handleOrderScapling.bind(this, i)}>Order Scapling</button>
               </div>
+              <br />
+              <div>
+                <button disabled={pending} onClick={this.handleOrderScapling.bind(this, i, true)}>Order Scapling Market</button>
+              </div>
               <hr />
               <div className="title">Stop Orders
                 {
@@ -380,18 +384,19 @@ export default class Trade extends React.Component {
     }
   }
   // order limit auto stop and order a stop market at the same time
-  handleOrderScapling(index) {
+  // market 市价
+  handleOrderScapling(index, market) {
     var userData = this.state.users[index]
     const user = userData.options.user
     const { order_side, order_qty, order_symbol } = userData.form
-    var info = `${user}\n ${order_symbol} ${order_side} ${order_qty} Scalping?`
+    var info = `${user}\n ${order_symbol} ${order_side} ${order_qty} Scalping Market?`
 
     const stopOffset = AUTO_STOP_OFFSET_MAP[order_symbol]
 
     if (window.confirm(info)) {
       userData.pending = true
       Promise.all([
-        axios.post('/api/coin/order_limit', {
+        axios.post(market ? '/api/coin/order_market' : '/api/coin/order_limit', {
           user,
           symbol: order_symbol,
           qty: order_qty,
