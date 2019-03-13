@@ -188,6 +188,7 @@ if (options.coinbase) {
       "ETH-USD"
     ],
     "channels": [
+      "heartbeat",
       {
         "name": "ticker",
         "product_ids": [
