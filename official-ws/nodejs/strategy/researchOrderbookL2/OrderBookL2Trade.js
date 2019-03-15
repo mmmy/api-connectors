@@ -24,9 +24,9 @@ OrderBook.prototype.setOptions = function (options) {
   }
 }
 
-OrderBook.prototype.update = function (json) {
+OrderBook.prototype.update = function (json, symbol) {
   // this.watchUpdate(json)
-  var newData = DeltaParser.onAction(json.action, json.table, 'XBTUSD', this._CLIENT, json)
+  var newData = DeltaParser.onAction(json.action, json.table, symbol || 'XBTUSD', this._CLIENT, json)
   this._data = newData
   // this.calcOrderLimitSignal()   // 每次都计算的话，有性能影响
   // return this._buySellBigCompares.slice(-1).concat(this._buySellSmallCompares.slice(-1))
@@ -176,7 +176,7 @@ OrderBook.prototype.getSignal = function () {
 // 根据累计挂单量获取订单
 // 如果minSize = 0 返回level1, 结果与getTopAsk，getTopBid一致
 //
-OrderBook.prototype._getBookBySizeTheshold = function (buySide, maxSize=0) {
+OrderBook.prototype._getBookBySizeTheshold = function (buySide, maxSize = 0) {
   var len = this._data.length
   if (len === 0) {
     return null
@@ -185,7 +185,7 @@ OrderBook.prototype._getBookBySizeTheshold = function (buySide, maxSize=0) {
   if (buySide) {
     let curtotalSize = 0
     let nextTotalSize = 0
-    for (var i=lastBuyIndex; i>=0; i--) {
+    for (var i = lastBuyIndex; i >= 0; i--) {
       var book = this._data[i]
       nextTotalSize += book.size
       if (nextTotalSize > maxSize && curtotalSize <= maxSize) {
@@ -199,7 +199,7 @@ OrderBook.prototype._getBookBySizeTheshold = function (buySide, maxSize=0) {
   } else {
     let curtotalSize = 0
     let nextTotalSize = 0
-    for (var i=lastBuyIndex + 1; i<len; i++) {
+    for (var i = lastBuyIndex + 1; i < len; i++) {
       var book = this._data[i]
       nextTotalSize += book.size
       if (nextTotalSize > maxSize && curtotalSize <= maxSize) {
@@ -240,7 +240,7 @@ OrderBook.prototype.getTopAskPrice = function () {
   return this._ask && this._ask.price
 }
 
-OrderBook.prototype.getPriceGap = function() {
+OrderBook.prototype.getPriceGap = function () {
   return this.getTopAskPrice() - this.getTopBidPrice()
 }
 
@@ -248,14 +248,14 @@ OrderBook.prototype.getOptions = function () {
   return this._options
 }
 
-OrderBook.prototype.getMissPrices = function() {
+OrderBook.prototype.getMissPrices = function () {
   var len = this._data.length
   const prices = []
   if (len > 1) {
     for (var i = 1; i < len; i++) {
       var preBook = this._data[i - 1]
       var book = this._data[i]
-      for (let p = preBook.price + 0.5; p < book.price; p+=0.5) {
+      for (let p = preBook.price + 0.5; p < book.price; p += 0.5) {
         prices.push(p)
       }
     }
@@ -263,17 +263,17 @@ OrderBook.prototype.getMissPrices = function() {
   return prices
 }
 // 永远是true?
-OrderBook.prototype.isMissPriceContinues = function() {
+OrderBook.prototype.isMissPriceContinues = function () {
   const prices = this.getMissPrices()
-  for (let i=1; i<prices.length; i++) {
-    if (prices[i] - prices[i-1] !== 0.5) {
+  for (let i = 1; i < prices.length; i++) {
+    if (prices[i] - prices[i - 1] !== 0.5) {
       return false
     }
   }
   return true
 }
 
-OrderBook.prototype.getOrderById = function(id) {
+OrderBook.prototype.getOrderById = function (id) {
   var len = this._data.length
   for (var i = 0; i < len; i++) {
     var book = this._data[i]

@@ -4,6 +4,7 @@ const AccountOrder = require('./AccountOrder')
 const AccountPosition = require('./AccountPosition')
 const AccountQuote = require('./AccountQuote')
 const AccountMargin = require('./AccountMargin')
+const AccountOrderBook = require('./AccountOrderBook')
 const BitmexCandleManager = require('./BitmexCandleManager')
 const Candles = require('../../strategy/Candles')
 const _ = require('lodash')
@@ -32,6 +33,7 @@ class FlowDataBase {
     this._accountPosition = new AccountPosition()
     this._accountQuote = new AccountQuote()
     this._accountMargin = new AccountMargin()
+    this._accountOrderBook = new AccountOrderBook()
     this._systemTime = 0
     this._orderManager = !this._options.test && new OrderManager(this._options, this._ob, this._accountPosition, this._accountOrder)
     this._orderManagerTest = new OrderManagerTest(this._options, this._ob)      // 回测
@@ -118,6 +120,7 @@ class FlowDataBase {
     }
     // TODO: update margin
     // this._ob.update(json)
+    this._accountOrderBook.update(json, symbol)
     this.onUpdateOrderBook()
   }
 
