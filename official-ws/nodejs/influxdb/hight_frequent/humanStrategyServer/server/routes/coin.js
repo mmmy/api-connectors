@@ -227,4 +227,25 @@ router.post('/order_stop', function (req, res, next) {
   })
 })
 
+router.post('/change_leverage', function (req, res) {
+  const { user, symbol, leverage } = req.body
+  if (!user || !symbol || !leverage) {
+    res.send({
+      result: false,
+      info: '缺少symbol, user, leverage参数'
+    })
+  }
+  manager.changeLeverage(user, symbol, leverage).then(json => {
+    res.send({
+      result: true,
+      data: json
+    }).catch(e => {
+      res.send({
+        result: false,
+        info: e
+      })
+    })
+  })
+})
+
 module.exports = router

@@ -26,6 +26,18 @@ const positionKeyText = {
   'unrealisedPnlPcnt': 'ur Pnl%'
 }
 
+const AUTO_STOP_OFFSET_MAP = {
+  'XBTUSD': 8,
+  'ETHUSD': 1,
+  'ADAH19': 0.0000001,
+  'XRPH19': 0.0000002,
+  'ETHH19': 0.0001,
+  'EOSH19': 0.000002,
+  'LTCH19': 0.0001,
+  'TRXH19': 0.00000008,
+  'BCHH19': 0.001,
+}
+
 const supportSymbols = ['XBTUSD', 'ETHUSD', 'ADAH19', 'XRPH19', 'ETHH19', 'EOSH19', 'LTCH19', 'TRXH19', 'BCHH19']
 
 export default class Trade extends React.Component {
@@ -82,7 +94,7 @@ export default class Trade extends React.Component {
                                   cn = 'red'
                                 }
                               }
-                              return <td className={cn}>{format}</td>
+                              return <td className={cn} onClick={this.handlePositionCellClick.bind(this, i, position, key)}>{format}</td>
                             }))}
                         </tr>
                       })
@@ -142,7 +154,7 @@ export default class Trade extends React.Component {
                 <input className={form.order_side === 'Buy' ? 'green' : 'red'} onChange={this.handleInputChangeFormData.bind(this, i, 'order_qty')} style={{ width: '80px' }} type="number" value={form.order_qty} />
               </div>
               <div style={{ marginBottom: '10px' }}>
-                <label for="auto_price_checkbox">auto price</label><input checked={form.auto_price} type="checkbox" id="auto_price_checkbox" onChange={this.handleChangeCheckbox.bind(this, i, 'auto_price')}/>
+                <label for="auto_price_checkbox">auto price</label><input checked={form.auto_price} type="checkbox" id="auto_price_checkbox" onChange={this.handleChangeCheckbox.bind(this, i, 'auto_price')} />
                 {
                   !form.auto_price && <span><label>P:</label><input value={form.order_price} style={{ width: '100px' }} type="number" onChange={this.handleInputChangeFormData.bind(this, i, 'order_price')} /></span>
                 }
@@ -151,6 +163,14 @@ export default class Trade extends React.Component {
               </div>
               <div>
                 <button disabled={pending} onClick={this.handleOrderMarket.bind(this, i)}>Order Market</button>
+              </div>
+              <br />
+              <div>
+                <button disabled={pending} onClick={this.handleOrderScapling.bind(this, i)}>Order Scapling</button>
+              </div>
+              <br />
+              <div>
+                <button disabled={pending} onClick={this.handleOrderScapling.bind(this, i, true)}>Order Scapling Market</button>
               </div>
               <hr />
               <div className="title">Stop Orders
@@ -181,7 +201,7 @@ export default class Trade extends React.Component {
                           <td style={{ cursor: 'pointer' }} title="点击修改" onClick={this.handleUpdateOrder.bind(this, i, order, 'stopPx')}>{order.stopPx}</td>
                           <td>{order.price || '市价'}</td>
                           <td>{order.ordStatus}</td>
-                          <td className={isBuy ? 'green' : 'red'}>{order.leavesQty * (isBuy ? 1 : -1)}</td>                          
+                          <td className={isBuy ? 'green' : 'red'}>{order.leavesQty * (isBuy ? 1 : -1)}</td>
                           <td>{new Date(order.timestamp).toLocaleString()}</td>
                         </tr>
                       })
@@ -363,6 +383,43 @@ export default class Trade extends React.Component {
       })
     }
   }
+  // order limit auto stop and order a stop market at the same time
+  // market 市价
+  handleOrderScapling(index, market) {
+    var userData = this.state.users[index]
+    const user = userData.options.user
+    const { order_side, order_qty, order_symbol } = userData.form
+    var info = `${user}\n ${order_symbol} ${order_side} ${order_qty} Scalping Market?`
+
+    const stopOffset = AUTO_STOP_OFFSET_MAP[order_symbol]
+
+    if (window.confirm(info)) {
+      userData.pending = true
+      Promise.all([
+        axios.post(market ? '/api/coin/order_market' : '/api/coin/order_limit', {
+          user,
+          symbol: order_symbol,
+          qty: order_qty,
+          side: order_side,
+          auto_price: true
+        }),
+        axios.post('api/coin/order_stop', {
+          user,
+          symbol: order_symbol,
+          qty: order_qty,
+          side: order_side === 'Buy' ? 'Sell' : 'Buy',
+          offset: stopOffset
+        })
+      ]).then(() => {
+        userData.pending = false
+        alert('success!')
+        this.fetchUserList()
+      }).catch(e => {
+        userData.pending = false
+        this.pushLog(e)
+      })
+    }
+  }
   // 市价止损
   handleOrderStop(index) {
     var userData = this.state.users[index]
@@ -443,6 +500,30 @@ export default class Trade extends React.Component {
         userData.pending = false
         if (status === 200 && data.result) {
           alert('close postion success')
+          this.fetchUserList()
+        } else {
+          this.pushLog(data.info)
+        }
+      }).catch(e => {
+        this.pushLog(e)
+      })
+    }
+  }
+
+  handlePositionCellClick(index, position, key) {
+    var userData = this.state.users[index]
+    const val = position[key]
+    const { user } = userData.options
+    const symbol = position.symbol
+
+    if (key === 'leverage') {
+      const newLeverage = window.prompt('leverage', val)
+      userData.pending = true
+      this.setState({})
+      axios.post('api/coin/change_leverage', { user, symbol, leverage: newLeverage }).then(({ status, data }) => {
+        userData.pending = false
+        if (status === 200 && data.result) {
+          alert('change leverage success!')
           this.fetchUserList()
         } else {
           this.pushLog(data.info)

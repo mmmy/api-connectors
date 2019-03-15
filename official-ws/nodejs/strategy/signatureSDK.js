@@ -134,6 +134,14 @@ class SignatureSDK {
     const data = {symbol: symbol, ordType: "Market", execInst: "Close" }
     return this.order(data)
   }
+
+  changeLeverage(symbol, leverage) {
+    const data = {symbol, leverage}
+    const path = '/api/v1/position/leverage'
+    const url = this.getUrl(path)
+    const headers = this.getHeaders('POST', path, data)
+    return requestWidthHeader(url, data, headers, 'post')
+  }
 }
 
 
