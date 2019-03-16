@@ -3,7 +3,7 @@ Description=human strategy
 
 [Service]
 Environment="NODE_ENV=production"
-ExecStart=/usr/bin/node /root/workspace/api-connectors/official-ws/nodejs/influxdb/hight_frequent/bitmex_data_signal/server/bin/www --noProxy
+ExecStart=/usr/bin/node /root/workspace/api-connectors/official-ws/nodejs/influxdb/hight_frequent/bitmexDataSignal/server/bin/www --noProxy
 WorkingDirectory=/root/workspace
 Restart=always
 
