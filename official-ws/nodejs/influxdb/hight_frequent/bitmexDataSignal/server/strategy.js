@@ -18,9 +18,9 @@ const dataManager = createStratey({
 
 dataManager._onOrderBookSignal = (symbol, signals) => {
   const lastSignal = signals[signals.length - 1]
-  const { buySide, sellSide } = lastSignal
+  const { buySide, sellSide, bid0, ask0 } = lastSignal
   if (buySide || sellSide) {
-    let msg = `${symbol} ${buySide ? "buySide" : ""} ${sellSide ? "sellSide" : ""}`
+    let msg = `${symbol} ${buySide ? bid0 : ask0} ${buySide ? "S🔻" : ""} ${sellSide ? "B✅" : ""}`
     sendMessageToGroup(msg)
   }
 }

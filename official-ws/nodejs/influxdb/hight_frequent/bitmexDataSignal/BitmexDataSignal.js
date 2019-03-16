@@ -67,7 +67,9 @@ class BitmexDataSignal extends FlowDataBase {
       }
       historySignals.push({
         buySide,
-        sellSide
+        bid0,
+        ask0,
+        sellSide,
       })
       if (historySignals.length > 9) {
         historySignals.shift()
