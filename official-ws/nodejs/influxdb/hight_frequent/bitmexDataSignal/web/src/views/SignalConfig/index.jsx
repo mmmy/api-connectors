@@ -30,12 +30,16 @@ export default class SignalConfig extends React.Component {
       <div>
         {
           obKeys.map((key, i) => {
+            const setting = orderBook[key]
+            const { check, maxSize, priceGap } = setting
             return <p key={i}>
               <label htmlFor={`ob_${i}`}>{key}</label>
               <input id={`ob_${i}`} type="checkbox"
-                checked={orderBook[key]}
-                onChange={this.handleCheckBoxChange.bind(this, `orderBook.${key}`)}
+                checked={check}
+                onChange={this.handleCheckBoxChange.bind(this, `orderBook.${key}.check`)}
               />
+              <span>maxSize</span><input value={maxSize} type="number" style={{width: '80px'}} onClick={this.handleChangeNumber.bind(this,  `orderBook.${key}.maxSize`)}/>
+              <span>priceGap</span><input value={priceGap} type="number" style={{width: '80px'}} onClick={this.handleChangeNumber.bind(this,  `orderBook.${key}.priceGap`)}/>
             </p>
           })
         }
@@ -101,5 +105,12 @@ export default class SignalConfig extends React.Component {
         this.fetchCheckOptions()
       }
     })
+  }
+
+  handleChangeNumber(path, e) {
+    let value = window.prompt(path, e.target.value)
+    if (value) {
+      this.updateOptionsValue(path, +value)
+    }
   }
 }
