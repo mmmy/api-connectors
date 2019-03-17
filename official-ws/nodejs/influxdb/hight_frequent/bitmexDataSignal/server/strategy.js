@@ -23,9 +23,15 @@ const lastSend = {
 
 dataManager._onOrderBookSignal = (symbol, signals) => {
   const lastSignal = signals[signals.length - 1]
-  const { buySide, sellSide, bid0, ask0 } = lastSignal
-  if (buySide || sellSide) {
-    let msg = `${symbol} ${buySide ? bid0 : ask0} ${buySide ? "S🔻" : ""} ${sellSide ? "B✅" : ""}`
+  const { buySide, sellSide, bid0, ask0, rateBuySignal, rateSellSignal, sizeRate } = lastSignal
+  if (buySide || sellSide || rateBuySignal || rateSellSignal) {
+    let msg = `${symbol} 
+                ${buySide ? bid0 : ask0} 
+                ${buySide ? "S🔻" : ""} 
+                ${sellSide ? "B✅" : ""} 
+                ${rateBuySignal ? ("💹 " + sizeRate) : ""} 
+                ${rateSellSignal ? ("🧨 " + sizeRate) : ""} 
+              `
     let now = new Date()
     if (lastSend.msg === msg && (now - lastSend.date) < 10 * 1000) {
       return

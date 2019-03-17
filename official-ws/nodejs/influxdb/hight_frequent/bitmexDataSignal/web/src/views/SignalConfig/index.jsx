@@ -31,7 +31,7 @@ export default class SignalConfig extends React.Component {
         {
           obKeys.map((key, i) => {
             const setting = orderBook[key]
-            const { check, maxSize, priceGap } = setting
+            const { check, maxSize, priceGap, rateTheshold } = setting
             return <p key={i}>
               <label htmlFor={`ob_${i}`}>{key}</label>
               <input id={`ob_${i}`} type="checkbox"
@@ -40,6 +40,7 @@ export default class SignalConfig extends React.Component {
               />
               <span>maxSize</span><input value={maxSize} type="number" style={{width: '80px'}} onClick={this.handleChangeNumber.bind(this,  `orderBook.${key}.maxSize`)}/>
               <span>priceGap</span><input value={priceGap} type="number" style={{width: '80px'}} onClick={this.handleChangeNumber.bind(this,  `orderBook.${key}.priceGap`)}/>
+              <span>rateTheshold</span><input value={rateTheshold} type="number" style={{width: '40px'}} onClick={this.handleChangeNumber.bind(this,  `orderBook.${key}.rateTheshold`)}/>
             </p>
           })
         }

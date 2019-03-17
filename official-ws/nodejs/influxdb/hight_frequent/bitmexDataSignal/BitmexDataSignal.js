@@ -2,6 +2,9 @@
 const FlowDataBase = require('../FlowDataBase')
 const _ = require('lodash')
 
+const buyRange = [0, 24]
+const sellRange = [25, 49]
+
 class BitmexDataSignal extends FlowDataBase {
   constructor(options) {
     super(options)
@@ -12,6 +15,7 @@ class BitmexDataSignal extends FlowDataBase {
           maxSize: 2E6,
           priceGap: 8,
           precision: 0.51,
+          rateTheshold: 2,               // totalBuySize / totalSellSize
           historySignals: [],
         },
         'ETHUSD': {
@@ -20,6 +24,7 @@ class BitmexDataSignal extends FlowDataBase {
           priceGap: 0.5,
           precision: 0.051,
           historySignals: [],
+          rateTheshold: 2,
         },
       }
     }
@@ -49,7 +54,7 @@ class BitmexDataSignal extends FlowDataBase {
     const orderBookSymobls = Object.getOwnPropertyNames(this._checkOptions.orderBook)
     orderBookSymobls.forEach(symbol => {
       const setting = this._checkOptions.orderBook[symbol]
-      const { maxSize, priceGap, precision, historySignals } = setting
+      const { maxSize, priceGap, precision, historySignals, rateTheshold } = setting
       const ob = this.getOrderBook(symbol)
       if (!ob) {
         return
@@ -66,16 +71,37 @@ class BitmexDataSignal extends FlowDataBase {
         buySide = bid0 - bid1 >= priceGap
         sellSide = ask1 - ask0 >= priceGap
       }
+
+      const lastIndex = ob.getLastBuyIndex()
+      let sizeRate = -1
+      let rateBuySignal = false
+      let rateSellSignal = false
+      if (lastIndex === 24) {
+        const buyTotalSize = ob.sumSizeRange(buyRange)
+        const sellTotalSize = ob.sumSizeRange(sellRange)
+        sizeRate = buyTotalSize / sellTotalSize
+        sizeRate = Math.round(sizeRate * 100) / 100
+        if (sizeRate > rateTheshold) {
+          rateBuySignal = true
+        } else if (sizeRate < 1 / rateTheshold) {
+          rateSellSignal = true
+        }
+        // console.log(symbol, (buyTotalSize / 1E6).toFixed(1), (sellTotalSize / 1E6).toFixed(1), ob._data[0].price, ob._data[49].price)
+      }
+
       historySignals.push({
-        buySide,
         bid0,
         ask0,
+        buySide,
         sellSide,
+        sizeRate,
+        rateBuySignal,
+        rateSellSignal,
       })
       if (historySignals.length > 9) {
         historySignals.shift()
       }
-      if ((buySide || sellSide) && this._onOrderBookSignal ) {
+      if ((buySide || sellSide || rateBuySignal || rateSellSignal) && this._onOrderBookSignal ) {
         this._onOrderBookSignal(symbol, historySignals)
       }
     })
