@@ -9,16 +9,16 @@ class BitmexDataSignal extends FlowDataBase {
       orderBook: {
         'XBTUSD': {
           check: true,
-          maxSize: 5E5,
-          priceGap: 5,
-          precision: 0.5,
+          maxSize: 2E6,
+          priceGap: 8,
+          precision: 0.51,
           historySignals: [],
         },
         'ETHUSD': {
           check: true,
-          maxSize: 3E5,
-          priceGap: 1,
-          precision: 0.05,
+          maxSize: 2E6,
+          priceGap: 0.5,
+          precision: 0.051,
           historySignals: [],
         },
       }
@@ -59,7 +59,8 @@ class BitmexDataSignal extends FlowDataBase {
       let buySide = false
       let sellSide = false
       // ask0 和 bid0 是连续的价格
-      if (ask0 - bid0 === precision) {
+      // 137.35 - 137.3 = 0.049999999
+      if (ask0 - bid0 <= precision) {
         const bid1 = ob.getTopBidPrice2(maxSize)
         const ask1 = ob.getTopAskPrice2(maxSize)
         buySide = bid0 - bid1 >= priceGap

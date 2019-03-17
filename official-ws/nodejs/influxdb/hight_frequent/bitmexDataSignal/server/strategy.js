@@ -16,12 +16,23 @@ const dataManager = createStratey({
   database: false,
 })
 
+const lastSend = {
+  date: new Date(),
+  msg: '',
+}
+
 dataManager._onOrderBookSignal = (symbol, signals) => {
   const lastSignal = signals[signals.length - 1]
   const { buySide, sellSide, bid0, ask0 } = lastSignal
   if (buySide || sellSide) {
     let msg = `${symbol} ${buySide ? bid0 : ask0} ${buySide ? "S🔻" : ""} ${sellSide ? "B✅" : ""}`
+    let now = new Date()
+    if (lastSend.msg === msg && (now - lastSend) < 10 * 1000) {
+      return
+    }
     sendMessageToGroup(msg)
+    lastSend.date = now
+    lastSend.msg = msg
   }
 }
 
