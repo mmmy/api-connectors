@@ -15,7 +15,7 @@ class BitmexDataSignal extends FlowDataBase {
           maxSize: 2E6,
           priceGap: 8,
           precision: 0.51,
-          rateTheshold: 2,               // totalBuySize / totalSellSize
+          rateTheshold: 2.5,               // totalBuySize / totalSellSize
           historySignals: [],
         },
         'ETHUSD': {
@@ -24,7 +24,7 @@ class BitmexDataSignal extends FlowDataBase {
           priceGap: 0.5,
           precision: 0.051,
           historySignals: [],
-          rateTheshold: 2,
+          rateTheshold: 2.5,
         },
       }
     }
