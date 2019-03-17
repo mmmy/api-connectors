@@ -27,7 +27,7 @@ dataManager._onOrderBookSignal = (symbol, signals) => {
   if (buySide || sellSide) {
     let msg = `${symbol} ${buySide ? bid0 : ask0} ${buySide ? "S🔻" : ""} ${sellSide ? "B✅" : ""}`
     let now = new Date()
-    if (lastSend.msg === msg && (now - lastSend) < 10 * 1000) {
+    if (lastSend.msg === msg && (now - lastSend.date) < 10 * 1000) {
       return
     }
     sendMessageToGroup(msg)
