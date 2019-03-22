@@ -166,7 +166,7 @@ export default class Trade extends React.Component {
               </div>
               <br />
               <div>
-                <button disabled={pending} onClick={this.handleOrderScapling.bind(this, i)}>Order Scapling</button>
+                <button disabled={pending} onClick={this.handleOrderScapling.bind(this, i, false)}>Order Scapling</button>
               </div>
               <br />
               <div>
