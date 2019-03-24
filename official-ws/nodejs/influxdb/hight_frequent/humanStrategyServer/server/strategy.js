@@ -14,6 +14,7 @@ manager.addStrategy({
   apiKey: isProduction ? qq.apiKey : apiKey,
   apiSecret: isProduction ? qq.apiSecret : apiSecret,
   database: isProduction,
+  initCheckSystem: true,
   main: true,
 })
 
