@@ -389,7 +389,7 @@ export default class Trade extends React.Component {
     var userData = this.state.users[index]
     const user = userData.options.user
     const { order_side, order_qty, order_symbol } = userData.form
-    var info = `${user}\n ${order_symbol} ${order_side} ${order_qty} Scalping Market?`
+    var info = `${user}\n ${order_symbol} ${order_side} ${order_qty} Scalping ${market ? "Market" : "Limit"}?`
 
     const stopOffset = AUTO_STOP_OFFSET_MAP[order_symbol]
 
