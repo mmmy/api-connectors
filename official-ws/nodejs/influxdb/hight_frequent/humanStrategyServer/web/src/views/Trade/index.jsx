@@ -176,7 +176,7 @@ export default class Trade extends React.Component {
               <div className="title">
                 Stop Orders
                 <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder} onChange={this.handleChangeZZSD.bind(this, i)}/> 5m自动追涨杀跌
-                <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder1h} onChange={this.handleChangeZZSD1h.bind(this, i)}/> 5m自动追涨杀跌
+                <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder1h} onChange={this.handleChangeZZSD1h.bind(this, i)}/> 1h自动追涨杀跌
                 {
                   <span className="red">{orderStopValideMsg}</span>
                 }
