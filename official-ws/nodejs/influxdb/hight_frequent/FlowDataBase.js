@@ -26,6 +26,7 @@ class FlowDataBase {
         dPeriod: 3,
       },
       autoUpdateStopOpenMarketOrder: false,
+      autoUpdateStopOpenMarketOrder1h: false,
       ...options
     }
     this._indicativeSettlePrice = 0
@@ -268,6 +269,9 @@ class FlowDataBase {
 
   updateTradeBin1h(json, symbol) {
     this._candles1h.update(json.data[0], symbol)
+    if (this._options.autoUpdateStopOpenMarketOrder1h) {
+      this.updateStopOpenOrderByLastCandle(symbol, this._candles1h)
+    }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
     const signal = this._candles1h.calcMacdDepartSignal(symbol, 90)
@@ -283,7 +287,7 @@ class FlowDataBase {
   updateTradeBin5m(json, symbol) {
     this._candles5m.update(json.data[0], symbol)
     if (this._options.autoUpdateStopOpenMarketOrder) {
-      this.updateStopOpenOrderByLastCandle(symbol)
+      this.updateStopOpenOrderByLastCandle(symbol, this._candles5m)
     }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
@@ -344,7 +348,7 @@ class FlowDataBase {
     return this._accountMargin.getMargin()
   }
 
-  updateStopOpenOrderByLastCandle(symbol) {
+  updateStopOpenOrderByLastCandle(symbol, candleManager) {
     const precisionMap = {
       'XBTUSD': 0.5,
       'ETHUSD': 0.05,
@@ -355,7 +359,7 @@ class FlowDataBase {
     }
 
     const orders = this._accountOrder.getStopOpenMarketOrders(symbol)
-    let lastCandle = this._candles5m.getHistoryCandle(symbol)
+    let lastCandle = candleManager.getHistoryCandle(symbol)
     const { high, low } = lastCandle
     // console.log(high, low)
     orders.forEach(o => {

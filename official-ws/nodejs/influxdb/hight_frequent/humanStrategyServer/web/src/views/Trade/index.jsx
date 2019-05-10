@@ -173,7 +173,10 @@ export default class Trade extends React.Component {
                 <button disabled={pending} onClick={this.handleOrderScapling.bind(this, i, true)}>Order Scapling Market</button>
               </div>
               <hr />
-              <div className="title">Stop Orders <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder} onChange={this.handleChangeZZSD.bind(this, i)}/> 5m自动追涨杀跌
+              <div className="title">
+                Stop Orders
+                <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder} onChange={this.handleChangeZZSD.bind(this, i)}/> 5m自动追涨杀跌
+                <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder1h} onChange={this.handleChangeZZSD1h.bind(this, i)}/> 5m自动追涨杀跌
                 {
                   <span className="red">{orderStopValideMsg}</span>
                 }
@@ -589,6 +592,11 @@ export default class Trade extends React.Component {
 
   handleChangeZZSD(index, e) {
     const key = 'autoUpdateStopOpenMarketOrder'
+    this.fetchChangeUserOption(index, key, e.target.checked)
+  }
+
+  handleChangeZZSD1h(index, e) {
+    const key = 'autoUpdateStopOpenMarketOrder1h'
     this.fetchChangeUserOption(index, key, e.target.checked)
   }
 
