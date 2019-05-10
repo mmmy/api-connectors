@@ -23,11 +23,11 @@ class AccountOrder {
       this._CLIENT._data.order[symbol] = []
     }
     DeltaParse.onAction(json.action, json.table, symbol, this._CLIENT, json)
-    // console.log('account order test', symbol, this.getOrders(symbol).length)
+    // console.log('account order test', symbol, this.getOrders(symbol))
   }
 
   getOrders(symbol = 'XBTUSD') {
-     return this._CLIENT._data.order[symbol].filter(item => ['Canceled', 'Filled'].indexOf(item.ordStatus) === -1)
+     return (this._CLIENT._data.order[symbol] || []).filter(item => ['Canceled', 'Filled'].indexOf(item.ordStatus) === -1)
   }
 
   hasOrder(symbol = 'XBTUSD') {
@@ -37,9 +37,13 @@ class AccountOrder {
   getLimitOrders(long, symbol = 'XBTUSD') {
     return this.getOrders(symbol).filter(o => o.side === (long ? 'Buy' : 'Sell'))
   }
-
+  // 默认是触发后平仓的限价止损
   getStopOrders(symbol = 'XBTUSD') {
-    return this.getOrders(symbol).filter(o => o.ordType === 'Stop')
+    return this.getOrders(symbol).filter(o => o.ordType === 'Stop' && o.execInst.indexOf('Close') > -1)
+  }
+  // 可以开仓的止损， 追涨杀跌使用
+  getStopOpenMarketOrders(symbol = 'XBTUSD') {
+    return this.getOrders(symbol).filter(o => o.ordType === 'Stop' && o.execInst.indexOf('Close') === -1)
   }
 
   getReduceOnlyOrders(symbol = 'XBTUSD') {

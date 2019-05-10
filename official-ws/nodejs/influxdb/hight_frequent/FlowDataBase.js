@@ -25,6 +25,7 @@ class FlowDataBase {
         kPeriod: 3,
         dPeriod: 3,
       },
+      autoUpdateStopOpenMarketOrder: false,
       ...options
     }
     this._indicativeSettlePrice = 0
@@ -64,6 +65,14 @@ class FlowDataBase {
     delete options.apiKey
     delete options.apiSecret
     return options
+  }
+
+  updateOptions(options) {
+    this._options = {
+      ...this._options,
+      ...options,
+    }
+    return this.getOptions()
   }
 
   listenJson(json, symbol) {
@@ -273,6 +282,9 @@ class FlowDataBase {
 
   updateTradeBin5m(json, symbol) {
     this._candles5m.update(json.data[0], symbol)
+    if (this._options.autoUpdateStopOpenMarketOrder) {
+      this.updateStopOpenOrderByLastCandle(symbol)
+    }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
     const signal = this._candles5m.calcMacdDepartSignal(symbol, 144)
@@ -330,6 +342,34 @@ class FlowDataBase {
 
   getAccountMargin() {
     return this._accountMargin.getMargin()
+  }
+
+  updateStopOpenOrderByLastCandle(symbol) {
+    const precisionMap = {
+      'XBTUSD': 0.5,
+      'ETHUSD': 0.05,
+    }
+    const precision = precisionMap[symbol]
+    if (!precision) {
+      return
+    }
+
+    const orders = this._accountOrder.getStopOpenMarketOrders(symbol)
+    let lastCandle = this._candles5m.getHistoryCandle(symbol)
+    const { high, low } = lastCandle
+    // console.log(high, low)
+    orders.forEach(o => {
+      const { side, stopPx } = o
+      const newStopPx = side === 'Buy' ? (high + precision) : (low - precision)
+      if (newStopPx !== stopPx) {
+        // update order
+        const newOrder = {
+          orderID: o.orderID,
+          stopPx: newStopPx
+        }
+        this._orderManager.getSignatureSDK().updateOrder(newOrder)
+      }
+    })
   }
 }
 

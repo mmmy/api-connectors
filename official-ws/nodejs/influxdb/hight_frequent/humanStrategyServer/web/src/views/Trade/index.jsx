@@ -68,7 +68,7 @@ export default class Trade extends React.Component {
             const orderStopValideMsg = this.checkStop(i)
             const positionKeys = ['symbol', 'leverage', 'currentQty', 'avgCostPrice', 'unrealisedPnl', 'unrealisedPnlPcnt', 'realisedGrossPnl', 'realisedPnl']
             return <div className="user-row">
-              <div>user: {user.options.user} ({(availableMargin / 1E8).toFixed(3)}/{(walletBalance / 1E8).toFixed(3)})</div>
+              <div>user: {options.user} ({(availableMargin / 1E8).toFixed(3)}/{(walletBalance / 1E8).toFixed(3)})</div>
               <div className="account clearfix">
                 <table style={{ fontSize: '12px' }}>
                   <thead>
@@ -173,7 +173,7 @@ export default class Trade extends React.Component {
                 <button disabled={pending} onClick={this.handleOrderScapling.bind(this, i, true)}>Order Scapling Market</button>
               </div>
               <hr />
-              <div className="title">Stop Orders
+              <div className="title">Stop Orders <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder} onChange={this.handleChangeZZSD.bind(this, i)}/> 5m自动追涨杀跌
                 {
                   <span className="red">{orderStopValideMsg}</span>
                 }
@@ -585,5 +585,32 @@ export default class Trade extends React.Component {
     })
 
     return msg
+  }
+
+  handleChangeZZSD(index, e) {
+    const key = 'autoUpdateStopOpenMarketOrder'
+    this.fetchChangeUserOption(index, key, e.target.checked)
+  }
+
+  fetchChangeUserOption(index, key, value) {
+    var userData = this.state.users[index]
+    const { user } = userData.options
+    userData.pending = true
+    this.setState({})
+    const options = {
+      [key]: value
+    }
+    axios.post('api/coin/change_options', { user, options }).then(({ status, data }) => {
+      userData.pending = false
+      if (status === 200 && data.result) {
+        alert('修改成功')
+        this.fetchUserList()
+      } else {
+        this.pushLog(data.info)
+      }
+    }).catch(e => {
+      userData.pending = false
+      this.pushLog(e)
+    })
   }
 }

@@ -174,4 +174,13 @@ module.exports = class StrategyUserManager {
     }
     return strategy.getOrderManager().getSignatureSDK().changeLeverage(symbol, leverage)
   }
+  // 止损开仓 自动跟踪前一根线的高低点, 5m
+  updateOptions(user, options) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    strategy.updateOptions(options)
+    return Promise.resolve(strategy.getOptions())
+  }
 }

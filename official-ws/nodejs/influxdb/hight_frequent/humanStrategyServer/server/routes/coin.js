@@ -248,4 +248,25 @@ router.post('/change_leverage', function (req, res) {
   })
 })
 
+router.post('/change_options', function (req, res) {
+  const { user, options } = req.body
+  if (!user) {
+    res.send({
+      result: false,
+      info: '缺少user参数'
+    })
+  }
+  manager.updateOptions(user, options).then(json => {
+    res.send({
+      result: true,
+      data: json
+    }).catch(e => {
+      res.send({
+        result: false,
+        info: e
+      })
+    })
+  })
+})
+
 module.exports = router

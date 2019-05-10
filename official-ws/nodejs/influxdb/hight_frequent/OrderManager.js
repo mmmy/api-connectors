@@ -450,6 +450,11 @@ class OrderManager {
   getSignatureSDK() {
     return this.signatureSDK
   }
+
+  getStopOpenMarketOrders(symbol) {
+    // [{stopPx, orderQty}]
+    return this._accountOrder.getStopOpenMarketOrders(symbol)
+  }
 }
 
 module.exports = OrderManager
