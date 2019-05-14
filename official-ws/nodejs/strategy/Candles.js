@@ -155,6 +155,46 @@ Candles.prototype.rsiSignal = function (realTime, len) {
   // console.log('rsi', rsi)
   return rsis
 }
+// rsi divergence
+Candles.prototype.rsiDivergenceSignal = function(realTime, len = 8, divergenceLen = 24) {
+  const data = this.getCandles(realTime)
+  const rsis = signal.RSI(data, len)
+  const rsisDivergence = rsis.slice(-divergenceLen - 1)
+  const lastRsi = rsisDivergence[rsisDivergence.length - 1]
+  const histRsis = rsisDivergence.slice(0, rsisDivergence.length - 1)
+
+  let long = false
+  let short = false
+  let isCurrentHighest = this.isCurrentHighestLowestClose(true, divergenceLen, 0)
+  let isCurrentLowest = this.isCurrentHighestLowestClose(false, divergenceLen, 0)
+  if (isCurrentHighest) {
+    const theshold_top = 80
+    // 其中含有了Rsi超高阈值
+    const isOverBoughtHappend = Math.max.apply(null, rsisDivergence) > theshold_top
+    if (isOverBoughtHappend) {
+      const isDivergenceShort = lastRsi < Math.max.apply(null, histRsis)
+      if (isDivergenceShort) {
+        short = true
+      }
+    }
+  }
+  if (isCurrentLowest) {
+    const theshold_bottom = 20
+    const isOverSoldHappend = Math.min.apply(null, rsisDivergence) < theshold_bottom
+    if (isOverSoldHappend) {
+      const isDivergenceLong = lastRsi > Math.min.apply(null, histRsis)
+      if (isDivergenceLong) {
+        long = true
+      }
+    }
+  }
+  // const { maxHigh, minLow } = signal.highestLowestHighLow(data, divergenceLen)
+  return {
+    long,
+    short
+  }
+}
+
 // 也许开始趋势反转, 这个根据历史数据
 Candles.prototype.mayTrendReverseSignal = function () {
   const bbSignal = this.bollSignal()

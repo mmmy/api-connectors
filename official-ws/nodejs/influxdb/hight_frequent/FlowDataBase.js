@@ -280,6 +280,19 @@ class FlowDataBase {
     if (this._options.autoUpdateStopOpenMarketOrder1h) {
       this.updateStopOpenOrderByLastCandle(symbol, this._candles1h)
     }
+    // RSI divergence signal
+    const rsiDivergenceSignal = this._candles1h.rsiDivergenceSignal(symbol, 8, 24)
+    if (rsiDivergenceSignal.long) {
+      if (this._options.autoCloseRsiDivergence1h) {
+        this.closeShortPositionIfHave()
+      }
+      notifyPhone(`${symbol} 1h rsiDivergenceSignal Long`)
+    } else if (rsiDivergenceSignal.short) {
+      if (this._options.autoCloseRsiDivergence1h) {
+        this.closeLongPostionIfHave()
+      }
+      notifyPhone(`${symbol} 1h rsiDivergenceSignal short`)
+    }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
     const signal = this._candles1h.calcMacdDepartSignal(symbol, 90)
@@ -289,12 +302,12 @@ class FlowDataBase {
       if (this._options.autoCloseMacdDivergence1h) {
         this.closeShortPositionIfHave()
       }
-      notifyPhone(`${symbol} 1h MacdDepartSignal Long`)
+      // notifyPhone(`${symbol} 1h MacdDepartSignal Long`)
     } else if (signal.short) {
       if (this._options.autoCloseMacdDivergence1h) {
         this.closeLongPostionIfHave()
       }
-      notifyPhone(`${symbol} 1h MacdDepartSignal Short`)
+      // notifyPhone(`${symbol} 1h MacdDepartSignal Short`)
     }
   }
 
@@ -302,6 +315,19 @@ class FlowDataBase {
     this._candles5m.update(json.data[0], symbol)
     if (this._options.autoUpdateStopOpenMarketOrder) {
       this.updateStopOpenOrderByLastCandle(symbol, this._candles5m)
+    }
+    // RSI divergence signal
+    const rsiDivergenceSignal = this._candles5m.rsiDivergenceSignal(symbol, 8, 24)
+    if (rsiDivergenceSignal.long) {
+      if (this._options.autoCloseRsiDivergence5m) {
+        this.closeShortPositionIfHave()
+      }
+      notifyPhone(`${symbol} 5m rsiDivergenceSignal Long`)
+    } else if (rsiDivergenceSignal.short) {
+      if (this._options.autoCloseRsiDivergence5m) {
+        this.closeLongPostionIfHave()
+      }
+      notifyPhone(`${symbol} 5m rsiDivergenceSignal short`)
     }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)

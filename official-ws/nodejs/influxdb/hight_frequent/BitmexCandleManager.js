@@ -32,6 +32,10 @@ class BitmexCandleManager {
     return this._candles[symbol].macdDepartSignal(false, len, offset)
   }
 
+  rsiDivergenceSignal(symbol, len, divergenceLen) {
+    return this._candles[symbol].rsiDivergenceSignal(false, len, divergenceLen)
+  }
+
   getHistoryCandle(symbol) {
     return this._candles[symbol].getHistoryCandle(1)
   }
