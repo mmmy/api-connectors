@@ -338,12 +338,12 @@ class FlowDataBase {
       if (this._options.autoCloseMacdDivergence5m) {
         this.closeShortPositionIfHave()
       }
-      notifyPhone(`${symbol} 5m MacdDepartSignal Long`)
+      // notifyPhone(`${symbol} 5m MacdDepartSignal Long`)
     } else if (signal.short && signal1.short) {
       if (this._options.autoCloseMacdDivergence5m) {
         this.closeLongPostionIfHave()
       }
-      notifyPhone(`${symbol} 5m MacdDepartSignal Short`)
+      // notifyPhone(`${symbol} 5m MacdDepartSignal Short`)
     }
   }
 
