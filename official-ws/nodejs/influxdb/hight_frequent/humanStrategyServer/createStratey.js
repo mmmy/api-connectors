@@ -43,6 +43,8 @@ module.exports = function createStratey(options) {
   // bitmex.listenExecution(dataCb)
   if (options.main) {
     bitmex.listenOrderBook(dataCb, 'XBTUSD')
+    bitmex.listenInstrument(dataCb)
+
     let symbols1h = ['XBTUSD', 'ETHUSD']
     symbols1h.forEach(symbol => {
       bitmex.listenQuote(dataCb, symbol)

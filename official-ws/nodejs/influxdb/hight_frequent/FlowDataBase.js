@@ -44,7 +44,7 @@ class FlowDataBase {
     this._orderManager = !this._options.test && new OrderManager(this._options, this._ob, this._accountPosition, this._accountOrder)
     this._orderManagerTest = new OrderManagerTest(this._options, this._ob)      // 回测
 
-    this._lastInstrumentUpdate = new Date()
+    this._lastDataUpdate = new Date()
 
     this._currentQty = 0
 
@@ -84,14 +84,16 @@ class FlowDataBase {
     const { table, action, data } = json
     switch (table) {
       case 'orderBookL2_25':
+        // this._lastDataUpdate = new Date()
         // this._lastOrderBookUpdate = new Date()
         this.updateOrderBook(json, symbol)
         break
       case 'trade':
+        // this._lastDataUpdate = new Date()
         this.updateTrade(json, symbol)
         break
       case 'instrument':
-        // this._lastInstrumentUpdate = new Date()
+        this._lastDataUpdate = new Date()
         this.updateInstrument(json, symbol)
         break
       case 'position':
@@ -246,7 +248,7 @@ class FlowDataBase {
   checkAlive() {
     let time = 10 * 60 * 1000
     let now = new Date()
-    if (now - this._lastInstrumentUpdate > time) {
+    if (now - this._lastDataUpdate > time) {
       return false
     }
     return true
@@ -283,10 +285,13 @@ class FlowDataBase {
     // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long) {
       if (this._options.autoCloseMacdDivergence1h) {
-        this.closePositionIfHave()
+        this.closeShortPositionIfHave()
       }
       notifyPhone(`${symbol} 1h MacdDepartSignal Long`)
     } else if (signal.short) {
+      if (this._options.autoCloseMacdDivergence1h) {
+        this.closeLongPostionIfHave()
+      }
       notifyPhone(`${symbol} 1h MacdDepartSignal Short`)
     }
   }
@@ -303,10 +308,13 @@ class FlowDataBase {
     // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long && signal1.long) {
       if (this._options.autoCloseMacdDivergence5m) {
-        this.closePositionIfHave()
+        this.closeShortPositionIfHave()
       }
       notifyPhone(`${symbol} 5m MacdDepartSignal Long`)
     } else if (signal.short && signal1.short) {
+      if (this._options.autoCloseMacdDivergence5m) {
+        this.closeLongPostionIfHave()
+      }
       notifyPhone(`${symbol} 5m MacdDepartSignal Short`)
     }
   }
@@ -384,6 +392,18 @@ class FlowDataBase {
         this._orderManager.getSignatureSDK().updateOrder(newOrder)
       }
     })
+  }
+
+  closeLongPostionIfHave() {
+    if (this._accountPosition.getCurrentQty() > 0) {
+      this.closePosition()
+    }
+  }
+
+  closeShortPositionIfHave() {
+    if (this._accountPosition.getCurrentQty() < 0) {
+      this.closePosition()
+    }
   }
 
   closePositionIfHave() {

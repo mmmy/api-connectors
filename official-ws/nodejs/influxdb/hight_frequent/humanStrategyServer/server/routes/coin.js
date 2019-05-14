@@ -227,6 +227,33 @@ router.post('/order_stop', function (req, res, next) {
   })
 })
 
+router.post('/order_market_if_touched', function (req, res, next) {
+  const { user, symbol, qty, side, stopPx, stop_close } = req.body
+  if (!symbol || !qty && !side) {
+    res.send({
+      result: false,
+      info: '缺少symbol, qty, side参数'
+    })
+  }
+  if (!stopPx && !offset) {
+    res.send({
+      result: false,
+      info: 'stopPx adn offset, at last one'
+    })
+  }
+  manager.orderMarketIfTouched(user, symbol, qty, stopPx, side, stop_close).then(json => {
+    res.send({
+      result: true,
+      data: json
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
+    })
+  })
+})
+
 router.post('/change_leverage', function (req, res) {
   const { user, symbol, leverage } = req.body
   if (!user || !symbol || !leverage) {

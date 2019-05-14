@@ -102,6 +102,14 @@ module.exports = class StrategyUserManager {
     }
     return strategy.getOrderManager().getSignatureSDK().orderStop(symbol, orderQty, stopPx, side, stop_close)
   }
+  // 市价止盈
+  orderMarketIfTouched(user, symbol, orderQty, stopPx, side, stop_close) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return strategy.getOrderManager().getSignatureSDK().orderMarketTouched(symbol, orderQty, stopPx, side)
+  }
 
   deleteOrder(user, orderID) {
     const strategy = this.findStrategyByUser(user)

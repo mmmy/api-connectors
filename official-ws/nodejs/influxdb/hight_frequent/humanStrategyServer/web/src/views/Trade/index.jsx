@@ -193,10 +193,11 @@ export default class Trade extends React.Component {
                     <th>剩余</th>
                     <th>时间</th>
                     <th>execInst</th>
+                    <th>ordType</th>
                   </tr></thead>
                   <tbody>
                     {
-                      orders.filter(o => o.ordType === 'Stop').map(order => {
+                      orders.filter(o => o.ordType === 'Stop' || o.ordType === 'MarketIfTouched').map(order => {
                         const isBuy = order.side === 'Buy'
                         return <tr>
                           <td><button onClick={this.handleDelOrder.bind(this, i, order)}>Del</button></td>
@@ -208,6 +209,7 @@ export default class Trade extends React.Component {
                           <td className={isBuy ? 'green' : 'red'}>{order.leavesQty * (isBuy ? 1 : -1)}</td>
                           <td>{new Date(order.timestamp).toLocaleString()}</td>
                           <td>{order.execInst}</td>
+                          <td>{order.ordType}</td>
                         </tr>
                       })
                     }
@@ -228,9 +230,10 @@ export default class Trade extends React.Component {
                 <div style={{ marginBottom: '10px' }}>
                   <label>stopPx:</label>
                   <input value={form.stop_price} style={{ width: '100px' }} type="number" onChange={this.handleInputChangeFormData.bind(this, i, 'stop_price')} />
-                  <button onClick={this.handleOrderStop.bind(this, i)} disabled={pending || !form.stop_price}>Order Stop Market</button>
+                  <button onClick={this.handleOrderStop.bind(this, i, 0)} disabled={pending || !form.stop_price}>Order Stop Market</button>
                   <label for="checkbox-stop-close">Close</label>
-                  <input value={form.stop_close} type="checkbox" id="checkbox-stop-close" onChange={this.handleChangeCheckbox.bind(this, i, 'stop_close')} />
+                  <input checked={form.stop_close} type="checkbox" id="checkbox-stop-close" onChange={this.handleChangeCheckbox.bind(this, i, 'stop_close')} />
+                  <button onClick={this.handleOrderStop.bind(this, i, 1)} disabled={pending || !form.stop_price}>Take Profit Market</button>
                 </div>
               </div>
               <hr />
@@ -246,8 +249,11 @@ export default class Trade extends React.Component {
               <div>
                 <h5>Config</h5>
                 {
-                  ['autoCloseMacdDivergence5m', 'autoCloseMacdDivergence5m', 'autoCloseRsiDivergence5m', 'autoCloseRsiDivergence1h'].map((key, j) => {
-                    return [<label for={`config-${j}`}>{key}</label>, <input id={`config-${j}`} type="checkbox" onChange={this.handleCheckboxOption.bind(this, i, key)} />]
+                  ['autoCloseMacdDivergence5m', 'autoCloseMacdDivergence1h', 'autoCloseRsiDivergence5m', 'autoCloseRsiDivergence1h'].map((key, j) => {
+                    return [
+                      <label for={`config-${j}`}>{key}</label>,
+                      <input id={`config-${j}`} type="checkbox" onChange={this.handleCheckboxOption.bind(this, i, key)} checked={options[key]}/>
+                    ]
                   })
                 }
               </div>
@@ -439,15 +445,16 @@ export default class Trade extends React.Component {
     }
   }
   // 市价止损
-  handleOrderStop(index) {
+  handleOrderStop(index, type) {
     var userData = this.state.users[index]
     const user = userData.options.user
     const { stop_side, stop_qty, stop_price, stop_symbol, stop_close } = userData.form
-    var info = `${user} order stop market?\n ${stop_symbol} ${stop_side} ${stop_qty} at ${stop_price}?`
+    var info = `${user} ${type === 1 ? 'order MarketIfTouched' : 'order stop market'}?\n ${stop_symbol} ${stop_side} ${stop_qty} at ${stop_price}?`
     if (window.confirm(info)) {
       userData.pending = true
       this.setState({})
-      axios.post('api/coin/order_stop', { user, symbol: stop_symbol, qty: stop_qty, side: stop_side, stopPx: stop_price, stop_close }).then(({ status, data }) => {
+      const path = type === 1 ? 'api/coin/order_market_if_touched' : 'api/coin/order_stop'
+      axios.post(path, { user, symbol: stop_symbol, qty: stop_qty, side: stop_side, stopPx: stop_price, stop_close }).then(({ status, data }) => {
         userData.pending = false
         if (status === 200 && data.result) {
           alert('order stop success')
