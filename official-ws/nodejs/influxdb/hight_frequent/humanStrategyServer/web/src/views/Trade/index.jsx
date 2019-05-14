@@ -175,8 +175,8 @@ export default class Trade extends React.Component {
               <hr />
               <div className="title">
                 Stop Orders
-                <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder} onChange={this.handleChangeZZSD.bind(this, i)}/> 5m自动追涨杀跌
-                <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder1h} onChange={this.handleChangeZZSD1h.bind(this, i)}/> 1h自动追涨杀跌
+                <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder} onChange={this.handleChangeZZSD.bind(this, i)} /> 5m自动追涨杀跌
+                <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder1h} onChange={this.handleChangeZZSD1h.bind(this, i)} /> 1h自动追涨杀跌
                 {
                   <span className="red">{orderStopValideMsg}</span>
                 }
@@ -192,6 +192,7 @@ export default class Trade extends React.Component {
                     <th>状态</th>
                     <th>剩余</th>
                     <th>时间</th>
+                    <th>execInst</th>
                   </tr></thead>
                   <tbody>
                     {
@@ -206,6 +207,7 @@ export default class Trade extends React.Component {
                           <td>{order.ordStatus}</td>
                           <td className={isBuy ? 'green' : 'red'}>{order.leavesQty * (isBuy ? 1 : -1)}</td>
                           <td>{new Date(order.timestamp).toLocaleString()}</td>
+                          <td>{order.execInst}</td>
                         </tr>
                       })
                     }
@@ -224,7 +226,11 @@ export default class Trade extends React.Component {
                   <input className={form.stop_side === 'Buy' ? 'green' : 'red'} onChange={this.handleInputChangeFormData.bind(this, i, 'stop_qty')} style={{ width: '80px' }} type="number" value={form.stop_qty} />
                 </div>
                 <div style={{ marginBottom: '10px' }}>
-                  <label>stopPx:</label><input value={form.stop_price} style={{ width: '100px' }} type="number" onChange={this.handleInputChangeFormData.bind(this, i, 'stop_price')} /><button onClick={this.handleOrderStop.bind(this, i)} disabled={pending || !form.stop_price}>Order Stop Market</button>
+                  <label>stopPx:</label>
+                  <input value={form.stop_price} style={{ width: '100px' }} type="number" onChange={this.handleInputChangeFormData.bind(this, i, 'stop_price')} />
+                  <button onClick={this.handleOrderStop.bind(this, i)} disabled={pending || !form.stop_price}>Order Stop Market</button>
+                  <label for="checkbox-stop-close">Close</label>
+                  <input value={form.stop_close} type="checkbox" id="checkbox-stop-close" onChange={this.handleChangeCheckbox.bind(this, i, 'stop_close')} />
                 </div>
               </div>
               <hr />
@@ -284,6 +290,7 @@ export default class Trade extends React.Component {
               order_symbol: 'XBTUSD',
               stop_symbol: 'XBTUSD',
               auto_price: false,
+              stop_close: true,
             }
             return item
           }),
@@ -427,12 +434,12 @@ export default class Trade extends React.Component {
   handleOrderStop(index) {
     var userData = this.state.users[index]
     const user = userData.options.user
-    const { stop_side, stop_qty, stop_price, stop_symbol } = userData.form
+    const { stop_side, stop_qty, stop_price, stop_symbol, stop_close } = userData.form
     var info = `${user} order stop market?\n ${stop_symbol} ${stop_side} ${stop_qty} at ${stop_price}?`
     if (window.confirm(info)) {
       userData.pending = true
       this.setState({})
-      axios.post('api/coin/order_stop', { user, symbol: stop_symbol, qty: stop_qty, side: stop_side, stopPx: stop_price }).then(({ status, data }) => {
+      axios.post('api/coin/order_stop', { user, symbol: stop_symbol, qty: stop_qty, side: stop_side, stopPx: stop_price, stop_close }).then(({ status, data }) => {
         userData.pending = false
         if (status === 200 && data.result) {
           alert('order stop success')

@@ -83,7 +83,7 @@ module.exports = class StrategyUserManager {
     return strategy.getOrderManager().getSignatureSDK().orderReduceOnlyLimit(symbol, orderQty, side, price)
   }
 
-  orderStop(user, symbol, orderQty, stopPx, side, offset) {
+  orderStop(user, symbol, orderQty, stopPx, side, offset, stop_close) {
     const strategy = this.findStrategyByUser(user)
     if (!strategy) {
       return Promise.reject(`${user} strategy not exist`)
@@ -100,7 +100,7 @@ module.exports = class StrategyUserManager {
       }
       stopPx = side == 'Buy' ? (quote.askPrice + offset) : (quote.bidPrice - offset)
     }
-    return strategy.getOrderManager().getSignatureSDK().orderStop(symbol, orderQty, stopPx, side)
+    return strategy.getOrderManager().getSignatureSDK().orderStop(symbol, orderQty, stopPx, side, stop_close)
   }
 
   deleteOrder(user, orderID) {

@@ -12,14 +12,14 @@ function requestWidthHeader(url, params, headers, method) {
   return new Promise((resolve, reject) => {
     // console.log(url, params, headers)
     httpClient[method](url, params, {
-          timeout: 10000,
-          headers: headers
-      }).then(data => {
-          let json = JSON.parse(data)
-          resolve(json)
-      }).catch(error => {
-          reject(error)
-      })
+      timeout: 10000,
+      headers: headers
+    }).then(data => {
+      let json = JSON.parse(data)
+      resolve(json)
+    }).catch(error => {
+      reject(error)
+    })
   })
 }
 
@@ -48,7 +48,7 @@ class SignatureSDK {
       'api-signature': signature
     }
   }
-  
+
   order(params) {
     var path = '/api/v1/order'
     const url = this.getUrl(path)
@@ -56,41 +56,45 @@ class SignatureSDK {
     return requestWidthHeader(url, params, headers, 'post')
   }
 
-  orderMarket(symbol, orderQty, side="Buy") {
-    const data = {symbol: symbol, orderQty, side, ordType:"Market"}
+  orderMarket(symbol, orderQty, side = "Buy") {
+    const data = { symbol: symbol, orderQty, side, ordType: "Market" }
     return this.order(data)
   }
   // 市价止损 , 所有市价 手续费太高0.075%
   //{"ordType":"Stop","stopPx":6520,"orderQty":1000,"side":"Buy","execInst":"Close,LastPrice","symbol":"XBTUSD","text":"Submission from testnet.bitmex.com"}
-  orderStop(symbol, orderQty, stopPx, side) {
-    const data = {symbol: symbol, orderQty, stopPx, side, ordType:"Stop", execInst:"Close,LastPrice"}
+  orderStop(symbol, orderQty, stopPx, side, stop_close) {
+    const instes = ['LastPrice']
+    if (stop_close !== false) {
+      instes.push('Close')
+    }
+    const data = { symbol: symbol, orderQty, stopPx, side, ordType: "Stop", execInst: instes.join(',') }
     return this.order(data)
   }
   // 市价止盈
   //{"ordType":"MarketIfTouched","stopPx":6400,"orderQty":1000,"side":"Buy","execInst":"Close,LastPrice","symbol":"XBTUSD","text":"Submission from testnet.bitmex.com"}
   orderMarketTouched(symbol, orderQty, stopPx, side) {
-    const data = {symbol: symbol, orderQty, stopPx, side, ordType:"MarketIfTouched", execInst:"Close,LastPrice"}
+    const data = { symbol: symbol, orderQty, stopPx, side, ordType: "MarketIfTouched", execInst: "Close,LastPrice" }
     return this.order(data)
   }
   // 限价手续费是-0.025%, 所以最好买入用orderLimit, displayQty: 0, 隐藏订单, 不显示到orderbook, 但是要收手续费
   // "ParticipateDoNotInitiate" : 一定返佣 否则系统会取消订单
   orderLimit(symbol, orderQty, side, price) {
-    const data = {symbol: symbol, orderQty, side, price, ordType: 'Limit', execInst: "ParticipateDoNotInitiate"}
+    const data = { symbol: symbol, orderQty, side, price, ordType: 'Limit', execInst: "ParticipateDoNotInitiate" }
     return this.order(data)
   }
   // 只减仓
   orderReduceOnlyLimit(symbol, orderQty, side, price) {
-    const data = {symbol: symbol, orderQty, side, price, ordType: 'Limit', execInst: "ParticipateDoNotInitiate,ReduceOnly"}
+    const data = { symbol: symbol, orderQty, side, price, ordType: 'Limit', execInst: "ParticipateDoNotInitiate,ReduceOnly" }
     return this.order(data)
   }
   // 限价止损, 手续费是负数, 你懂的
   orderStopLimit(symbol, orderQty, stopPx, side, price) {
-    const data = {symbol: symbol, orderQty, stopPx, price, side, ordType: 'StopLimit', execInst:"Close,LastPrice"}
+    const data = { symbol: symbol, orderQty, stopPx, price, side, ordType: 'StopLimit', execInst: "Close,LastPrice" }
     return this.order(data)
   }
   // 限价止盈, 手续费是负数
   orderProfitLimitTouched(symbol, orderQty, stopPx, side, price) {
-    const data = {symbol: symbol, orderQty, side, stopPx, price, ordType: 'LimitIfTouched', execInst:"Close,LastPrice"}
+    const data = { symbol: symbol, orderQty, side, stopPx, price, ordType: 'LimitIfTouched', execInst: "Close,LastPrice" }
     return this.order(data)
   }
 
@@ -101,7 +105,7 @@ class SignatureSDK {
     const headers = this.getHeaders('PUT', path, params)
     return requestWidthHeader(url, params, headers, 'put')
   }
-  
+
   deleteOrder(orderID) {
     const data = { orderID }
     const path = '/api/v1/order'
@@ -117,7 +121,7 @@ class SignatureSDK {
     const headers = this.getHeaders('DELETE', path, data)
     return requestWidthHeader(url, data, headers, 'delete')
   }
-  
+
   getPosition(symbol) {
     const path = '/api/v1/position'
     const url = this.getUrl(path)
@@ -131,12 +135,12 @@ class SignatureSDK {
   }
 
   closePositionMarket(symbol) {
-    const data = {symbol: symbol, ordType: "Market", execInst: "Close" }
+    const data = { symbol: symbol, ordType: "Market", execInst: "Close" }
     return this.order(data)
   }
 
   changeLeverage(symbol, leverage) {
-    const data = {symbol, leverage}
+    const data = { symbol, leverage }
     const path = '/api/v1/position/leverage'
     const url = this.getUrl(path)
     const headers = this.getHeaders('POST', path, data)

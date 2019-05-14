@@ -201,7 +201,7 @@ router.get('/all_quotes', function (req, res, next) {
 })
 
 router.post('/order_stop', function (req, res, next) {
-  const { user, symbol, qty, side, stopPx, offset } = req.body
+  const { user, symbol, qty, side, stopPx, offset, stop_close } = req.body
   if (!symbol || !qty && !side) {
     res.send({
       result: false,
@@ -214,7 +214,7 @@ router.post('/order_stop', function (req, res, next) {
       info: 'stopPx adn offset, at last one'
     })
   }
-  manager.orderStop(user, symbol, qty, stopPx, side, offset).then(json => {
+  manager.orderStop(user, symbol, qty, stopPx, side, offset, stop_close).then(json => {
     res.send({
       result: true,
       data: json
