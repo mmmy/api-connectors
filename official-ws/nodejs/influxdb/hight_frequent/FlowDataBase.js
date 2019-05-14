@@ -27,6 +27,10 @@ class FlowDataBase {
       },
       autoUpdateStopOpenMarketOrder: false,
       autoUpdateStopOpenMarketOrder1h: false,
+      autoCloseMacdDivergence5m: false,
+      autoCloseRsiDivergence5m: false,
+      autoCloseMacdDivergence1h: false,
+      autoCloseRsiDivergence1h: false,
       ...options
     }
     this._indicativeSettlePrice = 0
@@ -278,6 +282,9 @@ class FlowDataBase {
     // const candle = this._candles1h.getHistoryCandle(symbol)
     // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long) {
+      if (this._options.autoCloseMacdDivergence1h) {
+        this.closePositionIfHave()
+      }
       notifyPhone(`${symbol} 1h MacdDepartSignal Long`)
     } else if (signal.short) {
       notifyPhone(`${symbol} 1h MacdDepartSignal Short`)
@@ -295,6 +302,9 @@ class FlowDataBase {
     const signal1 = this._candles5m.calcMacdDepartSignal(symbol, 144, 1)
     // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long && signal1.long) {
+      if (this._options.autoCloseMacdDivergence5m) {
+        this.closePositionIfHave()
+      }
       notifyPhone(`${symbol} 5m MacdDepartSignal Long`)
     } else if (signal.short && signal1.short) {
       notifyPhone(`${symbol} 5m MacdDepartSignal Short`)
@@ -374,6 +384,12 @@ class FlowDataBase {
         this._orderManager.getSignatureSDK().updateOrder(newOrder)
       }
     })
+  }
+
+  closePositionIfHave() {
+    if (this._accountPosition.hasPosition()) {
+      this.closePosition()
+    }
   }
 }
 

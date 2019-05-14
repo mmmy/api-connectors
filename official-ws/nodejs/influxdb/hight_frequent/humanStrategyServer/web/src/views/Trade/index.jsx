@@ -243,6 +243,14 @@ export default class Trade extends React.Component {
                 </div>
                 <div></div>
               </div>
+              <div>
+                <h5>Config</h5>
+                {
+                  ['autoCloseMacdDivergence5m', 'autoCloseMacdDivergence5m', 'autoCloseRsiDivergence5m', 'autoCloseRsiDivergence1h'].map((key, j) => {
+                    return [<label for={`config-${j}`}>{key}</label>, <input id={`config-${j}`} type="checkbox" onChange={this.handleCheckboxOption.bind(this, i, key)} />]
+                  })
+                }
+              </div>
               {
                 pending && <div className="pending-container">fetching...</div>
               }
@@ -595,6 +603,10 @@ export default class Trade extends React.Component {
     })
 
     return msg
+  }
+
+  handleCheckboxOption(index, key, e) {
+    this.fetchChangeUserOption(index, key, e.target.checked)
   }
 
   handleChangeZZSD(index, e) {
