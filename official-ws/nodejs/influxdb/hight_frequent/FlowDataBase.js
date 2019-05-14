@@ -258,7 +258,9 @@ class FlowDataBase {
     this._interval = setInterval(() => {
       if (!this.checkAlive()) {
         notifyPhone('data not flow error')
-        process.exit(1) // centos7 设置 systemctl 服务会自动重启
+        setTimeout(() => {
+          process.exit(1) // centos7 设置 systemctl 服务会自动重启
+        }, 10 * 1000)
       }
     }, 5 * 60 * 1000)
   }
