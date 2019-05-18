@@ -27,6 +27,14 @@ class FlowDataBase {
       },
       autoUpdateStopOpenMarketOrder: false,
       autoUpdateStopOpenMarketOrder1h: false,
+
+      autoCloseStochOverTrade5m: false,
+      autoCloseStochOverTrade1h: false,
+      autoCloseStochDivergence5m: false,
+      autoCloseStochDivergence1h: false,
+      autoCloseRsiOverTrade5m: false,
+      autoCloseRsiOverTrade1h: false,
+
       autoCloseMacdDivergence5m: false,
       autoCloseRsiDivergence5m: false,
       autoCloseMacdDivergence1h: false,
@@ -280,6 +288,19 @@ class FlowDataBase {
     if (this._options.autoUpdateStopOpenMarketOrder1h) {
       this.updateStopOpenOrderByLastCandle(symbol, this._candles1h)
     }
+    // RSI over trade signal
+    const rsiOverTradeSignal = this._candles1h.rsiOverTradeSignal(symbol, 8)
+    if (rsiOverTradeSignal.long) {
+      if (this._options.autoCloseRsiOverTrade1h) {
+        this.closeShortPositionIfHave()
+      }
+      notifyPhone(`${symbol} 1h rsiOverTradeSignal Long`)
+    } else if (rsiOverTradeSignal.short) {
+      if (this._options.autoCloseRsiOverTrade1h) {
+        this.closeLongPostionIfHave()
+      }
+      notifyPhone(`${symbol} 1h rsiOverTradeSignal Short`)
+    }
     // RSI divergence signal
     const rsiDivergenceSignal = this._candles1h.rsiDivergenceSignal(symbol, 8, 24)
     if (rsiDivergenceSignal.long) {
@@ -315,6 +336,19 @@ class FlowDataBase {
     this._candles5m.update(json.data[0], symbol)
     if (this._options.autoUpdateStopOpenMarketOrder) {
       this.updateStopOpenOrderByLastCandle(symbol, this._candles5m)
+    }
+    // RSI over trade signal
+    const rsiOverTradeSignal = this._candles5m.rsiOverTradeSignal(symbol, 8)
+    if (rsiOverTradeSignal.long) {
+      if (this._options.autoCloseRsiOverTrade5m) {
+        this.closeShortPositionIfHave()
+      }
+      notifyPhone(`${symbol} 5m rsiOverTradeSignal Long`)
+    } else if (rsiOverTradeSignal.short) {
+      if (this._options.autoCloseRsiOverTrade5m) {
+        this.closeLongPostionIfHave()
+      }
+      notifyPhone(`${symbol} 5m rsiOverTradeSignal Short`)
     }
     // RSI divergence signal
     const rsiDivergenceSignal = this._candles5m.rsiDivergenceSignal(symbol, 8, 24)

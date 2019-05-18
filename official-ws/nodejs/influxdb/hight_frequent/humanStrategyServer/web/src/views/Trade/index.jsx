@@ -249,11 +249,22 @@ export default class Trade extends React.Component {
               <div>
                 <h5>Config</h5>
                 {
-                  ['autoCloseMacdDivergence5m', 'autoCloseMacdDivergence1h', 'autoCloseRsiDivergence5m', 'autoCloseRsiDivergence1h'].map((key, j) => {
-                    return [
-                      <label for={`config-${j}`}>{key}</label>,
+                  [
+                    // 'autoCloseMacdDivergence5m',
+                    // 'autoCloseMacdDivergence1h',
+                    'autoCloseStochOverTrade5m',
+                    'autoCloseStochOverTrade1h',
+                    'autoCloseStochDivergence5m',
+                    'autoCloseStochDivergence1h',
+                    'autoCloseRsiOverTrade5m',
+                    'autoCloseRsiOverTrade1h',
+                    'autoCloseRsiDivergence5m',
+                    'autoCloseRsiDivergence1h',
+                  ].map((key, j) => {
+                    return <div>
+                      <label for={`config-${j}`}>{key}</label>
                       <input id={`config-${j}`} type="checkbox" onChange={this.handleCheckboxOption.bind(this, i, key)} checked={options[key]}/>
-                    ]
+                    </div>
                   })
                 }
               </div>

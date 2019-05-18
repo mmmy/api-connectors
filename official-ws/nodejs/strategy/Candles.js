@@ -155,6 +155,17 @@ Candles.prototype.rsiSignal = function (realTime, len) {
   // console.log('rsi', rsi)
   return rsis
 }
+Candles.prototype.rsiOverTradeSignal = function(realTime, len = 8) {
+  const data = this.getHistoryCandle(realTime)
+  const rsis = signal.RSI(data, len)
+  const lastRsi = rsis[rsis.length - 1]
+  const theshold_top = 80
+  const theshold_bottom = 20
+  return {
+    long: lastRsi < theshold_bottom, // over sold, should close short position
+    short: lastRsi > theshold_top,   // over bought, should close long position
+  }
+}
 // rsi divergence
 Candles.prototype.rsiDivergenceSignal = function(realTime, len = 8, divergenceLen = 24) {
   const data = this.getCandles(realTime)

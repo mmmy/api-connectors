@@ -39,6 +39,10 @@ class BitmexCandleManager {
   getHistoryCandle(symbol) {
     return this._candles[symbol].getHistoryCandle(1)
   }
+
+  rsiOverTradeSignal(symbol, len) {
+    return this._candles[symbol].rsiOverTradeSignal(false, len)
+  }
 }
 
 module.exports = BitmexCandleManager
