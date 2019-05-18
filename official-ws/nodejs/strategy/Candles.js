@@ -156,7 +156,7 @@ Candles.prototype.rsiSignal = function (realTime, len) {
   return rsis
 }
 Candles.prototype.rsiOverTradeSignal = function(realTime, len = 8) {
-  const data = this.getHistoryCandle(realTime)
+  const data = this.getCandles(realTime)
   const rsis = signal.RSI(data, len)
   const lastRsi = rsis[rsis.length - 1]
   const theshold_top = 80
