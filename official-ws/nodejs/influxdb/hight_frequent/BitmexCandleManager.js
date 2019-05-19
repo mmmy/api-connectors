@@ -45,7 +45,7 @@ class BitmexCandleManager {
   }
 
   highlow1Signal(symbol) {
-    return this._candles[symbol].rsiOverTradeSignal()
+    return this._candles[symbol].highlow1Signal()
   }
 }
 

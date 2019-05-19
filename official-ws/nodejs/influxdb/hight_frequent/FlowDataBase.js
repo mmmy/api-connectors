@@ -293,6 +293,13 @@ class FlowDataBase {
     if (this._options.autoUpdateStopOpenMarketOrder1h) {
       this.updateStopOpenOrderByLastCandle(symbol, this._candles1h)
     }
+    // high1 low1
+    const highlow1Signal = this._candles1h.highlow1Signal(symbol)
+    if (highlow1Signal.high1) {
+      notifyPhone(`${symbol} 1h high 1`)
+    } else if (highlow1Signal.low1) {
+      notifyPhone(`${symbol} 1h low 1`)
+    }
     // RSI over trade signal
     const rsiOverTradeSignal = this._candles1h.rsiOverTradeSignal(symbol, 8)
     if (rsiOverTradeSignal.long) {
@@ -342,7 +349,7 @@ class FlowDataBase {
     if (this._options.autoUpdateStopOpenMarketOrder) {
       this.updateStopOpenOrderByLastCandle(symbol, this._candles5m)
     }
-    //
+    // high1 low1
     const highlow1Signal = this._candles5m.highlow1Signal(symbol)
     if (highlow1Signal.high1) {
       notifyPhone(`${symbol} 5m high 1`)
