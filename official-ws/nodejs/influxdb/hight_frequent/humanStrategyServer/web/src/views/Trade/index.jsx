@@ -228,10 +228,12 @@ export default class Trade extends React.Component {
                   <input className={form.stop_side === 'Buy' ? 'green' : 'red'} onChange={this.handleInputChangeFormData.bind(this, i, 'stop_qty')} style={{ width: '80px' }} type="number" value={form.stop_qty} />
                 </div>
                 <div style={{ marginBottom: '10px' }}>
-                  <label>stopPx:</label>
-                  <input value={form.stop_price} style={{ width: '100px' }} type="number" onChange={this.handleInputChangeFormData.bind(this, i, 'stop_price')} />
                   <button onClick={this.handleOrderStopByPreK.bind(this, i, '5m')}>前5m极点</button>
                   <button onClick={this.handleOrderStopByPreK.bind(this, i, '1h')}>前1h极点</button>
+                </div>
+                <div style={{ marginBottom: '10px' }}>
+                  <label>stopPx:</label>
+                  <input value={form.stop_price} style={{ width: '100px' }} type="number" onChange={this.handleInputChangeFormData.bind(this, i, 'stop_price')} />
                   <button onClick={this.handleOrderStop.bind(this, i, 0)} disabled={pending || !form.stop_price}>Order Stop Market</button>
                   <label for="checkbox-stop-close">Close</label>
                   <input checked={form.stop_close} type="checkbox" id="checkbox-stop-close" onChange={this.handleChangeCheckbox.bind(this, i, 'stop_close')} />
@@ -489,18 +491,21 @@ export default class Trade extends React.Component {
     const { stop_symbol, stop_side, stop_qty } = userData.form
     userData.pending = true
     this.setState({})
-    axios.post(path, { user, period, symbol: stop_symbol, qty: stop_qty, side: stop_side }).then(({ status, data }) => {
-      userData.pending = false
-      if (status === 200 && data.result) {
-        alert('order stop success')
-        this.fetchUserList()
-      } else {
-        this.pushLog(data.info)
-      }
-    }).catch(e => {
-      userData.pending = false
-      this.pushLog(e)
-    })
+    const info = `${user} order stop open: ${stop_side} ${stop_symbol} ${stop_qty} 前一K线（${period}）?`
+    if (window.confirm(info)) {
+      axios.post(path, { user, period, symbol: stop_symbol, qty: stop_qty, side: stop_side }).then(({ status, data }) => {
+        userData.pending = false
+        if (status === 200 && data.result) {
+          alert('order stop success')
+          this.fetchUserList()
+        } else {
+          this.pushLog(data.info)
+        }
+      }).catch(e => {
+        userData.pending = false
+        this.pushLog(e)
+      })
+    }
   }
 
   handleDelOrder(index, order) {

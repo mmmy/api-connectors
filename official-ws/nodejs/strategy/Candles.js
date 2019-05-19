@@ -642,5 +642,20 @@ Candles.prototype.calcStochRsiSignal = function (rsiPeriod, stochasticPeriod, kP
 Candles.prototype.getStochRsiSignals = function () {
   return this._stochRsiSignals
 }
+// from price action
+// candle hight1 low1 signal
+Candles.prototype.highLow1Signal = function() {
+  let high1 = false
+  let low1 = false
+  const c1 = this.getHistoryCandle(1),
+        c2 = this.getHistoryCandle(2),
+        c3 = this.getHistoryCandle(3)
+  high1 = c1.high > c2.high && c2.high <= c3.high
+  low1 = c1.low < c2.low && c2.low >= c3.low
+  return {
+    high1,
+    low1
+  }
+}
 
 module.exports = Candles

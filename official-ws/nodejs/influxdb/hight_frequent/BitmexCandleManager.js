@@ -43,6 +43,10 @@ class BitmexCandleManager {
   rsiOverTradeSignal(symbol, len) {
     return this._candles[symbol].rsiOverTradeSignal(false, len)
   }
+
+  highlow1Signal(symbol) {
+    return this._candles[symbol].rsiOverTradeSignal()
+  }
 }
 
 module.exports = BitmexCandleManager

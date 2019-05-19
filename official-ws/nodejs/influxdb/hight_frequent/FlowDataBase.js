@@ -299,12 +299,12 @@ class FlowDataBase {
       if (this._options.autoCloseRsiOverTrade1h) {
         this.closeShortPositionIfHave(symbol)
       }
-      notifyPhone(`${symbol} 1h rsiOverTradeSignal Long`)
+      // notifyPhone(`${symbol} 1h rsiOverTradeSignal Long`)
     } else if (rsiOverTradeSignal.short) {
       if (this._options.autoCloseRsiOverTrade1h) {
         this.closeLongPostionIfHave(symbol)
       }
-      notifyPhone(`${symbol} 1h rsiOverTradeSignal Short`)
+      // notifyPhone(`${symbol} 1h rsiOverTradeSignal Short`)
     }
     // RSI divergence signal
     const rsiDivergenceSignal = this._candles1h.rsiDivergenceSignal(symbol, 8, 24)
@@ -312,12 +312,12 @@ class FlowDataBase {
       if (this._options.autoCloseRsiDivergence1h) {
         this.closeShortPositionIfHave(symbol)
       }
-      notifyPhone(`${symbol} 1h rsiDivergenceSignal Long`)
+      // notifyPhone(`${symbol} 1h rsiDivergenceSignal Long`)
     } else if (rsiDivergenceSignal.short) {
       if (this._options.autoCloseRsiDivergence1h) {
         this.closeLongPostionIfHave(symbol)
       }
-      notifyPhone(`${symbol} 1h rsiDivergenceSignal short`)
+      // notifyPhone(`${symbol} 1h rsiDivergenceSignal short`)
     }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
@@ -342,18 +342,25 @@ class FlowDataBase {
     if (this._options.autoUpdateStopOpenMarketOrder) {
       this.updateStopOpenOrderByLastCandle(symbol, this._candles5m)
     }
+    //
+    const highlow1Signal = this._candles5m.highlow1Signal(symbol)
+    if (highlow1Signal.high1) {
+      notifyPhone(`${symbol} 5m high 1`)
+    } else if (highlow1Signal.low1) {
+      notifyPhone(`${symbol} 5m low 1`)
+    }
     // RSI over trade signal
     const rsiOverTradeSignal = this._candles5m.rsiOverTradeSignal(symbol, 8)
     if (rsiOverTradeSignal.long) {
       if (this._options.autoCloseRsiOverTrade5m) {
         this.closeShortPositionIfHave(symbol)
       }
-      notifyPhone(`${symbol} 5m rsiOverTradeSignal Long`)
+      // notifyPhone(`${symbol} 5m rsiOverTradeSignal Long`)
     } else if (rsiOverTradeSignal.short) {
       if (this._options.autoCloseRsiOverTrade5m) {
         this.closeLongPostionIfHave(symbol)
       }
-      notifyPhone(`${symbol} 5m rsiOverTradeSignal Short`)
+      // notifyPhone(`${symbol} 5m rsiOverTradeSignal Short`)
     }
     // RSI divergence signal
     const rsiDivergenceSignal = this._candles5m.rsiDivergenceSignal(symbol, 8, 24)
@@ -361,12 +368,12 @@ class FlowDataBase {
       if (this._options.autoCloseRsiDivergence5m) {
         this.closeShortPositionIfHave(symbol)
       }
-      notifyPhone(`${symbol} 5m rsiDivergenceSignal Long`)
+      // notifyPhone(`${symbol} 5m rsiDivergenceSignal Long`)
     } else if (rsiDivergenceSignal.short) {
       if (this._options.autoCloseRsiDivergence5m) {
         this.closeLongPostionIfHave(symbol)
       }
-      notifyPhone(`${symbol} 5m rsiDivergenceSignal short`)
+      // notifyPhone(`${symbol} 5m rsiDivergenceSignal short`)
     }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
