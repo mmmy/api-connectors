@@ -644,7 +644,7 @@ Candles.prototype.getStochRsiSignals = function () {
 }
 // from price action
 // candle hight1 low1 signal
-Candles.prototype.highLow1Signal = function() {
+Candles.prototype.highlow1Signal = function() {
   let high1 = false
   let low1 = false
   const c1 = this.getHistoryCandle(1),
