@@ -230,6 +230,8 @@ export default class Trade extends React.Component {
                 <div style={{ marginBottom: '10px' }}>
                   <label>stopPx:</label>
                   <input value={form.stop_price} style={{ width: '100px' }} type="number" onChange={this.handleInputChangeFormData.bind(this, i, 'stop_price')} />
+                  <button onClick={this.handleOrderStopByPreK.bind(this, i, '5m')}>前5m极点</button>
+                  <button onClick={this.handleOrderStopByPreK.bind(this, i, '1h')}>前1h极点</button>
                   <button onClick={this.handleOrderStop.bind(this, i, 0)} disabled={pending || !form.stop_price}>Order Stop Market</button>
                   <label for="checkbox-stop-close">Close</label>
                   <input checked={form.stop_close} type="checkbox" id="checkbox-stop-close" onChange={this.handleChangeCheckbox.bind(this, i, 'stop_close')} />
@@ -657,5 +659,9 @@ export default class Trade extends React.Component {
       userData.pending = false
       this.pushLog(e)
     })
+  }
+
+  handleOrderStopByPreK(index, period) {
+    
   }
 }

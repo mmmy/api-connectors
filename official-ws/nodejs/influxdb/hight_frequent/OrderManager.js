@@ -439,8 +439,8 @@ class OrderManager {
   }
 
   // 市价平仓
-  closePositionMarket() {
-    return this.signatureSDK.closePositionMarket()
+  closePositionMarket(symbol) {
+    return this.signatureSDK.closePositionMarket(symbol)
   }
   // 取消所有挂单
   deleteOrderAll() {

@@ -218,11 +218,11 @@ class FlowDataBase {
   }
 
   // 市价全平
-  closePosition() {
+  closePosition(symbol) {
     return new Promise((resove, reject) => {
-      this._orderManager.closePositionMarket().then(resove).catch(() => {
+      this._orderManager.closePositionMarket(symbol).then(resove).catch(() => {
         setTimeout(() => {
-          this._orderManager.closePositionMarket().then(resove).catch(reject)
+          this._orderManager.closePositionMarket(symbol).then(resove).catch(reject)
         }, 10 * 1000)
       })
     })
@@ -292,12 +292,12 @@ class FlowDataBase {
     const rsiOverTradeSignal = this._candles1h.rsiOverTradeSignal(symbol, 8)
     if (rsiOverTradeSignal.long) {
       if (this._options.autoCloseRsiOverTrade1h) {
-        this.closeShortPositionIfHave()
+        this.closeShortPositionIfHave(symbol)
       }
       notifyPhone(`${symbol} 1h rsiOverTradeSignal Long`)
     } else if (rsiOverTradeSignal.short) {
       if (this._options.autoCloseRsiOverTrade1h) {
-        this.closeLongPostionIfHave()
+        this.closeLongPostionIfHave(symbol)
       }
       notifyPhone(`${symbol} 1h rsiOverTradeSignal Short`)
     }
@@ -305,12 +305,12 @@ class FlowDataBase {
     const rsiDivergenceSignal = this._candles1h.rsiDivergenceSignal(symbol, 8, 24)
     if (rsiDivergenceSignal.long) {
       if (this._options.autoCloseRsiDivergence1h) {
-        this.closeShortPositionIfHave()
+        this.closeShortPositionIfHave(symbol)
       }
       notifyPhone(`${symbol} 1h rsiDivergenceSignal Long`)
     } else if (rsiDivergenceSignal.short) {
       if (this._options.autoCloseRsiDivergence1h) {
-        this.closeLongPostionIfHave()
+        this.closeLongPostionIfHave(symbol)
       }
       notifyPhone(`${symbol} 1h rsiDivergenceSignal short`)
     }
@@ -321,12 +321,12 @@ class FlowDataBase {
     // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long) {
       if (this._options.autoCloseMacdDivergence1h) {
-        this.closeShortPositionIfHave()
+        this.closeShortPositionIfHave(symbol)
       }
       // notifyPhone(`${symbol} 1h MacdDepartSignal Long`)
     } else if (signal.short) {
       if (this._options.autoCloseMacdDivergence1h) {
-        this.closeLongPostionIfHave()
+        this.closeLongPostionIfHave(symbol)
       }
       // notifyPhone(`${symbol} 1h MacdDepartSignal Short`)
     }
@@ -341,12 +341,12 @@ class FlowDataBase {
     const rsiOverTradeSignal = this._candles5m.rsiOverTradeSignal(symbol, 8)
     if (rsiOverTradeSignal.long) {
       if (this._options.autoCloseRsiOverTrade5m) {
-        this.closeShortPositionIfHave()
+        this.closeShortPositionIfHave(symbol)
       }
       notifyPhone(`${symbol} 5m rsiOverTradeSignal Long`)
     } else if (rsiOverTradeSignal.short) {
       if (this._options.autoCloseRsiOverTrade5m) {
-        this.closeLongPostionIfHave()
+        this.closeLongPostionIfHave(symbol)
       }
       notifyPhone(`${symbol} 5m rsiOverTradeSignal Short`)
     }
@@ -354,12 +354,12 @@ class FlowDataBase {
     const rsiDivergenceSignal = this._candles5m.rsiDivergenceSignal(symbol, 8, 24)
     if (rsiDivergenceSignal.long) {
       if (this._options.autoCloseRsiDivergence5m) {
-        this.closeShortPositionIfHave()
+        this.closeShortPositionIfHave(symbol)
       }
       notifyPhone(`${symbol} 5m rsiDivergenceSignal Long`)
     } else if (rsiDivergenceSignal.short) {
       if (this._options.autoCloseRsiDivergence5m) {
-        this.closeLongPostionIfHave()
+        this.closeLongPostionIfHave(symbol)
       }
       notifyPhone(`${symbol} 5m rsiDivergenceSignal short`)
     }
@@ -370,12 +370,12 @@ class FlowDataBase {
     // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long && signal1.long) {
       if (this._options.autoCloseMacdDivergence5m) {
-        this.closeShortPositionIfHave()
+        this.closeShortPositionIfHave(symbol)
       }
       // notifyPhone(`${symbol} 5m MacdDepartSignal Long`)
     } else if (signal.short && signal1.short) {
       if (this._options.autoCloseMacdDivergence5m) {
-        this.closeLongPostionIfHave()
+        this.closeLongPostionIfHave(symbol)
       }
       // notifyPhone(`${symbol} 5m MacdDepartSignal Short`)
     }
@@ -456,21 +456,21 @@ class FlowDataBase {
     })
   }
 
-  closeLongPostionIfHave() {
-    if (this._accountPosition.getCurrentQty() > 0) {
-      this.closePosition()
+  closeLongPostionIfHave(symbol) {
+    if (this._accountPosition.getCurrentQty(symbol) > 0) {
+      this.closePosition(symbol)
     }
   }
 
-  closeShortPositionIfHave() {
-    if (this._accountPosition.getCurrentQty() < 0) {
-      this.closePosition()
+  closeShortPositionIfHave(symbol) {
+    if (this._accountPosition.getCurrentQty(symbol) < 0) {
+      this.closePosition(symbol)
     }
   }
 
-  closePositionIfHave() {
-    if (this._accountPosition.hasPosition()) {
-      this.closePosition()
+  closePositionIfHave(symbol) {
+    if (this._accountPosition.hasPosition(symbol)) {
+      this.closePosition(symbol)
     }
   }
 }
