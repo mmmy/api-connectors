@@ -13,6 +13,11 @@ const OrderManagerTest = require('./OrderManagerTest')
 const { StrageyDB } = require('../db')
 const notifyPhone = require('../../strategy/notifyPhone').notifyPhone
 
+const precisionMap = {
+  'XBTUSD': 0.5,
+  'ETHUSD': 0.05,
+}
+
 class FlowDataBase {
   constructor(options) {
     this._options = {
@@ -429,10 +434,6 @@ class FlowDataBase {
   }
 
   updateStopOpenOrderByLastCandle(symbol, candleManager) {
-    const precisionMap = {
-      'XBTUSD': 0.5,
-      'ETHUSD': 0.05,
-    }
     const precision = precisionMap[symbol]
     if (!precision) {
       return
@@ -454,6 +455,29 @@ class FlowDataBase {
         this._orderManager.getSignatureSDK().updateOrder(newOrder)
       }
     })
+  }
+
+  getCandleManager(period) {
+    switch(period) {
+      case '5m':
+        return this._candles5m
+      case '1h':
+        return this._candles1h
+      default:
+        break
+    }
+  }
+
+  orderStopOrderByLastCandle(symbol, period, qty, side) {
+    const precision = precisionMap[symbol]
+    if (!precision) {
+      return
+    }
+    const candleManager = this.getCandleManager(period)
+    let lastCandle = candleManager.getHistoryCandle(symbol)
+    const { high, low } = lastCandle
+    const stopPx = side === 'Buy' ? (high + precision) : (low - precision)
+    return this._orderManager.getSignatureSDK().orderStop(symbol, qty, stopPx, side, false)
   }
 
   closeLongPostionIfHave(symbol) {

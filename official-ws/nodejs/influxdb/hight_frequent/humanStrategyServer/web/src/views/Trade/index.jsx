@@ -482,6 +482,27 @@ export default class Trade extends React.Component {
     }
   }
 
+  handleOrderStopByPreK(index, period) {
+    const path = 'api/coin/order_stop_open_by_lastcandle'
+    var userData = this.state.users[index]
+    const { user } = userData.options
+    const { stop_symbol, stop_side, stop_qty } = userData.form
+    userData.pending = true
+    this.setState({})
+    axios.post(path, { user, period, symbol: stop_symbol, qty: stop_qty, side: stop_side }).then(({ status, data }) => {
+      userData.pending = false
+      if (status === 200 && data.result) {
+        alert('order stop success')
+        this.fetchUserList()
+      } else {
+        this.pushLog(data.info)
+      }
+    }).catch(e => {
+      userData.pending = false
+      this.pushLog(e)
+    })
+  }
+
   handleDelOrder(index, order) {
     var userData = this.state.users[index]
     const { user } = userData.options
@@ -659,9 +680,5 @@ export default class Trade extends React.Component {
       userData.pending = false
       this.pushLog(e)
     })
-  }
-
-  handleOrderStopByPreK(index, period) {
-    
   }
 }

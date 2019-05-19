@@ -191,4 +191,12 @@ module.exports = class StrategyUserManager {
     strategy.updateOptions(options)
     return Promise.resolve(strategy.getOptions())
   }
+  // period: 5m 1h
+  orderStopOrderByLastCandle(user, symbol, period, qty, side) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return strategy.orderStopOrderByLastCandle(symbol, period, qty, side)
+  }
 }

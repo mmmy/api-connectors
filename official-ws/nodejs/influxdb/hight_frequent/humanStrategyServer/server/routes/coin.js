@@ -32,11 +32,13 @@ router.post('/order_limit', function (req, res, next) {
       result: false,
       info: '缺少symbol qty, side 参数',
     })
+    return
   } else if (!price && !auto_price) {
     res.send({
       result: false,
       info: 'price 或者 auto_price（bool）至少需要一个',
     })
+    return
   }
   manager.orderLimit(user, symbol, qty, side, price, auto_price).then(json => {
     res.send({
@@ -58,6 +60,7 @@ router.post('/order_reduce_only_limit', function (req, res, next) {
       result: false,
       info: '缺少symbol qty, side, price 参数',
     })
+    return
   }
   manager.orderReduceOnlyLimit(user, symbol, qty, side, price).then(json => {
     res.send({
@@ -116,6 +119,7 @@ router.post('/delete_order', function (req, res, next) {
       result: false,
       info: '缺少参数order_id'
     })
+    return
   }
   manager.deleteOrder(user, order_id).then(json => {
     res.send({
@@ -137,6 +141,7 @@ router.post('/close_position', function (req, res, next) {
       result: false,
       info: '缺少参数symbol'
     })
+    return
   }
   manager.closePositionMarket(user, symbol).then(json => {
     res.send({
@@ -207,14 +212,38 @@ router.post('/order_stop', function (req, res, next) {
       result: false,
       info: '缺少symbol, qty, side参数'
     })
+    return
   }
   if (!stopPx && !offset) {
     res.send({
       result: false,
       info: 'stopPx adn offset, at last one'
     })
+    return
   }
   manager.orderStop(user, symbol, qty, stopPx, side, offset, stop_close).then(json => {
+    res.send({
+      result: true,
+      data: json
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
+    })
+  })
+})
+
+router.post('/order_stop_open_by_lastcandle', function(req, res, next) {
+  const { user, period, symbol, qty, side } = req.body
+  if (!symbol || !qty || !side || !period) {
+    res.send({
+      result: false,
+      info: '缺少symbol, qty, side, period参数'
+    })
+    return
+  }
+  manager.orderStopOrderByLastCandle(user, symbol, period, qty, side).then(json => {
     res.send({
       result: true,
       data: json
@@ -234,12 +263,14 @@ router.post('/order_market_if_touched', function (req, res, next) {
       result: false,
       info: '缺少symbol, qty, side参数'
     })
+    return
   }
   if (!stopPx && !offset) {
     res.send({
       result: false,
       info: 'stopPx adn offset, at last one'
     })
+    return
   }
   manager.orderMarketIfTouched(user, symbol, qty, stopPx, side, stop_close).then(json => {
     res.send({
@@ -261,6 +292,7 @@ router.post('/change_leverage', function (req, res) {
       result: false,
       info: '缺少symbol, user, leverage参数'
     })
+    return
   }
   manager.changeLeverage(user, symbol, leverage).then(json => {
     res.send({
@@ -282,6 +314,7 @@ router.post('/change_options', function (req, res) {
       result: false,
       info: '缺少user参数'
     })
+    return
   }
   manager.updateOptions(user, options).then(json => {
     res.send({
