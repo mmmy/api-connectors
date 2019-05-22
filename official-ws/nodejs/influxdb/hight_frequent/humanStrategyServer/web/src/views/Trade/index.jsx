@@ -1,5 +1,6 @@
 import React from 'react'
 import axios from 'axios'
+import AutoOrderStopList from './AutoOrderStopList'
 
 import './index.css'
 
@@ -240,6 +241,7 @@ export default class Trade extends React.Component {
                   <button onClick={this.handleOrderStop.bind(this, i, 1)} disabled={pending || !form.stop_price}>Take Profit Market</button>
                 </div>
               </div>
+              <AutoOrderStopList />
               <hr />
               <div className="actions">
                 <div>
