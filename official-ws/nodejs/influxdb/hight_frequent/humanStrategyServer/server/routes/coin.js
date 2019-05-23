@@ -329,4 +329,92 @@ router.post('/change_options', function (req, res) {
   })
 })
 
+router.get('/auto_order_signal_list', function(req, res) {
+  const { user } = req.query
+  if (!user) {
+    res.send({
+      result: false,
+      info: '缺少user参数'
+    })
+    return
+  }
+  manager.getAutoOrderSignalList(user).then(json => {
+    res.send({
+      result: true,
+      data: json
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
+    })
+  })
+})
+
+router.post('/add_auto_order_signal', function(req, res) {
+  const { user, auto_order } = req.body
+  if (!user) {
+    res.send({
+      result: false,
+      info: '缺少user参数'
+    })
+    return
+  }
+  manager.addAutoOrderSignal(user, auto_order).then(json => {
+    res.send({
+      result: true,
+      data: json
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
+    })
+  })
+})
+
+router.post('/update_auto_order_signal', function(req, res) {
+  const { user, index, auto_order } = req.body
+  if (!user || index === undefined) {
+    res.send({
+      result: false,
+      info: '缺少user, index参数'
+    })
+    return
+  }
+  manager.updateAutoOrderSignal(user, index, auto_order).then(json => {
+    res.send({
+      result: true,
+      data: json
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
+    })
+  })
+})
+
+router.post('/delete_auto_order_signal', function(req, res) {
+  const { user, index } = req.body
+  if (!user || index === undefined) {
+    res.send({
+      result: false,
+      info: '缺少user, index参数'
+    })
+    return
+  }
+  manager.deleteAutoOrderSignal(user, index).then(json => {
+    res.send({
+      result: true,
+      data: json
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
+    })
+  })
+})
+
 module.exports = router

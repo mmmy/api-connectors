@@ -199,4 +199,36 @@ module.exports = class StrategyUserManager {
     }
     return strategy.orderStopOrderByLastCandle(symbol, period, qty, side)
   }
+
+  getAutoOrderSignalList(user) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return Promise.resolve(strategy.getAutoOrderSignalList())
+  }
+
+  addAutoOrderSignal(user, auto_order) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return Promise.resolve(strategy.addAutoOrderSignal(auto_order))
+  }
+
+  updateAutoOrderSignal(user, index, auto_order) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return Promise.resolve(strategy.updateAutoOrderSignal(index, auto_order))
+  }
+
+  deleteAutoOrderSignal(user, index) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return Promise.resolve(strategy.deleteAutoOrderSignal(index))
+  }
 }

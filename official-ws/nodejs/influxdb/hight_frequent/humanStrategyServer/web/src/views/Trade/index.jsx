@@ -241,7 +241,7 @@ export default class Trade extends React.Component {
                   <button onClick={this.handleOrderStop.bind(this, i, 1)} disabled={pending || !form.stop_price}>Take Profit Market</button>
                 </div>
               </div>
-              <AutoOrderStopList />
+              <AutoOrderStopList user={options.user} onPushLog={this.pushLog.bind(this)}/>
               <hr />
               <div className="actions">
                 <div>

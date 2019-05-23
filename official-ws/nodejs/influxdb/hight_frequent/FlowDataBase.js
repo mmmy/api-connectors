@@ -74,6 +74,8 @@ class FlowDataBase {
 
     this._volume24h = 0
     this._volumePerMinute = 0
+
+    this._autoOrderSignals = []
   }
 
   getOptions() {
@@ -510,6 +512,35 @@ class FlowDataBase {
     if (this._accountPosition.hasPosition(symbol)) {
       this.closePosition(symbol)
     }
+  }
+
+  getAutoOrderSignalList() {
+    return this._autoOrderSignals
+  }
+
+  addAutoOrderSignal(auto_order) {
+    this._autoOrderSignals.push(auto_order)
+    return auto_order
+  }
+
+  updateAutoOrderSignal(index, auto_order) {
+    const autoOrder = this._autoOrderSignals[index]
+    if (autoOrder) {
+      this._autoOrderSignals[index] = {
+        ...autoOrder,
+        ...auto_order,
+      }
+      return this._autoOrderSignals[index]
+    }
+    return false
+  }
+
+  deleteAutoOrderSignal(index) {
+    if (this._autoOrderSignals[index]) {
+      this._autoOrderSignals.splice(index, 1)
+      return true
+    }
+    return false
   }
 }
 
