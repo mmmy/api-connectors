@@ -6,18 +6,26 @@ const SYMBOLS = [
   'ETHUSD',
 ]
 
-const SIGNALS =                   [
+const OEPN_METHODS = [
+  'stopMarket1h',
+  'stopMarket5m',
+  'market',
+]
+
+const SIGNALS = {
   // 'autoCloseMacdDivergence5m',
   // 'autoCloseMacdDivergence1h',
-  'autoCloseStochOverTrade5m',
-  'autoCloseStochOverTrade1h',
-  'autoCloseStochDivergence5m',
-  'autoCloseStochDivergence1h',
-  'autoCloseRsiOverTrade5m',
-  'autoCloseRsiOverTrade1h',
-  'autoCloseRsiDivergence5m',
-  'autoCloseRsiDivergence1h',
-]
+  'autoCloseStochOverTrade5m': { operators: ['long', 'short'] },
+  'autoCloseStochOverTrade1h': { operators: ['long', 'short'] },
+  'autoCloseStochDivergence5m': { operators: ['long', 'short'] },
+  'autoCloseStochDivergence1h': { operators: ['long', 'short'] },
+  'autoCloseRsiOverTrade5m': { operators: ['long', 'short'] },
+  'autoCloseRsiOverTrade1h': { operators: ['long', 'short'] },
+  'autoCloseRsiDivergence5m': { operators: ['long', 'short'] },
+  'autoCloseRsiDivergence1h': { operators: ['long', 'short'] },
+}
+
+const signalKeys = Object.keys(SIGNALS)
 
 export default class AutoOrderStopList extends React.Component {
   constructor(props) {
@@ -26,8 +34,10 @@ export default class AutoOrderStopList extends React.Component {
       symbol: 'XBTUSD',
       side: 'Buy',
       amount: 1000,
-      signal_name: SIGNALS[0],
+      open_method: 'stopMarket1h',
+      signal_name: signalKeys[0],
       signal_side: 'long',
+      remain_times: 1,
       loading: false,
       list: [],
     }
@@ -36,7 +46,8 @@ export default class AutoOrderStopList extends React.Component {
     this.fetchList()
   }
   render() {
-    const { symbol, side, amount, signal_name, signal_side, loading } = this.state
+    const { symbol, side, amount, signal_name, signal_side, open_method, remain_times, loading } = this.state
+    const operators = SIGNALS[signal_name].operators
     return <div>
       <div style={{ marginBottom: '5px' }}>
         <select value={symbol} onChange={this.handleChangeForm.bind(this, 'symbol')}>
@@ -48,16 +59,23 @@ export default class AutoOrderStopList extends React.Component {
           <option value="Buy">Buy</option>
           <option value="Sell">Sell</option>
         </select>
-        <input type="number" value={amount} style={{width: '100px'}} onChange={this.handleChangeForm.bind(this, 'amount')}/>
+        <input type="number" value={amount} style={{width: '80px'}} onChange={this.handleChangeForm.bind(this, 'amount')}/>
+        <select value={open_method} onChange={this.handleChangeForm.bind(this, 'open_method')}>
+          {
+            OEPN_METHODS.map(m => <option value={m}>{m}</option>)
+          }
+        </select>
         <select value={signal_name} onChange={this.handleChangeForm.bind(this, 'signal_name')}>
           {
-            SIGNALS.map(s => <option value={s}>{s}</option>)
+            signalKeys.map(s => <option value={s}>{s}</option>)
           }
         </select>
         <select value={signal_side} onChange={this.handleChangeForm.bind(this, 'signal_side')}>
-          <option value={'long'}>long</option>
-          <option value={'short'}>short</option>
+          {
+            operators.map(o => <option value={o}>{o}</option>)
+          }
         </select>
+        {/* <input value={remain_times} type='number' min="0" step='1' onChange={this.handleChangeForm.bind(this, 'remain_times')} style={{ width: '50px' }} title="剩余次数"/> */}
         <button disabled={loading} onClick={this.onAdd.bind(this)}>添加</button>
       </div>
       {this.renderList()}
@@ -72,6 +90,7 @@ export default class AutoOrderStopList extends React.Component {
           <th>symbol</th>
           <th>side</th>
           <th>amount</th>
+          <th>open_method</th>
           <th>signal_name</th>
           <th>signal_side</th>
           <th>状态</th>
@@ -90,11 +109,13 @@ export default class AutoOrderStopList extends React.Component {
               <td>{a.symbol}</td>
               <td>{a.side}</td>
               <td style={{cursor: 'pointer', color: amountColor}} onClick={this.handleChangeAmount.bind(this, i)}>{a.amount}</td>
+              <td>{a.open_method}</td>
               <td>{a.signal_name}</td>
               <td>{a.signal_side}</td>
               <td>
-                <input onChange={this.handleSetOn.bind(this, i, !a.on)} checked={a.on} type="checkbox" id={`on-${i}`}/><label for={`on-${i}`} style={{marginRight: '5px'}}>on</label>
-                <input onChange={this.handleSetRepeat.bind(this, i, !a.repeat)} checked={a.repeat} type="checkbox" id={`repeat-${i}`}/><label for={`repeat-${i}`}>repeat</label>
+                <span onClick={this.handleChangeRemainTimes.bind(this, i)}>
+                  <label for={`remian-span-${i}`}>remain_times</label>&nbsp;<strong id={`remian-span-${i}`} >{a.remain_times}</strong>
+                </span>
               </td>
               <td><button onClick={this.handleDeleteItem.bind(this, i)}>x</button></td>
             </tr>
@@ -112,17 +133,15 @@ export default class AutoOrderStopList extends React.Component {
 
   onAdd() {
     const { user } = this.props
-    const { symbol, side, amount, signal_name, signal_side } = this.state
-    const repeat = false
-    const on = true
+    const { symbol, side, amount, open_method, signal_name, remain_times, signal_side } = this.state
     const auto_order = {
       symbol,
       side,
       amount,
+      open_method,
       signal_name,
       signal_side,
-      repeat,
-      on,
+      remain_times,
     }
     this.setState({
       loading: true
@@ -215,6 +234,18 @@ export default class AutoOrderStopList extends React.Component {
     if (newAmount) {
       const newOrder = {
         amount: +newAmount
+      }
+      this.updateAutoOrder(index, newOrder)
+    }
+  }
+
+  handleChangeRemainTimes(index) {
+    const { list } = this.state
+    const autoOrder = list[index]
+    const newTimes = window.prompt('remain_times', autoOrder.remain_times)
+    if (newTimes !== null) {
+      const newOrder = {
+        remain_times: +newTimes
       }
       this.updateAutoOrder(index, newOrder)
     }
