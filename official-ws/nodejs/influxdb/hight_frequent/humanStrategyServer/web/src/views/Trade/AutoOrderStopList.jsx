@@ -6,7 +6,7 @@ const SYMBOLS = [
   'ETHUSD',
 ]
 
-const OEPN_METHODS = [
+const ORDER_METHODS = [
   'stopMarket1h',
   'stopMarket5m',
   'market',
@@ -15,14 +15,14 @@ const OEPN_METHODS = [
 const SIGNALS = {
   // 'autoCloseMacdDivergence5m',
   // 'autoCloseMacdDivergence1h',
-  'autoCloseStochOverTrade5m': { operators: ['long', 'short'] },
-  'autoCloseStochOverTrade1h': { operators: ['long', 'short'] },
-  'autoCloseStochDivergence5m': { operators: ['long', 'short'] },
-  'autoCloseStochDivergence1h': { operators: ['long', 'short'] },
-  'autoCloseRsiOverTrade5m': { operators: ['long', 'short'] },
-  'autoCloseRsiOverTrade1h': { operators: ['long', 'short'] },
-  'autoCloseRsiDivergence5m': { operators: ['long', 'short'] },
-  'autoCloseRsiDivergence1h': { operators: ['long', 'short'] },
+  'rsiDivergence1h': { operators: ['long', 'short'] },
+  'rsiDivergence5m': { operators: ['long', 'short'] },
+  'rsiOverTrade1h': { operators: ['long', 'short'] },
+  'rsiOverTrade5m': { operators: ['long', 'short'] },
+  'stochOverTrade5m': { operators: ['long', 'short'] },
+  'stochOverTrade1h': { operators: ['long', 'short'] },
+  'stochDivergence5m': { operators: ['long', 'short'] },
+  'stochDivergence1h': { operators: ['long', 'short'] },
 }
 
 const signalKeys = Object.keys(SIGNALS)
@@ -34,9 +34,10 @@ export default class AutoOrderStopList extends React.Component {
       symbol: 'XBTUSD',
       side: 'Buy',
       amount: 1000,
-      open_method: 'stopMarket1h',
+      order_method: 'stopMarket1h',
       signal_name: signalKeys[0],
-      signal_side: 'long',
+      signal_operator: 'long',
+      signal_value: '',
       remain_times: 1,
       loading: false,
       list: [],
@@ -46,7 +47,7 @@ export default class AutoOrderStopList extends React.Component {
     this.fetchList()
   }
   render() {
-    const { symbol, side, amount, signal_name, signal_side, open_method, remain_times, loading } = this.state
+    const { symbol, side, amount, signal_name, signal_operator, order_method, remain_times, loading } = this.state
     const operators = SIGNALS[signal_name].operators
     return <div>
       <div style={{ marginBottom: '5px' }}>
@@ -60,9 +61,9 @@ export default class AutoOrderStopList extends React.Component {
           <option value="Sell">Sell</option>
         </select>
         <input type="number" value={amount} style={{width: '80px'}} onChange={this.handleChangeForm.bind(this, 'amount')}/>
-        <select value={open_method} onChange={this.handleChangeForm.bind(this, 'open_method')}>
+        <select value={order_method} onChange={this.handleChangeForm.bind(this, 'order_method')}>
           {
-            OEPN_METHODS.map(m => <option value={m}>{m}</option>)
+            ORDER_METHODS.map(m => <option value={m}>{m}</option>)
           }
         </select>
         <select value={signal_name} onChange={this.handleChangeForm.bind(this, 'signal_name')}>
@@ -70,7 +71,7 @@ export default class AutoOrderStopList extends React.Component {
             signalKeys.map(s => <option value={s}>{s}</option>)
           }
         </select>
-        <select value={signal_side} onChange={this.handleChangeForm.bind(this, 'signal_side')}>
+        <select value={signal_operator} onChange={this.handleChangeForm.bind(this, 'signal_operator')}>
           {
             operators.map(o => <option value={o}>{o}</option>)
           }
@@ -90,9 +91,9 @@ export default class AutoOrderStopList extends React.Component {
           <th>symbol</th>
           <th>side</th>
           <th>amount</th>
-          <th>open_method</th>
+          <th>order_method</th>
           <th>signal_name</th>
-          <th>signal_side</th>
+          <th>signal_operator</th>
           <th>状态</th>
           <th>操作</th>
         </tr>
@@ -109,9 +110,9 @@ export default class AutoOrderStopList extends React.Component {
               <td>{a.symbol}</td>
               <td>{a.side}</td>
               <td style={{cursor: 'pointer', color: amountColor}} onClick={this.handleChangeAmount.bind(this, i)}>{a.amount}</td>
-              <td>{a.open_method}</td>
+              <td>{a.order_method}</td>
               <td>{a.signal_name}</td>
-              <td>{a.signal_side}</td>
+              <td>{a.signal_operator}</td>
               <td>
                 <span onClick={this.handleChangeRemainTimes.bind(this, i)}>
                   <label for={`remian-span-${i}`}>remain_times</label>&nbsp;<strong id={`remian-span-${i}`} >{a.remain_times}</strong>
@@ -133,14 +134,15 @@ export default class AutoOrderStopList extends React.Component {
 
   onAdd() {
     const { user } = this.props
-    const { symbol, side, amount, open_method, signal_name, remain_times, signal_side } = this.state
+    const { symbol, side, amount, order_method, signal_name, remain_times, signal_operator } = this.state
     const auto_order = {
       symbol,
       side,
       amount,
-      open_method,
+      order_method,
       signal_name,
-      signal_side,
+      signal_operator,
+      signal_value,
       remain_times,
     }
     this.setState({

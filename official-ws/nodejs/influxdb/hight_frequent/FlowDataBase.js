@@ -13,6 +13,8 @@ const OrderManagerTest = require('./OrderManagerTest')
 const { StrageyDB } = require('../db')
 const notifyPhone = require('../../strategy/notifyPhone').notifyPhone
 
+const watchSignal = require('./watchSignal')
+
 const precisionMap = {
   'XBTUSD': 0.5,
   'ETHUSD': 0.05,
@@ -299,8 +301,10 @@ class FlowDataBase {
     const highlow1Signal = this._candles1h.highlow1Signal(symbol)
     if (highlow1Signal.high1) {
       // notifyPhone(`${symbol} 1h high 1`)
+      watchSignal(this, symbol, 'break1h', 'high1')
     } else if (highlow1Signal.low1) {
       // notifyPhone(`${symbol} 1h low 1`)
+      watchSignal(this, symbol, 'break1h', 'low1')
     }
     // RSI over trade signal
     const rsiOverTradeSignal = this._candles1h.rsiOverTradeSignal(symbol, 8)
@@ -308,11 +312,15 @@ class FlowDataBase {
       if (this._options.autoCloseRsiOverTrade1h) {
         this.closeShortPositionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'rsiOverTrade1h', 'long')
+
       // notifyPhone(`${symbol} 1h rsiOverTradeSignal Long`)
     } else if (rsiOverTradeSignal.short) {
       if (this._options.autoCloseRsiOverTrade1h) {
         this.closeLongPostionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'rsiOverTrade1h', 'short')
+
       // notifyPhone(`${symbol} 1h rsiOverTradeSignal Short`)
     }
     // RSI divergence signal
@@ -321,11 +329,15 @@ class FlowDataBase {
       if (this._options.autoCloseRsiDivergence1h) {
         this.closeShortPositionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'rsiDivergence1h', 'long')
+
       // notifyPhone(`${symbol} 1h rsiDivergenceSignal Long`)
     } else if (rsiDivergenceSignal.short) {
       if (this._options.autoCloseRsiDivergence1h) {
         this.closeLongPostionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'rsiDivergence1h', 'short')
+
       // notifyPhone(`${symbol} 1h rsiDivergenceSignal short`)
     }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
@@ -337,11 +349,15 @@ class FlowDataBase {
       if (this._options.autoCloseMacdDivergence1h) {
         this.closeShortPositionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'macdDivergence1h', 'long')
+
       // notifyPhone(`${symbol} 1h MacdDepartSignal Long`)
     } else if (signal.short) {
       if (this._options.autoCloseMacdDivergence1h) {
         this.closeLongPostionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'macdDivergence1h', 'short')
+
       // notifyPhone(`${symbol} 1h MacdDepartSignal Short`)
     }
   }
@@ -355,8 +371,12 @@ class FlowDataBase {
     const highlow1Signal = this._candles5m.highlow1Signal(symbol)
     if (highlow1Signal.high1) {
       // notifyPhone(`${symbol} 5m high 1`)
+      watchSignal(this, symbol, 'break5m', 'high1')
+
     } else if (highlow1Signal.low1) {
       // notifyPhone(`${symbol} 5m low 1`)
+      watchSignal(this, symbol, 'break5m', 'low1')
+
     }
     // RSI over trade signal
     const rsiOverTradeSignal = this._candles5m.rsiOverTradeSignal(symbol, 8)
@@ -364,11 +384,15 @@ class FlowDataBase {
       if (this._options.autoCloseRsiOverTrade5m) {
         this.closeShortPositionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'rsiOverTrade5m', 'long')
+
       // notifyPhone(`${symbol} 5m rsiOverTradeSignal Long`)
     } else if (rsiOverTradeSignal.short) {
       if (this._options.autoCloseRsiOverTrade5m) {
         this.closeLongPostionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'rsiOverTrade5m', 'short')
+
       // notifyPhone(`${symbol} 5m rsiOverTradeSignal Short`)
     }
     // RSI divergence signal
@@ -377,11 +401,15 @@ class FlowDataBase {
       if (this._options.autoCloseRsiDivergence5m) {
         this.closeShortPositionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'rsiDivergence5m', 'long')
+
       // notifyPhone(`${symbol} 5m rsiDivergenceSignal Long`)
     } else if (rsiDivergenceSignal.short) {
       if (this._options.autoCloseRsiDivergence5m) {
         this.closeLongPostionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'rsiDivergence5m', 'short')
+
       // notifyPhone(`${symbol} 5m rsiDivergenceSignal short`)
     }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
@@ -393,11 +421,15 @@ class FlowDataBase {
       if (this._options.autoCloseMacdDivergence5m) {
         this.closeShortPositionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'macdDivergence5m', 'long')
+
       // notifyPhone(`${symbol} 5m MacdDepartSignal Long`)
     } else if (signal.short && signal1.short) {
       if (this._options.autoCloseMacdDivergence5m) {
         this.closeLongPostionIfHave(symbol)
       }
+      watchSignal(this, symbol, 'macdDivergence5m', 'short')
+
       // notifyPhone(`${symbol} 5m MacdDepartSignal Short`)
     }
   }
