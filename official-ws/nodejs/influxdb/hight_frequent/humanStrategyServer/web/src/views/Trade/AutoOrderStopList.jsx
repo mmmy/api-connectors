@@ -23,6 +23,8 @@ const SIGNALS = {
   'stochOverTrade1h': { operators: ['long', 'short'] },
   'stochDivergence5m': { operators: ['long', 'short'] },
   'stochDivergence1h': { operators: ['long', 'short'] },
+  'break1h': { operators: ['high1', 'low1'] },
+  'break5m': { operators: ['high1', 'low1'] },
 }
 
 const signalKeys = Object.keys(SIGNALS)
