@@ -134,7 +134,7 @@ export default class AutoOrderStopList extends React.Component {
 
   onAdd() {
     const { user } = this.props
-    const { symbol, side, amount, order_method, signal_name, remain_times, signal_operator } = this.state
+    const { symbol, side, amount, order_method, signal_name, remain_times, signal_operator, signal_value } = this.state
     const auto_order = {
       symbol,
       side,

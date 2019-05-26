@@ -33,7 +33,7 @@ class FlowDataBase {
         dPeriod: 3,
       },
       autoUpdateStopOpenMarketOrder: false,
-      autoUpdateStopOpenMarketOrder1h: false,
+      autoUpdateStopOpenMarketOrder1h: true,
 
       autoCloseStochOverTrade5m: false,
       autoCloseStochOverTrade1h: false,
