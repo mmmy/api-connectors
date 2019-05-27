@@ -97,6 +97,7 @@ export default class AutoOrderStopList extends React.Component {
           <th>signal_name</th>
           <th>signal_operator</th>
           <th>状态</th>
+          <th>间隔(h)</th>
           <th>操作</th>
         </tr>
       </thead>
@@ -120,6 +121,7 @@ export default class AutoOrderStopList extends React.Component {
                   <label for={`remian-span-${i}`}>remain_times</label>&nbsp;<strong id={`remian-span-${i}`} >{a.remain_times}</strong>
                 </span>
               </td>
+              <td style={{cursor: 'pointer'}} onClick={this.handleChangeMinInterval.bind(this, i)}>{a.min_interval}</td>
               <td><button onClick={this.handleDeleteItem.bind(this, i)}>x</button></td>
             </tr>
           })
@@ -146,6 +148,7 @@ export default class AutoOrderStopList extends React.Component {
       signal_operator,
       signal_value,
       remain_times,
+      min_interval: 0,
     }
     this.setState({
       loading: true
@@ -250,6 +253,18 @@ export default class AutoOrderStopList extends React.Component {
     if (newTimes !== null) {
       const newOrder = {
         remain_times: +newTimes
+      }
+      this.updateAutoOrder(index, newOrder)
+    }
+  }
+
+  handleChangeMinInterval(index) {
+    const { list } = this.state
+    const autoOrder = list[index]
+    const newInterval = window.prompt('min_interval', autoOrder.min_interval)
+    if (newInterval !== null) {
+      const newOrder = {
+        min_interval: +newInterval
       }
       this.updateAutoOrder(index, newOrder)
     }
