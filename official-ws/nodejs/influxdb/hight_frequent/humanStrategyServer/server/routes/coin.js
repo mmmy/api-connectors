@@ -205,6 +205,20 @@ router.get('/all_quotes', function (req, res, next) {
   })
 })
 
+router.get('/all_instruments', function (req, res, next) {
+  manager.getAllInstrument().then(list => {
+    res.send({
+      result: true,
+      data: list
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
+    })
+  })
+})
+
 router.post('/order_stop', function (req, res, next) {
   const { user, symbol, qty, side, stopPx, offset, stop_close } = req.body
   if (!symbol || !qty && !side) {
@@ -234,7 +248,7 @@ router.post('/order_stop', function (req, res, next) {
   })
 })
 
-router.post('/order_stop_open_by_lastcandle', function(req, res, next) {
+router.post('/order_stop_open_by_lastcandle', function (req, res, next) {
   const { user, period, symbol, qty, side } = req.body
   if (!symbol || !qty || !side || !period) {
     res.send({
@@ -329,7 +343,7 @@ router.post('/change_options', function (req, res) {
   })
 })
 
-router.get('/auto_order_signal_list', function(req, res) {
+router.get('/auto_order_signal_list', function (req, res) {
   const { user } = req.query
   if (!user) {
     res.send({
@@ -351,7 +365,7 @@ router.get('/auto_order_signal_list', function(req, res) {
   })
 })
 
-router.post('/add_auto_order_signal', function(req, res) {
+router.post('/add_auto_order_signal', function (req, res) {
   const { user, auto_order } = req.body
   if (!user) {
     res.send({
@@ -373,7 +387,7 @@ router.post('/add_auto_order_signal', function(req, res) {
   })
 })
 
-router.post('/update_auto_order_signal', function(req, res) {
+router.post('/update_auto_order_signal', function (req, res) {
   const { user, index, auto_order } = req.body
   if (!user || index === undefined) {
     res.send({
@@ -395,7 +409,7 @@ router.post('/update_auto_order_signal', function(req, res) {
   })
 })
 
-router.post('/delete_auto_order_signal', function(req, res) {
+router.post('/delete_auto_order_signal', function (req, res) {
   const { user, index } = req.body
   if (!user || index === undefined) {
     res.send({
