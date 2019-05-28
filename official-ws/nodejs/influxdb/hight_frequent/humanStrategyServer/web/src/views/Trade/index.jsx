@@ -49,12 +49,14 @@ export default class Trade extends React.Component {
       users: [],
       list_pending: false,
       all_quotes: [],
+      all_instruments: [],
     }
   }
 
   componentDidMount() {
     this.fetchUserList()
     this.fetchOrderbookDepth()
+    this.fetchAllInstruments()
   }
 
   render() {
@@ -140,7 +142,15 @@ export default class Trade extends React.Component {
               <div>
                 {
                   all_quotes.map(quote => {
-                    return <div>{quote.symbol}: ({quote.bidSize / 1E3 + 'k'})<span className="green">{quote.bidPrice}</span> : <sapn className="red">{quote.askPrice}</sapn>({quote.askSize / 1E3 + 'k'})</div>
+                    const instrument = this.findInstrumentBySymbol(quote.symbol)
+                    return <div>
+                      {quote.symbol}:&nbsp;
+                      ({quote.bidSize / 1E3 + 'k'})<span className="green">{quote.bidPrice}</span> :&nbsp;
+                      <sapn className="red">{quote.askPrice}</sapn>({quote.askSize / 1E3 + 'k'})
+                      {
+                        instrument && `[${instrument.fundingRate * 100}% ${new Date(instrument.fundingTimestamp).toLocaleString()}]`
+                      }
+                    </div>
                   })
                 }
               </div>
@@ -241,7 +251,7 @@ export default class Trade extends React.Component {
                   <button onClick={this.handleOrderStop.bind(this, i, 1)} disabled={pending || !form.stop_price}>Take Profit Market</button>
                 </div>
               </div>
-              <AutoOrderStopList user={options.user} onPushLog={this.pushLog.bind(this)}/>
+              <AutoOrderStopList user={options.user} onPushLog={this.pushLog.bind(this)} />
               <hr />
               <div className="actions">
                 <div>
@@ -269,7 +279,7 @@ export default class Trade extends React.Component {
                   ].map((key, j) => {
                     return <div>
                       <label for={`config-${j}`}>{key}</label>
-                      <input id={`config-${j}`} type="checkbox" onChange={this.handleCheckboxOption.bind(this, i, key)} checked={options[key]}/>
+                      <input id={`config-${j}`} type="checkbox" onChange={this.handleCheckboxOption.bind(this, i, key)} checked={options[key]} />
                     </div>
                   })
                 }
@@ -304,6 +314,29 @@ export default class Trade extends React.Component {
         this.pushLog(data.info)
       }
     })
+  }
+
+  fetchAllInstruments() {
+    axios.get(`/api/coin/all_instruments?t=${+new Date()}`).then(({ status, data }) => {
+      if (status === 200 && data.result) {
+        const all_instruments = data.data || []
+        this.setState({
+          all_instruments
+        })
+      } else {
+        this.pushLog(data.info)
+      }
+    })
+  }
+
+  findInstrumentBySymbol(symbol) {
+    const { all_instruments } = this.state
+    for (let i = 0; i < all_instruments.length; i++) {
+      const item = all_instruments[i]
+      if (item.symbol === symbol) {
+        return item
+      }
+    }
   }
 
   fetchUserList() {
