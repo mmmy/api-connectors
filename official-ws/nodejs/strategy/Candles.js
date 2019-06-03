@@ -155,19 +155,17 @@ Candles.prototype.rsiSignal = function (realTime, len) {
   // console.log('rsi', rsi)
   return rsis
 }
-Candles.prototype.rsiOverTradeSignal = function(realTime, len = 8) {
+Candles.prototype.rsiOverTradeSignal = function(realTime, len = 8, theshold_bottom = 20, theshold_top = 80) {
   const data = this.getCandles(realTime)
   const rsis = signal.RSI(data, len)
   const lastRsi = rsis[rsis.length - 1]
-  const theshold_top = 80
-  const theshold_bottom = 20
   return {
     long: lastRsi < theshold_bottom, // over sold, should close short position
     short: lastRsi > theshold_top,   // over bought, should close long position
   }
 }
 // rsi divergence
-Candles.prototype.rsiDivergenceSignal = function(realTime, len = 8, divergenceLen = 24) {
+Candles.prototype.rsiDivergenceSignal = function(realTime, len = 8, divergenceLen = 24, theshold_bottom = 20, theshold_top = 80) {
   const data = this.getCandles(realTime)
   const rsis = signal.RSI(data, len)
   const rsisDivergence = rsis.slice(-divergenceLen - 1)
@@ -179,7 +177,6 @@ Candles.prototype.rsiDivergenceSignal = function(realTime, len = 8, divergenceLe
   let isCurrentHighest = this.isCurrentHighestLowestClose(true, divergenceLen, 0)
   let isCurrentLowest = this.isCurrentHighestLowestClose(false, divergenceLen, 0)
   if (isCurrentHighest) {
-    const theshold_top = 80
     // 其中含有了Rsi超高阈值
     const isOverBoughtHappend = Math.max.apply(null, rsisDivergence) > theshold_top
     if (isOverBoughtHappend) {
@@ -190,7 +187,6 @@ Candles.prototype.rsiDivergenceSignal = function(realTime, len = 8, divergenceLe
     }
   }
   if (isCurrentLowest) {
-    const theshold_bottom = 20
     const isOverSoldHappend = Math.min.apply(null, rsisDivergence) < theshold_bottom
     if (isOverSoldHappend) {
       const isDivergenceLong = lastRsi > Math.min.apply(null, histRsis)

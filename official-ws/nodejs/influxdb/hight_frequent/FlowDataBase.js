@@ -307,7 +307,10 @@ class FlowDataBase {
       watchSignal(this, symbol, 'break1h', 'low1')
     }
     // RSI over trade signal
-    const rsiOverTradeSignal = this._candles1h.rsiOverTradeSignal(symbol, 8)
+    const rsiOverTradeSignal = this._candles1h.rsiOverTradeSignal(symbol, 8, 20, 80)
+    const rsiOverTradeSignal_2575 = this._candles1h.rsiOverTradeSignal(symbol, 8, 25, 75)
+    const rsiOverTradeSignal_3070 = this._candles1h.rsiOverTradeSignal(symbol, 8, 30, 70)
+
     if (rsiOverTradeSignal.long) {
       if (this._options.autoCloseRsiOverTrade1h) {
         this.closeShortPositionIfHave(symbol)
@@ -323,8 +326,41 @@ class FlowDataBase {
 
       // notifyPhone(`${symbol} 1h rsiOverTradeSignal Short`)
     }
+    if (rsiOverTradeSignal_2575.long) {
+      if (this._options.autoCloseRsiOverTrade_2575_1h) {
+        this.closeShortPositionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'rsiOverTrade_2575_1h', 'long')
+
+      // notifyPhone(`${symbol} 1h rsiOverTradeSignal_2575 Long`)
+    } else if (rsiOverTradeSignal_2575.short) {
+      if (this._options.autoCloseRsiOverTrade_2575_1h) {
+        this.closeLongPostionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'rsiOverTrade_2575_1h', 'short')
+
+      // notifyPhone(`${symbol} 1h rsiOverTradeSignal_2575 Short`)
+    }
+    if (rsiOverTradeSignal_3070.long) {
+      if (this._options.autoCloseRsiOverTrade_3070_1h) {
+        this.closeShortPositionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'rsiOverTrade_3070_1h', 'long')
+
+      // notifyPhone(`${symbol} 1h rsiOverTradeSignal_3070 Long`)
+    } else if (rsiOverTradeSignal_3070.short) {
+      if (this._options.autoCloseRsiOverTrade_3070_1h) {
+        this.closeLongPostionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'rsiOverTrade_3070_1h', 'short')
+
+      // notifyPhone(`${symbol} 1h rsiOverTradeSignal_3070 Short`)
+    }
+
     // RSI divergence signal
-    const rsiDivergenceSignal = this._candles1h.rsiDivergenceSignal(symbol, 8, 24)
+    const rsiDivergenceSignal = this._candles1h.rsiDivergenceSignal(symbol, 8, 24, 20, 80)
+    const rsiDivergenceSignal_2575 = this._candles1h.rsiDivergenceSignal(symbol, 8, 24, 25, 75)
+    const rsiDivergenceSignal_3070 = this._candles1h.rsiDivergenceSignal(symbol, 8, 24, 30, 70)
     if (rsiDivergenceSignal.long) {
       if (this._options.autoCloseRsiDivergence1h) {
         this.closeShortPositionIfHave(symbol)
@@ -339,6 +375,36 @@ class FlowDataBase {
       watchSignal(this, symbol, 'rsiDivergence1h', 'short')
 
       // notifyPhone(`${symbol} 1h rsiDivergenceSignal short`)
+    }
+    if (rsiDivergenceSignal_2575.long) {
+      if (this._options.autoCloseRsiDivergence_2575_1h) {
+        this.closeShortPositionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'rsiDivergence_2575_1h', 'long')
+
+      // notifyPhone(`${symbol} 1h rsiDivergenceSignal_2575 Long`)
+    } else if (rsiDivergenceSignal_2575.short) {
+      if (this._options.autoCloseRsiDivergence_2575_1h) {
+        this.closeLongPostionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'rsiDivergence_2575_1h', 'short')
+
+      // notifyPhone(`${symbol} 1h rsiDivergenceSignal_2575 short`)
+    }
+    if (rsiDivergenceSignal_3070.long) {
+      if (this._options.autoCloseRsiDivergence_3070_1h) {
+        this.closeShortPositionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'rsiDivergence_3070_1h', 'long')
+
+      // notifyPhone(`${symbol} 1h rsiDivergenceSignal_3070 Long`)
+    } else if (rsiDivergenceSignal_3070.short) {
+      if (this._options.autoCloseRsiDivergence_3070_1h) {
+        this.closeLongPostionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'rsiDivergence_3070_1h', 'short')
+
+      // notifyPhone(`${symbol} 1h rsiDivergenceSignal_3070 short`)
     }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)

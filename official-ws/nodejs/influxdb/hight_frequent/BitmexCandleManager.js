@@ -32,16 +32,16 @@ class BitmexCandleManager {
     return this._candles[symbol].macdDepartSignal(false, len, offset)
   }
 
-  rsiDivergenceSignal(symbol, len, divergenceLen) {
-    return this._candles[symbol].rsiDivergenceSignal(false, len, divergenceLen)
+  rsiDivergenceSignal(symbol, len, divergenceLen, theshold_bottom, theshold_top) {
+    return this._candles[symbol].rsiDivergenceSignal(false, len, divergenceLen, theshold_bottom, theshold_top)
   }
 
   getHistoryCandle(symbol) {
     return this._candles[symbol].getHistoryCandle(1)
   }
 
-  rsiOverTradeSignal(symbol, len) {
-    return this._candles[symbol].rsiOverTradeSignal(false, len)
+  rsiOverTradeSignal(symbol, len, theshold_bottom, theshold_top) {
+    return this._candles[symbol].rsiOverTradeSignal(false, len, theshold_bottom, theshold_top)
   }
 
   highlow1Signal(symbol) {

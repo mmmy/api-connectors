@@ -257,15 +257,19 @@ export default class Trade extends React.Component {
                 {
                   [
                     // 'autoCloseMacdDivergence5m',
-                    // 'autoCloseMacdDivergence1h',
-                    'autoCloseStochOverTrade5m',
-                    'autoCloseStochOverTrade1h',
-                    'autoCloseStochDivergence5m',
-                    'autoCloseStochDivergence1h',
-                    'autoCloseRsiOverTrade5m',
+                    // 'autoCloseMacdDivergence1h',                    
+                    'autoCloseRsiOverTrade_3070_1h',
+                    'autoCloseRsiOverTrade_2575_1h',
                     'autoCloseRsiOverTrade1h',
-                    'autoCloseRsiDivergence5m',
+                    'autoCloseRsiDivergence_3070_1h',
+                    'autoCloseRsiDivergence_2575_1h',
                     'autoCloseRsiDivergence1h',
+                    'autoCloseRsiOverTrade5m',
+                    'autoCloseRsiDivergence5m',
+                    // 'autoCloseStochOverTrade5m',
+                    // 'autoCloseStochOverTrade1h',
+                    // 'autoCloseStochDivergence5m',
+                    // 'autoCloseStochDivergence1h',
                   ].map((key, j) => {
                     return <div>
                       <label for={`config-${j}`}>{key}</label>
