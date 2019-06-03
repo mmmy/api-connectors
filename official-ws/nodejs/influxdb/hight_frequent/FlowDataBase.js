@@ -3,6 +3,7 @@
 const AccountOrder = require('./AccountOrder')
 const AccountPosition = require('./AccountPosition')
 const AccountQuote = require('./AccountQuote')
+const AccountInstrument = require('./AccountInstrument')
 const AccountMargin = require('./AccountMargin')
 const AccountOrderBook = require('./AccountOrderBook')
 const BitmexCandleManager = require('./BitmexCandleManager')
@@ -53,6 +54,7 @@ class FlowDataBase {
     this._accountOrder = new AccountOrder()
     this._accountPosition = new AccountPosition()
     this._accountQuote = new AccountQuote()
+    this._accountInstrument = new AccountInstrument()
     this._accountMargin = new AccountMargin()
     this._accountOrderBook = new AccountOrderBook()
     this._systemTime = 0
@@ -196,6 +198,7 @@ class FlowDataBase {
     if (data0) {
       this._systemTime = new Date(data0.timestamp)
     }
+    this._accountInstrument.update(json, symbol)
   }
 
   updateExecution(json, symbol) {
@@ -539,6 +542,10 @@ class FlowDataBase {
     return this._accountQuote.getAllLatestQuote()
   }
 
+  getAllInstrument() {
+    return this._accountInstrument.getAllInstrument()
+  }
+
   getLatestQuote(symbol) {
     return this._accountQuote.getLatestQuote(symbol)
   }
@@ -572,7 +579,7 @@ class FlowDataBase {
   }
 
   getCandleManager(period) {
-    switch(period) {
+    switch (period) {
       case '5m':
         return this._candles5m
       case '1h':

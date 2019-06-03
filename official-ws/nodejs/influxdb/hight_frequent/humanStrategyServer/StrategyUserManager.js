@@ -163,6 +163,14 @@ module.exports = class StrategyUserManager {
     return Promise.resolve(mainStrategy.getAllLatestQuote())
   }
 
+  getAllInstrument() {
+    const mainStrategy = this.getMainStrategy()
+    if (!mainStrategy) {
+      return Promise.reject('main strategy not exist')
+    }
+    return Promise.resolve(mainStrategy.getAllInstrument())
+  }
+
   getMainStrategy() {
     return this._list.filter(s => s.getOptions().main)[0]
   }
