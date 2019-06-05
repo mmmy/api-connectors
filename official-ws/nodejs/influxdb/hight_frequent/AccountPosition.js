@@ -22,8 +22,9 @@ class AccountPosition {
   }
 
   getPositionData(symbol = 'XBTUSD') {
-    //永远长度为1， 即使是空仓也会有上次的交易信息
-    return this._CLIENT._data.position[symbol][0]
+    //永远长度为1， 即使是空仓也会有上次的交易信息??
+    const position = this._CLIENT._data.position[symbol]
+    return position ? position[0] : {}
   }
 
   hasPosition(symbol = 'XBTUSD') {
