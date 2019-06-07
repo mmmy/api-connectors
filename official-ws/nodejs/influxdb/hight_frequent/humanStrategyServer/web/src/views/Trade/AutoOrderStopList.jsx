@@ -12,6 +12,16 @@ const ORDER_METHODS = [
   'market',
 ]
 
+const SIDE_COLOR_CLASS = {
+  'Buy': 'green',
+  'Sell': 'red'
+}
+
+const SIGNAL_OP_COLOR_CLASS = {
+  'long': 'green',
+  'short': 'red'
+}
+
 const SIGNALS = {
   // 'autoCloseMacdDivergence5m',
   // 'autoCloseMacdDivergence1h',
@@ -66,7 +76,7 @@ export default class AutoOrderStopList extends React.Component {
           <option value="Buy">Buy</option>
           <option value="Sell">Sell</option>
         </select>
-        <input type="number" value={amount} style={{width: '80px'}} onChange={this.handleChangeForm.bind(this, 'amount')}/>
+        <input type="number" value={amount} style={{ width: '80px' }} onChange={this.handleChangeForm.bind(this, 'amount')} />
         <select value={order_method} onChange={this.handleChangeForm.bind(this, 'order_method')}>
           {
             ORDER_METHODS.map(m => <option value={m}>{m}</option>)
@@ -115,17 +125,23 @@ export default class AutoOrderStopList extends React.Component {
             }
             return <tr key={i}>
               <td>{a.symbol}</td>
-              <td>{a.side}</td>
-              <td style={{cursor: 'pointer', color: amountColor}} onClick={this.handleChangeAmount.bind(this, i)}>{a.amount}</td>
+              <td className={SIDE_COLOR_CLASS[a.side]}>{a.side}</td>
+              <td style={{ cursor: 'pointer', color: amountColor }} onClick={this.handleChangeAmount.bind(this, i)}>{a.amount}</td>
               <td>{a.order_method}</td>
-              <td>{a.signal_name}</td>
-              <td>{a.signal_operator}</td>
               <td>
+                <select value={a.signal_name} onChange={this.handleChangeKeyValue.bind(this, i, 'signal_name')}>
+                  {
+                    signalKeys.map(s => <option value={s}>{s}</option>)
+                  }
+                </select>
+              </td>
+              <td className={SIGNAL_OP_COLOR_CLASS[a.signal_operator]}>{a.signal_operator}</td>
+              <td className={a.remain_times > 0 ? 'flash' : ''}>
                 <span onClick={this.handleChangeRemainTimes.bind(this, i)}>
                   <label for={`remian-span-${i}`}>remain_times</label>&nbsp;<strong id={`remian-span-${i}`} >{a.remain_times}</strong>
                 </span>
               </td>
-              <td style={{cursor: 'pointer'}} onClick={this.handleChangeMinInterval.bind(this, i)}>{a.min_interval}</td>
+              <td style={{ cursor: 'pointer' }} onClick={this.handleChangeMinInterval.bind(this, i)}>{a.min_interval}</td>
               <td><button onClick={this.handleDeleteItem.bind(this, i)}>x</button></td>
             </tr>
           })
@@ -272,5 +288,14 @@ export default class AutoOrderStopList extends React.Component {
       }
       this.updateAutoOrder(index, newOrder)
     }
+  }
+
+  handleChangeKeyValue(index, key, e) {
+    // const { list } = this.state
+    // const autoOrder = list[index]
+    const newOrder = {
+      [key]: e.target.value
+    }
+    this.updateAutoOrder(index, newOrder)
   }
 }

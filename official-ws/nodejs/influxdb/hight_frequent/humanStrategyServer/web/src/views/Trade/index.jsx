@@ -173,15 +173,9 @@ export default class Trade extends React.Component {
                 <input type="checkbox" id="reduce-only-checkbox" checked={form.reduce_only} style={{ marginLeft: '10px' }} onChange={this.handleChangeCheckbox.bind(this, i, 'reduce_only')} /><label for="reduce-only-checkbox">reduce only</label>
               </div>
               <div>
-                <button disabled={pending} onClick={this.handleOrderMarket.bind(this, i)}>Order Market</button>
-              </div>
-              <br />
-              <div>
-                <button disabled={pending} onClick={this.handleOrderScapling.bind(this, i, false)}>Order Scapling</button>
-              </div>
-              <br />
-              <div>
-                <button disabled={pending} onClick={this.handleOrderScapling.bind(this, i, true)}>Order Scapling Market</button>
+                <button disabled={pending} onClick={this.handleOrderMarket.bind(this, i)} title="市价">Order Market</button>
+                <button disabled={pending} onClick={this.handleOrderScalping.bind(this, i, false)} title="限价单，并自动挂一个止损单">Order Scalping</button>
+                <button disabled={pending} onClick={this.handleOrderScalping.bind(this, i, true)} title="市价单，并自动挂一个止损单">Order Scalping Market</button>
               </div>
               <hr />
               <div className="title">
@@ -219,7 +213,7 @@ export default class Trade extends React.Component {
                           <td>{order.ordStatus}</td>
                           <td className={isBuy ? 'green' : 'red'}>{order.leavesQty * (isBuy ? 1 : -1)}</td>
                           <td>{new Date(order.timestamp).toLocaleString()}</td>
-                          <td>{order.execInst}</td>
+                          <td title="如果包含了Close, 那么只是平仓用，否则可以开仓">{order.execInst}</td>
                           <td>{order.ordType}</td>
                         </tr>
                       })
@@ -264,29 +258,43 @@ export default class Trade extends React.Component {
               </div>
               <div>
                 <h5>Config</h5>
-                {
-                  [
-                    // 'autoCloseMacdDivergence5m',
-                    // 'autoCloseMacdDivergence1h',                    
-                    'autoCloseRsiOverTrade_3070_1h',
-                    'autoCloseRsiOverTrade_2575_1h',
-                    'autoCloseRsiOverTrade1h',
-                    'autoCloseRsiDivergence_3070_1h',
-                    'autoCloseRsiDivergence_2575_1h',
-                    'autoCloseRsiDivergence1h',
-                    'autoCloseRsiOverTrade5m',
-                    'autoCloseRsiDivergence5m',
-                    // 'autoCloseStochOverTrade5m',
-                    // 'autoCloseStochOverTrade1h',
-                    // 'autoCloseStochDivergence5m',
-                    // 'autoCloseStochDivergence1h',
-                  ].map((key, j) => {
-                    return <div>
-                      <label for={`config-${j}`}>{key}</label>
-                      <input id={`config-${j}`} type="checkbox" onChange={this.handleCheckboxOption.bind(this, i, key)} checked={options[key]} />
-                    </div>
-                  })
-                }
+                <table>
+                  <thead>
+                    <tr><th>序号</th><td>自动平仓</td><td>信号</td></tr>
+                  </thead>
+                  <tbody>
+                    {
+                      [
+                        // 'autoCloseMacdDivergence5m',
+                        // 'autoCloseMacdDivergence1h',                    
+                        'autoCloseRsiOverTrade5m',
+                        'autoCloseRsiDivergence5m',
+                        'autoCloseRsiOverTrade_3070_1h',
+                        'autoCloseRsiOverTrade_2575_1h',
+                        'autoCloseRsiOverTrade1h',
+                        'autoCloseRsiDivergence_3070_1h',
+                        'autoCloseRsiDivergence_2575_1h',
+                        'autoCloseRsiDivergence1h',
+                        // 'autoCloseStochOverTrade5m',
+                        // 'autoCloseStochOverTrade1h',
+                        // 'autoCloseStochDivergence5m',
+                        // 'autoCloseStochDivergence1h',
+                      ].map((key, j) => {
+                        return <tr>
+                          <td>
+                            {j + 1}
+                          </td>
+                          <td>
+                            <input id={`config-${j}`} type="checkbox" onChange={this.handleCheckboxOption.bind(this, i, key)} checked={options[key]} />
+                          </td>
+                          <td>
+                            <label for={`config-${j}`}>{key}</label>
+                          </td>
+                        </tr>
+                      })
+                    }
+                  </tbody>
+                </table>
               </div>
               {
                 pending && <div className="pending-container">fetching...</div>
@@ -463,7 +471,7 @@ export default class Trade extends React.Component {
   }
   // order limit auto stop and order a stop market at the same time
   // market 市价
-  handleOrderScapling(index, market) {
+  handleOrderScalping(index, market) {
     var userData = this.state.users[index]
     const user = userData.options.user
     const { order_side, order_qty, order_symbol } = userData.form
