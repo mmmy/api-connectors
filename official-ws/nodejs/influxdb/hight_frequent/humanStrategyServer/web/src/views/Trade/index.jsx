@@ -143,7 +143,7 @@ export default class Trade extends React.Component {
                 {
                   all_quotes.map(quote => {
                     const instrument = this.findInstrumentBySymbol(quote.symbol)
-                    return <div>
+                    return <div style={{ whiteSpace: 'nowrap' }}>
                       {quote.symbol}:&nbsp;
                       ({quote.bidSize / 1E3 + 'k'})<span className="green">{quote.bidPrice}</span> :&nbsp;
                       <sapn className="red">{quote.askPrice}</sapn>({quote.askSize / 1E3 + 'k'})

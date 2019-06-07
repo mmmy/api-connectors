@@ -25,14 +25,14 @@ const SIGNAL_OP_COLOR_CLASS = {
 const SIGNALS = {
   // 'autoCloseMacdDivergence5m',
   // 'autoCloseMacdDivergence1h',
+  'rsiOverTrade5m': { operators: ['long', 'short'] },
+  'rsiDivergence5m': { operators: ['long', 'short'] },
   'rsiOverTrade_3070_1h': { operators: ['long', 'short'] },
   'rsiOverTrade_2575_1h': { operators: ['long', 'short'] },
   'rsiOverTrade1h': { operators: ['long', 'short'] },
   'rsiDivergence_3070_1h': { operators: ['long', 'short'] },
   'rsiDivergence_2575_1h': { operators: ['long', 'short'] },
   'rsiDivergence1h': { operators: ['long', 'short'] },
-  'rsiDivergence5m': { operators: ['long', 'short'] },
-  'rsiOverTrade5m': { operators: ['long', 'short'] },
   // 'stochOverTrade5m': { operators: ['long', 'short'] },
   // 'stochOverTrade1h': { operators: ['long', 'short'] },
   // 'stochDivergence5m': { operators: ['long', 'short'] },
@@ -51,7 +51,7 @@ export default class AutoOrderStopList extends React.Component {
       side: 'Buy',
       amount: 1000,
       order_method: 'stopMarket1h',
-      signal_name: signalKeys[0],
+      signal_name: 'rsiDivergence_3070_1h',
       signal_operator: 'long',
       signal_value: '',
       remain_times: 1,
@@ -84,7 +84,7 @@ export default class AutoOrderStopList extends React.Component {
         </select>
         <select value={signal_name} onChange={this.handleChangeForm.bind(this, 'signal_name')}>
           {
-            signalKeys.map(s => <option value={s}>{s}</option>)
+            signalKeys.map((s, j) => <option value={s}>[{j + 1}]{s}</option>)
           }
         </select>
         <select value={signal_operator} onChange={this.handleChangeForm.bind(this, 'signal_operator')}>
@@ -131,7 +131,7 @@ export default class AutoOrderStopList extends React.Component {
               <td>
                 <select value={a.signal_name} onChange={this.handleChangeKeyValue.bind(this, i, 'signal_name')}>
                   {
-                    signalKeys.map(s => <option value={s}>{s}</option>)
+                    signalKeys.map((s, j) => <option value={s}>[{j + 1}]{s}</option>)
                   }
                 </select>
               </td>
