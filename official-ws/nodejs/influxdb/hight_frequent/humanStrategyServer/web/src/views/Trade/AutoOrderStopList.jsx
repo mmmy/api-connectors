@@ -136,9 +136,10 @@ export default class AutoOrderStopList extends React.Component {
                 </select>
               </td>
               <td className={SIGNAL_OP_COLOR_CLASS[a.signal_operator]}>{a.signal_operator}</td>
-              <td className={a.remain_times > 0 ? 'flash' : ''}>
+              <td>
                 <span onClick={this.handleChangeRemainTimes.bind(this, i)}>
-                  <label for={`remian-span-${i}`}>remain_times</label>&nbsp;<strong id={`remian-span-${i}`} >{a.remain_times}</strong>
+                  <label for={`remian-span-${i}`}>remain_times</label>&nbsp;
+                  <strong id={`remian-span-${i}`} className={a.remain_times > 0 ? 'flash' : ''}>{a.remain_times}</strong>
                 </span>
               </td>
               <td style={{ cursor: 'pointer' }} onClick={this.handleChangeMinInterval.bind(this, i)}>{a.min_interval}</td>
