@@ -61,6 +61,8 @@ export default class Trade extends React.Component {
 
   render() {
     const { logs, users, all_quotes } = this.state
+    const xbtInstrument = this.findInstrumentBySymbol('XBTUSD')
+    const xbtBidPrice = xbtInstrument ? xbtInstrument.bidPrice : 0
     return <div className="trade-container">
       <div>
         {
@@ -70,8 +72,10 @@ export default class Trade extends React.Component {
             // 检查止损是否设置正常
             const orderStopValideMsg = this.checkStop(i)
             const positionKeys = ['symbol', 'leverage', 'currentQty', 'avgCostPrice', 'unrealisedPnl', 'unrealisedPnlPcnt', 'realisedGrossPnl', 'realisedPnl']
+            const balance = walletBalance / 1E8
+            const balaceUsd = xbtBidPrice ? (balance * xbtBidPrice).toFixed(0) : null
             return <div className="user-row">
-              <div>user: {options.user} ({(availableMargin / 1E8).toFixed(3)}/{(walletBalance / 1E8).toFixed(3)})</div>
+              <div>user: {options.user} ({(availableMargin / 1E8).toFixed(3)}/{balance.toFixed(3)})({balaceUsd})</div>
               <div className="account clearfix">
                 <table style={{ fontSize: '12px' }}>
                   <thead>
@@ -89,6 +93,9 @@ export default class Trade extends React.Component {
                             ].concat(positionKeys.map(key => {
                               const val = position[key]
                               const format = formatPosition(val, key, position)
+                              if (['unrealisedPnl'].indexOf(key) > -1 && xbtBidPrice) {
+                                format = `${format} (${(format * xbtBidPrice).toFixed(0)})`
+                              }
                               let cn = ''
                               if (['currentQty', 'realisedGrossPnl', 'realisedPnl', 'unrealisedPnl', 'unrealisedPnlPcnt'].indexOf(key) > -1) {
                                 if (val > 0) {
