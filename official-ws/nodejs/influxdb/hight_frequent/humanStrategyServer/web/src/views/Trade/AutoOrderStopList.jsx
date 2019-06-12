@@ -149,8 +149,8 @@ export default class AutoOrderStopList extends React.Component {
                 {
                   Object.getOwnPropertyNames(a.values || {}).map((key, j) => {
                     const id = `values-span-${i}-${key}`
-                    return <span key={id} onClick={this.handleChangeOperatorValue.bind(this, i, key)}>
-                      <label for={id}>{key}</label>
+                    return <span style={{ cursor: 'pointer' }} key={id} onClick={this.handleChangeOperatorValue.bind(this, i, key)}>
+                      <label for={id}>{key}</label>&nbsp;
                       <strong id={id}>{a.values[key]}</strong>
                     </span>
                   })
@@ -174,7 +174,20 @@ export default class AutoOrderStopList extends React.Component {
   handleChangeForm(key, e) {
     this.setState({
       [key]: e.target.value
+    }, () => {
+      this.updateStateBySignalName()
     })
+  }
+
+  updateStateBySignalName() {
+    const { signal_name, signal_operator } = this.state
+    const { operators } = SIGNALS[signal_name]
+    // 重置signal_operator
+    if (operators.indexOf(signal_operator) === -1) {
+      this.setState({
+        signal_operator: operators[0]
+      })
+    }
   }
 
   onAdd() {
