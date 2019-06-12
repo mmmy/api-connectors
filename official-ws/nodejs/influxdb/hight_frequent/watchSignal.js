@@ -49,6 +49,14 @@ function watchSignal(strategy, symbol, signal_name, signal_operator, signal_valu
     if (last_exec_time && (now - new Date(last_exec_time) < min_interval * 3600 * 1000 )) {
       return
     }
+    // 如果是highlow, 先判断次数
+    if (autoOrder.signal_name === 'high1' || autoOrder.signal_name === 'low1') {
+      const values = autoOrder.values
+      if (values.times > 1) {
+        values.times = values.times - 1
+        return
+      }
+    }
     //执行
     autoOrder.last_exec_time = now
     autoOrder.remain_times = autoOrder.remain_times - 1
