@@ -37,8 +37,8 @@ const SIGNALS = {
   // 'stochOverTrade1h': { operators: ['long', 'short'] },
   // 'stochDivergence5m': { operators: ['long', 'short'] },
   // 'stochDivergence1h': { operators: ['long', 'short'] },
-  'break1h': { operators: ['high1', 'low1'] },
-  'break5m': { operators: ['high1', 'low1'] },
+  'break1h': { operators: ['high1', 'low1'], values: [{ key: 'times', defaultValue: 1 }] },
+  'break5m': { operators: ['high1', 'low1'], values: [{ key: 'times', defaultValue: 1 }] },
 }
 
 const signalKeys = Object.keys(SIGNALS)
@@ -65,6 +65,7 @@ export default class AutoOrderStopList extends React.Component {
   render() {
     const { symbol, side, amount, signal_name, signal_operator, order_method, remain_times, loading } = this.state
     const operators = SIGNALS[signal_name].operators
+    const values = SIGNALS[signal_name].values
     return <div>
       <div style={{ marginBottom: '5px' }}>
         <select value={symbol} onChange={this.handleChangeForm.bind(this, 'symbol')}>
@@ -92,6 +93,13 @@ export default class AutoOrderStopList extends React.Component {
             operators.map(o => <option value={o}>{o}</option>)
           }
         </select>
+        {
+          values && values.map(({ key, defaultValue }) => {
+            let val = this.state[key]
+            val = val === undefined ? defaultValue : val
+            return <span><label>{key}</label><input type="number" style={{ width: '50px' }} value={val} onChange={this.handleChangeForm.bind(this, key)} /></span>
+          })
+        }
         {/* <input value={remain_times} type='number' min="0" step='1' onChange={this.handleChangeForm.bind(this, 'remain_times')} style={{ width: '50px' }} title="剩余次数"/> */}
         <button disabled={loading} onClick={this.onAdd.bind(this)}>添加</button>
       </div>
@@ -160,6 +168,7 @@ export default class AutoOrderStopList extends React.Component {
   onAdd() {
     const { user } = this.props
     const { symbol, side, amount, order_method, signal_name, remain_times, signal_operator, signal_value } = this.state
+    const values = SIGNALS[signal_name].values
     const auto_order = {
       symbol,
       side,
@@ -170,6 +179,16 @@ export default class AutoOrderStopList extends React.Component {
       signal_value,
       remain_times,
       min_interval: 0,
+      values: {}
+    }
+    if (values) {
+      values.forEach(({ key, defaultValue }) => {
+        let val = this.state[key]
+        if (val === undefined) {
+          val = defaultValue
+        }
+        auto_order.values[key] = val
+      })
     }
     this.setState({
       loading: true
