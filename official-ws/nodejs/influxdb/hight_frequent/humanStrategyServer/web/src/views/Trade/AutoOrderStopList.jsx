@@ -147,7 +147,7 @@ export default class AutoOrderStopList extends React.Component {
               <td className={SIGNAL_OP_COLOR_CLASS[a.signal_operator]}>{a.signal_operator}</td>
               <td>
                 {
-                  Object.getOwnPropertyNames(a.values || []).map((key, j) => {
+                  Object.getOwnPropertyNames(a.values || {}).map((key, j) => {
                     const id = `values-span-${i}-${key}`
                     return <span key={id} onClick={this.handleChangeOperatorValue.bind(this, i, key)}>
                       <label for={id}>{key}</label>
