@@ -118,6 +118,7 @@ export default class AutoOrderStopList extends React.Component {
           <th>order_method</th>
           <th>signal_name</th>
           <th>signal_operator</th>
+          <th>signal_values</th>
           <th>状态</th>
           <th>间隔(h)</th>
           <th>操作</th>
@@ -144,6 +145,17 @@ export default class AutoOrderStopList extends React.Component {
                 </select>
               </td>
               <td className={SIGNAL_OP_COLOR_CLASS[a.signal_operator]}>{a.signal_operator}</td>
+              <td>
+                {
+                  Object.getOwnPropertyNames(a.values || []).map((key, j) => {
+                    const id = `values-span-${i}-${key}`
+                    return <span key={id} onClick={this.handleChangeOperatorValue.bind(this, i, key)}>
+                      <label for={id}>{key}</label>
+                      <strong id={id}>{a.values[key]}</strong>
+                    </span>
+                  })
+                }
+              </td>
               <td>
                 <span onClick={this.handleChangeRemainTimes.bind(this, i)}>
                   <label for={`remian-span-${i}`}>remain_times</label>&nbsp;
@@ -293,6 +305,21 @@ export default class AutoOrderStopList extends React.Component {
     if (newTimes !== null) {
       const newOrder = {
         remain_times: +newTimes
+      }
+      this.updateAutoOrder(index, newOrder)
+    }
+  }
+
+  handleChangeOperatorValue(index, key) {
+    const { list } = this.state
+    const autoOrder = list[index]
+    const newV = window.prompt(key, autoOrder.values[key])
+    if (newV !== null) {
+      const newOrder = {
+        values: {
+          ...autoOrder.values,
+          [key]: +newV
+        }
       }
       this.updateAutoOrder(index, newOrder)
     }
