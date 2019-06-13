@@ -92,7 +92,7 @@ export default class Trade extends React.Component {
                               <td><button style={{ margin: "5px 2px" }} onClick={this.handleClosePosition.bind(this, i, position)}>Close</button></td>
                             ].concat(positionKeys.map(key => {
                               const val = position[key]
-                              const format = formatPosition(val, key, position)
+                              let format = formatPosition(val, key, position)
                               if (['unrealisedPnl'].indexOf(key) > -1 && xbtBidPrice) {
                                 format = `${format} (${(format * xbtBidPrice).toFixed(0)})`
                               }
