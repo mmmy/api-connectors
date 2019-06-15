@@ -69,13 +69,17 @@ export default class Trade extends React.Component {
           users.map((user, i) => {
             const { options, positions, margin, orders, form, pending } = user
             const { walletBalance, availableMargin } = margin || {}
+            const totalRPnl = positions.reduce((pre, cur) => pre + cur.unrealisedPnl, 0)
             // 检查止损是否设置正常
             const orderStopValideMsg = this.checkStop(i)
             const positionKeys = ['symbol', 'leverage', 'currentQty', 'avgCostPrice', 'unrealisedPnl', 'unrealisedPnlPcnt', 'realisedGrossPnl', 'realisedPnl']
             const balance = walletBalance / 1E8
             const balaceUsd = xbtBidPrice ? (balance * xbtBidPrice).toFixed(0) : null
+            const rpnBalance = balance + totalRPnl
+            const rpnBalanceUsd = xbtBidPrice ? (rpnBalance * xbtBidPrice).toFixed(0) : null
+
             return <div className="user-row">
-              <div>user: {options.user} ({(availableMargin / 1E8).toFixed(3)}/{balance.toFixed(3)})({balaceUsd})</div>
+              <div>user: {options.user} ({(availableMargin / 1E8).toFixed(3)}/{balance.toFixed(3)})({balaceUsd})&nbsp;close:{rpnBalanceUsd}</div>
               <div className="account clearfix">
                 <table style={{ fontSize: '12px' }}>
                   <thead>
