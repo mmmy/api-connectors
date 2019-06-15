@@ -69,7 +69,7 @@ export default class Trade extends React.Component {
           users.map((user, i) => {
             const { options, positions, margin, orders, form, pending } = user
             const { walletBalance, availableMargin } = margin || {}
-            const totalRPnl = positions.reduce((pre, cur) => pre + cur.unrealisedPnl, 0)
+            const totalRPnl = positions.reduce((pre, cur) => pre + cur.unrealisedPnl, 0) / 1E8
             // 检查止损是否设置正常
             const orderStopValideMsg = this.checkStop(i)
             const positionKeys = ['symbol', 'leverage', 'currentQty', 'avgCostPrice', 'unrealisedPnl', 'unrealisedPnlPcnt', 'realisedGrossPnl', 'realisedPnl']
