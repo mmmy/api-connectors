@@ -44,6 +44,13 @@ module.exports = function createStratey(options) {
   if (options.main) {
     bitmex.listenOrderBook(dataCb, 'XBTUSD')
 
+    const symbols1d = ['XBTUSD', 'ETHUSD']
+    symbols1d.forEach(symbol => {
+      // 1天K线
+      bitmex.listenCandle({ binSize: '1d', count: 200 }, list => {
+        strategy.setCandlesHistory(list, symbol, '1d')
+      }, dataCb, symbol)
+    })
 
     let symbols1h = ['XBTUSD', 'ETHUSD']
     symbols1h.forEach(symbol => {
@@ -51,7 +58,7 @@ module.exports = function createStratey(options) {
       bitmex.listenInstrument(dataCb, symbol)
       // 1小时K线
       bitmex.listenCandle({ binSize: '1h', count: 200 }, list => {
-        strategy.setCandles1hHistory(list, symbol)
+        strategy.setCandlesHistory(list, symbol, '1h')
       }, dataCb, symbol)
     })
 
@@ -59,7 +66,7 @@ module.exports = function createStratey(options) {
     symbols5m.forEach(symbol => {
       // 5m
       bitmex.listenCandle({ binSize: '5m', count: 200 }, list => {
-        strategy.setCandles5mHistory(list, symbol)
+        strategy.setCandlesHistory(list, symbol, '5m')
       }, dataCb, symbol)
     })
   } else {

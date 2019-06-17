@@ -65,6 +65,7 @@ class FlowDataBase {
 
     this._currentQty = 0
 
+    this._candles1d = new BitmexCandleManager()
     this._candles1h = new BitmexCandleManager()
     this._candles5m = new BitmexCandleManager()
 
@@ -285,14 +286,27 @@ class FlowDataBase {
     }, 5 * 60 * 1000)
   }
 
-  // 1小时K线数据
-  setCandles1hHistory(list, symbol) {
-    this._candles1h.setHistoryData(list, symbol)
+  // period : 1d 1h 5m
+  setCandlesHistory(list, symbol, period) {
+    const candleManager = this.getCandleManager(period)
+    candleManager.setHistoryData(list, symbol)
   }
 
-  // 5m
-  setCandles5mHistory(list, symbol) {
-    this._candles5m.setHistoryData(list, symbol)
+  updateTradeBin1d(json, symbol) {
+    const candleManager = this._candles1d
+    candleManager.update(json.data[0], symbol)
+    if (this._options.autoUpdateStopOpenMarketOrder1d) {
+      this.updateStopOpenOrderByLastCandle(symbol, candleManager)
+    }
+    // high1 low1
+    const highlow1Signal = this.candleManager.highlow1Signal(symbol)
+    if (highlow1Signal.high1) {
+      notifyPhone(`${symbol} 1d high 1`)
+      watchSignal(this, symbol, 'break1h', 'high1')
+    } else if (highlow1Signal.low1) {
+      notifyPhone(`${symbol} 1d low 1`)
+      watchSignal(this, symbol, 'break1h', 'low1')
+    }
   }
 
   updateTradeBin1h(json, symbol) {
@@ -584,6 +598,8 @@ class FlowDataBase {
         return this._candles5m
       case '1h':
         return this._candles1h
+      case '1d':
+        return this._candles1d
       default:
         break
     }
