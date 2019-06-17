@@ -1,6 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 import AutoOrderStopList from './AutoOrderStopList'
+import IndicatorValues from './IndicatorValues'
 
 import './index.css'
 
@@ -258,6 +259,7 @@ export default class Trade extends React.Component {
               </div>
               <AutoOrderStopList user={options.user} onPushLog={this.pushLog.bind(this)} />
               <hr />
+              <IndicatorValues />
               <div className="actions">
                 <div>
 
