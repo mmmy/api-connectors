@@ -666,6 +666,14 @@ Candles.prototype.getLastEMA = function (len) {
   return result && result[result.length - 1]
 }
 
+Candles.prototype.stochOverTradeSignal = function (len = 9, kLen = 3, theshold_bottom = 25, theshold_top = 75) {
+  const { d } = this.getLastStochKD(len, kLen) // d相当于tv中的k
+  return {
+    long: d < theshold_bottom, // over sold, should close short position
+    short: d > theshold_top,   // over bought, should close long position
+  }
+}
+
 // from price action
 // candle hight1 low1 signal
 Candles.prototype.highlow1Signal = function () {

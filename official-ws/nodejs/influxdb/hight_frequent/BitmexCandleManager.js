@@ -59,6 +59,10 @@ class BitmexCandleManager {
   getLastEMA(symbol, len) {
     return this._candles[symbol].getLastEMA(len)
   }
+
+  stochOverTradeSignal(symbol, len, kLen, theshold_bottom, theshold_top) {
+    return this._candles[symbol].stochOverTradeSignal(len, kLen, theshold_bottom, theshold_top)
+  }
 }
 
 module.exports = BitmexCandleManager

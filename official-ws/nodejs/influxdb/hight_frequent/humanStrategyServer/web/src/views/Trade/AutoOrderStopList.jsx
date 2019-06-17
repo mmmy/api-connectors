@@ -34,7 +34,7 @@ const SIGNALS = {
   'rsiDivergence_2575_1h': { operators: ['long', 'short'] },
   'rsiDivergence1h': { operators: ['long', 'short'] },
   // 'stochOverTrade5m': { operators: ['long', 'short'] },
-  // 'stochOverTrade1h': { operators: ['long', 'short'] },
+  'stochOverTrade_2575_1h': { operators: ['long', 'short'] },
   // 'stochDivergence5m': { operators: ['long', 'short'] },
   // 'stochDivergence1h': { operators: ['long', 'short'] },
   'break1h': { operators: ['high1', 'low1'], values: [{ key: 'times', defaultValue: 1 }] },

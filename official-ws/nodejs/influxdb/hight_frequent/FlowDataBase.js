@@ -37,7 +37,7 @@ class FlowDataBase {
       autoUpdateStopOpenMarketOrder1h: true,
 
       autoCloseStochOverTrade5m: false,
-      autoCloseStochOverTrade1h: false,
+      autoCloseStochOverTrade_2575_1h: false,
       autoCloseStochDivergence5m: false,
       autoCloseStochDivergence1h: false,
       autoCloseRsiOverTrade5m: false,
@@ -446,6 +446,20 @@ class FlowDataBase {
       watchSignal(this, symbol, 'macdDivergence1h', 'short')
 
       // notifyPhone(`${symbol} 1h MacdDepartSignal Short`)
+    }
+
+    // stoch
+    const stochOverTradeSignal_2575 = this._candles1h.stochOverTradeSignal(symbol, 9, 3, 25, 75)
+    if (stochOverTradeSignal_2575.long) {
+      if (this._options.autoCloseStochOverTrade_2575_1h) {
+        this.closeShortPositionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'stochOverTrade_2575_1h', 'long')
+    } else if (stochOverTradeSignal_2575.short) {
+      if (this._options.autoCloseStochOverTrade_2575_1h) {
+        this.closeLongPostionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'stochOverTrade_2575_1h', 'short')
     }
 
     this.caculateIndicatorAndCache(symbol, '1h')
