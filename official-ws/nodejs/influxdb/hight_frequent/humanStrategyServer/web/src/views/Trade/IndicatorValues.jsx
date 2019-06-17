@@ -104,7 +104,7 @@ export default class IndicatorValues extends React.Component {
       })
       if (status === 200) {
         this.setState({
-          data
+          data: data.data
         })
       }
     })
