@@ -645,8 +645,24 @@ Candles.prototype.calcStochKD = function (len, kLen) {
   return result
 }
 
+Candles.prototype.calcMEA = function (realTime, len) {
+  const klines = this.getCandles(realTime)
+  const result = signal.EMA(klines, len)
+  return result
+}
+
 Candles.prototype.getLastStochKD = function (len, kLen) {
   const result = this.calcStochKD(len, kLen)
+  return result && result[result.length - 1]
+}
+
+Candles.prototype.getLastRsi = function (len) {
+  const result = this.rsiSignal(false, len)
+  return result && result[result.length - 1]
+}
+
+Candles.prototype.getLastEMA = function (len) {
+  const result = this.calcMEA(false, len)
   return result && result[result.length - 1]
 }
 

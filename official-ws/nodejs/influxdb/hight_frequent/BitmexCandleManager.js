@@ -51,6 +51,14 @@ class BitmexCandleManager {
   getLastStochKD(symbol, len, kLen) {
     return this._candles[symbol].getLastStochKD(len, kLen)
   }
+
+  getLastRsi(symbol, len) {
+    return this._candles[symbol].getLastRsi(len)
+  }
+
+  getLastEMA(symbol, len) {
+    return this._candles[symbol].getLastEMA(len)
+  }
 }
 
 module.exports = BitmexCandleManager

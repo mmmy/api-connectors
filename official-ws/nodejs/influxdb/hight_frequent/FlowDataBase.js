@@ -675,6 +675,12 @@ class FlowDataBase {
     const candleManager = this.getCandleManager(period)
     const { k } = candleManager.getLastStochKD(symbol, 9, 3)
     this.cacheIndicator(symbol, period, 'stoch_k', k)
+
+    const rsi_8 = candleManager.getLastRsi(symbol, 8)
+    this.cacheIndicator(symbol, period, 'rsi', rsi_8)
+
+    const ema = candleManager.getLastEMA(symbol, 20)
+    this.cacheIndicator(symbol, period, 'ema', ema)
   }
 
   cacheIndicator(symbol, period, name, value) {

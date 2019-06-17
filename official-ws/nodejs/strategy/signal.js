@@ -6,6 +6,7 @@ var SMA = technicalindicators.SMA
 var PSAR = require('../lib/PSAR').PSAR
 var StochasticRsi = technicalindicators.StochasticRSI
 var Stochastic = technicalindicators.Stochastic
+var EMA = technicalindicators.EMA
 // var jStat = require('jStat')
 
 function parseKline(kline) {
@@ -118,6 +119,15 @@ exports.StochKD = function (kline, period = 9, signalPeriod = 3) {
         signalPeriod,
     })
     return result  //[{k, d}]
+}
+
+exports.EMA = function (kline, len = 20) {
+    const { T, O, H, L, C, V } = parseKline(kline)
+    var result = EMA.calculate({
+        values: C,
+        period: len,
+    })
+    return result
 }
 
 // 200条K线以上？？
