@@ -291,6 +291,7 @@ class FlowDataBase {
   setCandlesHistory(list, symbol, period) {
     const candleManager = this.getCandleManager(period)
     candleManager.setHistoryData(list, symbol)
+    this.caculateIndicatorAndCache(symbol, period)
   }
 
   updateTradeBin1d(json, symbol) {
@@ -308,6 +309,8 @@ class FlowDataBase {
       notifyPhone(`${symbol} 1d low 1`)
       watchSignal(this, symbol, 'break1h', 'low1')
     }
+
+    this.caculateIndicatorAndCache(symbol, '1d')
   }
 
   updateTradeBin1h(json, symbol) {
@@ -444,6 +447,8 @@ class FlowDataBase {
 
       // notifyPhone(`${symbol} 1h MacdDepartSignal Short`)
     }
+
+    this.caculateIndicatorAndCache(symbol, '1h')
   }
 
   updateTradeBin5m(json, symbol) {
@@ -516,6 +521,7 @@ class FlowDataBase {
 
       // notifyPhone(`${symbol} 5m MacdDepartSignal Short`)
     }
+    this.caculateIndicatorAndCache(symbol, '5m')
   }
 
   updateAccountOrder(json, symbol) {
