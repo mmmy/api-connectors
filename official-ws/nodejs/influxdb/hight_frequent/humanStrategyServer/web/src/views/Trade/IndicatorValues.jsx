@@ -45,7 +45,7 @@ export default class IndicatorValues extends React.Component {
   }
 
   componentDidMount() {
-
+    this.fetchIndicatorValues()
   }
 
   render() {
