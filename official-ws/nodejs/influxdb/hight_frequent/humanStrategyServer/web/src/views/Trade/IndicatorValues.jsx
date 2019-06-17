@@ -16,6 +16,25 @@ const INDICATORS = [
   }
 ]
 
+function formatValue(name, value) {
+  let cn = ''
+  switch (name) {
+    case 'stoch_k':
+      if (value > 80) {
+        cn = 'red'
+      } else if (value < 20) {
+        cn = 'green'
+      }
+      break
+    default:
+      break
+  }
+  if (value !== undefined) {
+    value = value.toFixed(2)
+  }
+  return <span className={cn}>{value}</span>
+}
+
 export default class IndicatorValues extends React.Component {
   constructor(props) {
     super(props)
@@ -64,7 +83,7 @@ export default class IndicatorValues extends React.Component {
                 const { period, indicators } = ind
                 const periodData = symbolData[period] || {}
                 indicators.forEach(indName => {
-                  valuesRow.push(<td>{periodData[indName]}</td>)
+                  valuesRow.push(<td>{formatValue(indName, periodData[indName])}</td>)
                 })
               })
               return <tr>{valuesRow}</tr>
