@@ -674,7 +674,7 @@ class FlowDataBase {
   caculateIndicatorAndCache(symbol, period) {
     const candleManager = this.getCandleManager(period)
     const { k } = candleManager.getLastStochKD(symbol, 9, 3)
-    this.cacheIndicator(symbol, period, 'soch_k', k)
+    this.cacheIndicator(symbol, period, 'stoch_k', k)
   }
 
   cacheIndicator(symbol, period, name, value) {
