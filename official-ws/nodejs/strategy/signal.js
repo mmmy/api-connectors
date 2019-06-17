@@ -5,6 +5,7 @@ var MACD = technicalindicators.MACD
 var SMA = technicalindicators.SMA
 var PSAR = require('../lib/PSAR').PSAR
 var StochasticRsi = technicalindicators.StochasticRSI
+var Stochastic = technicalindicators.Stochastic
 // var jStat = require('jStat')
 
 function parseKline(kline) {
@@ -42,7 +43,7 @@ exports.MacdSignal = function (kline) {
     return lastVs
 }
 
-exports.BBSignalSeries = function(kline) {
+exports.BBSignalSeries = function (kline) {
     const { T, O, H, L, C, V } = parseKline(kline)
     const result = BB.calculate({ period: 20, values: C, stdDev: 2 })
     const rLen = result.length
@@ -87,7 +88,7 @@ exports.BollingerBandsSignal = function (kline) {
     }
 }
 // 注意最好是200条k线以上
-exports.RSI = function (kline, len=14) {
+exports.RSI = function (kline, len = 14) {
     const { T, O, H, L, C, V } = parseKline(kline)
     var result = RSI.calculate({ values: C, period: len })
     const lastVs = result
@@ -95,7 +96,7 @@ exports.RSI = function (kline, len=14) {
     // console.log(result.slice(result.length - 10))
 }
 
-exports.StochasticRsi = function(kline, rsiPeriod=14, stochasticPeriod=14, kPeriod=3, dPeriod=3) {
+exports.StochasticRsi = function (kline, rsiPeriod = 14, stochasticPeriod = 14, kPeriod = 3, dPeriod = 3) {
     const { T, O, H, L, C, V } = parseKline(kline)
     var result = StochasticRsi.calculate({
         values: C,
@@ -107,8 +108,20 @@ exports.StochasticRsi = function(kline, rsiPeriod=14, stochasticPeriod=14, kPeri
     return result
 }
 
+exports.StochKD = function (kline, period = 9, signalPeriod = 3) {
+    const { T, O, H, L, C, V } = parseKline(kline)
+    var result = Stochastic.calculate({
+        high: H,
+        low: L,
+        close: C,
+        period,
+        signalPeriod,
+    })
+    return result  //[{k, d}]
+}
+
 // 200条K线以上？？
-exports.PasrSignal = function (kline, start=0.02, step=0.02, max=0.11) {
+exports.PasrSignal = function (kline, start = 0.02, step = 0.02, max = 0.11) {
     const { T, O, H, L, C, V } = parseKline(kline)
 
     const psar = new PSAR({ high: H, low: L, start, step, max }) // 0.11-0.13效果好
@@ -132,7 +145,7 @@ function SMA(kline, period) {
 }
 
 // fastLen: 20, slowLen: 20
-exports.SmaSignal = function(kline, fastLen, slowLen) {
+exports.SmaSignal = function (kline, fastLen, slowLen) {
     const { T, O, H, L, C, V } = parseKline(kline)
     const fastResult = SMA.calculate({ period: fastLen, values: C }).reverse()
     const slowResult = SMA.calculate({ period: slowLen, values: C }).reverse()
@@ -157,7 +170,7 @@ exports.SmaSignal = function(kline, fastLen, slowLen) {
     }
 }
 // 效率比上面高25%
-exports.SmaCross = function(kline, fastLen, slowLen) {
+exports.SmaCross = function (kline, fastLen, slowLen) {
     const dataLen = kline.length
     const startSlowIndex = dataLen - slowLen - 1
     const startFastIndex = dataLen - fastLen - 1
@@ -172,9 +185,9 @@ exports.SmaCross = function(kline, fastLen, slowLen) {
     }
     const lastClose = kline[dataLen - 1].close
     const slowMa1 = sumSlow / slowLen,
-          slowMa = (sumSlow - kline[dataLen - slowLen - 1].close + lastClose) / slowLen,
-          fastMa1 = sumFast / fastLen,
-          fastMa = (sumFast - kline[dataLen - fastLen - 1].close + lastClose) / fastLen
+        slowMa = (sumSlow - kline[dataLen - slowLen - 1].close + lastClose) / slowLen,
+        fastMa1 = sumFast / fastLen,
+        fastMa = (sumFast - kline[dataLen - fastLen - 1].close + lastClose) / fastLen
 
     return {
         goldCross: fastMa > slowMa && fastMa1 <= slowMa1,
@@ -198,13 +211,13 @@ function SmaValue(kline, smaLen) {
 exports.SmaValue = SmaValue
 
 // 判断价格(一般是close)是否在均线之上
-exports.PriceAboveSma = function(kline, smaLen) {
+exports.PriceAboveSma = function (kline, smaLen) {
     const { avg, lastClose } = SmaValue(kline, smaLen)
     return lastClose > avg
 }
 
 // 模仿TradingView barssince, list的length 一般100, true false list
-exports.barssince = function(list, long) {
+exports.barssince = function (list, long) {
     const len = list.length
     let index = -1
     for (var i = len - 1; i >= 0; i--) {
@@ -218,7 +231,7 @@ exports.barssince = function(list, long) {
     return len - index
 }
 // 最近第二次出现
-exports.barssince2 = function(list, long) {
+exports.barssince2 = function (list, long) {
     const len = list.length
     let index = -1
     let fisrtFond = false
@@ -238,7 +251,7 @@ exports.barssince2 = function(list, long) {
     return len - index
 }
 
-exports.highestLowestClose = function(kline, barsLen) {
+exports.highestLowestClose = function (kline, barsLen) {
     const len = kline.length
     const endIndex = len - barsLen
     let maxClose = kline[len - 1].close
@@ -254,7 +267,7 @@ exports.highestLowestClose = function(kline, barsLen) {
     }
 }
 
-exports.highestLowestHighLow = function(kline, barsLen) {
+exports.highestLowestHighLow = function (kline, barsLen) {
     const len = kline.length
     const endIndex = len - barsLen
     let maxHigh = kline[len - 1].high
@@ -271,7 +284,7 @@ exports.highestLowestHighLow = function(kline, barsLen) {
     }
 }
 // 弃用
-exports.canculateTopBottomPoints = function(kline, count) {
+exports.canculateTopBottomPoints = function (kline, count) {
     const len = kline.length
     // 高点确定的半径
     const searchR = 10
@@ -279,7 +292,7 @@ exports.canculateTopBottomPoints = function(kline, count) {
     let highestH
     let lowestL
     let offset = 0
-    for (var i=0; i<len; i++) {
+    for (var i = 0; i < len; i++) {
         const middleIndex = len - 1 - i
         if (middleIndex === 0) {
             break

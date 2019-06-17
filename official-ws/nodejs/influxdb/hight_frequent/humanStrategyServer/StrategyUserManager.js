@@ -239,4 +239,9 @@ module.exports = class StrategyUserManager {
     }
     return Promise.resolve(strategy.deleteAutoOrderSignal(index))
   }
+
+  getAllIndicatorValues() {
+    const mainStrategy = this.getMainStrategy()
+    return Promise.resolve(mainStrategy.getAllIndicatorValues())
+  }
 }

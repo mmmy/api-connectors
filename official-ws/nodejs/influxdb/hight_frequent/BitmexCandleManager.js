@@ -21,7 +21,7 @@ class BitmexCandleManager {
     this._candles[symbol].setHistoryData(list)
     return this._candles[symbol]
   }
-  
+
   initManagerIfNeed(symbol) {
     if (!this._candles[symbol]) {
       this._candles[symbol] = new Candles()
@@ -46,6 +46,10 @@ class BitmexCandleManager {
 
   highlow1Signal(symbol) {
     return this._candles[symbol].highlow1Signal()
+  }
+
+  getLastStochKD(symbol, len, kLen) {
+    return this._candles[symbol].getLastStochKD(len, kLen)
   }
 }
 

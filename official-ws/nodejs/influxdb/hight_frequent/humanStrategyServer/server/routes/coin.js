@@ -431,4 +431,18 @@ router.post('/delete_auto_order_signal', function (req, res) {
   })
 })
 
+router.get('/all_indicator_values', function (req, res, next) {
+  manager.getAllIndicatorValues().then(list => {
+    res.send({
+      result: true,
+      data: list
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
+    })
+  })
+})
+
 module.exports = router

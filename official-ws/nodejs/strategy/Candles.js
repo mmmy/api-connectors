@@ -155,7 +155,7 @@ Candles.prototype.rsiSignal = function (realTime, len) {
   // console.log('rsi', rsi)
   return rsis
 }
-Candles.prototype.rsiOverTradeSignal = function(realTime, len = 8, theshold_bottom = 20, theshold_top = 80) {
+Candles.prototype.rsiOverTradeSignal = function (realTime, len = 8, theshold_bottom = 20, theshold_top = 80) {
   const data = this.getCandles(realTime)
   const rsis = signal.RSI(data, len)
   const lastRsi = rsis[rsis.length - 1]
@@ -165,7 +165,7 @@ Candles.prototype.rsiOverTradeSignal = function(realTime, len = 8, theshold_bott
   }
 }
 // rsi divergence
-Candles.prototype.rsiDivergenceSignal = function(realTime, len = 8, divergenceLen = 24, theshold_bottom = 20, theshold_top = 80) {
+Candles.prototype.rsiDivergenceSignal = function (realTime, len = 8, divergenceLen = 24, theshold_bottom = 20, theshold_top = 80) {
   const data = this.getCandles(realTime)
   const rsis = signal.RSI(data, len)
   const rsisDivergence = rsis.slice(-divergenceLen - 1)
@@ -577,7 +577,7 @@ Candles.prototype.getLastHistoryClose = function () {
   return this._histories[this._histories.length - 1].close
 }
 // 从最后一个开始索引
-Candles.prototype.getHistoryCandle = function (bars=1) {
+Candles.prototype.getHistoryCandle = function (bars = 1) {
   return this._histories[this._histories.length - bars]
 }
 // 获取 _histories 的最后一个close
@@ -638,14 +638,26 @@ Candles.prototype.calcStochRsiSignal = function (rsiPeriod, stochasticPeriod, kP
 Candles.prototype.getStochRsiSignals = function () {
   return this._stochRsiSignals
 }
+
+Candles.prototype.calcStochKD = function (len, kLen) {
+  const klines = this.getCandles(false)
+  const result = signal.StochKD(klines, len, kLen)
+  return result
+}
+
+Candles.prototype.getLastStochKD = function (len, kLen) {
+  const result = this.calcStochKD(len, kLen)
+  return result && result[result.length - 1]
+}
+
 // from price action
 // candle hight1 low1 signal
-Candles.prototype.highlow1Signal = function() {
+Candles.prototype.highlow1Signal = function () {
   let high1 = false
   let low1 = false
   const c1 = this.getHistoryCandle(1),
-        c2 = this.getHistoryCandle(2),
-        c3 = this.getHistoryCandle(3)
+    c2 = this.getHistoryCandle(2),
+    c3 = this.getHistoryCandle(3)
   high1 = c1.high > c2.high && c2.high <= c3.high
   low1 = c1.low < c2.low && c2.low >= c3.low
   return {

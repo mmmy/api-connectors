@@ -81,6 +81,7 @@ class FlowDataBase {
     this._volumePerMinute = 0
 
     this._autoOrderSignals = []
+    this._indicatorCache = {}
   }
 
   getOptions() {
@@ -662,6 +663,20 @@ class FlowDataBase {
       return true
     }
     return false
+  }
+
+  caculateIndicatorAndCache(symbol, period) {
+    const candleManager = this.getCandleManager(period)
+    const { k } = candleManager.getLastStochKD(symbol, 9, 3)
+    this.cacheIndicator(symbol, period, 'soch_k', k)
+  }
+
+  cacheIndicator(symbol, period, name, value) {
+    _.set(this._indicatorCache, [symbol, period, name].join('.'), value)
+  }
+
+  getAllIndicatorValues() {
+    return this._indicatorCache
   }
 }
 
