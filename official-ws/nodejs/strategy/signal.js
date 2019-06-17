@@ -108,7 +108,7 @@ exports.StochasticRsi = function (kline, rsiPeriod = 14, stochasticPeriod = 14, 
     })
     return result
 }
-
+// 注意在tradingview中的k对应这里的d, sma(d, N)之后才是tradingview的d
 exports.StochKD = function (kline, period = 9, signalPeriod = 3) {
     const { T, O, H, L, C, V } = parseKline(kline)
     var result = Stochastic.calculate({
