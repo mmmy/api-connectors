@@ -310,6 +310,20 @@ class FlowDataBase {
       watchSignal(this, symbol, 'break1h', 'low1')
     }
 
+    // stoch
+    const stochOverTradeSignal_2575 = this.candleManager.stochOverTradeSignal(symbol, 9, 3, 25, 75)
+    if (stochOverTradeSignal_2575.long) {
+      if (this._options.autoCloseStochOverTrade_2575_1d) {
+        this.closeShortPositionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'stochOverTrade_2575_1d', 'long')
+    } else if (stochOverTradeSignal_2575.short) {
+      if (this._options.autoCloseStochOverTrade_2575_1d) {
+        this.closeLongPostionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'stochOverTrade_2575_1d', 'short')
+    }
+
     this.caculateIndicatorAndCache(symbol, '1d')
   }
 
@@ -535,6 +549,21 @@ class FlowDataBase {
 
       // notifyPhone(`${symbol} 5m MacdDepartSignal Short`)
     }
+
+    // stoch
+    const stochOverTradeSignal_2575 = this._candles5m.stochOverTradeSignal(symbol, 9, 3, 25, 75)
+    if (stochOverTradeSignal_2575.long) {
+      if (this._options.autoCloseStochOverTrade_2575_5m) {
+        this.closeShortPositionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'stochOverTrade_2575_5m', 'long')
+    } else if (stochOverTradeSignal_2575.short) {
+      if (this._options.autoCloseStochOverTrade_2575_5m) {
+        this.closeLongPostionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'stochOverTrade_2575_5m', 'short')
+    }
+
     this.caculateIndicatorAndCache(symbol, '5m')
   }
 

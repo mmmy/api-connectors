@@ -280,6 +280,7 @@ export default class Trade extends React.Component {
                       [
                         // 'autoCloseMacdDivergence5m',
                         // 'autoCloseMacdDivergence1h',                    
+                        'autoCloseStochOverTrade_2575_5m',
                         'autoCloseRsiOverTrade5m',
                         'autoCloseRsiDivergence5m',
                         'autoCloseStochOverTrade_2575_1h',
@@ -289,6 +290,7 @@ export default class Trade extends React.Component {
                         'autoCloseRsiDivergence_3070_1h',
                         'autoCloseRsiDivergence_2575_1h',
                         'autoCloseRsiDivergence1h',
+                        'autoCloseStochOverTrade_2575_1d',
                         // 'autoCloseStochOverTrade5m',
                         // 'autoCloseStochDivergence5m',
                         // 'autoCloseStochDivergence1h',
