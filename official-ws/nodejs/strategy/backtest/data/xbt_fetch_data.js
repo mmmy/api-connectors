@@ -39,7 +39,7 @@ async function requestData(params) {
 
 function sleep(sec) {
   return new Promise(resolve => {
-    setTimeout(() => {}, sec * 1000)
+    setTimeout(() => { }, sec * 1000)
   })
 }
 
@@ -88,7 +88,7 @@ async function run() {
     console.log('has no new data, exit')
   }
   let dataList = []
-  while(hasNewData) {
+  while (hasNewData) {
     const remains = Math.floor(remainBars(lastTimestamp, CONFIG.binSize))
     console.log('remain:', remains, 'request:', Math.ceil(remains / CONFIG.count))
     if (remains === 0) {
@@ -112,7 +112,7 @@ async function run() {
     hasNewData = len === CONFIG.count
     lastTimestamp = list[len - 1].timestamp
     dataList = dataList.concat(list)
-    if (dataList.length > 5E3) {
+    if (dataList.length > 2E3) {
       saveToFile(dataList)
       dataList = []
     }
@@ -125,5 +125,13 @@ async function run() {
   }
 }
 
-run()
+try {
+  run()
+} catch (e) {
+  console.log(e)
+  console.log('wait to restart')
+  setTimeout(() => {
+    run()
+  }, 10 * 1000)
+}
 // console.log(data)
