@@ -10,7 +10,7 @@ const JSONtoCSV = (arr, columns, delimiter = ',') =>
   ].join('\n');
 
 
-const arrayToCSV = (arr, delimiter=',') => {
+const arrayToCSV = (arr, delimiter = ',') => {
   return arr.map(item => item.join(delimiter)).join('\n')
 }
 // 統計
@@ -63,9 +63,27 @@ const statisticTrades = function (trades) {
   }
 }
 
+function findIndexByTime(data, time) {
+  const len = data.length
+  time = +new Date(time)
+  for (let i = 0; i < len; i++) {
+    const b = data[i]
+    if (+new Date(b.timestamp) === time) {
+      return i
+    }
+  }
+}
+
+function timeToSeries(data, list) {
+  return list.map(r => {
+    return r.map(t => typeof t === 'string' ? findIndexByTime(data, t) : t)
+  })
+}
+
 module.exports = {
   arrayToCSV,
   JSONtoCSV,
-  statisticTrades
+  statisticTrades,
+  timeToSeries
 }
 
