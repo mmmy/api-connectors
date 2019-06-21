@@ -13,6 +13,9 @@ class Account {
     this._minMaxPrices = {minP:null, maxP:null}
     this._bars = -1
     this._entryBars = -1
+
+    this._amount = 0
+    this._avgPrice = 0
   }
 
   order(bar, long) {
@@ -30,6 +33,48 @@ class Account {
       this.updateEntryBars()
     }
   }
+
+  orderMarket(price, bar, amount) {
+    const { timestamp, close, open, high, low } = bar
+    this._lastTradeTime = new Date(timestamp)
+    if (this._amount === 0) {
+      this._avgPrice = price
+      this._amount = amount
+      return
+    } else {
+      const nextAmount = this._amount + amount
+      // add postion
+      if (this._amount * amount > 0) {                         
+        this._avgPrice = (this._avgPrice * this._amount + price * amount) /  nextAmount
+        this._amount = nextAmount
+      // reduce postion
+      } else {
+        const closeAmount = Math.min(Math.abs(this._amount), Math.abs(amount))
+        let profit = 0
+        // close short
+        if (amount > 0) {
+          profit = closeAmount * (this._avgPrice - price)
+          // close short
+        } else {
+          profit = closeAmount * (price - this._avgPrice)
+        }
+        if (Math.abs(this._amount) <= Math.abs(amount)) {
+          this._avgPrice = price
+        }
+        const wined = profit > 0
+        this._amount = nextAmount
+        return {
+          wined,
+          profit,
+          timestamp,
+          amount,
+          postionAmount: this._amount,
+          price,
+        }
+      }
+    }
+  }
+
   updateMinMax(bar) {
     this._bars ++
     this._minMaxPrices.minP = Math.min(this._minMaxPrices.minP, bar.low)
@@ -44,22 +89,13 @@ class Account {
       this._entryBars = this._bars
     }
   }
-  // 暂时无用
-  exit(profit, loss, bar) {
-    if (this._hasPosition) {
-      const long = this._long
-      const profitPrice = this._price + (long ? profit : -profit)
-      const lossPrice = this._price + (long ? loss : -loss)
-      const lossed = long ? (low <= lossPrice) : (low >= lossPrice)
-      const wined = long ? (high > profitPrice) : (high < profitPrice)
-      if (lossed || wined) {
-        return this.liquidation(wined ? profitPrice : lossPrice, bar)
-      }
-    }
-  }
 
   close(bar) {
     return this.liquidation(bar.close, bar)
+  }
+
+  closeMarket(bar) {
+    return this.orderMarket(bar.close, bar, -this.getPostionAmount())
   }
 
   liquidation(price, bar) {
@@ -122,7 +158,11 @@ class Account {
   }
 
   hasPosition() {
-    return this._hasPosition
+    return this._amount !== 0
+  }
+
+  getPostionAmount () {
+    return this._amount
   }
 }
 

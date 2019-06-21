@@ -12,6 +12,9 @@ class BackTest {
     this._accout = new Account(this._options['account'])
     this._periods = ['1m', '5m', '1h', '1d']
     this._candles = {}
+    this._highsToBuy = { ordring: false, remains: 0 }  // 高N买
+    this._lowsToSell = { ordring: false, remains: 0 }   // 低N卖
+    this._onUpdateBar = {}
     this.initCandles()
 
   }
@@ -29,6 +32,26 @@ class BackTest {
     })
   }
 
+  hasStopOpenOrder() {
+    return this._highsToBuy.ordring || this._lowsToSell.ordering
+  }
+
+  startBuyHigh(times = 1) {
+    if (this._highsToBuy.ordring) {
+      console.warn('this._highsToBuy.ordering = true')
+    }
+    this._highsToBuy.ordering = true
+    this._highsToBuy.remains = times
+  }
+
+  startSellLow(times = 1) {
+    if (this._lowsToSell.ordring) {
+      console.warn('this._lowsToSell.ordering = true')
+    }
+    this._lowsToSell.ordering = true
+    this._lowsToSell.remains = times
+  }
+
   setCandleHistory(period, list) {
     this._candles[period].setHistoryData(list)
   }
@@ -37,6 +60,8 @@ class BackTest {
     // console.log('updateCandleLastHistory', period, data)
     this._candles[period].updateLastHistory(data)
     this._candles[period].checkData()
+    const cb = this._onUpdateBar[period]
+    cb && cb(data)
   }
 
   setStrategy(strategy) {
@@ -45,6 +70,10 @@ class BackTest {
 
   entry(bar, long) {
     this._accout.order(bar, long)
+  }
+
+  orderStop(bar, long) {
+    this._accout.orderStop(bar, long)
   }
 
   readBar(bar) {

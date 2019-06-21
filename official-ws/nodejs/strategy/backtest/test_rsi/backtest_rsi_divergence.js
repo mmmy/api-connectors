@@ -32,7 +32,7 @@ function testRange(orangeData, indexRange) {
     if (i % 1000 === 0) {
       console.log(i)
     }
-    manager.readBar(bar)
+    // manager.readBar(bar)
     manager.updateCandleLastHistory('5m', bar)
   }
 }
