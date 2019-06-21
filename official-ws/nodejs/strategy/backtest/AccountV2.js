@@ -63,7 +63,9 @@ class Account {
         }
         const wined = profit > 0
         this._amount = nextAmount
+        console.log(timestamp, profit)
         return {
+          touched: true,
           wined,
           profit,
           timestamp,

@@ -12,8 +12,8 @@ class BackTest {
     this._accout = new Account(this._options['account'])
     this._periods = ['1m', '5m', '1h', '1d']
     this._candles = {}
-    this._highsToBuy = { ordring: false, remains: 0 }  // 高N买
-    this._lowsToSell = { ordring: false, remains: 0 }   // 低N卖
+    this._highsToBuy = { ordering: false, remains: 0 }  // 高N买
+    this._lowsToSell = { ordering: false, remains: 0 }   // 低N卖
     this._onUpdateBar = {}
     this.initCandles()
 
@@ -33,11 +33,11 @@ class BackTest {
   }
 
   hasStopOpenOrder() {
-    return this._highsToBuy.ordring || this._lowsToSell.ordering
+    return this._highsToBuy.ordering || this._lowsToSell.ordering
   }
 
   startBuyHigh(times = 1) {
-    if (this._highsToBuy.ordring) {
+    if (this._highsToBuy.ordering) {
       console.warn('this._highsToBuy.ordering = true')
     }
     this._highsToBuy.ordering = true
@@ -45,7 +45,7 @@ class BackTest {
   }
 
   startSellLow(times = 1) {
-    if (this._lowsToSell.ordring) {
+    if (this._lowsToSell.ordering) {
       console.warn('this._lowsToSell.ordering = true')
     }
     this._lowsToSell.ordering = true

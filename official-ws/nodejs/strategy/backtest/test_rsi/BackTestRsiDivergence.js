@@ -36,13 +36,13 @@ class BackTestRsiDivergence extends BackTest {
 
       const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 10, 24, 20, 83)
 
-      // 设置中禁止做空
       const disableShort = this._options.disableShort
       const disableLong = this._options.disableLong
       if (
         !disableLong &&
         rsiDivergenceSignal.long
       ) {
+        // console.log(bar.timestamp, bar.close)
         long = true
       } else if (
         !disableShort &&
@@ -60,7 +60,7 @@ class BackTestRsiDivergence extends BackTest {
 
     this._closeSignal = () => {
       const candleManager5m = this.getCandleByPeriod('5m')
-      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 10, 24, 30, 70)
+      const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 30, 70)
       return rsiDivergenceSignal
     }
 
@@ -68,22 +68,24 @@ class BackTestRsiDivergence extends BackTest {
   }
 
   readBar5m(bar) {
+    // const signal = this._strategy(bar, this._candles)
+    // return
     const hasStopOpenOrder = this.hasStopOpenOrder()
     if (hasStopOpenOrder) {
-      if (this._highsToBuy.ordring && this.isHigh1('5m')) {
+      if (this._highsToBuy.ordering && this.isHigh1('5m')) {
         if (this._highsToBuy.remains === 1) {
           // has bought
           this.orderMarketPrevHighLow('5m', bar, 1)
-          this._highsToBuy.ordring = false
+          this._highsToBuy.ordering = false
         } else {
           this._highsToBuy.remains = this._highsToBuy.remains - 1
         }
       }
-      if (this._lowsToSell.ordring && this.isLow1('5m')) {
+      if (this._lowsToSell.ordering && this.isLow1('5m')) {
         if (this._lowsToSell.remains === 1) {
           // has bought
           this.orderMarketPrevHighLow('5m', bar, -1)
-          this._lowsToSell.ordring = false
+          this._lowsToSell.ordering = false
         } else {
           this._lowsToSell.remains = this._lowsToSell.remains - 1
         }
@@ -100,13 +102,13 @@ class BackTestRsiDivergence extends BackTest {
       } else {
         // close trade
         const closeSignal = this._closeSignal(bar, this._candles)
-        if (closeSignal.long && this._accout.getPostionAmount() > 0) {
+        if (closeSignal.long && this._accout.getPostionAmount() < 0) {
           const result = this._accout.closeMarket(bar)
           if (result) {
             this._tradeHistory.push(result)
           }
         }
-        if (closeSignal.short && this._accout.getPostionAmount() < 0) {
+        if (closeSignal.short && this._accout.getPostionAmount() > 0) {
           const result = this._accout.closeMarket(bar)
           if (result) {
             this._tradeHistory.push(result)
