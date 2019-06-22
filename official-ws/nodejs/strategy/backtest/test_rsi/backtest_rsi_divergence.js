@@ -16,7 +16,8 @@ const manager = new BackTestManager()
 
 manager.addNewStrategy(new TestStrategy({
   id: 'rsi_divergence',
-  disableShort: true,
+  // disableShort: true,
+  disableLong: true
 }))
 
 function testRange(orangeData, indexRange) {

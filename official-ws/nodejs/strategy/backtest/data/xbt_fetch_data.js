@@ -2,10 +2,13 @@ const fs = require('fs')
 const BitmexSdk = require('../../bitmexSdk')
 const path = require('path')
 
+const BinSize = '1d'
+
 const sizeToMilSec = {
   '1m': 60 * 1000,
   '5m': 5 * 60 * 1000,
-  '1h': 3600 * 1000
+  '1h': 3600 * 1000,
+  '1d': 24 * 3600 * 1000
 }
 
 function remainBars(lastTime, binSize) {
@@ -31,7 +34,7 @@ async function requestData(params) {
   const json = await BitmexSdk.getTradeHistory(params)
   const dataList = JSON.parse(json)
   if (Array.isArray(dataList)) {
-    return dataList.reverse()
+    return params.reverse ? dataList.reverse() : dataList
   } else {
     throw dataList
   }
@@ -52,6 +55,20 @@ const CONFIG = {
   binSize: '5m',
   startDate: '2017-09-01',
   columns: ['timestamp', 'open', 'high', 'low', 'close', 'volume'],
+  reverse: true,
+}
+
+if (BinSize === '1h') {
+  CONFIG.binSize = BinSize
+  CONFIG.startDate = '2017-06-01'
+  CONFIG.count = 100
+}
+
+if (BinSize === '1d') {
+  CONFIG.binSize = BinSize
+  CONFIG.startDate = '2017-04-01'
+  CONFIG.count = 10
+  CONFIG.reverse = false
 }
 
 const fileName = `${CONFIG.prefix}${CONFIG.symbol}_${CONFIG.binSize}_${CONFIG.startDate}.csv`
@@ -83,6 +100,12 @@ function saveToFile(list) {
 
 async function run() {
   let offset = 3540300000
+  if (BinSize === '1h') {
+    offset = 42843600000
+  }
+  if (BinSize === '1d') {
+    offset = 0
+  }
   let hasNewData = new Date(lastTimestamp) < (new Date() - sizeToMilSec[CONFIG.binSize])
   if (!hasNewData) {
     console.log('has no new data, exit')
@@ -96,13 +119,20 @@ async function run() {
       break
     }
     let startTime = new Date(new Date(lastTimestamp) - offset + sizeToMilSec[CONFIG.binSize]).toISOString()
-    const list = await requestData({
-      symbol: CONFIG.symbol,
-      binSize: CONFIG.binSize,
-      count: CONFIG.count,
-      reverse: true,
-      startTime
-    })
+    let list = []
+    try {
+      list = await requestData({
+        symbol: CONFIG.symbol,
+        binSize: CONFIG.binSize,
+        count: CONFIG.count,
+        reverse: CONFIG.reverse,
+        startTime
+      })
+    } catch(e) {
+      console.log(e)
+      console.log('continue...')
+      continue
+    }
     const len = list.length
     if (len === 0) {
       console.log('data len is 0, finished')
@@ -112,7 +142,7 @@ async function run() {
     hasNewData = len === CONFIG.count
     lastTimestamp = list[len - 1].timestamp
     dataList = dataList.concat(list)
-    if (dataList.length > 2E3) {
+    if (dataList.length > (BinSize === '1d' ? 50 : 5E2)) {
       saveToFile(dataList)
       dataList = []
     }
@@ -125,13 +155,6 @@ async function run() {
   }
 }
 
-try {
-  run()
-} catch (e) {
-  console.log(e)
-  console.log('wait to restart')
-  setTimeout(() => {
-    run()
-  }, 10 * 1000)
-}
+run()
+
 // console.log(data)
