@@ -9,21 +9,79 @@ const timeToSeries = require('../utils').timeToSeries
 
 const JSONtoCSV = require('../utils').JSONtoCSV
 
-var xbt5m = require('../data/xbt5m')
-var len = xbt5m.length
+const { getXBTUSD5mData, getXBTUSD1hData, getXBTUSD1dData } = require('../data/xbt5m')
+const xbt5m = getXBTUSD5mData()
+const xbt1h = getXBTUSD1hData()
+const xbt1d = getXBTUSD1dData()
 
 const manager = new BackTestManager()
 
 manager.addNewStrategy(new TestStrategy({
-  id: 'rsi_divergence',
+  id: 'rsi_divergence_width_filter',
   // disableShort: true,
   disableLong: true
 }))
 
+let DataIndex =  {
+  '1h': 0,
+  '1d': 0,
+}
+function setHourHistoryData(curTime, period) {
+  let data = null
+  let lastHourTime = ''
+  if (period === '1h') {
+    data = xbt1h
+    lastHourTime = curTime.replace(/\d\d:\d\d\..*Z/g, '00:00.000Z')
+  } else if (period === '1d') {
+    data = xbt1d
+    lastHourTime = curTime.replace(/\d\d:\d\d:\d\d\..*Z/g, '00:00:00.000Z')
+  }
+  const len = data.length
+ 
+  for (let i=0; i<len-1; i++) {
+    const nextd = data[i + 1]
+    if (nextd.timestamp === lastHourTime) {
+      DataIndex[period] = i
+      manager.setCandleHistory(period, data.slice(i - 90, i))
+      break
+    }
+  }
+}
+
+function pushHistoryDataIfNeed(curTime, period, cb) {
+  curTime = new Date(curTime)
+  let data = null
+  let timePassedToUpdate = 3600000
+  if (period === '1h') {
+    data = xbt1h
+    timePassedToUpdate = 3600000
+  } else if (period === '1d') {
+    data = xbt1d
+    timePassedToUpdate = 3600000 * 24
+  }
+  // 1h
+  const listDataTime = new Date(data[DataIndex[period]].timestamp)
+  const timePassed = curTime - listDataTime
+  // asserts
+  if (timePassed < timePassedToUpdate || timePassed > timePassedToUpdate * 2) {
+    throw `wrong time to push hour data ${curTime} - ${listDataTime}`
+  }
+  if (timePassed === timePassedToUpdate * 2) {
+    manager.updateCandleLastHistory(period, data[DataIndex[period]])
+    DataIndex[period] = DataIndex[period] + 1
+    cb && cb()
+  }
+}
+
 function testRange(orangeData, indexRange) {
   const startIndex = indexRange[0]
+  const startTime = orangeData[startIndex].timestamp
   const endIndex = indexRange[1] || orangeData.length
   manager.setCandleHistory('5m', orangeData.slice(startIndex - 380, startIndex))
+  
+  setHourHistoryData(startTime, '1h')
+  setHourHistoryData(startTime, '1d')
+
   for (let i = startIndex; i < endIndex; i++) {
     const bar = orangeData[i]
     // progress.tick();
@@ -35,6 +93,9 @@ function testRange(orangeData, indexRange) {
     }
     // manager.readBar(bar)
     manager.updateCandleLastHistory('5m', bar)
+    pushHistoryDataIfNeed(bar.timestamp, '1h', () => {
+      pushHistoryDataIfNeed(bar.timestamp, '1d')
+    })
   }
 }
 

@@ -43,12 +43,18 @@ class BackTestRsiDivergence extends BackTest {
         rsiDivergenceSignal.long
       ) {
         // console.log(bar.timestamp, bar.close)
-        long = true
+        const trendSignal = this.get1dMacdTrendSignal()
+        if (trendSignal.long) {
+          long = true
+        }
       } else if (
         !disableShort &&
         rsiDivergenceSignal.short
       ) {
-        short = true
+        const trendSignal = this.get1dMacdTrendSignal()
+        if (trendSignal.short) {
+          short = true
+        }
       }
       let strategyPrice = null
 
@@ -146,6 +152,12 @@ class BackTestRsiDivergence extends BackTest {
 
   getHistoryCandleByPeriod(period, bars) {
     return this.getCandleByPeriod(period).getHistoryCandle(bars)
+  }
+
+  get1dMacdTrendSignal() {
+    const candleManager = this._candles['1d']
+    const macdTrendSignal = candleManager.macdTrendSignal(false)
+    return macdTrendSignal
   }
 }
 
