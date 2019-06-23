@@ -17,7 +17,7 @@ const xbt1d = getXBTUSD1dData()
 const manager = new BackTestManager()
 
 manager.addNewStrategy(new TestStrategy({
-  id: 'rsi_divergence_width_filter',
+  id: 'rsi_divergence_width_filter_1h',
   // disableShort: true,
   disableLong: true
 }))

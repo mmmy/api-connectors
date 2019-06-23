@@ -43,16 +43,19 @@ class BackTestRsiDivergence extends BackTest {
         rsiDivergenceSignal.long
       ) {
         // console.log(bar.timestamp, bar.close)
-        const trendSignal = this.get1dMacdTrendSignal()
-        if (trendSignal.long) {
+        // const trendSignal = this.get1dMacdTrendSignal()
+        const filterS = this.getMacdDepartSignal('1h')
+        if (filterS.long) {
           long = true
         }
       } else if (
         !disableShort &&
         rsiDivergenceSignal.short
       ) {
-        const trendSignal = this.get1dMacdTrendSignal()
-        if (trendSignal.short) {
+        // const trendSignal = this.get1dMacdTrendSignal()
+        const filterS = this.getMacdDepartSignal('1h')
+        if (filterS.short) {
+        // if (trendSignal.short) {
           short = true
         }
       }
@@ -158,6 +161,12 @@ class BackTestRsiDivergence extends BackTest {
     const candleManager = this._candles['1d']
     const macdTrendSignal = candleManager.macdTrendSignal(false)
     return macdTrendSignal
+  }
+
+  getMacdDepartSignal(period) {
+    const candleManager = this._candles[period]
+    const signal = candleManager.macdDepartSignal(false)
+    return signal
   }
 }
 
