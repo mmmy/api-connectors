@@ -301,7 +301,7 @@ class FlowDataBase {
       this.updateStopOpenOrderByLastCandle(symbol, candleManager)
     }
     // high1 low1
-    const highlow1Signal = this.candleManager.highlow1Signal(symbol)
+    const highlow1Signal = candleManager.highlow1Signal(symbol)
     if (highlow1Signal.high1) {
       notifyPhone(`${symbol} 1d high 1`)
       watchSignal(this, symbol, 'break1h', 'high1')
