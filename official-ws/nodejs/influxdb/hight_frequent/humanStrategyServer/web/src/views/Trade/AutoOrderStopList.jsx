@@ -28,6 +28,7 @@ const SIGNALS = {
   'stochOverTrade_2575_5m': { operators: ['long', 'short'] },
   'rsiOverTrade5m': { operators: ['long', 'short'] },
   'rsiDivergence5m': { operators: ['long', 'short'] },
+  'stochOverTrade_3070_1h': { operators: ['long', 'short'] },
   'stochOverTrade_2575_1h': { operators: ['long', 'short'] },
   'rsiOverTrade_3070_1h': { operators: ['long', 'short'] },
   'rsiOverTrade_2575_1h': { operators: ['long', 'short'] },
@@ -38,7 +39,7 @@ const SIGNALS = {
   // 'stochOverTrade5m': { operators: ['long', 'short'] },
   // 'stochDivergence5m': { operators: ['long', 'short'] },
   // 'stochDivergence1h': { operators: ['long', 'short'] },
-  'stochOverTrade_2575_1d': { operators: ['long', 'short'] },
+  'stochOverTrade_3070_1d': { operators: ['long', 'short'] },
   'break1h': { operators: ['high1', 'low1'], values: [{ key: 'times', defaultValue: 1 }] },
   'break5m': { operators: ['high1', 'low1'], values: [{ key: 'times', defaultValue: 1 }] },
 }

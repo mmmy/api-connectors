@@ -38,6 +38,7 @@ class FlowDataBase {
 
       autoCloseStochOverTrade5m: false,
       autoCloseStochOverTrade_2575_1h: false,
+      autoCloseStochOverTrade_3070_1h: false,
       autoCloseStochDivergence5m: false,
       autoCloseStochDivergence1h: false,
       autoCloseRsiOverTrade5m: false,
@@ -87,7 +88,7 @@ class FlowDataBase {
         order_method: "stopMarket1h",
         remain_times: 0,
         side: "Buy",
-        signal_name: "stochOverTrade_2575_1h",
+        signal_name: "stochOverTrade_3070_1h",
         signal_operator: "long",
         signal_value: "",
         symbol: "XBTUSD",
@@ -486,6 +487,19 @@ class FlowDataBase {
         this.closeLongPostionIfHave(symbol)
       }
       watchSignal(this, symbol, 'stochOverTrade_2575_1h', 'short')
+    }
+
+    const stochOverTradeSignal_3070 = this._candles1h.stochOverTradeSignal(symbol, 9, 3, 30, 70)
+    if (stochOverTradeSignal_3070.long) {
+      if (this._options.autoCloseStochOverTrade_3070_1h) {
+        this.closeShortPositionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'stochOverTrade_3070_1h', 'long')
+    } else if (stochOverTradeSignal_3070.short) {
+      if (this._options.autoCloseStochOverTrade_3070_1h) {
+        this.closeLongPostionIfHave(symbol)
+      }
+      watchSignal(this, symbol, 'stochOverTrade_3070_1h', 'short')
     }
 
     this.caculateIndicatorAndCache(symbol, '1h')
