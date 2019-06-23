@@ -80,7 +80,19 @@ class FlowDataBase {
     this._volume24h = 0
     this._volumePerMinute = 0
 
-    this._autoOrderSignals = []
+    this._autoOrderSignals = [
+      {
+        amount: 1000,
+        min_interval: 8,// 重复触发至少间隔时间8小时
+        order_method: "stopMarket1h",
+        remain_times: 0,
+        side: "Buy",
+        signal_name: "stochOverTrade_2575_1h",
+        signal_operator: "long",
+        signal_value: "",
+        symbol: "XBTUSD",
+      }
+    ]
     this._indicatorCache = {}
   }
 
