@@ -63,8 +63,10 @@ class BackTestRsiDivergence extends BackTest {
         // const filterS = this.getMacdDepartSignal('1h')
         // if (filterS.short) {
         // if (trendSignal.short) {
+        if (!mainCandle.isCurrentHighestLowestClose(true, 300)) {
+
           short = true
-        // }
+        }
       }
       let strategyPrice = null
 
