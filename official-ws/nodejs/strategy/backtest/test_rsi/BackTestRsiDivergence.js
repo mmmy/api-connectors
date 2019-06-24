@@ -32,6 +32,7 @@ class BackTestRsiDivergence extends BackTest {
       let long = false
       let short = false
       const _5mCandle = candles['5m']
+      const _1hCandle = candles['1h']
       let mainCandle = _5mCandle
 
       const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 10, 24, 20, 83)
@@ -44,8 +45,14 @@ class BackTestRsiDivergence extends BackTest {
       ) {
         // console.log(bar.timestamp, bar.close)
         // const trendSignal = this.get1dMacdTrendSignal()
-        const filterS = this.getMacdDepartSignal('1h')
-        if (filterS.long) {
+        // const filterS = this.getMacdDepartSignal('1h')
+        // if (filterS.long) {
+
+        // 这个很牛逼
+        // if (!mainCandle.isCurrentHighestLowestClose(false, 300)) {
+        //   long = true
+        // }
+        if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
           long = true
         }
       } else if (
@@ -53,11 +60,11 @@ class BackTestRsiDivergence extends BackTest {
         rsiDivergenceSignal.short
       ) {
         // const trendSignal = this.get1dMacdTrendSignal()
-        const filterS = this.getMacdDepartSignal('1h')
-        if (filterS.short) {
+        // const filterS = this.getMacdDepartSignal('1h')
+        // if (filterS.short) {
         // if (trendSignal.short) {
           short = true
-        }
+        // }
       }
       let strategyPrice = null
 
