@@ -51,13 +51,23 @@ export default class Trade extends React.Component {
       list_pending: false,
       all_quotes: [],
       all_instruments: [],
+      name: '',
     }
   }
 
   componentDidMount() {
-    this.fetchUserList()
-    this.fetchOrderbookDepth()
-    this.fetchAllInstruments()
+    if (window.location.pathname === '/u' && window.location.search) {
+      const name = window.location.search.split('?n=')[1]
+      if (name) {
+        this.setState({
+          name
+        }, () => {
+          this.fetchUserList()
+          this.fetchOrderbookDepth()
+          this.fetchAllInstruments()
+        })
+      }
+    }
   }
 
   render() {
@@ -371,7 +381,7 @@ export default class Trade extends React.Component {
     this.setState({
       list_pending: true
     })
-    axios.get('/api/coin').then(({ data, status }) => {
+    axios.get(`/api/coin?user=${this.state.name}`).then(({ data, status }) => {
       if (status === 200 && data.result) {
         this.setState({
           users: data.items.map(item => {

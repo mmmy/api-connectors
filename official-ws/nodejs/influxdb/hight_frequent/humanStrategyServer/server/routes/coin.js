@@ -4,9 +4,10 @@ const manager = require('../strategy')
 
 // return user list
 router.get('/', function (req, res, next) {
+  const { user } = req.query
   res.send({
     result: true,
-    items: manager.getAllUsersAccount()
+    items: manager.getUserData(user)
   })
 });
 

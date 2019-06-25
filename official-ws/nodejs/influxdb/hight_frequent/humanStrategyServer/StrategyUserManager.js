@@ -32,6 +32,10 @@ module.exports = class StrategyUserManager {
     return newStrategy
   }
 
+  getUserData(user) {
+    return this.getAllUsersAccount().filter(item => item.options.user === user)
+  }
+
   getAllUsersAccount() {
     const users = this._list.map(strategy => {
       const options = strategy.getOptions()
