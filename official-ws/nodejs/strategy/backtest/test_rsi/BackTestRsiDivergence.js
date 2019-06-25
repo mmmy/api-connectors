@@ -49,12 +49,12 @@ class BackTestRsiDivergence extends BackTest {
         // if (filterS.long) {
 
         // 这个很牛逼
-        // if (!mainCandle.isCurrentHighestLowestClose(false, 300)) {
-        //   long = true
-        // }
-        if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
+        if (!mainCandle.isCurrentHighestLowestClose(false, 300)) {
           long = true
         }
+        // if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
+        //   long = true
+        // }
       } else if (
         !disableShort &&
         rsiDivergenceSignal.short

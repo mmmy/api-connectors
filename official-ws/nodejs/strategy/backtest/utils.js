@@ -28,7 +28,7 @@ const statisticTrades = function (trades) {
   let sumMinute = 0
   let backList = [0]
   touchedTrades.forEach((t, i) => {
-    const { wined, minute, profit } = t
+    const { wined, minute, profit, price } = t
     if (wined) {
       wins++
     }
@@ -42,8 +42,9 @@ const statisticTrades = function (trades) {
       backList.push(back)
     }
     tradeEarnList.push({
-      st: t.startTime && new Date(t.startTime).toISOString(),
+      st: (t.startTime || t.timestamp) && new Date(t.startTime || t.timestamp).toISOString(),
       pf: netProfit,
+      pfp: profit / price,
       bk: backList[backList.length - 1] || 0,
     })
   })
