@@ -36,7 +36,7 @@ class BackTestRsiDivergence extends BackTest {
       const _1dCandle = candles['1d']
       let mainCandle = _5mCandle
 
-      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 10, 24, 25, 83)
+      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 12, 10, 25, 83)
 
       const disableShort = this._options.disableShort
       const disableLong = this._options.disableLong

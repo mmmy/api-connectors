@@ -18,7 +18,7 @@ const manager = new BackTestManager()
 
 manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
-  id: 'rsi_divergence25_gaobodong_width_filter_not_highestlowest_300_5m_long',
+  id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
   disableShort: true,
   // disableLong: true
 }))
