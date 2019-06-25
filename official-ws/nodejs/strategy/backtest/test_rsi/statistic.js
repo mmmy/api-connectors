@@ -57,7 +57,7 @@ dataList.map((t, i) => {
   const newTrades = trades// filterTradesBars(trades)
   const statistic = statisticTrades(newTrades)
   console.log(statistic)
-  const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk'])
+  const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk', 'pfp'])
   fs.writeFileSync(savePath, dataToCsv)
 })
 
