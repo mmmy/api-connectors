@@ -690,4 +690,12 @@ Candles.prototype.highlow1Signal = function () {
   }
 }
 
+Candles.prototype.isAdxHigh = function(len = 14) {
+  const klines = this.getCandles(false)
+  const result = signal.ADXSignal(klines, len = 14)
+  const d0 = result[result.length - 1]
+  const { adx, mdi, pdi } = d0
+  return adx > mdi && adx > pdi
+}
+
 module.exports = Candles

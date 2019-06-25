@@ -7,6 +7,7 @@ var PSAR = require('../lib/PSAR').PSAR
 var StochasticRsi = technicalindicators.StochasticRSI
 var Stochastic = technicalindicators.Stochastic
 var EMA = technicalindicators.EMA
+var ADX = technicalindicators.ADX
 // var jStat = require('jStat')
 
 function parseKline(kline) {
@@ -28,6 +29,17 @@ function parseKline(kline) {
     })
 
     return { T, O, H, L, C, V }
+}
+
+//[{ adx, mdi, pdi }]
+exports.ADXSignal = function(kline, len = 14) {
+    const { C, H, L } = parseKline(kline)
+    return ADX.calculate({
+        close: C,
+        high: H,
+        low: L,
+        period: len,
+    })
 }
 // [{MACD: ,histogram: , signal: }]
 exports.MacdSignal = function (kline) {
