@@ -127,7 +127,7 @@ allTrades.map((t, i) => {
   const { id, statistic } = t
   const saveName = `rsi_divergence_result_${id || (i + 1)}.csv`
   const savePath = path.join(__dirname, saveName)
-  const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk'])
+  const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk', 'pfp'])
   fs.writeFileSync(savePath, dataToCsv)
 })
 

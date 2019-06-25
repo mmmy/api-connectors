@@ -690,6 +690,15 @@ Candles.prototype.highlow1Signal = function () {
   }
 }
 
+Candles.prototype.isAdxLong = function(len = 14, gaobodong=false) {
+  const klines = this.getCandles(false)
+  const result = signal.ADXSignal(klines, len = 14)
+  const d0 = result[result.length - 1]
+  const { adx, mdi, pdi } = d0
+  const bodong = adx > mdi && adx > pdi
+  return gaobodong ? (bodong && (pdi >= mdi)) : (pdi >= mdi)
+}
+
 Candles.prototype.isAdxHigh = function(len = 14) {
   const klines = this.getCandles(false)
   const result = signal.ADXSignal(klines, len = 14)
