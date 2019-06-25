@@ -36,7 +36,7 @@ class BackTestRsiDivergence extends BackTest {
       const _1dCandle = candles['1d']
       let mainCandle = _5mCandle
 
-      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 10, 24, 25, 83)
+      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 10, 24, 20, 83)
 
       const disableShort = this._options.disableShort
       const disableLong = this._options.disableLong
@@ -44,7 +44,7 @@ class BackTestRsiDivergence extends BackTest {
         !disableLong &&
         rsiDivergenceSignal.long
       ) {
-        const isHighBoDong = _1dCandle.isAdxLong(8, true)
+        const isHighBoDong = _1dCandle.isAdxHigh(8)
         // console.log(bar.timestamp, bar.close)
         // const trendSignal = this.get1dMacdTrendSignal()
         // const filterS = this.getMacdDepartSignal('1h')
