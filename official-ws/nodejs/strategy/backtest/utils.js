@@ -42,7 +42,7 @@ const statisticTrades = function (trades) {
       backList.push(back)
     }
     tradeEarnList.push({
-      st: t.startTime && new Date(t.startTime).toISOString(),
+      st: (t.startTime || t.timestamp) && new Date(t.startTime || t.timestamp).toISOString(),
       pf: netProfit,
       bk: backList[backList.length - 1] || 0,
     })

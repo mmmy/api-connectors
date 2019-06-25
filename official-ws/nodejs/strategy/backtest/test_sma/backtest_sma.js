@@ -21,7 +21,7 @@ const defaultPriceFilter = {
 }
 const manager = new BackTestManager()
 manager.addNewStrategy(new BackTestSma({
-  id: 'p8090l200',
+  id: 'p8090l200-2019',
   account: {
     loss: -30,
     profit: 37,
@@ -38,7 +38,7 @@ manager.addNewStrategy(new BackTestSma({
 }))
 
 manager.addNewStrategy(new BackTestSma({
-  id: 'lands200',
+  id: 'lands200-2019',
   account: {
     loss: -30,
     profit: 37,

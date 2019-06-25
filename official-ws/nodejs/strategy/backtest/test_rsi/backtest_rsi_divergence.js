@@ -17,12 +17,12 @@ const xbt1d = getXBTUSD1dData()
 const manager = new BackTestManager()
 
 manager.addNewStrategy(new TestStrategy({
-  id: 'rsi_divergence_width_filter_not_highest_short',
+  id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // disableShort: true,
-  disableLong: true
+  // disableLong: true
 }))
 
-let DataIndex =  {
+let DataIndex = {
   '1h': 0,
   '1d': 0,
 }
@@ -37,8 +37,8 @@ function setHourHistoryData(curTime, period) {
     lastHourTime = curTime.replace(/\d\d:\d\d:\d\d\..*Z/g, '00:00:00.000Z')
   }
   const len = data.length
- 
-  for (let i=0; i<len-1; i++) {
+
+  for (let i = 0; i < len - 1; i++) {
     const nextd = data[i + 1]
     if (nextd.timestamp === lastHourTime) {
       DataIndex[period] = i
@@ -78,7 +78,7 @@ function testRange(orangeData, indexRange) {
   const startTime = orangeData[startIndex].timestamp
   const endIndex = indexRange[1] || orangeData.length
   manager.setCandleHistory('5m', orangeData.slice(startIndex - 380, startIndex))
-  
+
   setHourHistoryData(startTime, '1h')
   setHourHistoryData(startTime, '1d')
 
