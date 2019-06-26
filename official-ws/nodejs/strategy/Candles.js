@@ -714,5 +714,17 @@ Candles.prototype.isLowVol = function (len = 14, rate = 1) {
   const sizeSma0 = result[result.length - 1]
   return size / sizeSma0 < rate
 }
+// for day
+Candles.prototype.isStrongShort = function () {
+  const c1 = this.getHistoryCandle(1)
+  const c2 = this.getHistoryCandle(2)
+  const c3 = this.getHistoryCandle(3)
+  const c1Rate = (c1.close - c1.open) / c1.open
+  const isDown = c1.high < c2.high && c1.low < c2.low
+  if (c1Rate < -0.04 && isDown) {
+    return true
+  }
+  return false
+}
 
 module.exports = Candles
