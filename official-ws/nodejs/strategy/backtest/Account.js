@@ -81,6 +81,7 @@ class Account {
       long: this._long,
       entryPrice: this._price,
       exitPrice: price,
+      price,
       startTime: this._lastTradeTime,
       endtTime: bar.timestamp,
     }

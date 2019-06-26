@@ -44,7 +44,7 @@ class BackTestRsiDivergence extends BackTest {
         !disableLong &&
         rsiDivergenceSignal.long
       ) {
-        const isLowVol = _5mCandle.isLowVol(50, 3)
+        // const isLowVol = _5mCandle.isLowVol(50, 3)
         const isHighBoDong = _1dCandle.isAdxHigh(14)
         // console.log(bar.timestamp, bar.close)
         // const trendSignal = this.get1dMacdTrendSignal()
@@ -53,7 +53,7 @@ class BackTestRsiDivergence extends BackTest {
 
         // 这个很牛逼
         // if (isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
-        if (isHighBoDong && isLowVol && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
+        if (isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
           long = true
         }
         // if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
@@ -138,7 +138,11 @@ class BackTestRsiDivergence extends BackTest {
         }
       }
     }
-    // const result = this._accout.shouldLiquidation(bar)
+    // stop market
+    const result = this._accout.shouldStopClosePosition(bar)
+    if (result) {
+      this._tradeHistory.push(result)
+    }
   }
 
   orderMarketPrevHighLow(period, bar, amount) {

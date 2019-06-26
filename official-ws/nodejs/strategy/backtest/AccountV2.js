@@ -35,6 +35,13 @@ class Account {
     }
   }
 
+  setStopPrice() {
+    if (this.hasPosition()) {
+      const longPosition = this._amount > 0
+      this._stopPrice = longPosition ? this._avgPrice - 200 : this._avgPrice + 200
+    }
+  }
+
   orderMarket(price, bar, amount, stopped) {
     const { timestamp, close, open, high, low } = bar
     this._lastTradeTime = new Date(timestamp)
@@ -43,6 +50,7 @@ class Account {
       this._amount = amount
       this._minMaxPrices.minP = low
       this._minMaxPrices.maxP = high
+      this.setStopPrice()
       return
     } else {
       const nextAmount = this._amount + amount
@@ -85,7 +93,7 @@ class Account {
     this._bars ++
     this._minMaxPrices.minP = Math.min(this._minMaxPrices.minP, bar.low)
     this._minMaxPrices.maxP = Math.max(this._minMaxPrices.maxP, bar.high)
-    this.updateEntryBars()
+    // this.updateEntryBars()
   }
 
   updateEntryBars() {
@@ -140,7 +148,7 @@ class Account {
 
   shouldStopClosePosition(bar) {
     const { timestamp, high, low } = bar
-    if (this.hasPosition()) {
+    if (this.hasPosition() && this._stopPrice) {
       this.updateMinMax(bar)
       const lossPrice = this._stopPrice
       const longPosition = this._amount > 0
