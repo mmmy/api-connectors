@@ -716,13 +716,16 @@ Candles.prototype.isLowVol = function (len = 14, rate = 1) {
 }
 // for day
 Candles.prototype.isStrongShort = function () {
+  const { d } = this.getLastStochKD(9, 3) // d相当于tv中的k
+  const overBuy = d > 70
   const c1 = this.getHistoryCandle(1)
   const c2 = this.getHistoryCandle(2)
   const c3 = this.getHistoryCandle(3)
+  const moreVol = c1.size > c2.size
   const c1Rate = (c1.close - c1.open) / c1.open
   const fatBody = Math.abs(c1.close - c1.open) / (c1.high - c1.low) > 0.7
   const isDown = c1.high < c2.high && c1.low < c2.low
-  if (c1Rate < -0.04 && isDown && fatBody) {
+  if (c1Rate < -0.04 && isDown && overBuy && moreVol) {
     return true
   }
   return false
