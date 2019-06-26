@@ -690,7 +690,7 @@ Candles.prototype.highlow1Signal = function () {
   }
 }
 
-Candles.prototype.isAdxLong = function(len = 14, gaobodong=false) {
+Candles.prototype.isAdxLong = function (len = 14, gaobodong = false) {
   const klines = this.getCandles(false)
   const result = signal.ADXSignal(klines, len = 14)
   const d0 = result[result.length - 1]
@@ -699,12 +699,20 @@ Candles.prototype.isAdxLong = function(len = 14, gaobodong=false) {
   return gaobodong ? (bodong && (pdi >= mdi)) : (pdi >= mdi)
 }
 
-Candles.prototype.isAdxHigh = function(len = 14) {
+Candles.prototype.isAdxHigh = function (len = 14) {
   const klines = this.getCandles(false)
   const result = signal.ADXSignal(klines, len = 14)
   const d0 = result[result.length - 1]
   const { adx, mdi, pdi } = d0
   return adx > mdi && adx > pdi
+}
+
+Candles.prototype.isLowVol = function (len = 14, rate = 1) {
+  const klines = this.getCandles(false)
+  const { size } = this.getHistoryCandle(1)
+  const result = signal.VolSMA(klines, len)
+  const sizeSma0 = result[result.length - 1]
+  return size / sizeSma0 < rate
 }
 
 module.exports = Candles

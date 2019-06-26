@@ -8,7 +8,7 @@ const PRIOD_MIS = {
   '1d': 24 * 3600 * 1000,
 }
 
-module.exports = function(fileName, period) {
+module.exports = function (fileName, period) {
   const filePath = path.join(__dirname, fileName)
   const fileContent = fs.readFileSync(filePath).toString()
   const csvList = fileContent.split('\n')
@@ -25,7 +25,7 @@ module.exports = function(fileName, period) {
       high: +splitList[2],
       low: +splitList[3],
       close: +splitList[4],
-      volume: +splitList[5]
+      size: +splitList[5]
     }
   })
   return list
