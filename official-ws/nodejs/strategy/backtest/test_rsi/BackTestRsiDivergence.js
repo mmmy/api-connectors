@@ -64,11 +64,14 @@ class BackTestRsiDivergence extends BackTest {
         !disableShort &&
         rsiDivergenceSignal.short
       ) {
+        const isLowVol = _5mCandle.isLowVol(50, 3)
+        const isHighBoDong = _1dCandle.isAdxHigh(14)
+        // const isStrongLong = _1dCandle.isStrongLong()
         // const trendSignal = this.get1dMacdTrendSignal()
         // const filterS = this.getMacdDepartSignal('1h')
         // if (filterS.short) {
         // if (trendSignal.short) {
-        if (!mainCandle.isCurrentHighestLowestClose(true, 300)) {
+        if (isLowVol && isHighBoDong && !mainCandle.isCurrentHighestLowestClose(true, 300)) {
 
           short = true
         }
