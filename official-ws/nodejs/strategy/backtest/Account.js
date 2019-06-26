@@ -105,11 +105,11 @@ class Account {
       const long = this._long
       let lossed = false
       if (lossPrice > 0) {
-        lossed = long ? (low <= lossPrice) : (low >= lossPrice)
+        lossed = long ? (low <= lossPrice) : (high >= lossPrice)
       }
       let wined = false
       if (profitPrice > 0) {
-        wined = long ? (high > profitPrice) : (high < profitPrice)
+        wined = long ? (high > profitPrice) : (low < profitPrice)
       }
       if (lossed || wined) {
         return this.liquidation(wined ? profitPrice : lossPrice, bar)

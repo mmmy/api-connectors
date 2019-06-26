@@ -21,7 +21,7 @@ const defaultPriceFilter = {
 }
 const manager = new BackTestManager()
 manager.addNewStrategy(new BackTestSma({
-  id: 'p8090l200-2019',
+  id: 'p8090l200-2019-fix-bug',
   account: {
     loss: -30,
     profit: 37,
@@ -29,7 +29,7 @@ manager.addNewStrategy(new BackTestSma({
   },
   '5m': { smaFastLen: 53, smaSlowLen: 88 },
   // '5m': { smaFastLen: 40, smaSlowLen: 88 },
-  disableLong: true,
+  disableLong: false,
   disableShort: false,
   shortRateLen: 200,
   shortPriceRateMin: 0,
@@ -38,7 +38,7 @@ manager.addNewStrategy(new BackTestSma({
 }))
 
 manager.addNewStrategy(new BackTestSma({
-  id: 'lands200-2019',
+  id: 'lands200-2019-fix-bug',
   account: {
     loss: -30,
     profit: 37,

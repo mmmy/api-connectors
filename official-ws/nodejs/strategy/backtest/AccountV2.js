@@ -16,6 +16,7 @@ class Account {
 
     this._amount = 0
     this._avgPrice = 0
+    this._stopPrice = 0
   }
 
   order(bar, long) {
@@ -40,6 +41,8 @@ class Account {
     if (this._amount === 0) {
       this._avgPrice = price
       this._amount = amount
+      this._minMaxPrices.minP = low
+      this._minMaxPrices.maxP = high
       return
     } else {
       const nextAmount = this._amount + amount
@@ -132,6 +135,16 @@ class Account {
   getLossLimitPrices() {
     let loss = this._options.loss
     return loss ? this._price + (this._long ? loss : -loss) : -1
+  }
+
+  shouldStopClosePosition(bar) {
+    const { timestamp, high, low } = bar
+    if (this.hasPosition()) {
+      this.updateMinMax(bar)
+      const lossPrice = this._stopPrice
+      const longPosition = this._amount > 0
+      const lost = longPosition ? (low <= lossPrice) : (high >= lossPrice)
+    }
   }
 
   shouldLiquidation(bar) {
