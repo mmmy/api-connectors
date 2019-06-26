@@ -741,7 +741,7 @@ Candles.prototype.isStrongLong = function () {
   const c1Rate = (c1.close - c1.open) / c1.open
   const fatBody = Math.abs(c1.close - c1.open) / (c1.high - c1.low) > 0.7
   const isUp = c1.high > c2.high && c1.low > c2.low && c1.close > c2.close
-  if (c1Rate > 0.04 && isDown && overBuy && moreVol) {
+  if (c1Rate > 0.04 && isUp && overSell && moreVol) {
     return true
   }
   return false
