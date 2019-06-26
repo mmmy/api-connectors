@@ -50,7 +50,7 @@ class Account {
       this._amount = amount
       this._minMaxPrices.minP = low
       this._minMaxPrices.maxP = high
-      this.setStopPrice()
+      // this.setStopPrice()
       return
     } else {
       const nextAmount = this._amount + amount

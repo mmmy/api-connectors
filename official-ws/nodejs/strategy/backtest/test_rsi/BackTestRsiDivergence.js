@@ -36,7 +36,7 @@ class BackTestRsiDivergence extends BackTest {
       const _1dCandle = candles['1d']
       let mainCandle = _5mCandle
 
-      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 12, 10, 25, 83)
+      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 10, 24, 25, 83)
 
       const disableShort = this._options.disableShort
       const disableLong = this._options.disableLong
@@ -44,7 +44,7 @@ class BackTestRsiDivergence extends BackTest {
         !disableLong &&
         rsiDivergenceSignal.long
       ) {
-        // const isLowVol = _5mCandle.isLowVol(50, 3)
+        const isLowVol = _5mCandle.isLowVol(50, 3)
         const isHighBoDong = _1dCandle.isAdxHigh(14)
         // console.log(bar.timestamp, bar.close)
         // const trendSignal = this.get1dMacdTrendSignal()
@@ -53,7 +53,7 @@ class BackTestRsiDivergence extends BackTest {
 
         // 这个很牛逼
         // if (isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
-        if (isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
+        if (isHighBoDong && isLowVol && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
           long = true
         }
         // if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
