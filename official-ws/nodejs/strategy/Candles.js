@@ -720,7 +720,7 @@ Candles.prototype.isStrongShort = function () {
   const c2 = this.getHistoryCandle(2)
   const c3 = this.getHistoryCandle(3)
   const c1Rate = (c1.close - c1.open) / c1.open
-  const fatBody = Math.abs(c1.close - c1.open) / (cl.high - c1.low) > 0.7
+  const fatBody = Math.abs(c1.close - c1.open) / (c1.high - c1.low) > 0.7
   const isDown = c1.high < c2.high && c1.low < c2.low
   if (c1Rate < -0.04 && isDown && fatBody) {
     return true
