@@ -7,7 +7,8 @@ const fs = require('fs')
 
 const JSONtoCSV = require('../utils').JSONtoCSV
 
-var xbt5m = require('../data/xbt5m')
+var { getXBTUSD5mData } = require('../data/xbt5m')
+xbt5m = getXBTUSD5mData()
 var len = xbt5m.length
 
 const defaultPriceFilter = {
