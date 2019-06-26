@@ -149,7 +149,7 @@ allTrades.map((t, i) => {
   const { id, statistic } = t
   const saveName = `sma_test_result_${id || (i + 1)}.csv`
   const savePath = path.join(__dirname, saveName)
-  const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk'])
+  const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk', 'pfp'])
   fs.writeFileSync(savePath, dataToCsv)
 })
 console.log('time used:', (new Date() - d0) / 1000)

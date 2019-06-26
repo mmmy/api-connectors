@@ -35,7 +35,7 @@ class Account {
     }
   }
 
-  orderMarket(price, bar, amount) {
+  orderMarket(price, bar, amount, stopped) {
     const { timestamp, close, open, high, low } = bar
     this._lastTradeTime = new Date(timestamp)
     if (this._amount === 0) {
@@ -71,6 +71,7 @@ class Account {
           touched: true,
           wined,
           profit,
+          stopped,
           timestamp,
           amount,
           postionAmount: this._amount,
@@ -144,6 +145,9 @@ class Account {
       const lossPrice = this._stopPrice
       const longPosition = this._amount > 0
       const lost = longPosition ? (low <= lossPrice) : (high >= lossPrice)
+      if (lost) {
+        return this.orderMarket(lossPrice, bar, -this.getPostionAmount(), lost)
+      }
     }
   }
 
