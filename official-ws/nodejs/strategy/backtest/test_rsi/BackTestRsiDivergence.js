@@ -36,7 +36,7 @@ class BackTestRsiDivergence extends BackTest {
       const _1dCandle = candles['1d']
       let mainCandle = _5mCandle
 
-      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 12, 100, 25, 75)
+      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 12, 50, 50, 25, 75)
 
       const disableShort = this._options.disableShort
       const disableLong = this._options.disableLong
@@ -86,7 +86,7 @@ class BackTestRsiDivergence extends BackTest {
 
     this._closeSignal = () => {
       const candleManager5m = this.getCandleByPeriod('5m')
-      const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 30, 70)
+      const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 24, 30, 70)
       return rsiDivergenceSignal
     }
 
@@ -96,6 +96,7 @@ class BackTestRsiDivergence extends BackTest {
   readBar5m(bar) {
     // const signal = this._strategy(bar, this._candles)
     // return
+    this.checkCandle()
     const hasStopOpenOrder = this.hasStopOpenOrder()
     if (hasStopOpenOrder) {
       if (this._highsToBuy.ordering && this.isHigh1('5m')) {
@@ -188,6 +189,25 @@ class BackTestRsiDivergence extends BackTest {
     const candleManager = this._candles[period]
     const signal = candleManager.macdDepartSignal(false)
     return signal
+  }
+
+  checkCandle() {
+    const candle5m = this.getCandleByPeriod('5m')
+    const candle1h = this.getCandleByPeriod('1h')
+    const candle1d = this.getCandleByPeriod('1d')
+    const timestamp5m = candle5m.getHistoryCandle(1).timestamp
+    const timestamp1h = candle1h.getHistoryCandle(1).timestamp
+    const timestamp1d = candle1d.getHistoryCandle(1).timestamp
+    const gap5m1h = new Date(timestamp5m) - new Date(timestamp1h)
+    const gap5m1d = new Date(timestamp5m) - new Date(timestamp1d)
+    if (gap5m1h < 3600000 || gap5m1h > (3600000 * 2)) {
+      console.log(`1h data timestamp not valide: ${gap5m1h / 60000}`)
+      throw new Error(`1h data timestamp not valide: ${gap5m1h / 60000}`)
+    }
+    if (gap5m1d < 24 * 3600000 || gap5m1d > 24 * 3600000 * 2) {
+      console.log(`1d data timestamp not valide: ${gap5m1d / (24 * 3600000)}`)
+      throw new Error(`1d data timestamp not valide: ${gap5m1d / (24 * 3600000)}`)
+    }
   }
 }
 

@@ -70,6 +70,7 @@ Candles.prototype.setHistoryData = function (list) {
 Candles.prototype.updateLastHistory = function (data) {
   var len = this._histories.length
   var lastData = this._histories[len - 1]
+
   var time = +new Date(data.timestamp)
   var lastTime = +new Date(lastData.timestamp)
   if (time > lastTime) {
@@ -165,7 +166,7 @@ Candles.prototype.rsiOverTradeSignal = function (realTime, len = 8, theshold_bot
   }
 }
 // rsi divergence
-Candles.prototype.rsiDivergenceSignal = function (realTime, len = 8, divergenceLen = 24, theshold_bottom = 20, theshold_top = 80) {
+Candles.prototype.rsiDivergenceSignal = function (realTime, len = 8, highlowLen = 24, divergenceLen = 24, theshold_bottom = 20, theshold_top = 80) {
   const data = this.getCandles(realTime)
   const rsis = signal.RSI(data, len)
   const rsisDivergence = rsis.slice(-divergenceLen - 1)
@@ -174,8 +175,8 @@ Candles.prototype.rsiDivergenceSignal = function (realTime, len = 8, divergenceL
 
   let long = false
   let short = false
-  let isCurrentHighest = this.isCurrentHighestLowestClose(true, divergenceLen, 0)
-  let isCurrentLowest = this.isCurrentHighestLowestClose(false, divergenceLen, 0)
+  let isCurrentHighest = this.isCurrentHighestLowestClose(true, highlowLen, 0)
+  let isCurrentLowest = this.isCurrentHighestLowestClose(false, highlowLen, 0)
   if (isCurrentHighest) {
     // 其中含有了Rsi超高阈值
     const isOverBoughtHappend = Math.max.apply(null, rsisDivergence) > theshold_top

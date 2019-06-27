@@ -406,9 +406,9 @@ class FlowDataBase {
     }
 
     // RSI divergence signal
-    const rsiDivergenceSignal = this._candles1h.rsiDivergenceSignal(symbol, 8, 24, 20, 80)
-    const rsiDivergenceSignal_2575 = this._candles1h.rsiDivergenceSignal(symbol, 8, 24, 25, 75)
-    const rsiDivergenceSignal_3070 = this._candles1h.rsiDivergenceSignal(symbol, 8, 24, 30, 70)
+    const rsiDivergenceSignal = this._candles1h.rsiDivergenceSignal(symbol, 8, 24, 24, 20, 80)
+    const rsiDivergenceSignal_2575 = this._candles1h.rsiDivergenceSignal(symbol, 8, 24, 24, 25, 75)
+    const rsiDivergenceSignal_3070 = this._candles1h.rsiDivergenceSignal(symbol, 8, 24, 24, 30, 70)
     if (rsiDivergenceSignal.long) {
       if (this._options.autoCloseRsiDivergence1h) {
         this.closeShortPositionIfHave(symbol)
@@ -539,7 +539,7 @@ class FlowDataBase {
       // notifyPhone(`${symbol} 5m rsiOverTradeSignal Short`)
     }
     // RSI divergence signal
-    const rsiDivergenceSignal = this._candles5m.rsiDivergenceSignal(symbol, 8, 24)
+    const rsiDivergenceSignal = this._candles5m.rsiDivergenceSignal(symbol, 8, 24, 24)
     if (rsiDivergenceSignal.long) {
       if (this._options.autoCloseRsiDivergence5m) {
         this.closeShortPositionIfHave(symbol)

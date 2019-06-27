@@ -9,17 +9,31 @@ const timeToSeries = require('../utils').timeToSeries
 
 const JSONtoCSV = require('../utils').JSONtoCSV
 
-const { getXBTUSD5mData, getXBTUSD1hData, getXBTUSD1dData } = require('../data/xbt5m')
-const xbt5m = getXBTUSD5mData()
-const xbt1h = getXBTUSD1hData()
-const xbt1d = getXBTUSD1dData()
+const { getHistroyData } = require('../data/xbt5m')
+
+const HistoryData = {
+  'XBTUSD': {
+    '5m': getHistroyData('XBTUSD', '5m'),
+    '1h': getHistroyData('XBTUSD', '1h'),
+    '1d': getHistroyData('XBTUSD', '1d'),
+  },
+  'ETHUSD': {
+    '5m': getHistroyData('ETHUSD', '5m'),
+    '1h': getHistroyData('ETHUSD', '1h'),
+    '1d': getHistroyData('ETHUSD', '1d'),
+  },
+}
 
 const manager = new BackTestManager()
+const symbol = 'ETHUSD'
+const data5m = HistoryData[symbol]['5m']
+const data1h = HistoryData[symbol]['1h']
+const data1d = HistoryData[symbol]['1d']
 
 manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: 'rsi_divergence12100_filter_width_filter_not_highestlowest_lowvol_300_5m_long_last',
+  id: `${symbol}_rsi_divergence122450_filter_width_filter_not_highestlowest_lowvol_300_5m_long_last`,
   disableShort: true,
   // disableLong: true
 }))
@@ -32,19 +46,19 @@ function setHourHistoryData(curTime, period) {
   let data = null
   let lastHourTime = ''
   if (period === '1h') {
-    data = xbt1h
+    data = data1h
     lastHourTime = curTime.replace(/\d\d:\d\d\..*Z/g, '00:00.000Z')
   } else if (period === '1d') {
-    data = xbt1d
+    data = data1d
     lastHourTime = curTime.replace(/\d\d:\d\d:\d\d\..*Z/g, '00:00:00.000Z')
   }
   const len = data.length
 
   for (let i = 0; i < len - 1; i++) {
-    const nextd = data[i + 1]
-    if (nextd.timestamp === lastHourTime) {
+    const d = data[i]
+    if (d.timestamp === lastHourTime) {
       DataIndex[period] = i
-      manager.setCandleHistory(period, data.slice(i - 90, i))
+      manager.setCandleHistory(period, data.slice(Math.max(i - 90, 0), i))
       break
     }
   }
@@ -55,14 +69,14 @@ function pushHistoryDataIfNeed(curTime, period, cb) {
   let data = null
   let timePassedToUpdate = 3600000
   if (period === '1h') {
-    data = xbt1h
+    data = data1h
     timePassedToUpdate = 3600000
   } else if (period === '1d') {
-    data = xbt1d
+    data = data1d
     timePassedToUpdate = 3600000 * 24
   }
   // 1h
-  const listDataTime = new Date(data[DataIndex[period]].timestamp)
+  const listDataTime = new Date(data[DataIndex[period] - 1].timestamp)
   const timePassed = curTime - listDataTime
   // asserts
   if (timePassed < timePassedToUpdate || timePassed > timePassedToUpdate * 2) {
@@ -102,18 +116,18 @@ function testRange(orangeData, indexRange) {
 }
 
 let dataSeries = [
-  [400]
+  symbol === 'XBTUSD' ? [400] : ["2018-09-01T10:00:00.000Z"]
   // ['2017-09-16T00:00:00.000Z', '2017-12-13T00:00:00.000Z'],
   // ["2017-10-01T00:00:00.000Z", "2017-11-10T00:00:00.000Z",],
   // ["2017-11-13T00:00:00.000Z", "2017-12-08T00:00:00.000Z",],
   // ["2019-05-22T10:00:00.000Z"]
 ]
 
-const seriesIndex = timeToSeries(xbt5m, dataSeries)
+const seriesIndex = timeToSeries(data5m, dataSeries)
 
 console.log(seriesIndex)
 seriesIndex.forEach(range => {
-  testRange(xbt5m, range)
+  testRange(data5m, range)
 })
 
 const d0 = new Date()
@@ -126,7 +140,7 @@ fs.writeFileSync(path.join(__dirname, 'temp.json'), str)
 
 allTrades.map((t, i) => {
   const { id, statistic } = t
-  const saveName = `rsi_divergence_result_${id || (i + 1)}.csv`
+  const saveName = `${symbol}_rsi_divergence_result_${id || (i + 1)}.csv`
   const savePath = path.join(__dirname, saveName)
   const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk', 'pfp'])
   fs.writeFileSync(savePath, dataToCsv)

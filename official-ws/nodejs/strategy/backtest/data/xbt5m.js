@@ -1,20 +1,23 @@
 
 const csvToJson = require('./csvToJson')
 
-function getXBTUSD5mData() {
-  return csvToJson('XBTUSD_5m_2017-09-01.csv', '5m')
+const fileMap = {
+  'XBTUSD': {
+    '5m': 'XBTUSD_5m_2017-09-01.csv',
+    '1h': 'XBTUSD_1h_2017-06-01.csv',
+    '1d': 'XBTUSD_1d_2017-04-01.csv',
+  },
+  'ETHUSD': {
+    '5m': 'ETHUSD_5m_2018-08-03.csv',
+    '1h': 'ETHUSD_1h_2018-08-03.csv',
+    '1d': 'ETHUSD_1d_2018-08-03.csv',
+  }
 }
 
-function getXBTUSD1hData() {
-  return csvToJson('XBTUSD_1h_2017-06-01.csv', '1h')
-}
-
-function getXBTUSD1dData() {
-  return csvToJson('XBTUSD_1d_2017-04-01.csv', '1d')
+function getHistroyData(symbol, period) {
+  return csvToJson(fileMap[symbol][period], period)
 }
 
 module.exports = {
-  getXBTUSD5mData,
-  getXBTUSD1hData,
-  getXBTUSD1dData
+  getHistroyData
 }
