@@ -29,6 +29,8 @@ class BackTestRsiDivergence extends BackTest {
       const shortPriceRateMin = this._options.shortPriceRateMin || 0.1
       const shortPriceRateMax = this._options.shortPriceRateMax || 0.3
 
+      const { lowVol, highBoDong, strongLongShort, len, highlowLen, divergenceLen, theshold_bottom, theshold_top } = this._options
+
       let long = false
       let short = false
       const _5mCandle = candles['5m']
@@ -36,7 +38,7 @@ class BackTestRsiDivergence extends BackTest {
       const _1dCandle = candles['1d']
       let mainCandle = _5mCandle
 
-      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, 12, 50, 50, 25, 75)
+      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, len || 12, highlowLen || 50, divergenceLen || 50, theshold_bottom || 25, theshold_top || 75)
 
       const disableShort = this._options.disableShort
       const disableLong = this._options.disableLong
@@ -44,9 +46,9 @@ class BackTestRsiDivergence extends BackTest {
         !disableLong &&
         rsiDivergenceSignal.long
       ) {
-        const isLowVol = _5mCandle.isLowVol(50, 3)
-        const isHighBoDong = _1dCandle.isAdxHigh(14)
-        // const isStrongShort = _1dCandle.isStrongShort()
+        const lowVolFilter = lowVol ? _5mCandle.isLowVol(50, 3) : true
+        const highBoDongFilter = highBoDong ? _1dCandle.isAdxHigh(14) : true
+        const strongShortFilter = strongLongShort ? !_1dCandle.isStrongShort() : true
         // console.log(bar.timestamp, bar.close)
         // const trendSignal = this.get1dMacdTrendSignal()
         // const filterS = this.getMacdDepartSignal('1h')
@@ -54,7 +56,7 @@ class BackTestRsiDivergence extends BackTest {
 
         // 这个很牛逼
         // if (isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
-        if (isLowVol && isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
+        if (lowVolFilter && highBoDongFilter && strongShortFilter && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
           long = true
         }
         // if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {

@@ -41,11 +41,20 @@ const statisticTrades = function (trades) {
       back = Math.min(0, back)
       backList.push(back)
     }
+    const pfp = profit / price
+    const pfp_r = pfp + 0.9985
+    let margin = 1
+    if (i > 0) {
+      const pre = tradeEarnList[i - 1]
+      margin = pre.margin * pfp_r
+    }
     tradeEarnList.push({
       st: (t.startTime || t.timestamp) && new Date(t.startTime || t.timestamp).toISOString(),
       pf: netProfit,
-      pfp: profit / price,
+      pfp,
+      pfp_r,
       bk: backList[backList.length - 1] || 0,
+      margin,
     })
   })
   maxBack = Math.min.apply(null, backList)

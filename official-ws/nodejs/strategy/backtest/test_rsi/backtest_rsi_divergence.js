@@ -25,7 +25,7 @@ const HistoryData = {
 }
 
 const manager = new BackTestManager()
-const symbol = 'ETHUSD'
+const symbol = 'XBTUSD'
 const data5m = HistoryData[symbol]['5m']
 const data1h = HistoryData[symbol]['1h']
 const data1d = HistoryData[symbol]['1d']
@@ -33,8 +33,96 @@ const data1d = HistoryData[symbol]['1d']
 manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_rsi_divergence122450_filter_width_filter_not_highestlowest_lowvol_300_5m_long_last`,
+  id: `${symbol}_rsi_divergence125050_300_5m_long`,
   disableShort: true,
+  lowVol: false,
+  highBoDong: false,
+  strongLongShort: false,
+  len: 12,
+  highlowLen: 50,
+  divergenceLen: 50,
+  theshold_bottom: 25,
+  theshold_top: 75
+  // disableLong: true
+}))
+
+manager.addNewStrategy(new TestStrategy({
+  // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
+  // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
+  id: `${symbol}_rsi_divergence122450_300_5m_long`,
+  disableShort: true,
+  lowVol: false,
+  highBoDong: false,
+  strongLongShort: false,
+  len: 12,
+  highlowLen: 24,
+  divergenceLen: 50,
+  theshold_bottom: 25,
+  theshold_top: 75
+  // disableLong: true
+}))
+
+manager.addNewStrategy(new TestStrategy({
+  // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
+  // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
+  id: `${symbol}_rsi_divergence125050_theshold_bottom20_300_5m_long`,
+  disableShort: true,
+  lowVol: false,
+  highBoDong: false,
+  strongLongShort: false,
+  len: 12,
+  highlowLen: 50,
+  divergenceLen: 50,
+  theshold_bottom: 20,
+  theshold_top: 75
+  // disableLong: true
+}))
+
+manager.addNewStrategy(new TestStrategy({
+  // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
+  // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
+  id: `${symbol}_rsi_divergence125050_300_5m_long_filter(lowVol)`,
+  disableShort: true,
+  lowVol: true,
+  highBoDong: false,
+  strongLongShort: false,
+  len: 12,
+  highlowLen: 50,
+  divergenceLen: 50,
+  theshold_bottom: 25,
+  theshold_top: 75
+  // disableLong: true
+}))
+
+manager.addNewStrategy(new TestStrategy({
+  // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
+  // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
+  id: `${symbol}_rsi_divergence125050_300_5m_long_filter(highBoDong)`,
+  disableShort: true,
+  lowVol: false,
+  highBoDong: true,
+  strongLongShort: false,
+  len: 12,
+  highlowLen: 50,
+  divergenceLen: 50,
+  theshold_bottom: 25,
+  theshold_top: 75
+  // disableLong: true
+}))
+
+manager.addNewStrategy(new TestStrategy({
+  // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
+  // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
+  id: `${symbol}_rsi_divergence125050_300_5m_long_filter(strongLongShort)`,
+  disableShort: true,
+  lowVol: false,
+  highBoDong: false,
+  strongLongShort: true,
+  len: 12,
+  highlowLen: 50,
+  divergenceLen: 50,
+  theshold_bottom: 25,
+  theshold_top: 75
   // disableLong: true
 }))
 
@@ -142,7 +230,7 @@ allTrades.map((t, i) => {
   const { id, statistic } = t
   const saveName = `${symbol}_rsi_divergence_result_${id || (i + 1)}.csv`
   const savePath = path.join(__dirname, saveName)
-  const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk', 'pfp'])
+  const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk', 'pfp', 'margin'])
   fs.writeFileSync(savePath, dataToCsv)
 })
 
