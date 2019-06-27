@@ -48,25 +48,26 @@ function sleep(sec) {
 
 const JSONtoCSV = require('../utils').JSONtoCSV
 
+const symbol = 'ETHUSD'
 const CONFIG = {
   prefix: '',
-  symbol: 'XBTUSD',
+  symbol: symbol,
   count: 200,
   binSize: '5m',
-  startDate: '2017-09-01',
+  startDate: symbol === 'XBTUSD' ? '2017-09-01' : '2018-08-03',
   columns: ['timestamp', 'open', 'high', 'low', 'close', 'volume'],
   reverse: true,
 }
 
 if (BinSize === '1h') {
   CONFIG.binSize = BinSize
-  CONFIG.startDate = '2017-06-01'
+  CONFIG.startDate = symbol === 'XBTUSD' ? '2017-06-01' : '2018-08-03'
   CONFIG.count = 100
 }
 
 if (BinSize === '1d') {
   CONFIG.binSize = BinSize
-  CONFIG.startDate = '2017-04-01'
+  CONFIG.startDate = symbol === 'XBTUSD' ? '2017-04-01' : '2018-08-03'
   CONFIG.count = 10
   CONFIG.reverse = false
 }
@@ -128,7 +129,7 @@ async function run() {
         reverse: CONFIG.reverse,
         startTime
       })
-    } catch(e) {
+    } catch (e) {
       console.log(e)
       console.log('continue...')
       continue
