@@ -25,7 +25,7 @@ const HistoryData = {
 }
 
 const manager = new BackTestManager()
-const symbol = 'XBTUSD'
+const symbol = 'ETHUSD'
 const data5m = HistoryData[symbol]['5m']
 const data1h = HistoryData[symbol]['1h']
 const data1d = HistoryData[symbol]['1d']
@@ -33,73 +33,9 @@ const data1d = HistoryData[symbol]['1d']
 manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_rsi_divergence125050_300_5m_long`,
-  disableShort: true,
-  lowVol: false,
-  highBoDong: false,
-  strongLongShort: false,
-  len: 12,
-  highlowLen: 50,
-  divergenceLen: 50,
-  theshold_bottom: 25,
-  theshold_top: 75
-  // disableLong: true
-}))
-
-manager.addNewStrategy(new TestStrategy({
-  // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
-  // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_rsi_divergence122450_300_5m_long`,
-  disableShort: true,
-  lowVol: false,
-  highBoDong: false,
-  strongLongShort: false,
-  len: 12,
-  highlowLen: 24,
-  divergenceLen: 50,
-  theshold_bottom: 25,
-  theshold_top: 75
-  // disableLong: true
-}))
-
-manager.addNewStrategy(new TestStrategy({
-  // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
-  // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_rsi_divergence125050_theshold_bottom20_300_5m_long`,
-  disableShort: true,
-  lowVol: false,
-  highBoDong: false,
-  strongLongShort: false,
-  len: 12,
-  highlowLen: 50,
-  divergenceLen: 50,
-  theshold_bottom: 20,
-  theshold_top: 75
-  // disableLong: true
-}))
-
-manager.addNewStrategy(new TestStrategy({
-  // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
-  // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_rsi_divergence125050_300_5m_long_filter(lowVol)`,
+  id: `${symbol}_rsi_divergence125050_300_5m_long_filter(lowVol+highBoDong)`,
   disableShort: true,
   lowVol: true,
-  highBoDong: false,
-  strongLongShort: false,
-  len: 12,
-  highlowLen: 50,
-  divergenceLen: 50,
-  theshold_bottom: 25,
-  theshold_top: 75
-  // disableLong: true
-}))
-
-manager.addNewStrategy(new TestStrategy({
-  // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
-  // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_rsi_divergence125050_300_5m_long_filter(highBoDong)`,
-  disableShort: true,
-  lowVol: false,
   highBoDong: true,
   strongLongShort: false,
   len: 12,
@@ -113,18 +49,49 @@ manager.addNewStrategy(new TestStrategy({
 manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_rsi_divergence125050_300_5m_long_filter(strongLongShort)`,
+  id: `${symbol}_rsi_divergence128080_300_5m_long_filter(lowVol+highBoDong)`,
   disableShort: true,
-  lowVol: false,
-  highBoDong: false,
-  strongLongShort: true,
+  lowVol: true,
+  highBoDong: true,
+  strongLongShort: false,
   len: 12,
-  highlowLen: 50,
-  divergenceLen: 50,
+  highlowLen: 80,
+  divergenceLen: 80,
   theshold_bottom: 25,
   theshold_top: 75
   // disableLong: true
 }))
+
+manager.addNewStrategy(new TestStrategy({
+  // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
+  // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
+  id: `${symbol}_rsi_divergence12120120_300_5m_long_filter(lowVol+highBoDong)`,
+  disableShort: true,
+  lowVol: true,
+  highBoDong: true,
+  strongLongShort: false,
+  len: 12,
+  highlowLen: 120,
+  divergenceLen: 120,
+  theshold_bottom: 25,
+  theshold_top: 75
+  // disableLong: true
+}))
+// manager.addNewStrategy(new TestStrategy({
+//   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
+//   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
+//   id: `${symbol}_rsi_divergence125050_300_5m_long_filter(strongLongShort)`,
+//   disableShort: true,
+//   lowVol: false,
+//   highBoDong: false,
+//   strongLongShort: true,
+//   len: 12,
+//   highlowLen: 50,
+//   divergenceLen: 50,
+//   theshold_bottom: 25,
+//   theshold_top: 75
+//   // disableLong: true
+// }))
 
 let DataIndex = {
   '1h': 0,
