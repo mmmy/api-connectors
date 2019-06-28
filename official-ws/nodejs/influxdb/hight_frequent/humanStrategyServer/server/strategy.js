@@ -1,27 +1,53 @@
 
 // var daishu = require('../../../../strategy/daishu-secret.json')
-var qq = require('../../../../strategy/secret.json')
 const isProduction = process.env.NODE_ENV === 'production'
-
-let qqTest = {}
-let yqheroTest = {}
-if (!isProduction) {
-  qqTest = require('../../../../strategy/test-secret.json')
-  yqheroTest = require('../../../../strategy/test-secret-yqhero.json')
-}
 
 const StrategyUserManager = require('../StrategyUserManager')
 const manager = new StrategyUserManager()
-// 注意，要有个main: true, 这个用来接收orderbook等信息。
-manager.addStrategy({
-  user: 'yq',
-  test: false,
-  testnet: isProduction ? false : true,
-  apiKey: isProduction ? qq.apiKey : qqTest.apiKey,
-  apiSecret: isProduction ? qq.apiSecret : qqTest.apiSecret,
-  database: isProduction,
-  initCheckSystem: true,
-  main: true,
+
+const list = []
+if (isProduction) {
+  var qq = require('../../../../strategy/apikey/qq_secret.json')
+  var godice = require('../../../../strategy/apikey/godice_secret.json')
+  // 注意，要有个main: true, 这个用来接收orderbook等信息。
+  list.push({
+    user: 'yq',
+    test: false,
+    testnet: false,
+    apiKey: qq.apiKey,
+    apiSecret: qq.apiSecret,
+    database: false,
+    initCheckSystem: true,
+    main: true,
+  })
+  list.push({
+    user: 'godice',
+    test: false,
+    testnet: false,
+    apiKey: godice.apiKey,
+    apiSecret: godice.apiSecret,
+    database: false,
+    initCheckSystem: false,
+    main: false,
+  })
+
+} else {
+  var qqTest = require('../../../../strategy/apikey/test-secret.json')
+  // var yqheroTest = require('../../../../strategy/test-secret-yqhero.json')
+  list.push({
+    user: 'yq',
+    test: false,
+    testnet: true,
+    apiKey: qqTest.apiKey,
+    apiSecret: qqTest.apiSecret,
+    database: false,
+    initCheckSystem: true,
+    main: true,
+  })
+}
+
+list.forEach(option => {
+  manager.addStrategy(option)
 })
 
 // manager.addStrategy({

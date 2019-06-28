@@ -1,6 +1,6 @@
 const BitmexManager = require('../../../strategy/researchStrategy/BitmexManager')
 // var { apiKey, apiSecret } = require('../../strategy/daishu-secret.json')
-var { apiKey, apiSecret } = require('../../../strategy/test-secret.json')
+// var { apiKey, apiSecret } = require('../../../strategy/test-secret.json')
 
 const HumanStrategy = require('./HumanStrategy')
 /**
@@ -18,8 +18,8 @@ module.exports = function createStratey(options) {
     user: 'yq',
     test: true,
     testnet: true,
-    apiKey,
-    apiSecret,
+    // apiKey,
+    // apiSecret,
     database: false,
     ...options
   })
