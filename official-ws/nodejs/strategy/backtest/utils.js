@@ -42,7 +42,13 @@ const statisticTrades = function (trades) {
       backList.push(back)
     }
     const pfp = profit / price
-    const pfp_r = pfp + 0.9985
+    let pfp_r = pfp + 0.9985
+    const amount = Math.abs(t.amount)
+    if (!isNaN(amount)) {
+      const baseAmount = 1
+      const pp = amount / baseAmount
+      pfp_r = pfp + 1 - 0.0015 * pp
+    }
     let margin = 1
     if (i > 0) {
       const pre = tradeEarnList[i - 1]

@@ -12,8 +12,8 @@ class BackTest {
     this._accout = new Account(this._options['account'])
     this._periods = ['1m', '5m', '1h', '1d']
     this._candles = {}
-    this._highsToBuy = { ordering: false, remains: 0 }  // 高N买
-    this._lowsToSell = { ordering: false, remains: 0 }   // 低N卖
+    this._highsToBuy = { ordering: false, remains: 0, amount: 1 }  // 高N买
+    this._lowsToSell = { ordering: false, remains: 0, amount: -1 }   // 低N卖
     this._onUpdateBar = {}
     this.initCandles()
 
@@ -36,20 +36,22 @@ class BackTest {
     return this._highsToBuy.ordering || this._lowsToSell.ordering
   }
 
-  startBuyHigh(times = 1) {
+  startBuyHigh(times = 1, amount) {
     if (this._highsToBuy.ordering) {
       console.warn('this._highsToBuy.ordering = true')
     }
     this._highsToBuy.ordering = true
     this._highsToBuy.remains = times
+    this._highsToBuy.amount = amount
   }
 
-  startSellLow(times = 1) {
+  startSellLow(times = 1, amount) {
     if (this._lowsToSell.ordering) {
       console.warn('this._lowsToSell.ordering = true')
     }
     this._lowsToSell.ordering = true
     this._lowsToSell.remains = times
+    this._lowsToSell.amount = amount
   }
 
   setCandleHistory(period, list) {

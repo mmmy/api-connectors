@@ -104,7 +104,7 @@ class BackTestRsiDivergence extends BackTest {
       if (this._highsToBuy.ordering && this.isHigh1('5m')) {
         if (this._highsToBuy.remains === 1) {
           // has bought
-          this.orderMarketPrevHighLow('5m', bar, 1)
+          this.orderMarketPrevHighLow('5m', bar, this._highsToBuy.amount)
           this._highsToBuy.ordering = false
         } else {
           this._highsToBuy.remains = this._highsToBuy.remains - 1
@@ -113,7 +113,7 @@ class BackTestRsiDivergence extends BackTest {
       if (this._lowsToSell.ordering && this.isLow1('5m')) {
         if (this._lowsToSell.remains === 1) {
           // has bought
-          this.orderMarketPrevHighLow('5m', bar, -1)
+          this.orderMarketPrevHighLow('5m', bar, this._lowsToSell.amount)
           this._lowsToSell.ordering = false
         } else {
           this._lowsToSell.remains = this._lowsToSell.remains - 1
@@ -123,13 +123,22 @@ class BackTestRsiDivergence extends BackTest {
       if (!this._accout.hasPosition()) {
         const signal = this._strategy(bar, this._candles)
         if (signal.long) {
-          this.startBuyHigh(2)
+          this.startBuyHigh(2, 0.7)
         }
         if (signal.short) {
-          this.startSellLow(2)
+          this.startSellLow(2, -0.7)
         }
       } else {
         // close trade
+        if (this._accout.getUnreleasedProfitPercent(bar.close) < 0.01) {
+          const signal = this._strategy(bar, this._candles)
+          const positionAmount = this._accout.getPostionAmount()
+          if (signal.long && positionAmount < 1) {
+            const positionTime = new Date(bar.timestamp) - new Date(this._accout._openTime)
+            console.log('and long long', positionTime / (60000))
+            this.startBuyHigh(2, 1 - positionAmount)
+          }
+        }
         const closeSignal = this._closeSignal(bar, this._candles)
         if (closeSignal.long && this._accout.getPostionAmount() < 0) {
           const result = this._accout.closeMarket(bar)

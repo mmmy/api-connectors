@@ -10,13 +10,14 @@ class Account {
     this._hasPosition = false
     this._price = null
     this._long = true
-    this._minMaxPrices = {minP:null, maxP:null}
+    this._minMaxPrices = { minP: null, maxP: null }
     this._bars = -1
     this._entryBars = -1
 
     this._amount = 0
     this._avgPrice = 0
     this._stopPrice = 0
+    this._openTime = 0
   }
 
   order(bar, long) {
@@ -50,15 +51,16 @@ class Account {
       this._amount = amount
       this._minMaxPrices.minP = low
       this._minMaxPrices.maxP = high
+      this._openTime = timestamp
       // this.setStopPrice()
       return
     } else {
       const nextAmount = this._amount + amount
       // add postion
-      if (this._amount * amount > 0) {                         
-        this._avgPrice = (this._avgPrice * this._amount + price * amount) /  nextAmount
+      if (this._amount * amount > 0) {
+        this._avgPrice = (this._avgPrice * this._amount + price * amount) / nextAmount
         this._amount = nextAmount
-      // reduce postion
+        // reduce postion
       } else {
         const closeAmount = Math.min(Math.abs(this._amount), Math.abs(amount))
         let profit = 0
@@ -74,7 +76,7 @@ class Account {
         }
         const wined = profit > 0
         this._amount = nextAmount
-        console.log(timestamp, profit)
+        console.log(timestamp, profit, amount)
         return {
           touched: true,
           wined,
@@ -90,14 +92,14 @@ class Account {
   }
 
   updateMinMax(bar) {
-    this._bars ++
+    this._bars++
     this._minMaxPrices.minP = Math.min(this._minMaxPrices.minP, bar.low)
     this._minMaxPrices.maxP = Math.max(this._minMaxPrices.maxP, bar.high)
     // this.updateEntryBars()
   }
 
   updateEntryBars() {
-    const {minP, maxP} = this._minMaxPrices
+    const { minP, maxP } = this._minMaxPrices
     const touched = this._long ? this._price >= minP : this._price <= maxP
     if (this._entryBars === -1 && touched) {
       this._entryBars = this._bars
@@ -188,8 +190,16 @@ class Account {
     return this._amount !== 0
   }
 
-  getPostionAmount () {
+  getPostionAmount() {
     return this._amount
+  }
+
+  getUnreleasedProfitPercent(price) {
+    if (this._amount > 0) {
+      return (price - this._avgPrice) / this._avgPrice
+    } else if (this._amount < 0) {
+      return (this._avgPrice - price) / this._avgPrice
+    }
   }
 }
 
