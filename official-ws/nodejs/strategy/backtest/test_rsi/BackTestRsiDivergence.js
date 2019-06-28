@@ -123,10 +123,10 @@ class BackTestRsiDivergence extends BackTest {
       if (!this._accout.hasPosition()) {
         const signal = this._strategy(bar, this._candles)
         if (signal.long) {
-          this.startBuyHigh(2, 0.7)
+          this.startBuyHigh(2, 1)
         }
         if (signal.short) {
-          this.startSellLow(2, -0.7)
+          this.startSellLow(2, -1)
         }
       } else {
         // close trade
