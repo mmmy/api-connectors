@@ -33,14 +33,14 @@ const data1d = HistoryData[symbol]['1d']
 manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_rsi_divergence125050_300_5m_long_filter(lowVol+highBoDong)`,
+  id: `${symbol}_rsi_divergence128080_300_5m_long_filter(lowVol+highBoDong)`,
   disableShort: true,
   lowVol: true,
   highBoDong: true,
   strongLongShort: false,
   len: 12,
-  highlowLen: 50,
-  divergenceLen: 50,
+  highlowLen: 80,
+  divergenceLen: 80,
   theshold_bottom: 25,
   theshold_top: 75
   // disableLong: true
