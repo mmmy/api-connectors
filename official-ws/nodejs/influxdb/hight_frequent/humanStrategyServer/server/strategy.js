@@ -2,6 +2,8 @@
 // var daishu = require('../../../../strategy/daishu-secret.json')
 const isProduction = process.env.NODE_ENV === 'production'
 
+process.setMaxListeners(0)
+const BitmexManager = require('../../../../strategy/researchStrategy/BitmexManager')
 const StrategyUserManager = require('../StrategyUserManager')
 const manager = new StrategyUserManager()
 
@@ -63,6 +65,49 @@ if (isProduction) {
 
 list.forEach(option => {
   manager.addStrategy(option)
+})
+
+const bitmexPublic = new BitmexManager({
+  testnet: !isProduction,
+  // apiKeyID: options.apiKey,
+  // apiKeySecret: options.apiSecret
+})
+
+function dataCb(json, symbol) {
+  // if (json.table === 'orderBookL2_25') {
+  //   client_orderbook.saveJson(json)
+  // } else if (json.table === 'instrument' || json.table === 'trade') {
+  //   client_others.saveJson(json)
+  // }
+  manager.listenPublicJson(json, symbol)
+}
+
+// bitmexPublic.listenOrderBook(dataCb, 'XBTUSD')
+
+const symbols1d = ['XBTUSD', 'ETHUSD']
+symbols1d.forEach(symbol => {
+  // 1天K线
+  bitmexPublic.listenCandle({ binSize: '1d', count: 200 }, list => {
+    manager.setCandlesHistory(list, symbol, '1d')
+  }, dataCb, symbol)
+})
+
+let symbols1h = ['XBTUSD', 'ETHUSD']
+symbols1h.forEach(symbol => {
+  bitmexPublic.listenQuote(dataCb, symbol)
+  bitmexPublic.listenInstrument(dataCb, symbol)
+  // 1小时K线
+  bitmexPublic.listenCandle({ binSize: '1h', count: 200 }, list => {
+    manager.setCandlesHistory(list, symbol, '1h')
+  }, dataCb, symbol)
+})
+
+let symbols5m = ['XBTUSD', 'ETHUSD']
+symbols5m.forEach(symbol => {
+  // 5m
+  bitmexPublic.listenCandle({ binSize: '5m', count: 200 }, list => {
+    manager.setCandlesHistory(list, symbol, '5m')
+  }, dataCb, symbol)
 })
 
 // manager.addStrategy({

@@ -41,6 +41,7 @@ module.exports = function createStratey(options) {
   bitmex.listenMargin(dataCb, "*")
   bitmex.listenOrder(dataCb, "*")
   // bitmex.listenExecution(dataCb)
+  /*
   if (options.main) {
     bitmex.listenOrderBook(dataCb, 'XBTUSD')
 
@@ -70,9 +71,10 @@ module.exports = function createStratey(options) {
       }, dataCb, symbol)
     })
   } else {
+    */
     // 为了保持和bitmex的连接, 也可以send {ping}
-    bitmex.listenInstrument(() => { })
-  }
+  bitmex.listenInstrument(() => { })
+  // }
 
   return strategy
 }

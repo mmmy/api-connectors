@@ -23,7 +23,7 @@ const precisionMap = {
 
 class FlowDataBase {
   constructor(options) {
-    this._options = _.extend({
+    this._options = _.merge({
       test: true,
       database: false,
       maxCache: 200,
@@ -124,7 +124,7 @@ class FlowDataBase {
   }
 
   updateOptions(options) {
-    this._options = _.extend(this._options, options)
+    this._options = _.merge(this._options, options)
     return this.getOptions()
   }
 
@@ -857,10 +857,10 @@ class FlowDataBase {
       // open
       const openSignal = this._candles5m.rsiDivergenceSignal(symbol, len || 12, highlowLen || 80, divergenceLen || 80, theshold_bottom || 25, theshold_top || 75)
       
-      const lowVolFilter = lowVol ? this._candles5m.isLowVol(symbol, 50, 3) : true
-      const highBoDongFilter = highBoDong ? this._candles1d.isAdxHigh(symbol, 14) : true
       if ((openSignal.long && enableLong) || (openSignal.short && enableShort)) {
-        if (lowVolFilter, highBoDongFilter) {
+        const lowVolFilter = lowVol ? this._candles5m.isLowVol(symbol, 50, 3) : true
+        const highBoDongFilter = highBoDong ? this._candles1d.isAdxHigh(symbol, 14) : true
+        if (lowVolFilter && highBoDongFilter) {
           notifyPhone('rsi divergence bot open!')
           // high2 low2 to open
           this.updateAutoSignalById(botId, {
@@ -893,7 +893,7 @@ class FlowDataBase {
   updateAutoSignalById(id, newOrder) {
     const order = this._autoOrderSignals.filter(o => o.id === id)[0]
     if (order) {
-      _.extend(order, newOrder)
+      _.merge(order, newOrder)
     } else {
       this._autoOrderSignals.push({
         ...newOrder,

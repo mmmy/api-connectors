@@ -36,6 +36,36 @@ module.exports = class StrategyUserManager {
     return this.getAllUsersAccount().filter(item => item.options.user === user)
   }
 
+  applyStrategyFunc(name, args) {
+    this._list.forEach(s => {
+      s[name].apply(s, args)
+    })
+  }
+
+  listenPublicJson(json, symbol) {
+    this._list.forEach(s => s.listenJson(json, symbol))
+  }
+
+  setCandlesHistory() {
+    this.applyStrategyFunc('setCandlesHistory', arguments)
+  }
+
+  updateCandleLastHistory() {
+    this.applyStrategyFunc('updateCandleLastHistory', arguments)
+  }
+
+  updateCandlesRealTime() {
+    this.applyStrategyFunc('updateCandlesRealTime', arguments)
+  }
+
+  updateOrderbook() {
+    this.applyStrategyFunc('updateOrderbook', arguments)
+  }
+
+  updateTradeHistoryData() {
+    this.applyStrategyFunc('updateTradeHistoryData', arguments)
+  }
+
   getAllUsersAccount() {
     const users = this._list.map(strategy => {
       const options = strategy.getOptions()
