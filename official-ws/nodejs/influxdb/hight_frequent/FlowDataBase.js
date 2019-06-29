@@ -339,9 +339,13 @@ class FlowDataBase {
           process.exit(1) // centos7 设置 systemctl 服务会自动重启
         }, 10 * 1000)
       }
-      const checkCandleMsg = this.checkCandles()
-      if (checkCandleMsg) {
-        notifyPhone(checkCandleMsg)
+      const checkXBTCandleMsg = this.checkCandles('XBTUSD')
+      const checkETHCandleMsg = this.checkCandles('ETHUSD')
+      if (checkXBTCandleMsg) {
+        notifyPhone(checkXBTCandleMsg)
+      }
+      if (checkETHCandleMsg) {
+        notifyPhone(checkETHCandleMsg)
       }
     }, 5 * 60 * 1000)
   }
