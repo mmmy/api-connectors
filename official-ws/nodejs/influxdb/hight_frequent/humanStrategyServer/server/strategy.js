@@ -33,7 +33,7 @@ if (isProduction) {
 
 } else {
   var qqTest = require('../../../../strategy/apikey/test-secret.json')
-  // var yqheroTest = require('../../../../strategy/test-secret-yqhero.json')
+  var yqheroTest = require('../../../../strategy/apikey/test-secret-yqhero.json')
   list.push({
     user: 'yq',
     test: false,
@@ -43,6 +43,21 @@ if (isProduction) {
     database: false,
     initCheckSystem: true,
     main: true,
+  })
+  list.push({
+    user: 'yqhero',
+    test: false,
+    testnet: true,
+    apiKey: yqheroTest.apiKey,
+    apiSecret: yqheroTest.apiSecret,
+    database: false,
+    initCheckSystem: false,
+    main: false,
+    botRsiDivergence: {
+      on: true
+    },
+    autoUpdateStopOpenMarketOrder: true,
+    autoUpdateStopOpenMarketOrder1h: false,
   })
 }
 

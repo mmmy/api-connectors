@@ -23,7 +23,7 @@ const precisionMap = {
 
 class FlowDataBase {
   constructor(options) {
-    this._options = {
+    this._options = _.extend({
       test: true,
       database: false,
       maxCache: 200,
@@ -48,8 +48,12 @@ class FlowDataBase {
       autoCloseRsiDivergence5m: false,
       autoCloseMacdDivergence1h: false,
       autoCloseRsiDivergence1h: false,
-      ...options
-    }
+
+      botRsiDivergence: {
+        on: false
+      }
+    }, options)
+
     this._indicativeSettlePrice = 0
     this._ispList = []                    //[{timestamp, price}]
     this._accountOrder = new AccountOrder()
