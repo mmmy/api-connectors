@@ -824,7 +824,7 @@ class FlowDataBase {
       on, botId, symbols, enableLong, enableShort,
       len, highlowLen, divergenceLen, theshold_bottom, theshold_top,
       lowVol, highBoDong
-    } = this.options.botRsiDivergence
+    } = this._options.botRsiDivergence
 
     if (!on) {
       return
