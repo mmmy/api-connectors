@@ -56,7 +56,7 @@ class BackTestRsiDivergence extends BackTest {
 
         // 这个很牛逼
         // if (isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
-        if (lowVolFilter && highBoDongFilter && strongShortFilter && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
+        if (highBoDongFilter && lowVolFilter && strongShortFilter && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
           long = true
         }
         // if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
