@@ -31,6 +31,11 @@ if (isProduction) {
     database: false,
     initCheckSystem: false,
     main: false,
+    botRsiDivergence: {
+      on: true
+    },
+    autoUpdateStopOpenMarketOrder: true,
+    autoUpdateStopOpenMarketOrder1h: false,
   })
 
 } else {
