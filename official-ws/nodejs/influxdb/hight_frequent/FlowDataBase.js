@@ -111,10 +111,12 @@ class FlowDataBase {
   }
 
   updateOptions(options) {
-    this._options = {
-      ...this._options,
-      ...options,
-    }
+    this._options = _.extend(this._options, options)
+    return this.getOptions()
+  }
+
+  updateOption(path, value) {
+    _.set(this._options, path, value)
     return this.getOptions()
   }
 

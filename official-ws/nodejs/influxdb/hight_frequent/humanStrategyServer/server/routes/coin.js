@@ -344,6 +344,28 @@ router.post('/change_options', function (req, res) {
   })
 })
 
+router.post('/change_option', function (req, res) {
+  const { user, path, value } = req.body
+  if (!user) {
+    res.send({
+      result: false,
+      info: '缺少user参数'
+    })
+    return
+  }
+  manager.updateOption(user, path, value).then(json => {
+    res.send({
+      result: true,
+      data: json
+    }).catch(e => {
+      res.send({
+        result: false,
+        info: e
+      })
+    })
+  })
+})
+
 router.get('/auto_order_signal_list', function (req, res) {
   const { user } = req.query
   if (!user) {

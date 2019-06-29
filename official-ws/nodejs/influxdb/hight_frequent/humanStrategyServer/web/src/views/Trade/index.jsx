@@ -322,6 +322,13 @@ export default class Trade extends React.Component {
                   </tbody>
                 </table>
               </div>
+              <div>
+                <h5>BOT</h5>
+                <div>
+                  <input id="bot-rsi-divergence-checkbox" onClick={}/>
+                  <label>rsi divergence</label>
+                </div>
+              </div>
               {
                 pending && <div className="pending-container">fetching...</div>
               }
@@ -738,15 +745,13 @@ export default class Trade extends React.Component {
     this.fetchChangeUserOption(index, key, e.target.checked)
   }
 
-  fetchChangeUserOption(index, key, value) {
+  fetchChangeUserOption(index, path, value) {
     var userData = this.state.users[index]
     const { user } = userData.options
     userData.pending = true
     this.setState({})
-    const options = {
-      [key]: value
-    }
-    axios.post('api/coin/change_options', { user, options }).then(({ status, data }) => {
+
+    axios.post('api/coin/change_option', { user, path, value }).then(({ status, data }) => {
       userData.pending = false
       if (status === 200 && data.result) {
         alert('修改成功')

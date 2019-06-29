@@ -203,6 +203,14 @@ module.exports = class StrategyUserManager {
     strategy.updateOptions(options)
     return Promise.resolve(strategy.getOptions())
   }
+  updateOption(user, path, value) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    strategy.updateOption(path, value)
+    return Promise.resolve(strategy.getOptions())
+  }
   // period: 5m 1h
   orderStopOrderByLastCandle(user, symbol, period, qty, side) {
     const strategy = this.findStrategyByUser(user)
