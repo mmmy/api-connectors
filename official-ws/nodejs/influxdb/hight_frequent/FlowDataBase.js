@@ -50,7 +50,20 @@ class FlowDataBase {
       autoCloseRsiDivergence1h: false,
 
       botRsiDivergence: {
-        on: false
+        botId: '__rsi_divergence_bot',
+        symbols: ['XBTUSD'],
+        on: false,
+        len: 12,
+        highlowLen: 80,
+        divergenceLen: 80,
+        theshold_bottom: 25,
+        theshold_top: 80,
+        enableLong: true,
+        enableShort: false,
+        open_size: 1,
+        lowVol: true,
+        highBoDong: true,
+
       }
     }, options)
 
@@ -150,6 +163,9 @@ class FlowDataBase {
         break
       case 'tradeBin1h':
         this.updateTradeBin1h(json, symbol)
+        break
+      case 'tradeBin1d':
+        this.updateTradeBin1d(json, symbol)
         break
       case 'order':
         this.updateAccountOrder(json, symbol)
@@ -295,6 +311,26 @@ class FlowDataBase {
     return true
   }
 
+  checkCandles(symbol) {
+    const timestamp5m = this._candles5m.getHistoryCandle(symbol).timestamp
+    const timestamp1h = this._candles1h.getHistoryCandle(symbol).timestamp
+    const timestamp1d = this._candles1d.getHistoryCandle(symbol).timestamp
+    const now = new Date()
+    const gap5m = now - new Date(timestamp5m)
+    const gap1h = now - new Date(timestamp1h)
+    const gap1d = now - new Date(timestamp1d)
+    if (gap5m > 6 * 60000) {
+      return `${symbol} 5m candle timestamp wrong ${gap5m / 60000} 分钟`
+    }
+    if (gap1h > 3700 * 1000) {
+      return `${symbol} 1h candle timestamp wrong ${gap1h / 60000} 分钟`
+    }
+    if (gap1d > 25 * 3600 * 1000) {
+      return `${symbol} 1d candle timestamp wrong ${gap1d / 3600000} 小时`
+    }
+    return false
+  }
+
   initCheckSystem() {
     this._interval = setInterval(() => {
       if (!this.checkAlive()) {
@@ -302,6 +338,10 @@ class FlowDataBase {
         setTimeout(() => {
           process.exit(1) // centos7 设置 systemctl 服务会自动重启
         }, 10 * 1000)
+      }
+      const checkCandleMsg = this.checkCandles()
+      if (checkCandleMsg) {
+        notifyPhone(checkCandleMsg)
       }
     }, 5 * 60 * 1000)
   }
@@ -597,6 +637,8 @@ class FlowDataBase {
     }
 
     this.caculateIndicatorAndCache(symbol, '5m')
+
+    this.runRsiDevergenceBot(symbol)
   }
 
   updateAccountOrder(json, symbol) {
@@ -604,10 +646,6 @@ class FlowDataBase {
     // console.log('BTM: account order update', json.action, '[ordStatus]', json.data[0] && json.data[0].ordStatus, '[ordType]', json.data[0] && json.data[0].ordType)
     // console.log(json)
     // console.log(this._accountOrder)
-  }
-
-  hasPosition() {
-    return this._currentQty !== 0
   }
 
   getAccountPosition(symbol) {
@@ -764,6 +802,100 @@ class FlowDataBase {
 
   getAllIndicatorValues() {
     return this._indicatorCache
+  }
+
+  hasStopOpenOrder(symbol) {
+    this._orderManager.getStopOpenMarketOrders(symbol).length > 0
+  }
+
+  getWalletBalanceUsd() {
+    const { walletBalance } = this.getAccountMargin()
+    const balance = walletBalance / 1E8
+    const xbtPirce = this._candles5m.getHistoryCandle('XBTUSD').close
+    return Math.floor(xbtPirce * balance)
+  }
+
+  getAccountFullAmount() {
+    return this.getWalletBalanceUsd()
+  }
+
+  runRsiDevergenceBot(symbol) {
+    const {
+      on, botId, symbols, enableLong, enableShort,
+      len, highlowLen, divergenceLen, theshold_bottom, theshold_top,
+      lowVol, highBoDong
+    } = this.options.botRsiDivergence
+
+    if (!on) {
+      return
+    }
+    if (symbols.indexOf(symbol) === -1) {
+      return
+    }
+    if (this.hasStopOpenOrder(symbol)) {
+      return
+    }
+    if (this.isAutoSignalRunding(botId)) {
+      return
+    }
+
+    if (this._accountPosition.hasPosition(symbol)) {
+      // may close
+      // const currentQty = this._accountPosition.getCurrentQty(symbol)
+      const closeSignal = this._candles5m.rsiDivergenceSignal(symbol, 10, 24, 24, 30, 70)
+      if (closeSignal.long) {
+        this.closeShortPositionIfHave(symbol)
+      }
+      if (closeSignal.short) {
+        this.closeLongPostionIfHave(symbol)
+      }
+    } else {
+      // open
+      const openSignal = this._candles5m.rsiDivergenceSignal(symbol, len || 12, highlowLen || 80, divergenceLen || 80, theshold_bottom || 25, theshold_top || 75)
+      
+      const lowVolFilter = lowVol ? this._candles5m.isLowVol(symbol, 50, 3) : true
+      const highBoDongFilter = highBoDong ? this._candles1d.isAdxHigh(symbol, 14) : true
+      if ((openSignal.long && enableLong) || (openSignal.short && enableShort)) {
+        if (lowVolFilter, highBoDongFilter) {
+          notifyPhone('rsi divergence bot open!')
+          // high2 low2 to open
+          this.updateAutoSignalById(botId, {
+            symbol: symbol,
+            amount: this.getAccountFullAmount(),
+            min_interval: 1,// 重复触发至少间隔时间1小时, 关系不大
+            order_method: "stopMarket5m", // highlow1
+            remain_times: 1,
+            side: openSignal.long ? "Buy" : "Sell",
+            signal_name: "break5m",
+            signal_operator: openSignal.long ? "low1" : "high1",
+            signal_value: "",
+            values: {
+              times: 2
+            }
+          })
+        }
+      }
+    }
+  }
+
+  isAutoSignalRunding(id) {
+    const order = this._autoOrderSignals.filter(o => o.id === id)[0]
+    if (order && order.remain_times > 0) {
+      return true
+    }
+    return false
+  }
+
+  updateAutoSignalById(id, newOrder) {
+    const order = this._autoOrderSignals.filter(o => o.id === id)[0]
+    if (order) {
+      _.extend(order, newOrder)
+    } else {
+      this._autoOrderSignals.push({
+        ...newOrder,
+        id
+      })
+    }
   }
 }
 

@@ -63,6 +63,14 @@ class BitmexCandleManager {
   stochOverTradeSignal(symbol, len, kLen, theshold_bottom, theshold_top) {
     return this._candles[symbol].stochOverTradeSignal(len, kLen, theshold_bottom, theshold_top)
   }
+
+  isLowVol(symbol, len, rate) {
+    return this._candles[symbol].isLowVol(len, rate)
+  }
+
+  isAdxHigh(symbol, len) {
+    return this._candles[symbol].isAdxHigh(len)
+  }
 }
 
 module.exports = BitmexCandleManager

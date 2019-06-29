@@ -325,7 +325,7 @@ export default class Trade extends React.Component {
               <div>
                 <h5>BOT</h5>
                 <div>
-                  <input id="bot-rsi-divergence-checkbox" onClick={}/>
+                  <input type="checkbox" id="bot-rsi-divergence-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botRsiDivergence.on')} checked={options.botRsiDivergence.on}/>
                   <label>rsi divergence</label>
                 </div>
               </div>
