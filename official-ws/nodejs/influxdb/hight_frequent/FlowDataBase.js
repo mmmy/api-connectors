@@ -374,7 +374,7 @@ class FlowDataBase {
     }
 
     // stoch
-    const stochOverTradeSignal_2575 = this.candleManager.stochOverTradeSignal(symbol, 9, 3, 25, 75)
+    const stochOverTradeSignal_2575 = candleManager.stochOverTradeSignal(symbol, 9, 3, 25, 75)
     if (stochOverTradeSignal_2575.long) {
       if (this._options.autoCloseStochOverTrade_2575_1d) {
         this.closeShortPositionIfHave(symbol)
@@ -856,7 +856,7 @@ class FlowDataBase {
     } else {
       // open
       const openSignal = this._candles5m.rsiDivergenceSignal(symbol, len || 12, highlowLen || 80, divergenceLen || 80, theshold_bottom || 25, theshold_top || 75)
-      
+
       if ((openSignal.long && enableLong) || (openSignal.short && enableShort)) {
         const lowVolFilter = lowVol ? this._candles5m.isLowVol(symbol, 50, 3) : true
         const highBoDongFilter = highBoDong ? this._candles1d.isAdxHigh(symbol, 14) : true
