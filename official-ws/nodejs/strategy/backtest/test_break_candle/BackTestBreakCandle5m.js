@@ -69,9 +69,13 @@ class BackTestBreakCandle5m extends BackTest {
     })
 
     this._closeSignal = () => {
-      const candleManager5m = this.getCandleByPeriod('5m')
-      const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 24, 30, 70)
-      return rsiDivergenceSignal
+      return {
+        long: false,
+        short: false
+      }
+      // const candleManager5m = this.getCandleByPeriod('5m')
+      // const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 24, 30, 70)
+      // return rsiDivergenceSignal
     }
 
     this._onUpdateBar['5m'] = this.readBar5m.bind(this)
@@ -88,6 +92,7 @@ class BackTestBreakCandle5m extends BackTest {
           // has bought
           this.orderMarketPrevHighLow('5m', bar, this._highsToBuy.amount)
           this.setPositionStop(true)
+          this.setPositionProfit(true)
           this._highsToBuy.ordering = false
         } else {
           this._highsToBuy.remains = this._highsToBuy.remains - 1
@@ -98,6 +103,7 @@ class BackTestBreakCandle5m extends BackTest {
           // has bought
           this.orderMarketPrevHighLow('5m', bar, this._lowsToSell.amount)
           this.setPositionStop(false)
+          this.setPositionProfit(false)
           this._lowsToSell.ordering = false
         } else {
           this._lowsToSell.remains = this._lowsToSell.remains - 1
@@ -150,6 +156,13 @@ class BackTestBreakCandle5m extends BackTest {
     const { len } = this._options
     const { maxHigh, minLow } = this.getCandleByPeriod('5m').getMinMaxHighLow(len)
     this._accout.setStopPrice(long ? minLow : maxHigh)
+  }
+  
+  setPositionProfit(long) {
+    const { len } = this._options
+    const { high, low } = this.getHistoryCandleByPeriod('5m', 2)
+    const { maxHigh, minLow } = this.getCandleByPeriod('5m').getMinMaxHighLow(len)
+    this._accout.setProfitPrice(long ? (high + maxHigh - minLow) : (low - maxHigh + minLow))
   }
 
   orderMarketPrevHighLow(period, bar, amount) {

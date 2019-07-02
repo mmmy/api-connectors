@@ -87,13 +87,9 @@ class BackTestRsiDivergence extends BackTest {
     })
 
     this._closeSignal = () => {
-      return {
-        long: false,
-        short: false
-      }
-      // const candleManager5m = this.getCandleByPeriod('5m')
-      // const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 24, 30, 70)
-      // return rsiDivergenceSignal
+      const candleManager5m = this.getCandleByPeriod('5m')
+      const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 24, 30, 70)
+      return rsiDivergenceSignal
     }
 
     this._onUpdateBar['5m'] = this.readBar5m.bind(this)
