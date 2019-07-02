@@ -311,7 +311,7 @@ Candles.prototype.macdDepartSignal = function (realTime = false, len = 90, offse
   }
 }
 // 判断当前k线的收盘价是最近最高的
-Candles.prototype.isCurrentHighestLowestClose = function (isHighest, backlen, offset) {
+Candles.prototype.isCurrentHighestLowestClose = function (isHighest, backlen, offset, useHighLow) {
   let histories = this.getCandles(false, offset)
   const len = histories.length
   if (len < backlen) {
@@ -321,9 +321,9 @@ Candles.prototype.isCurrentHighestLowestClose = function (isHighest, backlen, of
   for (let i = 1; i < backlen; i++) {
     const candle = histories[len - i - 1]
     if (candle) {
-      if (isHighest && candle.close > currentClose) {
+      if (isHighest && (useHighLow ? candle.high : candle.close) > currentClose) {
         return false
-      } else if (!isHighest && candle.close < currentClose) {
+      } else if (!isHighest && (useHighLow ? candle.low : candle.close) < currentClose) {
         return false
       }
     }
@@ -744,6 +744,21 @@ Candles.prototype.isStrongLong = function () {
   const isUp = c1.high > c2.high && c1.low > c2.low && c1.close > c2.close
   if (c1Rate > 0.04 && isUp && overSell && moreVol) {
     return true
+  }
+  return false
+}
+
+Candles.prototype.isLastBarTrend = function (up, len = 30) {
+  const lastCandle = this.getHistoryCandle(1)
+  const klines = this.getCandles(false)
+  const volSmaResult = signal.VolSMA(klines, len)
+  const highVol = lastCandle.size > volSmaResult[volSmaResult.length - 1]
+  if (highVol) {
+    if (upl) {
+      return this.isCurrentHighestLowestClose(true, len, 0, true)
+    } else if (down) {
+      return this.isCurrentHighestLowestClose(false, len, 0, true)
+    }
   }
   return false
 }

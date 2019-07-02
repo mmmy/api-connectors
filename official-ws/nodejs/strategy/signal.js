@@ -160,11 +160,11 @@ exports.PasrSignal = function (kline, start = 0.02, step = 0.02, max = 0.11) {
     }
 }
 
-function SMA(kline, period) {
-    const { T, O, H, L, C, V } = parseKline(kline)
-    const result = SMA.calculate({ period, values: C })
-    return result
-}
+// function SMA(kline, period) {
+//     const { T, O, H, L, C, V } = parseKline(kline)
+//     const result = SMA.calculate({ period, values: C })
+//     return result
+// }
 
 exports.VolSMA = function (kline, period) {
     kline = kline.slice(-period * 2)
