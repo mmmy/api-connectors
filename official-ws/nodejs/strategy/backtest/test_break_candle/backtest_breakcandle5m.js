@@ -17,11 +17,11 @@ const HistoryData = {
     '1h': getHistroyData('XBTUSD', '1h'),
     '1d': getHistroyData('XBTUSD', '1d'),
   },
-  'ETHUSD': {
-    '5m': getHistroyData('ETHUSD', '5m'),
-    '1h': getHistroyData('ETHUSD', '1h'),
-    '1d': getHistroyData('ETHUSD', '1d'),
-  },
+  // 'ETHUSD': {
+  //   '5m': getHistroyData('ETHUSD', '5m'),
+  //   '1h': getHistroyData('ETHUSD', '1h'),
+  //   '1d': getHistroyData('ETHUSD', '1d'),
+  // },
 }
 
 const manager = new BackTestManager()
@@ -37,7 +37,7 @@ manager.addNewStrategy(new TestStrategy({
   disableShort: true,
   highVol: true,
   useAdx: true,
-  len: 12,
+  len: 30,
   // disableLong: true
 }))
 

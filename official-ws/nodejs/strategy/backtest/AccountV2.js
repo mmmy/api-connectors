@@ -17,6 +17,7 @@ class Account {
     this._amount = 0
     this._avgPrice = 0
     this._stopPrice = 0
+    this._profitPrice = 0
     this._openTime = 0
   }
 
@@ -36,10 +37,24 @@ class Account {
     }
   }
 
-  setStopPrice() {
+  setStopPriceByPoint() {
     if (this.hasPosition()) {
       const longPosition = this._amount > 0
       this._stopPrice = longPosition ? this._avgPrice - 200 : this._avgPrice + 200
+    }
+  }
+
+  setStopPrice(price) {
+    this._stopPrice = price
+    if (this._amount > 0 && this._stopPrice > this._avgPrice) {
+      throw Error('long position stopPrice > avgPrice ?')
+    }
+  }
+
+  setProfitPrice(price) {
+    this._profitPrice = price
+    if (this._amount > 0 && this._profitPrice < this._avgPrice) {
+      throw Error('long position _profitPrice < _avgPrice ?')
     }
   }
 
@@ -148,6 +163,14 @@ class Account {
     return loss ? this._price + (this._long ? loss : -loss) : -1
   }
 
+  shouldClosePosition(bar) {
+    const result = this.shouldStopClosePosition(bar)
+    if (result) {
+      return result
+    }
+    return this.shouldTakeProfit(bar)
+  }
+
   shouldStopClosePosition(bar) {
     const { timestamp, high, low } = bar
     if (this.hasPosition() && this._stopPrice) {
@@ -157,6 +180,18 @@ class Account {
       const lost = longPosition ? (low <= lossPrice) : (high >= lossPrice)
       if (lost) {
         return this.orderMarket(lossPrice, bar, -this.getPostionAmount(), lost)
+      }
+    }
+  }
+
+  shouldTakeProfit(bar) {
+    const { timestamp, high, low } = bar
+    if (this.hasPosition() && this._profitPrice) {
+      // this.updateMinMax(bar)
+      const longPosition = this._amount > 0
+      const wined = longPosition ? (high > this._profitPrice) : (low < this._profitPrice)
+      if (wined) {
+        return this.orderMarket(this._profitPrice, bar, -this.getPostionAmount(), false)
       }
     }
   }

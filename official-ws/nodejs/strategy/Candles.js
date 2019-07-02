@@ -691,13 +691,18 @@ Candles.prototype.highlow1Signal = function () {
   }
 }
 
-Candles.prototype.isAdxLong = function (len = 14, gaobodong = false) {
+Candles.prototype.adxSignal = function (len = 14, gaobodong = false) {
   const klines = this.getCandles(false)
   const result = signal.ADXSignal(klines, len = 14)
   const d0 = result[result.length - 1]
   const { adx, mdi, pdi } = d0
   const bodong = adx > mdi && adx > pdi
-  return gaobodong ? (bodong && (pdi >= mdi)) : (pdi >= mdi)
+  let long = gaobodong ? (bodong && (pdi >= mdi)) : (pdi >= mdi)
+  let short = gaobodong ? (bodong && (mdi > pdi)) : (mdi > pdi)
+  return {
+    long,
+    short
+  }
 }
 
 Candles.prototype.isAdxHigh = function (len = 14) {
@@ -748,19 +753,31 @@ Candles.prototype.isStrongLong = function () {
   return false
 }
 
-Candles.prototype.isLastBarTrend = function (up, len = 30) {
+Candles.prototype.isLastBarTrend = function (len = 30) {
   const lastCandle = this.getHistoryCandle(1)
   const klines = this.getCandles(false)
   const volSmaResult = signal.VolSMA(klines, len)
   const highVol = lastCandle.size > volSmaResult[volSmaResult.length - 1]
+  let long = false
+  let short = false
   if (highVol) {
-    if (upl) {
-      return this.isCurrentHighestLowestClose(true, len, 0, true)
-    } else if (down) {
-      return this.isCurrentHighestLowestClose(false, len, 0, true)
+    if (this.isCurrentHighestLowestClose(true, len, 0, true)) {
+      long = true
+    } else if (this.isCurrentHighestLowestClose(false, len, 0, true)) {
+      short = true
     }
   }
-  return false
+  return {
+    long,
+    short
+  }
+}
+
+Candles.prototype.isUpVol = function(slowLen, fastLen) {
+  const klines = this.getCandles(false)
+  const volFastSmaResult = signal.VolSMA(klines, fastLen)
+  const volSlowSmaResult = signal.VolSMA(klines, slowLen)
+  return volFastSmaResult.slice(-1)[0] > volSlowSmaResult.slice(-1)[0]
 }
 
 module.exports = Candles

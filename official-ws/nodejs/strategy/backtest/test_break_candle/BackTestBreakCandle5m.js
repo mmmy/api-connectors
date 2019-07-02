@@ -22,23 +22,23 @@ class BackTestBreakCandle5m extends BackTest {
       const _1dCandle = candles['1d']
       let mainCandle = _5mCandle
 
-      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, len || 12, highlowLen || 50, divergenceLen || 50, theshold_bottom || 25, theshold_top || 75)
+      const signal = mainCandle.isLastBarTrend(len)
 
       const disableShort = this._options.disableShort
       const disableLong = this._options.disableLong
       if (
         !disableLong &&
-        rsiDivergenceSignal.long
+        signal.long
       ) {
-        const highVolFilter = highVol ? _5mCandle.isLowVol(50, 3) : true
+        const highVolFilter = highVol ? _1hCandle.isUpVol(10, 3) : true
+        const adxFilter = useAdx ? _1hCandle.adxSignal(14, false).long : true
         // console.log(bar.timestamp, bar.close)
         // const trendSignal = this.get1dMacdTrendSignal()
         // const filterS = this.getMacdDepartSignal('1h')
         // if (filterS.long) {
 
-        // 这个很牛逼
         // if (isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
-        if (highVolFilter && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
+        if (highVolFilter && adxFilter) {
           long = true
         }
         // if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
@@ -46,7 +46,7 @@ class BackTestBreakCandle5m extends BackTest {
         // }
       } else if (
         !disableShort &&
-        rsiDivergenceSignal.short
+        signal.short
       ) {
         const isLowVol = _5mCandle.isLowVol(50, 3)
         const isHighBoDong = _1dCandle.isAdxHigh(14)
@@ -87,6 +87,7 @@ class BackTestBreakCandle5m extends BackTest {
         if (this._highsToBuy.remains === 1) {
           // has bought
           this.orderMarketPrevHighLow('5m', bar, this._highsToBuy.amount)
+          this.setPositionStop(true)
           this._highsToBuy.ordering = false
         } else {
           this._highsToBuy.remains = this._highsToBuy.remains - 1
@@ -96,6 +97,7 @@ class BackTestBreakCandle5m extends BackTest {
         if (this._lowsToSell.remains === 1) {
           // has bought
           this.orderMarketPrevHighLow('5m', bar, this._lowsToSell.amount)
+          this.setPositionStop(false)
           this._lowsToSell.ordering = false
         } else {
           this._lowsToSell.remains = this._lowsToSell.remains - 1
@@ -106,6 +108,7 @@ class BackTestBreakCandle5m extends BackTest {
         const signal = this._strategy(bar, this._candles)
         if (signal.long) {
           this.startBuyHigh(2, 1)
+          // this._openLongSignalStopPrice = this._5mCandle.get
         }
         if (signal.short) {
           this.startSellLow(2, -1)
@@ -136,11 +139,17 @@ class BackTestBreakCandle5m extends BackTest {
         }
       }
     }
-    // stop market
-    const result = this._accout.shouldStopClosePosition(bar)
+    // stop market or takeProfit
+    const result = this._accout.shouldClosePosition(bar)
     if (result) {
       this._tradeHistory.push(result)
     }
+  }
+
+  setPositionStop(long) {
+    const { len } = this._options
+    const { maxHigh, minLow } = this.getCandleByPeriod('5m').getMinMaxHighLow(len)
+    this._accout.setStopPrice(long ? minLow : maxHigh)
   }
 
   orderMarketPrevHighLow(period, bar, amount) {

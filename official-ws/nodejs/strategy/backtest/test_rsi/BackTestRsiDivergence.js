@@ -87,9 +87,13 @@ class BackTestRsiDivergence extends BackTest {
     })
 
     this._closeSignal = () => {
-      const candleManager5m = this.getCandleByPeriod('5m')
-      const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 24, 30, 70)
-      return rsiDivergenceSignal
+      return {
+        long: false,
+        short: false
+      }
+      // const candleManager5m = this.getCandleByPeriod('5m')
+      // const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 24, 30, 70)
+      // return rsiDivergenceSignal
     }
 
     this._onUpdateBar['5m'] = this.readBar5m.bind(this)
@@ -119,14 +123,24 @@ class BackTestRsiDivergence extends BackTest {
           this._lowsToSell.remains = this._lowsToSell.remains - 1
         }
       }
+    } else if (this._waitingForOrderBreak.long || this._waitingForOrderBreak.short) {
+      const stochOverSignal = this._5mCandle.stochOverTradeSignal(9, 3, 30, 70)
+      if (stochOverSignal.long && this._waitingForOrderBreak.long) {
+        this.startBuyHigh(2, 1)
+        this._waitingForOrderBreak.long = false
+      }
+      if (stochOverSignal.short && this._waitingForOrderBreak.short) {
+        this.startSellLow(2, -1)
+        this._waitingForOrderBreak.short = false
+      }
     } else {
       if (!this._accout.hasPosition()) {
         const signal = this._strategy(bar, this._candles)
         if (signal.long) {
-          this.startBuyHigh(2, 1)
+          this._waitingForOrderBreak.long = true
         }
         if (signal.short) {
-          this.startSellLow(2, -1)
+          this._waitingForOrderBreak.short = true
         }
       } else {
         // close trade

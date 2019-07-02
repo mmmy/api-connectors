@@ -15,6 +15,7 @@ class BackTest {
     this._highsToBuy = { ordering: false, remains: 0, amount: 1 }  // 高N买
     this._lowsToSell = { ordering: false, remains: 0, amount: -1 }   // 低N卖
     this._onUpdateBar = {}
+    this._waitingForOrderBreak = { long: false, short: false }
     this.initCandles()
 
   }
