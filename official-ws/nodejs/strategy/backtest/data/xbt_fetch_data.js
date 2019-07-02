@@ -1,8 +1,11 @@
 const fs = require('fs')
 const BitmexSdk = require('../../bitmexSdk')
 const path = require('path')
+const execSync = require('child_process').execSync
+const args = require('yargs').argv
 
-const BinSize = '1d'
+const BinSize = args.b || '5m'
+const symbol = args.s || 'XBTUSD'
 
 const sizeToMilSec = {
   '1m': 60 * 1000,
@@ -48,7 +51,6 @@ function sleep(sec) {
 
 const JSONtoCSV = require('../utils').JSONtoCSV
 
-const symbol = 'ETHUSD'
 const CONFIG = {
   prefix: '',
   symbol: symbol,
@@ -99,6 +101,17 @@ function saveToFile(list) {
   console.log('end save to file, second:', sec)
 }
 
+function checkDataFile() {
+  execSync(`node check_data.js ./${fileName}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`)
+      return
+    }
+    stdout && console.log(`stdout: ${stdout}`)
+    stderr && console.log(`stderr: ${stderr}`)
+  })
+}
+
 async function run() {
   let offset = 3540300000
   if (BinSize === '1h') {
@@ -110,6 +123,7 @@ async function run() {
   let hasNewData = new Date(lastTimestamp) < (new Date() - sizeToMilSec[CONFIG.binSize])
   if (!hasNewData) {
     console.log('has no new data, exit')
+    // checkDataFile()
   }
   let dataList = []
   while (hasNewData) {
@@ -117,6 +131,7 @@ async function run() {
     console.log('remain:', remains, 'request:', Math.ceil(remains / CONFIG.count))
     if (remains === 0) {
       console.log('remain is 0, finished')
+      // checkDataFile()
       break
     }
     let startTime = new Date(new Date(lastTimestamp) - offset + sizeToMilSec[CONFIG.binSize]).toISOString()
