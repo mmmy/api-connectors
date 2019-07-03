@@ -109,15 +109,25 @@ class BackTestBreakCandle5m extends BackTest {
           this._lowsToSell.remains = this._lowsToSell.remains - 1
         }
       }
+    } else if (this._waitingForOrderBreak.long || this._waitingForOrderBreak.short) {
+      const stochOverSignal = this.getCandleByPeriod('5m').stochOverTradeSignal(9, 3, 30, 70)
+      if (stochOverSignal.long && this._waitingForOrderBreak.long) {
+        this.startBuyHigh(2, 1)
+        this._waitingForOrderBreak.long = false
+      }
+      if (stochOverSignal.short && this._waitingForOrderBreak.short) {
+        this.startSellLow(2, -1)
+        this._waitingForOrderBreak.short = false
+      }
     } else {
       if (!this._accout.hasPosition()) {
         const signal = this._strategy(bar, this._candles)
         if (signal.long) {
-          this.startBuyHigh(2, 1)
+          this._waitingForOrderBreak.long = true
           // this._openLongSignalStopPrice = this._5mCandle.get
         }
         if (signal.short) {
-          this.startSellLow(2, -1)
+          this._waitingForOrderBreak.short = true
         }
       } else {
         // close trade
@@ -157,7 +167,7 @@ class BackTestBreakCandle5m extends BackTest {
     const { maxHigh, minLow } = this.getCandleByPeriod('5m').getMinMaxHighLow(len)
     this._accout.setStopPrice(long ? minLow : maxHigh)
   }
-  
+
   setPositionProfit(long) {
     const { len } = this._options
     const { high, low } = this.getHistoryCandleByPeriod('5m', 2)

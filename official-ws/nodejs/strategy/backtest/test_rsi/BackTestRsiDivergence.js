@@ -119,24 +119,14 @@ class BackTestRsiDivergence extends BackTest {
           this._lowsToSell.remains = this._lowsToSell.remains - 1
         }
       }
-    } else if (this._waitingForOrderBreak.long || this._waitingForOrderBreak.short) {
-      const stochOverSignal = this._5mCandle.stochOverTradeSignal(9, 3, 30, 70)
-      if (stochOverSignal.long && this._waitingForOrderBreak.long) {
-        this.startBuyHigh(2, 1)
-        this._waitingForOrderBreak.long = false
-      }
-      if (stochOverSignal.short && this._waitingForOrderBreak.short) {
-        this.startSellLow(2, -1)
-        this._waitingForOrderBreak.short = false
-      }
     } else {
       if (!this._accout.hasPosition()) {
         const signal = this._strategy(bar, this._candles)
         if (signal.long) {
-          this._waitingForOrderBreak.long = true
+          this.startBuyHigh(2, 1)
         }
         if (signal.short) {
-          this._waitingForOrderBreak.short = true
+          this.startSellLow(2, -1)
         }
       } else {
         // close trade
