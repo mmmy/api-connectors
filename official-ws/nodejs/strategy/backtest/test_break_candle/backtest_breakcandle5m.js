@@ -33,7 +33,7 @@ const data1d = HistoryData[symbol]['1d']
 manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_breakcandle5m_30`,
+  id: `${symbol}_breakcandle5m_30_0601`,
   disableShort: true,
   highVol: true,
   useAdx: true,
@@ -123,7 +123,7 @@ let dataSeries = [
   // ['2017-09-16T00:00:00.000Z', '2017-12-13T00:00:00.000Z'],
   // ["2017-10-01T00:00:00.000Z", "2017-11-10T00:00:00.000Z",],
   // ["2017-11-13T00:00:00.000Z", "2017-12-08T00:00:00.000Z",],
-  // ["2019-05-22T10:00:00.000Z"]
+  // ["2019-06-01T10:00:00.000Z"]
 ]
 
 const seriesIndex = timeToSeries(data5m, dataSeries)
@@ -137,12 +137,16 @@ const d0 = new Date()
 const allTrades = manager.getAllTrades(true)
 
 const str = JSON.stringify(allTrades)
-console.log(str)
+// console.log(str)
 
 fs.writeFileSync(path.join(__dirname, 'temp.json'), str)
 
 allTrades.map((t, i) => {
   const { id, statistic } = t
+  console.log(id, {
+    ...statistic,
+    tradeEarnList: []
+  })
   const saveName = `${symbol}_rsi_divergence_result_${id || (i + 1)}.csv`
   const savePath = path.join(__dirname, saveName)
   const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk', 'pfp', 'margin'])
