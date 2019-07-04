@@ -55,20 +55,24 @@ const CONFIG = {
   prefix: '',
   symbol: symbol,
   count: 200,
-  binSize: '5m',
+  binSize: BinSize,
   startDate: symbol === 'XBTUSD' ? '2017-09-01' : '2018-08-03',
   columns: ['timestamp', 'open', 'high', 'low', 'close', 'volume'],
   reverse: true,
 }
 
+if (BinSize === '1m') {
+  CONFIG.startDate = symbol === 'XBTUSD' ? '2017-09-01' : '2018-08-03'
+  CONFIG.count = 200
+  CONFIG.reverse = false
+}
+
 if (BinSize === '1h') {
-  CONFIG.binSize = BinSize
   CONFIG.startDate = symbol === 'XBTUSD' ? '2017-06-01' : '2018-08-03'
   CONFIG.count = 100
 }
 
 if (BinSize === '1d') {
-  CONFIG.binSize = BinSize
   CONFIG.startDate = symbol === 'XBTUSD' ? '2017-04-01' : '2018-08-03'
   CONFIG.count = 10
   CONFIG.reverse = false
@@ -114,6 +118,9 @@ function checkDataFile() {
 
 async function run() {
   let offset = 3540300000
+  if (BinSize === '1m') {
+    offset = 0
+  }
   if (BinSize === '1h') {
     offset = 42843600000
   }
