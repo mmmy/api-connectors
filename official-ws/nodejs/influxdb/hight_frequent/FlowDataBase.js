@@ -836,12 +836,14 @@ class FlowDataBase {
     if (symbols.indexOf(symbol) === -1) {
       return
     }
+    console.log('runRsiDevergenceBot', symbol)
     if (this.hasStopOpenOrder(symbol)) {
       return
     }
     if (this.isAutoSignalRunding(botId)) {
       return
     }
+    console.log('runRsiDevergenceBot not isAutoSignalRunding')
 
     if (this._accountPosition.hasPosition(symbol)) {
       // may close
@@ -856,7 +858,7 @@ class FlowDataBase {
     } else {
       // open
       const openSignal = this._candles5m.rsiDivergenceSignal(symbol, len || 12, highlowLen || 80, divergenceLen || 80, theshold_bottom || 25, theshold_top || 75)
-
+      console.log('runRsiDevergenceBot', 'signal', openSignal)
       if ((openSignal.long && enableLong) || (openSignal.short && enableShort)) {
         const lowVolFilter = lowVol ? this._candles5m.isLowVol(symbol, 50, 3) : true
         const highBoDongFilter = highBoDong ? this._candles1d.isAdxHigh(symbol, 14) : true
