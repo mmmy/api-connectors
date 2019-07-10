@@ -71,6 +71,10 @@ class BitmexCandleManager {
   isAdxHigh(symbol, len) {
     return this._candles[symbol].isAdxHigh(len)
   }
+
+  isCurrentHighestLowestClose(symbol, len) {
+    return this._candles[symbol].isCurrentHighestLowestClose(false, len)
+  }
 }
 
 module.exports = BitmexCandleManager
