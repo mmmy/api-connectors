@@ -848,9 +848,11 @@ class FlowDataBase {
       // const currentQty = this._accountPosition.getCurrentQty(symbol)
       const closeSignal = this._candles5m.rsiDivergenceSignal(symbol, 10, 24, 24, 30, 70)
       if (closeSignal.long) {
+        notifyPhone('rsiDivergenceSignal bot close short')
         this.closeShortPositionIfHave(symbol)
       }
       if (closeSignal.short) {
+        notifyPhone('rsiDivergenceSignal bot close long')
         this.closeLongPostionIfHave(symbol)
       }
     } else {
