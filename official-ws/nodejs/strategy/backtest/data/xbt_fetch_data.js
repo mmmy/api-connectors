@@ -58,7 +58,7 @@ const CONFIG = {
   binSize: BinSize,
   startDate: symbol === 'XBTUSD' ? '2017-09-01' : '2018-08-03',
   columns: ['timestamp', 'open', 'high', 'low', 'close', 'volume'],
-  reverse: true,
+  reverse: false,
 }
 
 if (BinSize === '1m') {
@@ -117,16 +117,17 @@ function checkDataFile() {
 }
 
 async function run() {
-  let offset = 3540300000
-  if (BinSize === '1m') {
-    offset = 0
-  }
-  if (BinSize === '1h') {
-    offset = 42843600000
-  }
-  if (BinSize === '1d') {
-    offset = 0
-  }
+  // let offset = 3540300000
+  // if (BinSize === '1m') {
+  //   offset = 0
+  // }
+  // if (BinSize === '1h') {
+  //   offset = 42843600000
+  // }
+  // if (BinSize === '1d') {
+  //   offset = 0
+  // }
+  let offset = 0
   let hasNewData = new Date(lastTimestamp) < (new Date() - sizeToMilSec[CONFIG.binSize])
   if (!hasNewData) {
     console.log('has no new data, exit')

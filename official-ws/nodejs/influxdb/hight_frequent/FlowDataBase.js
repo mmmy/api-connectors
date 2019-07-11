@@ -860,6 +860,7 @@ class FlowDataBase {
         const isNotLH = !this._candles5m.isCurrentHighestLowestClose(symbol, 300)
         const lowVolFilter = lowVol ? this._candles5m.isLowVol(symbol, 50, 3) : true
         const highBoDongFilter = highBoDong ? this._candles1d.isAdxHigh(symbol, 14) : true
+        notifyPhone(`rsi divergence bot long! ${isNotLH} ${lowVolFilter} ${highBoDongFilter}`)
         if (isNotLH && lowVolFilter && highBoDongFilter) {
           notifyPhone('rsi divergence bot open!')
           // high2 low2 to open
