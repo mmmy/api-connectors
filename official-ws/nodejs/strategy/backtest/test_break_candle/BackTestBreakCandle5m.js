@@ -13,7 +13,7 @@ class BackTestBreakCandle5m extends BackTest {
 
   initStrategy() {
     this.setStrategy((bar, candles) => {
-      const { highVol, useAdx, len } = this._options
+      const { highVol, useAdx, len, upVol } = this._options
 
       let long = false
       let short = false
@@ -30,7 +30,9 @@ class BackTestBreakCandle5m extends BackTest {
         !disableLong &&
         signal.long
       ) {
-        const highVolFilter = highVol ? _1hCandle.isUpVol(10, 3) : true
+        // const highVolFilter = highVol ? _1hCandle.isUpVol(10, 3) : true
+        const upVolFilter = upVol ? _5mCandle.isUpVol(len, 3) : true
+        const highVolFilter = highVol ? _5mCandle.isHighVol(len, 3) : true
         const adxFilter = useAdx ? _1hCandle.adxSignal(14, false).long : true
         // console.log(bar.timestamp, bar.close)
         // const trendSignal = this.get1dMacdTrendSignal()
@@ -38,7 +40,7 @@ class BackTestBreakCandle5m extends BackTest {
         // if (filterS.long) {
 
         // if (isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
-        if (highVolFilter && adxFilter) {
+        if (highVolFilter && adxFilter && upVolFilter) {
           long = true
         }
         // if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {

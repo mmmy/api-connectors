@@ -426,14 +426,14 @@ Candles.prototype.priceRateFilter = function (len, rateMin, rateMax = 2) {
   return lastCandle.close >= pMin && lastCandle.close <= pMax
 }
 
-Candles.prototype.getMinMaxHighLow = function (len, realTime) {
-  var klines = this.getCandles(realTime)
+Candles.prototype.getMinMaxHighLow = function (len, offset = 0, realTime = false) {
+  var klines = this.getCandles(realTime, offset)
   return signal.highestLowestHighLow(klines, len)
 }
 
 Candles.prototype.priceRateFilterHighLow = function (len, rateMin, rateMax = 2) {
   const lastCandle = this.getHistoryCandle(1)
-  const { minLow, maxHigh } = this.getMinMaxHighLow(len, false)
+  const { minLow, maxHigh } = this.getMinMaxHighLow(len, 0, false)
   const pMin = minLow + (maxHigh - minLow) * rateMin
   const pMax = minLow + (maxHigh - minLow) * rateMax
   return lastCandle.close >= pMin && lastCandle.close <= pMax
@@ -720,6 +720,13 @@ Candles.prototype.isLowVol = function (len = 14, rate = 1) {
   const sizeSma0 = result[result.length - 1]
   return size / sizeSma0 < rate
 }
+Candles.prototype.isHighVol = function (len = 14, rate = 3) {
+  const klines = this.getCandles(false)
+  const { size } = this.getHistoryCandle(1)
+  const result = signal.VolSMA(klines, len)
+  const sizeSma0 = result[result.length - 1]
+  return size / sizeSma0 > rate
+}
 // for day
 Candles.prototype.isStrongShort = function () {
   const { d } = this.getLastStochKD(9, 3) // d相当于tv中的k
@@ -758,12 +765,14 @@ Candles.prototype.isLastBarTrend = function (len = 30) {
   const klines = this.getCandles(false)
   const volSmaResult = signal.VolSMA(klines, len)
   const highVol = lastCandle.size > volSmaResult[volSmaResult.length - 1]
+  const { high, low, close } = lastCandle
   let long = false
   let short = false
   if (highVol) {
-    if (this.isCurrentHighestLowestClose(true, len, 0, true)) {
+    const { minLow, maxHigh } = this.getMinMaxHighLow(len, 3, false)
+    if (close > (maxHigh * 1.005)) {
       long = true
-    } else if (this.isCurrentHighestLowestClose(false, len, 0, true)) {
+    } else if (close < (minLow * 0.99)) {
       short = true
     }
   }
@@ -773,7 +782,7 @@ Candles.prototype.isLastBarTrend = function (len = 30) {
   }
 }
 
-Candles.prototype.isUpVol = function(slowLen, fastLen) {
+Candles.prototype.isUpVol = function (slowLen, fastLen) {
   const klines = this.getCandles(false)
   const volFastSmaResult = signal.VolSMA(klines, fastLen)
   const volSlowSmaResult = signal.VolSMA(klines, slowLen)

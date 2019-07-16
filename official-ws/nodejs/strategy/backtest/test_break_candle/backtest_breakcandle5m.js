@@ -17,11 +17,11 @@ const HistoryData = {
     '1h': getHistroyData('XBTUSD', '1h'),
     '1d': getHistroyData('XBTUSD', '1d'),
   },
-  // 'ETHUSD': {
-  //   '5m': getHistroyData('ETHUSD', '5m'),
-  //   '1h': getHistroyData('ETHUSD', '1h'),
-  //   '1d': getHistroyData('ETHUSD', '1d'),
-  // },
+  'ETHUSD': {
+    '5m': getHistroyData('ETHUSD', '5m'),
+    '1h': getHistroyData('ETHUSD', '1h'),
+    '1d': getHistroyData('ETHUSD', '1d'),
+  },
 }
 
 const manager = new BackTestManager()
@@ -33,11 +33,12 @@ const data1d = HistoryData[symbol]['1d']
 manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_breakcandle5m_30_0601`,
+  id: `${symbol}_breakcandle5m_48_0601`,
   disableShort: true,
-  highVol: true,
+  highVol: false,
   useAdx: true,
-  len: 30,
+  upVol: true,
+  len: 48,
   // disableLong: true
 }))
 
