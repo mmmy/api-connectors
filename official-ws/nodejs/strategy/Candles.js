@@ -120,7 +120,7 @@ Candles.prototype.checkData = function () {
    [ { timestamp: '2018-07-09T06:32:43.133Z',
        symbol: 'XBTUSD',
        side: 'Buy',
-       size: 404,
+       volume: 404,
        price: 6709,
        tickDirection: 'ZeroPlusTick',
        trdMatchID: '2377c6c5-48e3-56f6-38d7-d6d8eccfbbda',
@@ -715,17 +715,17 @@ Candles.prototype.isAdxHigh = function (len = 14) {
 
 Candles.prototype.isLowVol = function (len = 14, rate = 1) {
   const klines = this.getCandles(false)
-  const { size } = this.getHistoryCandle(1)
+  const { volume } = this.getHistoryCandle(1)
   const result = signal.VolSMA(klines, len)
   const sizeSma0 = result[result.length - 1]
-  return size / sizeSma0 < rate
+  return volume / sizeSma0 < rate
 }
 Candles.prototype.isHighVol = function (len = 14, rate = 3) {
   const klines = this.getCandles(false)
-  const { size } = this.getHistoryCandle(1)
+  const { volume } = this.getHistoryCandle(1)
   const result = signal.VolSMA(klines, len)
   const sizeSma0 = result[result.length - 1]
-  return size / sizeSma0 > rate
+  return volume / sizeSma0 > rate
 }
 // for day
 Candles.prototype.isStrongShort = function () {
@@ -734,7 +734,7 @@ Candles.prototype.isStrongShort = function () {
   const c1 = this.getHistoryCandle(1)
   const c2 = this.getHistoryCandle(2)
   const c3 = this.getHistoryCandle(3)
-  const moreVol = c1.size > c2.size
+  const moreVol = c1.volume > c2.volume
   const c1Rate = (c1.close - c1.open) / c1.open
   const fatBody = Math.abs(c1.close - c1.open) / (c1.high - c1.low) > 0.7
   const isDown = c1.high < c2.high && c1.low < c2.low
@@ -750,7 +750,7 @@ Candles.prototype.isStrongLong = function () {
   const c1 = this.getHistoryCandle(1)
   const c2 = this.getHistoryCandle(2)
   const c3 = this.getHistoryCandle(3)
-  const moreVol = c1.size > c2.size
+  const moreVol = c1.volume > c2.volume
   const c1Rate = (c1.close - c1.open) / c1.open
   const fatBody = Math.abs(c1.close - c1.open) / (c1.high - c1.low) > 0.7
   const isUp = c1.high > c2.high && c1.low > c2.low && c1.close > c2.close
@@ -764,7 +764,7 @@ Candles.prototype.isLastBarTrend = function (len = 30) {
   const lastCandle = this.getHistoryCandle(1)
   const klines = this.getCandles(false)
   const volSmaResult = signal.VolSMA(klines, len)
-  const highVol = lastCandle.size > volSmaResult[volSmaResult.length - 1]
+  const highVol = lastCandle.volume > volSmaResult[volSmaResult.length - 1]
   const { high, low, close } = lastCandle
   let long = false
   let short = false

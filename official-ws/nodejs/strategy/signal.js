@@ -25,7 +25,7 @@ function parseKline(kline) {
         H.push(parseFloat(item.high))
         L.push(parseFloat(item.low))
         C.push(parseFloat(item.close))
-        V.push(parseFloat(item.size))
+        V.push(parseFloat(item.volume))
     })
 
     return { T, O, H, L, C, V }

@@ -25,7 +25,7 @@ module.exports = function (fileName, period) {
       high: +splitList[2],
       low: +splitList[3],
       close: +splitList[4],
-      size: +splitList[5]
+      volume: +splitList[5]
     }
   })
   return list
