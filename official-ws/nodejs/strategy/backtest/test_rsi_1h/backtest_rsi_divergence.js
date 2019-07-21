@@ -1,5 +1,5 @@
 
-const TestStrategy = require('./BackTestRsiDivergence')
+const TestStrategy = require('./BackTestRsiDivergence1h')
 const BackTestManager = require('../BackTestManager')
 
 const path = require('path')
@@ -33,16 +33,15 @@ const data1d = HistoryData[symbol]['1d']
 manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_rsi_divergence128080_300_5m_long_filter(lowVol+highBoDong)v3`,
+  id: `${symbol}_rsi_divergence128080_300_1h_long_filter(lowVol+highBoDong)`,
   disableShort: true,
   lowVol: true,
   highBoDong: true,
   strongLongShort: false,
-  len: 12,
+  len: 8,
   highlowLen: 80,
   divergenceLen: 80,
-  // theshold_bottom: 25,
-  theshold_bottom: 25,
+  theshold_bottom: 40,
   theshold_top: 80,
   disableLong: false,
 }))

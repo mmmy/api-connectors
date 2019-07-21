@@ -3,7 +3,7 @@ const BackTest = require('../BackTest')
 const AccountV2 = require('../AccountV2')
 
 
-class BackTestRsiDivergence extends BackTest {
+class BackTestRsiDivergence1h extends BackTest {
   constructor(options) {
     super(options)
     this._accout = new AccountV2(this._options['account'])
@@ -36,7 +36,7 @@ class BackTestRsiDivergence extends BackTest {
       const _5mCandle = candles['5m']
       const _1hCandle = candles['1h']
       const _1dCandle = candles['1d']
-      let mainCandle = _5mCandle
+      let mainCandle = _1hCandle
 
       const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, len || 12, highlowLen || 50, divergenceLen || 50, theshold_bottom || 25, theshold_top || 75)
 
@@ -46,9 +46,9 @@ class BackTestRsiDivergence extends BackTest {
         !disableLong &&
         rsiDivergenceSignal.long
       ) {
-        const lowVolFilter = lowVol ? _5mCandle.isLowVol(50, 3) : true
+        // const lowVolFilter = lowVol ? _1hCandle.isLowVol(50, 3) : true
         // const lowVolFilter = lowVol ? _5mCandle.isLatestLowVol(50, 12, 1) : true
-        // const lowVolFilter = lowVol ? _1hCandle.isLatestLowVol(50, 4, 1) && _5mCandle.isLowVol(50, 3) : true
+        const lowVolFilter = lowVol ? _1hCandle.isLatestLowVol(50, 4, 1.5) : true
         const highBoDongFilter = highBoDong ? _1dCandle.isAdxHigh(14) : true
         const strongShortFilter = strongLongShort ? !_1dCandle.isStrongShort() : true
         // console.log(bar.timestamp, bar.close)
@@ -69,7 +69,7 @@ class BackTestRsiDivergence extends BackTest {
         rsiDivergenceSignal.short
       ) {
         // const isLowVol = _5mCandle.isLowVol(50, 3)
-        const lowVolFilter = lowVol ? _1hCandle.isLatestLowVol(50, 4, 1) && _5mCandle.isLowVol(50, 3) : true
+        const lowVolFilter = lowVol ? _1hCandle.isLowVol(50, 3) : true
         // const lowVolFilter = lowVol ? _5mCandle.isLatestLowVol(50, 12, 4) : true
         const highBoDongFilter = highBoDong ? _1dCandle.isAdxHigh(14) : true
 
@@ -93,33 +93,33 @@ class BackTestRsiDivergence extends BackTest {
     })
 
     this._closeSignal = () => {
-      const candleManager5m = this.getCandleByPeriod('5m')
-      const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 24, 35, 67)
+      const candleManager5m = this.getCandleByPeriod('1h')
+      const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 24, 45, 55)
       return rsiDivergenceSignal
     }
 
-    this._onUpdateBar['5m'] = this.readBar5m.bind(this)
+    this._onUpdateBar['1h'] = this.readBar1h.bind(this)
   }
 
-  readBar5m(bar) {
+  readBar1h(bar) {
     // const signal = this._strategy(bar, this._candles)
     // return
-    // this.checkCandle()
+    this.checkCandle()
     const hasStopOpenOrder = this.hasStopOpenOrder()
     if (hasStopOpenOrder) {
-      if (this._highsToBuy.ordering && this.isHigh1('5m')) {
+      if (this._highsToBuy.ordering && this.isHigh1('1h')) {
         if (this._highsToBuy.remains === 1) {
           // has bought
-          this.orderMarketPrevHighLow('5m', bar, this._highsToBuy.amount)
+          this.orderMarketPrevHighLow('1h', bar, this._highsToBuy.amount)
           this._highsToBuy.ordering = false
         } else {
           this._highsToBuy.remains = this._highsToBuy.remains - 1
         }
       }
-      if (this._lowsToSell.ordering && this.isLow1('5m')) {
+      if (this._lowsToSell.ordering && this.isLow1('1h')) {
         if (this._lowsToSell.remains === 1) {
           // has bought
-          this.orderMarketPrevHighLow('5m', bar, this._lowsToSell.amount)
+          this.orderMarketPrevHighLow('1h', bar, this._lowsToSell.amount)
           this._lowsToSell.ordering = false
         } else {
           this._lowsToSell.remains = this._lowsToSell.remains - 1
@@ -228,4 +228,4 @@ class BackTestRsiDivergence extends BackTest {
   }
 }
 
-module.exports = BackTestRsiDivergence
+module.exports = BackTestRsiDivergence1h
