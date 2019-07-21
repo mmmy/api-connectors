@@ -33,8 +33,8 @@ const data1d = HistoryData[symbol]['1d']
 manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_rsi_divergence128080_300_5m_long_filter(lowVol+highBoDong)`,
-  disableShort: true,
+  id: `${symbol}_rsi_divergence128080_300_5m_long_filter(lowVol+highBoDong)-short`,
+  disableShort: false,
   lowVol: true,
   highBoDong: true,
   strongLongShort: false,
@@ -42,17 +42,17 @@ manager.addNewStrategy(new TestStrategy({
   highlowLen: 80,
   divergenceLen: 80,
   theshold_bottom: 25,
-  theshold_top: 75
-  // disableLong: true
+  theshold_top: 75,
+  disableLong: true,
 }))
 
 // manager.addNewStrategy(new TestStrategy({
 //   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
 //   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-//   id: `${symbol}_rsi_divergence128080_300_5m_long_filter(lowVol+highBoDong)`,
+//   id: `${symbol}_rsi_divergence128080_300_5m_long_filter(lowVol)v2`,
 //   disableShort: true,
 //   lowVol: true,
-//   highBoDong: true,
+//   highBoDong: false,
 //   strongLongShort: false,
 //   len: 12,
 //   highlowLen: 80,
@@ -195,6 +195,10 @@ fs.writeFileSync(path.join(__dirname, 'temp.json'), str)
 
 allTrades.map((t, i) => {
   const { id, statistic } = t
+  console.log(id, {
+    ...statistic,
+    tradeEarnList: []
+  })
   const saveName = `${symbol}_rsi_divergence_result_${id || (i + 1)}.csv`
   const savePath = path.join(__dirname, saveName)
   const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk', 'pfp', 'margin'])

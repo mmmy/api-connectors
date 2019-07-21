@@ -46,6 +46,8 @@ class BackTestRsiDivergence extends BackTest {
         !disableLong &&
         rsiDivergenceSignal.long
       ) {
+        // const lowVolFilter = lowVol ? _5mCandle.isLowVol(50, 3) : true
+        // const lowVolFilter = lowVol ? _5mCandle.isLatestLowVol(50, 12, 1) : true
         const lowVolFilter = lowVol ? _5mCandle.isLowVol(50, 3) : true
         const highBoDongFilter = highBoDong ? _1dCandle.isAdxHigh(14) : true
         const strongShortFilter = strongLongShort ? !_1dCandle.isStrongShort() : true
@@ -66,14 +68,18 @@ class BackTestRsiDivergence extends BackTest {
         !disableShort &&
         rsiDivergenceSignal.short
       ) {
-        const isLowVol = _5mCandle.isLowVol(50, 3)
-        const isHighBoDong = _1dCandle.isAdxHigh(14)
+        // const isLowVol = _5mCandle.isLowVol(50, 3)
+        const lowVolFilter = lowVol ? _1hCandle.isLatestLowVol(50, 4, 1) && _5mCandle.isLowVol(50, 3) : true
+        // const lowVolFilter = lowVol ? _5mCandle.isLatestLowVol(50, 12, 4) : true
+        const highBoDongFilter = highBoDong ? _1dCandle.isAdxHigh(14) : true
+
+        // const isHighBoDong = _1dCandle.isAdxHigh(14)
         // const isStrongLong = _1dCandle.isStrongLong()
         // const trendSignal = this.get1dMacdTrendSignal()
         // const filterS = this.getMacdDepartSignal('1h')
         // if (filterS.short) {
         // if (trendSignal.short) {
-        if (isLowVol && isHighBoDong && !mainCandle.isCurrentHighestLowestClose(true, 300)) {
+        if (lowVolFilter && highBoDongFilter && !mainCandle.isCurrentHighestLowestClose(true, 300)) {
 
           short = true
         }

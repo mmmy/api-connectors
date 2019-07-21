@@ -720,6 +720,17 @@ Candles.prototype.isLowVol = function (len = 14, rate = 1) {
   const sizeSma0 = result[result.length - 1]
   return volume / sizeSma0 < rate
 }
+Candles.prototype.isLatestLowVol = function (backlen = 100, len = 20, rate = 3) {
+  const klines = this.getCandles(false)
+  const latestCandles = klines.slice(-len)
+  const vols = latestCandles.map(c => c.volume)
+  const sumV = vols.reduce((pre, cur) => pre + cur, 0)
+  const meanV = sumV / vols.length
+  // const maxV = Math.max.apply(null, vols)
+  const result = signal.VolSMA(klines, backlen)
+  const sizeSma0 = result[result.length - 1]
+  return meanV / sizeSma0 < rate
+}
 Candles.prototype.isHighVol = function (len = 14, rate = 3) {
   const klines = this.getCandles(false)
   const { volume } = this.getHistoryCandle(1)
