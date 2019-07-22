@@ -174,7 +174,10 @@ class BackTestBreakCandle5m extends BackTest {
     const { len } = this._options
     const { high, low } = this.getHistoryCandleByPeriod('5m', 2)
     const { maxHigh, minLow } = this.getCandleByPeriod('5m').getMinMaxHighLow(len)
-    this._accout.setProfitPrice(long ? (high + maxHigh - minLow) : (low - maxHigh + minLow))
+    let profit = (maxHigh - minLow) * 1
+    profit = Math.round(profit * 2) / 2
+    // this._accout.setProfitPrice(long ? (high + maxHigh - minLow) : (low - maxHigh + minLow))
+    this._accout.setProfitPrice(long ? (high + profit) : (low - profit))
   }
 
   orderMarketPrevHighLow(period, bar, amount) {
