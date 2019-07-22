@@ -844,15 +844,20 @@ class FlowDataBase {
     }
 
     if (this._accountPosition.hasPosition(symbol)) {
+      const longPosition = this._accountPosition.getCurrentQty(symbol) > 0
       // may close
       // const currentQty = this._accountPosition.getCurrentQty(symbol)
-      const closeSignal = this._candles5m.rsiDivergenceSignal(symbol, 10, 24, 24, 30, 70)
+      const closeSignal = this._candles5m.rsiDivergenceSignal(symbol, 10, 24, 24, 35, 69)
       if (closeSignal.long) {
-        notifyPhone('rsiDivergenceSignal bot close short')
+        if (!longPosition) {
+          notifyPhone('rsiDivergenceSignal bot close short')
+        }
         this.closeShortPositionIfHave(symbol)
       }
       if (closeSignal.short) {
-        notifyPhone('rsiDivergenceSignal bot close long')
+        if (longPosition) {
+          notifyPhone('rsiDivergenceSignal bot close long')
+        }
         this.closeLongPostionIfHave(symbol)
       }
     } else {
