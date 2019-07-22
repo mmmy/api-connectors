@@ -36,7 +36,7 @@ manager.addNewStrategy(new TestStrategy({
   id: `${symbol}_breakcandle5m_48_0601`,
   disableShort: true,
   highVol: false,
-  useAdx: true,
+  useAdx: true,   // good
   upVol: true,
   len: 48,
   // disableLong: true
