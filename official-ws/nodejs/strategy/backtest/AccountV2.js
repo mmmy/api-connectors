@@ -67,9 +67,11 @@ class Account {
       this._minMaxPrices.minP = low
       this._minMaxPrices.maxP = high
       this._openTime = timestamp
+      this._bars = 1
       // this.setStopPrice()
       return
     } else {
+      const preAmount = this._amount
       const nextAmount = this._amount + amount
       // add postion
       if (this._amount * amount > 0) {
@@ -100,8 +102,10 @@ class Account {
           openTime: this._openTime,
           timestamp,
           amount,
+          preAmount,
           postionAmount: this._amount,
           price,
+          entryBars: this._bars,
         }
       }
     }
