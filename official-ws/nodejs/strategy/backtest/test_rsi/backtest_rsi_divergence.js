@@ -172,11 +172,11 @@ function testRange(orangeData, indexRange) {
 }
 
 let dataSeries = [
-  symbol === 'XBTUSD' ? [400] : ["2018-09-01T10:00:00.000Z"]
+  // symbol === 'XBTUSD' ? [400] : ["2018-09-01T10:00:00.000Z"]
   // ['2017-09-16T00:00:00.000Z', '2017-12-13T00:00:00.000Z'],
   // ["2017-10-01T00:00:00.000Z", "2017-11-10T00:00:00.000Z",],
   // ["2017-11-13T00:00:00.000Z", "2017-12-08T00:00:00.000Z",],
-  // ["2019-05-22T10:00:00.000Z"]
+  ["2019-06-29T00:00:00.000Z"]
 ]
 
 const seriesIndex = timeToSeries(data5m, dataSeries)
@@ -192,7 +192,7 @@ const allTrades = manager.getAllTrades(true)
 const str = JSON.stringify(allTrades)
 console.log(str)
 
-fs.writeFileSync(path.join(__dirname, 'temp.json'), str)
+fs.writeFileSync(path.join(__dirname, 'temp-report.json'), str)
 
 allTrades.map((t, i) => {
   const { id, statistic } = t

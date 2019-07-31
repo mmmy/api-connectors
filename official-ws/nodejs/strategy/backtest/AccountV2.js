@@ -101,11 +101,11 @@ class Account {
           stopped,
           openTime: this._openTime,
           timestamp,
-          amount,
+          amount, // 负数表示平多
           preAmount,
           postionAmount: this._amount,
           price,
-          entryBars: this._bars,
+          holdBars: this._bars,
         }
       }
     }
