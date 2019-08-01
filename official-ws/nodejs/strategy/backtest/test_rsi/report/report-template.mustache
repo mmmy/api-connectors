@@ -3,8 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <style>
-      th, td {
+      table {
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
         padding: 3px 20px;
+        border: 1px solid #aaa;
       }
     </style>
   </head>
@@ -12,7 +18,19 @@
     <h3>{{title}}</h3>
     <div>
       <table>
-        
+        <thead>
+          <tr><th></th><th>all</th><th>long</th><th>short</th></tr>
+        </thead>
+        <tbody>
+          {{#items}}
+            <tr>
+              <td>{{name}}</td>
+              <td style="color: {{all_color}}">{{all}}</td>
+              <td style="color: {{long_color}}">{{long}}</td>
+              <td style="color: {{short_color}}">{{short}}</td>
+            </tr>
+          {{/items}}
+        </tbody>
       </table>
     </div>
   </body>

@@ -4,6 +4,7 @@ const JSONtoCSV = require('../../utils').JSONtoCSV
 const statisticTradesReport = require('../../utils').statisticTradesReport
 const args = require('yargs').argv
 
+const { saveHtml } = require('./dataToReport')
 const file = args.f || 'temp.json'
 console.log('file:', file)
 
@@ -62,5 +63,8 @@ dataList.map((t, i) => {
   console.log(report)
   const dataToCsv = JSONtoCSV(report.all.tradeEarnList, ['st', 'pf', 'bk', 'pfp', 'margin'])
   fs.writeFileSync(savePath, dataToCsv)
+  saveHtml({
+    id, report
+  })
 })
 

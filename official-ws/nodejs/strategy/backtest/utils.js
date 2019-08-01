@@ -91,6 +91,7 @@ const statisticTrades = function (trades) {
     touchedTotal,
     touchedRate: touchedTotal / total,
     wins,
+    loses: touchedTotal - wins,
     netProfit,
     winRate,
     maxBack,
