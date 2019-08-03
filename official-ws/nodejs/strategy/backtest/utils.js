@@ -32,6 +32,8 @@ const statisticTrades = function (trades) {
   let sumMinute = 0
   let sumBars = 0
   let backList = [0]
+  let ppBackList = [0]
+  // let compound_pr = 1 //复利计算
 
   touchedTrades.forEach((t, i) => {
     const { wined, minute, profit, price, holdBars, amount } = t
@@ -68,6 +70,12 @@ const statisticTrades = function (trades) {
     if (i > 0) {
       const pre = tradeEarnList[i - 1]
       margin = pre.margin * pfp_r
+
+      let pBackLen = ppBackList.length
+      const profitP = pfp_r - 1
+      let pBack = ppBackList[pBackLen - 1] + profitP
+      pBack = Math.min(0, pBack)
+      ppBackList.push(pBack)
     }
     tradeEarnList.push({
       st: (t.startTime || t.timestamp) && new Date(t.startTime || t.timestamp).toISOString(),
@@ -75,6 +83,7 @@ const statisticTrades = function (trades) {
       pfp,
       pfp_r,
       bk: backList[backList.length - 1] || 0,
+      pp_bk: ppBackList[ppBackList.length - 1] || 0,
       margin,
     })
   })
