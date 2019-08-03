@@ -16,10 +16,28 @@
   </head>
   <body>
     <h3>{{title}}</h3>
+    <p>
+      回测日期：{{date}}<br/>
+      回测交易所：{{exchange}}<br/>
+      品种：{{symbol}}<br/>
+      时间级别：{{period}}<br/>
+      回测K线数：{{candleCount}}<br/>
+    </p>
+    <ul>
+      {{#comments}}
+        <li>{{text}}</li>
+      {{/comments}}
+    </ul>
+    <h4>收益曲线</h4>
+    <p>
+      <img src="./result.jpg"/>
+    </p>
+    <h4>绩效总结</h4>
+    <p>每次开仓是单位1个BTC</p>
     <div>
       <table>
         <thead>
-          <tr><th></th><th>all</th><th>long</th><th>short</th></tr>
+          <tr><th></th><th>全部</th><th>做多</th><th>做空</th></tr>
         </thead>
         <tbody>
           {{#items}}

@@ -34,22 +34,22 @@ function formatValue(key, value) {
 }
 
 const KEY_MAP = {
-  netProfit: { name: '' },
-  winProfitSum: { name: '' },
-  loseProfitSum: { name: '' },
-  maxBack: { name: '' },
-  profitScore: { name: '' },
-  maxAmount: { name: '' },
-  touchedTotal: { name: '' },
-  wins: { name: 'wins' },
-  loses: { name: '' },
-  winRate: { name: 'winRate' },
-  avgProfit: { name: '' },
-  avgWinProfit: { name: '' },
-  avgLoseProfit: { name: '' },
-  avgHoldBars: { name: '' },
-  avgWinHoldBars: { name: '' },
-  avgLoseHoldBars: { name: '' },
+  netProfit: { name: '净利润' },
+  winProfitSum: { name: '毛利润' },
+  loseProfitSum: { name: '毛亏损' },
+  maxBack: { name: '最大回撤' },
+  profitScore: { name: '盈利因子' },
+  maxAmount: { name: '最大持仓' },
+  touchedTotal: { name: '所有已平仓交易' },
+  wins: { name: '获利交易次数' },
+  loses: { name: '亏损交易次数' },
+  winRate: { name: '胜率' },
+  avgProfit: { name: '平均交易' },
+  avgWinProfit: { name: '平均盈利交易' },
+  avgLoseProfit: { name: '平均亏损交易' },
+  avgHoldBars: { name: '全部交易的平均持仓K线根数' },
+  avgWinHoldBars: { name: '盈利交易的平均持仓K线根数' },
+  avgLoseHoldBars: { name: '亏损交易的平均持仓K线根数' },
 }
 const KEYS = [
   'netProfit', 'winProfitSum', 'loseProfitSum', 'maxBack',
@@ -76,17 +76,18 @@ function convertData(reportData) {
     }
   })
   return {
+    ...reportData,
     title: id,
     items,
   }
 }
 
-function saveHtml(reportData) {
+function saveHtml(reportData, path) {
   const data = convertData(reportData)
   const result = Mustache.render(template, data)
-  const savePath = path.join(__dirname, `report-${data.title}-${new Date().toLocaleDateString()}.html`)
-  fs.writeFileSync(savePath, result)
-  return savePath
+  // const savePath = path.join(__dirname, `report-${data.title}-${new Date().toLocaleDateString()}.html`)
+  fs.writeFileSync(path, result)
+  // return savePath
 }
 
 module.exports = {

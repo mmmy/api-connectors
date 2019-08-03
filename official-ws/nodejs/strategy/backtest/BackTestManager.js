@@ -29,8 +29,10 @@ class BackTestManager {
   getAllTrades(trades) {
     return this._list.map((s, i) => {
       return {
+        date: new Date().toISOString(),
         id: s._options.id,
         index: i,
+        candleCountMap: s._candleCount,
         trades: trades ? s.getTrades() : undefined,
         statistic: s.statistic()
       }

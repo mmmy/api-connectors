@@ -7,7 +7,7 @@ const path = require('path')
 async function launchBrowser() {
   return await puppeteer.launch({
     headless: false,
-    executablePath: 'F:/chrome-win32/chrome.exe',
+    executablePath: 'F:/chrome-win/chrome.exe',
     defaultViewport: {
       width: 1500,
       height: 1000,
@@ -43,6 +43,10 @@ function createOptions(data, reportData) {
     title: {
       left: 'center',
       text: ''
+    },
+    legend: {
+      show: true,
+      top: 0,
     },
     axisPointer: {
       link: [{
@@ -152,26 +156,45 @@ function createOptions(data, reportData) {
     grid: [{
       left: 10,
       right: 10,
-      top: 10,
-      height: 400
+      top: 30,
+      height: 350
     }, {
       left: 10,
       right: 10,
       height: 60,
-      top: 420
+      top: 400
     }, {
       left: 10,
       right: 10,
       height: 120,
-      top: 480,
+      top: 470,
     }, {
       left: 10,
       right: 10,
       height: 120,
-      top: 630,
+      top: 670,
     }],
-    series: [{
-      name: 'Volume',
+    series: [
+      {
+        type: 'candlestick',
+        name: '日线价格图',
+        data: candlesData,
+        itemStyle: {
+          normal: {
+            color: '#14b143',
+            color0: '#ef232a',
+            borderColor: '#14b143',
+            borderColor0: '#ef232a',
+          },
+          emphasis: {
+            color: 'black',
+            color0: '#444',
+            borderColor: 'black',
+            borderColor0: '#444'
+          }
+        }
+      }, {
+      name: '交易量',
       type: 'bar',
       xAxisIndex: 1,
       yAxisIndex: 1,
@@ -184,28 +207,10 @@ function createOptions(data, reportData) {
         }
       },
       data: volumes
-    }, {
-      type: 'candlestick',
-      name: '日K',
-      data: candlesData,
-      itemStyle: {
-        normal: {
-          color: '#14b143',
-          color0: '#ef232a',
-          borderColor: '#14b143',
-          borderColor0: '#ef232a',
-        },
-        emphasis: {
-          color: 'black',
-          color0: '#444',
-          borderColor: 'black',
-          borderColor0: '#444'
-        }
-      }
     },
     {
       type: 'line',
-      name: 'pfp',
+      name: '复利收益曲线（%）',
       data: pfData,
       xAxisIndex: 2,
       yAxisIndex: 2,
@@ -226,7 +231,7 @@ function createOptions(data, reportData) {
     },
     {
       type: 'bar',
-      name: 'pfp',
+      name: '发生交易',
       data: pfData,
       xAxisIndex: 2,
       yAxisIndex: 2,
@@ -244,7 +249,7 @@ function createOptions(data, reportData) {
     },
     {
       type: 'line',
-      name: 'ppBack',
+      name: '回撤',
       data: ppBackData,
       xAxisIndex: 3,
       yAxisIndex: 3,
@@ -289,7 +294,7 @@ async function drawKline({ symbol, period, title, timeRange, reportData }, fileP
               <title>Document</title>
         </head>
         <body>
-              <div id="canvas" style="width:1000px;height:800px"></div>
+              <div id="canvas" style="width:750px;height:750px"></div>
         </body>
   </html>`
 

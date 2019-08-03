@@ -17,7 +17,9 @@ class BackTest {
     this._onUpdateBar = {}
     this._waitingForOrderBreak = { long: false, short: false }
     this.initCandles()
+    this._candleCount={
 
+    }
   }
 
   initCandles() {
@@ -57,6 +59,7 @@ class BackTest {
 
   setCandleHistory(period, list) {
     this._candles[period].setHistoryData(list)
+    this._candleCount[period] = this._candleCount[period] || list.length
   }
 
   updateCandleLastHistory(period, data) {
@@ -65,6 +68,10 @@ class BackTest {
     // this._candles[period].checkData()
     const cb = this._onUpdateBar[period]
     cb && cb(data)
+    if (!this._candleCount[period]) {
+      this._candleCount[period] = 0
+    }
+    this._candleCount[period] ++
   }
 
   setStrategy(strategy) {
