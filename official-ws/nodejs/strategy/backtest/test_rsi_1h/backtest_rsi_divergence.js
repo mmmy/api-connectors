@@ -9,18 +9,18 @@ const timeToSeries = require('../utils').timeToSeries
 
 const JSONtoCSV = require('../utils').JSONtoCSV
 
-const { getHistroyData } = require('../data/xbt5m')
+const { getHistoryData } = require('../data/xbt5m')
 
 const HistoryData = {
   'XBTUSD': {
-    '5m': getHistroyData('XBTUSD', '5m'),
-    '1h': getHistroyData('XBTUSD', '1h'),
-    '1d': getHistroyData('XBTUSD', '1d'),
+    '5m': getHistoryData('XBTUSD', '5m'),
+    '1h': getHistoryData('XBTUSD', '1h'),
+    '1d': getHistoryData('XBTUSD', '1d'),
   },
   'ETHUSD': {
-    '5m': getHistroyData('ETHUSD', '5m'),
-    '1h': getHistroyData('ETHUSD', '1h'),
-    '1d': getHistroyData('ETHUSD', '1d'),
+    '5m': getHistoryData('ETHUSD', '5m'),
+    '1h': getHistoryData('ETHUSD', '1h'),
+    '1d': getHistoryData('ETHUSD', '1d'),
   },
 }
 

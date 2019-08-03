@@ -4,7 +4,7 @@ const JSONtoCSV = require('../../utils').JSONtoCSV
 const statisticTradesReport = require('../../utils').statisticTradesReport
 const args = require('yargs').argv
 
-const { saveHtml } = require('./dataToReport')
+const { saveHtml } = require('../../dataToReport')
 const file = args.f || 'temp.json'
 console.log('file:', file)
 

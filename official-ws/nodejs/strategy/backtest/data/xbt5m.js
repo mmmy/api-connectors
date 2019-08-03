@@ -14,10 +14,10 @@ const fileMap = {
   }
 }
 
-function getHistroyData(symbol, period) {
+function getHistoryData(symbol, period) {
   return csvToJson(fileMap[symbol][period], period)
 }
 
 module.exports = {
-  getHistroyData
+  getHistoryData
 }
