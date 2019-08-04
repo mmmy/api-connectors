@@ -25,7 +25,8 @@ const positionKeyText = {
   'realisedGrossPnl': 'rG Pnl',
   'realisedPnl': 'r Pnl',
   'unrealisedPnl': 'ur Pnl',
-  'unrealisedPnlPcnt': 'ur Pnl%'
+  'unrealisedPnlPcnt': 'ur Pnl%',
+  'liquidationPrice': '强平',
 }
 
 const AUTO_STOP_OFFSET_MAP = {
@@ -83,7 +84,7 @@ export default class Trade extends React.Component {
             const totalRPnl = positions.reduce((pre, cur) => pre + cur.unrealisedPnl, 0) / 1E8
             // 检查止损是否设置正常
             const orderStopValideMsg = this.checkStop(i)
-            const positionKeys = ['symbol', 'leverage', 'currentQty', 'avgCostPrice', 'unrealisedPnl', 'unrealisedPnlPcnt', 'realisedGrossPnl', 'realisedPnl']
+            const positionKeys = ['symbol', 'leverage', 'currentQty', 'avgCostPrice', 'unrealisedPnl', 'unrealisedPnlPcnt', 'realisedGrossPnl', 'realisedPnl', 'liquidationPrice']
             const balance = walletBalance / 1E8
             const balaceUsd = xbtBidPrice ? (balance * xbtBidPrice).toFixed(0) : null
             const rpnBalance = balance + totalRPnl
@@ -327,6 +328,8 @@ export default class Trade extends React.Component {
                 <div>
                   <input type="checkbox" id="bot-rsi-divergence-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botRsiDivergence.on')} checked={options.botRsiDivergence.on}/>
                   <label>rsi divergence</label>
+                  <input type="checkbox" id="bot-rsi-divergence-checkbox-usdmode" onClick={this.handleCheckboxOption.bind(this, i, 'botRsiDivergence.usdMode')} checked={options.botRsiDivergence.usdMode}/>
+                  <label title="开启后 套保才是空仓">usdMode</label>
                 </div>
               </div>
               {

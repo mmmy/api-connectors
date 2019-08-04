@@ -63,7 +63,7 @@ class FlowDataBase {
         open_size: 1,
         lowVol: true,
         highBoDong: true,
-
+        usdMode: false, // $本位
       }
     }, options)
 
@@ -275,6 +275,10 @@ class FlowDataBase {
         }, 10 * 1000)
       })
     })
+  }
+
+  orderMarket(symbol, side, qty) {
+    return this._orderManager.getSignatureSDK().orderMarket(symbol, qty, side)
   }
 
   deleteOrderAll() {
@@ -827,7 +831,8 @@ class FlowDataBase {
     const {
       on, botId, symbols, enableLong, enableShort,
       len, highlowLen, divergenceLen, theshold_bottom, theshold_top,
-      lowVol, highBoDong
+      lowVol, highBoDong,
+      usdMode,
     } = this._options.botRsiDivergence
 
     if (!on) {
@@ -842,9 +847,28 @@ class FlowDataBase {
     if (this.isAutoSignalRunding(botId)) {
       return
     }
+    // todo: 结合 交易所的强制平仓价格来判断
+    // const maxAmount = this.getAccountFullAmount()
+    // const positionQty = Math.abs(this._accountPosition.getCurrentQty(symbol))
+    // console.log(maxAmount, positionQty)
+    // if (positionQty / maxAmount > 1.2) {
+    //   notifyPhone('仓位异常')
+    //   return
+    // }
+    // 注意：usdMode 下套保后才是空仓
+    let hasPosition = false
+    const positionQty = this._accountPosition.getCurrentQty(symbol)
 
-    if (this._accountPosition.hasPosition(symbol)) {
-      const longPosition = this._accountPosition.getCurrentQty(symbol) > 0
+    if (usdMode) {
+      hasPosition = positionQty >= 0 //=0 相当于现货
+    } else {
+      hasPosition = this._accountPosition.hasPosition(symbol)
+    }
+
+
+    if (hasPosition) {
+      const longPosition = usdMode ?
+        positionQty >= 0 : positionQty > 0
       // may close
       // const currentQty = this._accountPosition.getCurrentQty(symbol)
       const closeSignal = this._candles5m.rsiDivergenceSignal(symbol, 10, 24, 24, 35, 69)
@@ -852,13 +876,23 @@ class FlowDataBase {
         if (!longPosition) {
           notifyPhone('rsiDivergenceSignal bot close short')
         }
-        this.closeShortPositionIfHave(symbol)
+        if (usdMode) {
+          // 暂时不做空
+        } else {
+          this.closeShortPositionIfHave(symbol)
+        }
       }
       if (closeSignal.short) {
         if (longPosition) {
-          notifyPhone('rsiDivergenceSignal bot close long')
+          notifyPhone('rsiDivergenceSignal bot close long' + (usdMode ? '套保' : ''))
         }
-        this.closeLongPostionIfHave(symbol)
+        if (usdMode) {
+          //开套保
+          const qty = this.getAccountFullAmount()
+          this.orderMarket(symbol, 'Sell', qty)
+        } else {
+          this.closeLongPostionIfHave(symbol)
+        }
       }
     } else {
       // open
@@ -873,7 +907,7 @@ class FlowDataBase {
           // high2 low2 to open
           this.updateAutoSignalById(botId, {
             symbol: symbol,
-            amount: this.getAccountFullAmount(),
+            amount: usdMode ? Math.abs(positionQty) : this.getAccountFullAmount(),
             min_interval: 1,// 重复触发至少间隔时间1小时, 关系不大
             order_method: "stopMarket5m", // highlow1
             remain_times: 1,
