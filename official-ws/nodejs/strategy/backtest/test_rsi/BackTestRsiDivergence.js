@@ -135,6 +135,7 @@ class BackTestRsiDivergence extends BackTest {
           this.startSellLow(2, -1)
         }
       } else {
+        this._accout.updateMinMax(bar)
         // close trade
         if (this._accout.getUnreleasedProfitPercent(bar.close) < 0.01) {
           const signal = this._strategy(bar, this._candles)

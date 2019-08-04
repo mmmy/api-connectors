@@ -105,7 +105,7 @@ class Account {
           preAmount,
           postionAmount: this._amount,
           price,
-          holdBars: this._bars,
+          holdBars: this._bars + 1, // 对比tv回测
         }
       }
     }
@@ -178,8 +178,8 @@ class Account {
 
   shouldStopClosePosition(bar) {
     const { timestamp, high, low } = bar
+    // this.updateMinMax(bar)
     if (this.hasPosition() && this._stopPrice) {
-      this.updateMinMax(bar)
       const lossPrice = this._stopPrice
       const longPosition = this._amount > 0
       const lost = longPosition ? (low <= lossPrice) : (high >= lossPrice)
@@ -204,7 +204,7 @@ class Account {
   shouldLiquidation(bar) {
     const { timestamp, high, low } = bar
     if (this._hasPosition) {
-      this.updateMinMax(bar)
+      // this.updateMinMax(bar)
       const lossPrice = this.getLossLimitPrices()
       const profitPrice = this.getProfitLimitPrices()
       const long = this._long

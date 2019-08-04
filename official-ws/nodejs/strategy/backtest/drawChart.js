@@ -172,7 +172,7 @@ function createOptions(data, reportData) {
       left: 10,
       right: 10,
       height: 120,
-      top: 670,
+      top: 620,
     }],
     series: [
       {
@@ -294,7 +294,7 @@ async function drawKline({ symbol, period, title, timeRange, reportData }, fileP
               <title>Document</title>
         </head>
         <body>
-              <div id="canvas" style="width:750px;height:750px"></div>
+              <div id="canvas" style="width:750px;height:770px"></div>
         </body>
   </html>`
 
