@@ -50,15 +50,15 @@ class BackTestBreakCandle5m extends BackTest {
         !disableShort &&
         signal.short
       ) {
-        const isLowVol = _5mCandle.isLowVol(50, 3)
-        const isHighBoDong = _1dCandle.isAdxHigh(14)
+        const upVolFilter = upVol ? _1hCandle.isUpVol(10, 3) : true
+        const highVolFilter = highVol ? _5mCandle.isHighVol(len, 3) : true
+        const adxFilter = useAdx ? _1dCandle.adxSignal(14, false).long : true
         // const isStrongLong = _1dCandle.isStrongLong()
         // const trendSignal = this.get1dMacdTrendSignal()
         // const filterS = this.getMacdDepartSignal('1h')
         // if (filterS.short) {
         // if (trendSignal.short) {
-        if (isLowVol && isHighBoDong && !mainCandle.isCurrentHighestLowestClose(true, 300)) {
-
+        if (highVolFilter && adxFilter && upVolFilter) {
           short = true
         }
       }
@@ -177,7 +177,7 @@ class BackTestBreakCandle5m extends BackTest {
     let profit = (maxHigh - minLow) * 1
     profit = Math.round(profit * 2) / 2
     // this._accout.setProfitPrice(long ? (high + maxHigh - minLow) : (low - maxHigh + minLow))
-    this._accout.setProfitPrice(long ? (high + profit) : (low - profit))
+    this._accout.setProfitPrice(long ? (low + profit) : (high - profit))
   }
 
   orderMarketPrevHighLow(period, bar, amount) {

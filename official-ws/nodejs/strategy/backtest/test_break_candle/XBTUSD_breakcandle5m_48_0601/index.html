@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      table {
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 3px 20px;
+        border: 1px solid #aaa;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>XBTUSD_breakcandle5m_48_0601</h3>
+    <p>
+      回测日期：2019-8-7<br/>
+      回测交易所：BITMEX<br/>
+      品种：XBTUSD<br/>
+      时间级别：5分钟<br/>
+      回测K线数：201995<br/>
+    </p>
+    <ul>
+        <li>基本原理：使用RSI背离指标，结合波动性和交易量和轴枢点位置等做短线反转</li>
+        <li>优势：牛市中的回调会买入，熊市中也会有很好的抗风险能力</li>
+        <li>交易方式：程序全自动化交易，亦可以辅助人工操作, 结合常见顶部形态可将策略关闭即可</li>
+        <li>杠杆倍数：小于3</li>
+        <li>备注：最大回撤出现在2018年11月份，那是BCH分叉事件导致，可以人工避免那段交易</li>
+    </ul>
+    <h4>收益曲线</h4>
+    <p>
+      <img src="./result.jpg"/>
+    </p>
+    <h4>绩效总结</h4>
+    <p>每次开仓是单位1个BTC</p>
+    <div>
+      <table>
+        <thead>
+          <tr><th></th><th>全部</th><th>做多</th><th>做空</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+              <td>净利润</td>
+              <td style="color: ">$12822.80</td>
+              <td style="color: ">$0.00</td>
+              <td style="color: ">$12822.80</td>
+            </tr>
+            <tr>
+              <td>毛利润</td>
+              <td style="color: ">$30129.80</td>
+              <td style="color: ">$0.00</td>
+              <td style="color: ">$30129.80</td>
+            </tr>
+            <tr>
+              <td>毛亏损</td>
+              <td style="color: red">$-17307.00</td>
+              <td style="color: ">$0.00</td>
+              <td style="color: red">$-17307.00</td>
+            </tr>
+            <tr>
+              <td>最大回撤</td>
+              <td style="color: red">$-2631.50</td>
+              <td style="color: ">$0.00</td>
+              <td style="color: red">$-2631.50</td>
+            </tr>
+            <tr>
+              <td>盈利因子</td>
+              <td style="color: ">1.7409025249898884</td>
+              <td style="color: ">NaN</td>
+              <td style="color: ">1.7409025249898884</td>
+            </tr>
+            <tr>
+              <td>最大持仓</td>
+              <td style="color: ">100.00%</td>
+              <td style="color: ">0.00%</td>
+              <td style="color: ">100.00%</td>
+            </tr>
+            <tr>
+              <td>所有已平仓交易</td>
+              <td style="color: ">112</td>
+              <td style="color: ">0</td>
+              <td style="color: ">112</td>
+            </tr>
+            <tr>
+              <td>获利交易次数</td>
+              <td style="color: ">52</td>
+              <td style="color: ">0</td>
+              <td style="color: ">52</td>
+            </tr>
+            <tr>
+              <td>亏损交易次数</td>
+              <td style="color: ">60</td>
+              <td style="color: ">0</td>
+              <td style="color: ">60</td>
+            </tr>
+            <tr>
+              <td>胜率</td>
+              <td style="color: ">46.43%</td>
+              <td style="color: ">NaN%</td>
+              <td style="color: ">46.43%</td>
+            </tr>
+            <tr>
+              <td>平均交易</td>
+              <td style="color: ">$114.49</td>
+              <td style="color: ">$NaN</td>
+              <td style="color: ">$114.49</td>
+            </tr>
+            <tr>
+              <td>平均盈利交易</td>
+              <td style="color: ">$579.42</td>
+              <td style="color: ">$NaN</td>
+              <td style="color: ">$579.42</td>
+            </tr>
+            <tr>
+              <td>平均亏损交易</td>
+              <td style="color: red">$-288.45</td>
+              <td style="color: ">$NaN</td>
+              <td style="color: red">$-288.45</td>
+            </tr>
+            <tr>
+              <td>全部交易的平均持仓K线根数</td>
+              <td style="color: ">2</td>
+              <td style="color: ">NaN</td>
+              <td style="color: ">2</td>
+            </tr>
+            <tr>
+              <td>盈利交易的平均持仓K线根数</td>
+              <td style="color: ">2</td>
+              <td style="color: ">NaN</td>
+              <td style="color: ">2</td>
+            </tr>
+            <tr>
+              <td>亏损交易的平均持仓K线根数</td>
+              <td style="color: ">2</td>
+              <td style="color: ">NaN</td>
+              <td style="color: ">2</td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

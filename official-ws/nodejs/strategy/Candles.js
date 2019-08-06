@@ -773,17 +773,21 @@ Candles.prototype.isStrongLong = function () {
 
 Candles.prototype.isLastBarTrend = function (len = 30) {
   const lastCandle = this.getHistoryCandle(1)
+  const c1 = lastCandle
+  // const c2 = this.getHistoryCandle(2)
+  // const c3 = this.getHistoryCandle(3)
   const klines = this.getCandles(false)
   const volSmaResult = signal.VolSMA(klines, len)
   const highVol = lastCandle.volume > volSmaResult[volSmaResult.length - 1]
   const { high, low, close } = lastCandle
   let long = false
   let short = false
-  if (highVol) {
-    const { minLow, maxHigh } = this.getMinMaxHighLow(len, 3, false)
+  if (highVol || true) {
+    const fatBody = Math.abs(c1.close - c1.open) / (c1.high - c1.low) > 0.7
+    const { minLow, maxHigh } = this.getMinMaxHighLow(len, 4, false)
     if (close > (maxHigh * 1.005)) {
       long = true
-    } else if (close < (minLow * 0.99)) {
+    } else if (close < (minLow * 0.995)) {
       short = true
     }
   }
