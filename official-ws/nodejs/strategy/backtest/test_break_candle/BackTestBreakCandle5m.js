@@ -50,7 +50,7 @@ class BackTestBreakCandle5m extends BackTest {
         !disableShort &&
         signal.short
       ) {
-        const upVolFilter = upVol ? _1hCandle.isUpVol(10, 3) : true
+        const upVolFilter = upVol ? _1hCandle.isUpVol(10, 2) : true
         const highVolFilter = highVol ? _5mCandle.isHighVol(len, 3) : true
         const adxFilter = useAdx ? _1dCandle.adxSignal(14, false).long : true
         // const isStrongLong = _1dCandle.isStrongLong()
@@ -114,11 +114,11 @@ class BackTestBreakCandle5m extends BackTest {
     } else if (this._waitingForOrderBreak.long || this._waitingForOrderBreak.short) {
       const stochOverSignal = this.getCandleByPeriod('5m').stochOverTradeSignal(9, 3, 30, 70)
       if (stochOverSignal.long && this._waitingForOrderBreak.long) {
-        this.startBuyHigh(2, 1)
+        this.startBuyHigh(4, 1)
         this._waitingForOrderBreak.long = false
       }
       if (stochOverSignal.short && this._waitingForOrderBreak.short) {
-        this.startSellLow(2, -1)
+        this.startSellLow(4, -1)
         this._waitingForOrderBreak.short = false
       }
     } else {
