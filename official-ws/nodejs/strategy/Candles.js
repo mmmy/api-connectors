@@ -693,7 +693,7 @@ Candles.prototype.highlow1Signal = function () {
 
 Candles.prototype.adxSignal = function (len = 14, gaobodong = false) {
   const klines = this.getCandles(false)
-  const result = signal.ADXSignal(klines, len = 14)
+  const result = signal.ADXSignal(klines, len)
   const d0 = result[result.length - 1]
   const { adx, mdi, pdi } = d0
   const bodong = adx > mdi && adx > pdi
