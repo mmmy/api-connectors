@@ -784,11 +784,12 @@ Candles.prototype.isLastBarTrend = function (len = 30) {
   let short = false
   if (highVol || true) {
     const strongPull = (c1.high - c1.close) / c1.close < 0.0005
+    const strongBear = (c1.close - c1.low) / c1.close < 0.001
     // const fatBody = Math.abs(c1.close - c1.open) / (c1.high - c1.low) > 0.8
     const { minLow, maxHigh } = this.getMinMaxHighLow(len, 4, false)
     if (close > (maxHigh * 1.001) && strongPull) {
       long = true
-    } else if (close < (minLow * 0.995)) {
+    } else if (close < (minLow * 0.999) && strongBear) {
       short = true
     }
   }

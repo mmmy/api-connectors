@@ -50,9 +50,9 @@ class BackTestBreakCandle5m extends BackTest {
         !disableShort &&
         signal.short
       ) {
-        const upVolFilter = upVol ? _1hCandle.isUpVol(10, 2) : true
+        const upVolFilter = upVol ? _1hCandle.isUpVol(10, 3) : true
         const highVolFilter = highVol ? _5mCandle.isHighVol(len, 3) : true
-        const adxFilter = useAdx ? _1dCandle.adxSignal(14, false).long : true
+        const adxFilter = useAdx ? _1dCandle.adxSignal(14, false).short : true
         // const isStrongLong = _1dCandle.isStrongLong()
         // const trendSignal = this.get1dMacdTrendSignal()
         // const filterS = this.getMacdDepartSignal('1h')
