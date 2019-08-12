@@ -48,7 +48,12 @@ class FlowDataBase {
       autoCloseRsiDivergence5m: false,
       autoCloseMacdDivergence1h: false,
       autoCloseRsiDivergence1h: false,
-
+      BotConfig: {
+        usdMode: false,  // $本位
+        currentPositionBotId: {
+          'XBTUSD': '',  // 记录当前仓位的bot id
+        },
+      },
       botRsiDivergence: {
         botId: '__rsi_divergence_bot',
         symbols: ['XBTUSD'],
@@ -63,8 +68,12 @@ class FlowDataBase {
         open_size: 1,
         lowVol: true,
         highBoDong: true,
-        usdMode: false, // $本位
-      }
+      },
+      botBreakCandle: {
+        botId: '__break_candle_bot',
+        symbols: ['XBTUSD'],
+        on: false,
+      },
     }, options)
 
     this._indicativeSettlePrice = 0
@@ -827,13 +836,27 @@ class FlowDataBase {
     return this.getWalletBalanceUsd()
   }
 
+  setCurrentPositionBotId(id, symbol) {
+    this._options.BotConfig.currentPositionBotId[symbol] = id
+  }
+
+  getCurrentPositionBotId(symbol) {
+    return this._options.BotConfig.currentPositionBotId[symbol]
+  }
+
+  isRunningBot(id, symbol) {
+    const currentBotId = this.getCurrentPositionBotId(symbol)
+    return !currentBotId || currentBotId === id   
+  }
+
   runRsiDevergenceBot(symbol) {
     const {
       on, botId, symbols, enableLong, enableShort,
       len, highlowLen, divergenceLen, theshold_bottom, theshold_top,
       lowVol, highBoDong,
-      usdMode,
     } = this._options.botRsiDivergence
+
+    const { usdMode } = this._options.BotConfig
 
     if (!on) {
       return
@@ -845,6 +868,9 @@ class FlowDataBase {
       return
     }
     if (this.isAutoSignalRunding(botId)) {
+      return
+    }
+    if (!this.isRunningBot(botId, symbol)) {
       return
     }
     // todo: 结合 交易所的强制平仓价格来判断
@@ -872,7 +898,8 @@ class FlowDataBase {
       // may close
       // const currentQty = this._accountPosition.getCurrentQty(symbol)
       const closeSignal = this._candles5m.rsiDivergenceSignal(symbol, 10, 24, 24, 35, 69)
-      if (closeSignal.long) {
+      // 超卖平空
+      if (closeSignal.long && !longPosition) {
         if (!longPosition) {
           notifyPhone('rsiDivergenceSignal bot close short')
         }
@@ -881,8 +908,11 @@ class FlowDataBase {
         } else {
           this.closeShortPositionIfHave(symbol)
         }
+        // 重置id
+        this.setCurrentPositionBotId('', symbol)
       }
-      if (closeSignal.short) {
+      // 超买平多
+      if (closeSignal.short && longPosition) {
         if (longPosition) {
           notifyPhone('rsiDivergenceSignal bot close long' + (usdMode ? '套保' : ''))
         }
@@ -893,6 +923,8 @@ class FlowDataBase {
         } else {
           this.closeLongPostionIfHave(symbol)
         }
+        // 重置id
+        this.setCurrentPositionBotId('', symbol)
       }
     } else {
       // open
@@ -904,6 +936,8 @@ class FlowDataBase {
         notifyPhone(`rsi divergence bot long! ${isNotLH} ${lowVolFilter} ${highBoDongFilter}`)
         if (isNotLH && lowVolFilter && highBoDongFilter) {
           notifyPhone('rsi divergence bot open!')
+          // 锁定为当前id
+          this.setCurrentPositionBotId(botId, symbol)
           // high2 low2 to open
           this.updateAutoSignalById(botId, {
             symbol: symbol,

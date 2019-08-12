@@ -324,12 +324,21 @@ export default class Trade extends React.Component {
                 </table>
               </div>
               <div>
-                <h5>BOT</h5>
+                <h5>
+                  BOT&nbsp;&nbsp;
+                  <label title="开启后 套保才是空仓">usdMode</label>
+                  <input type="checkbox" id="bot-rsi-divergence-checkbox-usdmode" onClick={this.handleCheckboxOption.bind(this, i, 'BotConfig.usdMode')} checked={options.BotConfig.usdMode}/>
+                  &nbsp;&nbsp;&nbsp;&nbsp;
+                  <label>currentPostionBotId-XBTUSD</label>
+                  <select onChange={this.handleSelectPositonBotId.bind(this, i, 'BotConfig.currentPositionBotId.XBTUSD')} value={options.BotConfig.currentPositionBotId['XBTUSD']}>
+                    <option value="">无</option>
+                    <option value="__rsi_divergence_bot">__rsi_divergence_bot</option>
+                    <option value="__break_candle_bot">__break_candle_bot</option>
+                  </select>
+                </h5>
                 <div>
                   <input type="checkbox" id="bot-rsi-divergence-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botRsiDivergence.on')} checked={options.botRsiDivergence.on}/>
                   <label>rsi divergence</label>
-                  <input type="checkbox" id="bot-rsi-divergence-checkbox-usdmode" onClick={this.handleCheckboxOption.bind(this, i, 'botRsiDivergence.usdMode')} checked={options.botRsiDivergence.usdMode}/>
-                  <label title="开启后 套保才是空仓">usdMode</label>
                 </div>
               </div>
               {
@@ -736,6 +745,16 @@ export default class Trade extends React.Component {
 
   handleCheckboxOption(index, key, e) {
     this.fetchChangeUserOption(index, key, e.target.checked)
+  }
+
+  handleSelectChangeOption(index, key, e) {
+    this.fetchChangeUserOption(index, key, e.target.value)
+  }
+
+  handleSelectPositonBotId(index, key, e) {
+    if (window.confirm('强制修改bot id?')) {
+      this.handleSelectChangeOption(index, key, e)
+    }
   }
 
   handleChangeZZSD(index, e) {
