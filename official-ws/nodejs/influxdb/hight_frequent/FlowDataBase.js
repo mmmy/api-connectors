@@ -1001,6 +1001,7 @@ class FlowDataBase {
         positionQty >= 0 : positionQty > 0
       // 此策略已经设置了止盈止损
       // 可以在此检查止盈止损有没有设置
+      // 平仓后重置botId
     } else {
       if (_waitingForOrderBreak.long || _waitingForOrderBreak.short) {
         const stochOverSignal = this._candles5m.stochOverTradeSignal(symbol, 9, 3, 30, 70)
