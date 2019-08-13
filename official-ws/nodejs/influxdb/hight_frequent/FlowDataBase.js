@@ -73,6 +73,12 @@ class FlowDataBase {
         botId: '__break_candle_bot',
         symbols: ['XBTUSD'],
         on: false,
+        enableLong: true,
+        enableShort: false,
+        _waitingForOrderBreak: {long: false, short: false},
+        len: 48,
+        upVol: true,
+        useAdx: true,
       },
     }, options)
 
@@ -955,6 +961,94 @@ class FlowDataBase {
           })
         }
       }
+    }
+  }
+
+  runBreakCandleBot(symbol) {
+    const {
+      on, botId, symbols, _waitingForOrderBreak, enableLong, enableShort,
+      len, upVol, useAdx,
+    } = this._options.botBreakCandle
+
+    const { usdMode } = this._options.BotConfig
+
+    if (!on) {
+      return
+    }
+    if (symbols.indexOf(symbol) === -1) {
+      return
+    }
+    if (this.hasStopOpenOrder(symbol)) {
+      return
+    }
+    if (this.isAutoSignalRunding(botId)) {
+      return
+    }
+    if (!this.isRunningBot(botId, symbol)) {
+      return
+    }
+
+    let hasPosition = false
+    const positionQty = this._accountPosition.getCurrentQty(symbol)
+    if (usdMode) {
+      hasPosition = positionQty >= 0 //=0 相当于现货
+    } else {
+      hasPosition = this._accountPosition.hasPosition(symbol)
+    }
+
+    if (hasPosition) {
+      const longPosition = usdMode ?
+        positionQty >= 0 : positionQty > 0
+      // 此策略已经设置了止盈止损
+      // 可以在此检查止盈止损有没有设置
+    } else {
+      if (_waitingForOrderBreak.long || _waitingForOrderBreak.short) {
+        const stochOverSignal = this._candles5m.stochOverTradeSignal(symbol, 9, 3, 30, 70)
+        const toOpenPostion = (stochOverSignal.long && _waitingForOrderBreak.long) ||
+          (stochOverSignal.short && this._waitingForOrderBreak.short)
+        if (toOpenPostion) {
+          _waitingForOrderBreak.long = false
+          _waitingForOrderBreak.short = false
+          notifyPhone('break candle bot push auto signal! 可手动取消')
+          // 高4, 低4
+          this.updateAutoOrderSignal(botId, {
+            symbol: symbol,
+            amount: usdMode ? Math.abs(positionQty) : this.getAccountFullAmount(),
+            min_interval: 1,// 重复触发至少间隔时间1小时, 关系不大
+            order_method: "stopMarket5m", // highlow1
+            remain_times: 1,
+            side: stochOverSignal.long ? "Buy" : "Sell",
+            signal_name: "break5m",
+            signal_operator: stochOverSignal.long ? "low1" : "high1",
+            signal_value: "",
+            values: {
+              times: 4
+            }
+          })
+        }
+      } else {
+        const barTrendSignal = this._candles5m.isLastBarTrend(symbol, len)
+        if ((barTrendSignal.long && enableLong) || (barTrendSignal.short && enableShort)) {
+          const upVolFilter = upVol ? this._candles1h.isUpVol(symbol, 10, 3) : true
+          let adxFilter = true
+          
+          if (useAdx) {
+            const adxSignal = this._candles1d.adxSignal(symbol, 14)
+            adxFilter = (adxSignal.long && barTrendSignal.long) || (adxSignal.short && barTrendSignal.short)
+          }
+          notifyPhone(`break candle bot signal! ${barTrendSignal.long ? 'long' : 'short'} upVolFilter${upVolFilter} adxFilter${adxFilter}`)
+          if (upVolFilter && adxFilter) {
+            // 锁定为当前id
+            this.setCurrentPositionBotId(botId, symbol)
+            if (barTrendSignal.long) {
+              _waitingForOrderBreak.long = true
+            } else {
+              _waitingForOrderBreak.short = true
+            }
+          }
+        }
+      }
+
     }
   }
 
