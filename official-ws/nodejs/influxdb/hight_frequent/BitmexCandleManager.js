@@ -87,6 +87,10 @@ class BitmexCandleManager {
   adxSignal(symbol, len) {
     return this._candles[symbol].adxSignal(len, false)
   }
+
+  getMinMaxHighLow(symbol, len) {
+    return this._candles[symbol].getMinMaxHighLow(len)
+  }
 }
 
 module.exports = BitmexCandleManager

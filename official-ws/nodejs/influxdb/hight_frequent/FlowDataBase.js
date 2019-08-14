@@ -827,8 +827,16 @@ class FlowDataBase {
     return this._indicatorCache
   }
 
+  hasReduceOnlyOrder(symbol) {
+    return this._accountOrder.getReduceOnlyOrders(symbol).length > 0
+  }
+
+  hasStopOrder(symbol) {
+    return this._accountOrder.getStopOrders(symbol).length > 0
+  }
+
   hasStopOpenOrder(symbol) {
-    this._orderManager.getStopOpenMarketOrders(symbol).length > 0
+    return this._accountOrder.getStopOpenMarketOrders(symbol).length > 0
   }
 
   getWalletBalanceUsd() {
@@ -970,7 +978,7 @@ class FlowDataBase {
       len, upVol, useAdx,
     } = this._options.botBreakCandle
 
-    const { usdMode } = this._options.BotConfig
+    const { usdMode, currentPositionBotId } = this._options.BotConfig
 
     if (!on) {
       return
@@ -988,6 +996,7 @@ class FlowDataBase {
       return
     }
 
+    const isBotRunning = currentPositionBotId[symbol] === botId
     let hasPosition = false
     const positionQty = this._accountPosition.getCurrentQty(symbol)
     if (usdMode) {
@@ -999,9 +1008,16 @@ class FlowDataBase {
     if (hasPosition) {
       const longPosition = usdMode ?
         positionQty >= 0 : positionQty > 0
-      // 此策略已经设置了止盈止损
+      // 设置了止盈止损
       // 可以在此检查止盈止损有没有设置
       // 平仓后重置botId
+      if (!this.hasStopOrder(symbol)) {
+        const { maxHigh, minLow } = this._candles5m.getMinMaxHighLow(symbol, len)
+        // this._orderManager.getSignatureSDK().orderStop(symbol, qty, stopPx, side, false)
+      }
+      if (!this.hasReduceOnlyOrder(symbol)) {
+        
+      }
     } else {
       if (_waitingForOrderBreak.long || _waitingForOrderBreak.short) {
         const stochOverSignal = this._candles5m.stochOverTradeSignal(symbol, 9, 3, 30, 70)
@@ -1028,6 +1044,9 @@ class FlowDataBase {
           })
         }
       } else {
+        if (isBotRunning) {
+          this.setCurrentPositionBotId('', symbol)
+        }
         const barTrendSignal = this._candles5m.isLastBarTrend(symbol, len)
         if ((barTrendSignal.long && enableLong) || (barTrendSignal.short && enableShort)) {
           const upVolFilter = upVol ? this._candles1h.isUpVol(symbol, 10, 3) : true
