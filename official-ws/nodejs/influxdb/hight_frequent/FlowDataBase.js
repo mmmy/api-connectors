@@ -75,7 +75,7 @@ class FlowDataBase {
         on: false,
         enableLong: true,
         enableShort: false,
-        _waitingForOrderBreak: {long: false, short: false},
+        _waitingForOrderBreak: { long: false, short: false },
         len: 48,
         upVol: true,
         useAdx: true,
@@ -662,6 +662,7 @@ class FlowDataBase {
     this.caculateIndicatorAndCache(symbol, '5m')
 
     this.runRsiDevergenceBot(symbol)
+    this.runBreakCandleBot(symbol)
   }
 
   updateAccountOrder(json, symbol) {
@@ -830,13 +831,17 @@ class FlowDataBase {
   hasReduceOnlyOrder(symbol) {
     return this._accountOrder.getReduceOnlyOrders(symbol).length > 0
   }
-
-  hasStopOrder(symbol) {
-    return this._accountOrder.getStopOrders(symbol).length > 0
+  // 如果side不传, 返回全部
+  hasStopOrder(symbol, side) {
+    return this._accountOrder.getStopOrders(symbol, side).length > 0
   }
 
-  hasStopOpenOrder(symbol) {
-    return this._accountOrder.getStopOpenMarketOrders(symbol).length > 0
+  hasStopOpenOrder(symbol, side) {
+    return this._accountOrder.getStopOpenMarketOrders(symbol, side).length > 0
+  }
+
+  hasLimitOrder(long, symbol) {
+    return this._accountOrder.getLimitOrders(long, symbol).length > 0
   }
 
   getWalletBalanceUsd() {
@@ -860,7 +865,7 @@ class FlowDataBase {
 
   isRunningBot(id, symbol) {
     const currentBotId = this.getCurrentPositionBotId(symbol)
-    return !currentBotId || currentBotId === id   
+    return !currentBotId || currentBotId === id
   }
 
   runRsiDevergenceBot(symbol) {
@@ -986,7 +991,8 @@ class FlowDataBase {
     if (symbols.indexOf(symbol) === -1) {
       return
     }
-    if (this.hasStopOpenOrder(symbol)) {
+    // 如果该策略没有运行, 还有stopOpenOrder, 返回
+    if (!currentPositionBotId[symbol] && this.hasStopOpenOrder(symbol)) {
       return
     }
     if (this.isAutoSignalRunding(botId)) {
@@ -1006,17 +1012,48 @@ class FlowDataBase {
     }
 
     if (hasPosition) {
-      const longPosition = usdMode ?
-        positionQty >= 0 : positionQty > 0
+      // const longPosition = usdMode ?
+      //   positionQty >= 0 : positionQty > 0
       // 设置了止盈止损
       // 可以在此检查止盈止损有没有设置
-      // 平仓后重置botId
-      if (!this.hasStopOrder(symbol)) {
-        const { maxHigh, minLow } = this._candles5m.getMinMaxHighLow(symbol, len)
-        // this._orderManager.getSignatureSDK().orderStop(symbol, qty, stopPx, side, false)
-      }
-      if (!this.hasReduceOnlyOrder(symbol)) {
-        
+      const { maxHigh, minLow } = this._candles5m.getMinMaxHighLow(symbol, len)
+      if (usdMode) {
+        const longPosition = positionQty >= 0
+        const stopSide = longPosition ? 'Sell' : 'Buy'
+        const qty = this.getAccountFullAmount()
+        // 止损
+        if (!this.hasStopOpenOrder(symbol, stopSide)) {
+          console.log('usdMode and set stop')
+          notifyPhone('usdMode and set stop')
+          this._orderManager.getSignatureSDK().orderStop(symbol, qty, longPosition ? minLow : maxHigh, stopSide, false)
+        }
+        // 止盈
+        if (!this.hasLimitOrder(!longPosition, symbol)) {
+          console.log('usdMode and set limit profit')
+          notifyPhone('usdMode and set limit profit')
+          const { high, low } = this._candles5m.getHistoryCandle(symbol, 2)
+          let profit = (maxHigh - minLow) * 1
+          profit = Math.round(profit * 2) / 2
+          this._orderManager.getSignatureSDK().orderLimit(symbol, qty, stopSide, longPosition ? (low + profit) : (high - profit))
+        }
+      } else {
+        const longPosition = positionQty > 0
+        const stopSide = longPosition ? 'Sell' : 'Buy'
+        if (!this.hasStopOrder(symbol, stopSide)) {
+          // 止损
+          console.log('btc mode and set stop')
+          notifyPhone('btc mode and set stop')
+          this._orderManager.getSignatureSDK().orderStop(symbol, Math.abs(positionQty), longPosition ? minLow : maxHigh, stopSide, true)
+        }
+        if (!this.hasReduceOnlyOrder(symbol)) {
+          // 止盈
+          console.log('btc mode and set profit limit')
+          notifyPhone('btc mode and set profit limit')
+          const { high, low } = this._candles5m.getHistoryCandle(symbol, 2)
+          let profit = (maxHigh - minLow) * 1
+          profit = Math.round(profit * 2) / 2
+          this._orderManager.getSignatureSDK().orderReduceOnlyLimit(symbol, Math.abs(positionQty), stopSide, longPosition ? (low + profit) : (high - profit))
+        }
       }
     } else {
       if (_waitingForOrderBreak.long || _waitingForOrderBreak.short) {
@@ -1044,14 +1081,17 @@ class FlowDataBase {
           })
         }
       } else {
+        // 平仓后重置botId
         if (isBotRunning) {
           this.setCurrentPositionBotId('', symbol)
+          // clear orders
+          this._orderManager.getSignatureSDK().deleteOrderAll()
         }
         const barTrendSignal = this._candles5m.isLastBarTrend(symbol, len)
         if ((barTrendSignal.long && enableLong) || (barTrendSignal.short && enableShort)) {
           const upVolFilter = upVol ? this._candles1h.isUpVol(symbol, 10, 3) : true
           let adxFilter = true
-          
+
           if (useAdx) {
             const adxSignal = this._candles1d.adxSignal(symbol, 14)
             adxFilter = (adxSignal.long && barTrendSignal.long) || (adxSignal.short && barTrendSignal.short)

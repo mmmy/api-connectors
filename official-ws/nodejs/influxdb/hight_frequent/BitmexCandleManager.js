@@ -36,8 +36,8 @@ class BitmexCandleManager {
     return this._candles[symbol].rsiDivergenceSignal(false, len, highlowLen, divergenceLen, theshold_bottom, theshold_top)
   }
 
-  getHistoryCandle(symbol) {
-    return this._candles[symbol].getHistoryCandle(1)
+  getHistoryCandle(symbol, bars = 1) {
+    return this._candles[symbol].getHistoryCandle(bars)
   }
 
   rsiOverTradeSignal(symbol, len, theshold_bottom, theshold_top) {

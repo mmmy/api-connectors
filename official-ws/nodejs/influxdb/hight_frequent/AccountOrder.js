@@ -15,7 +15,7 @@ class AccountOrder {
       }
     }
   }
-  
+
   update(json, symbol) {
     symbol = symbol || 'XBTUSD'
     // 由于首次可能不是action=partial, 导致永远不能更新的bug
@@ -27,7 +27,7 @@ class AccountOrder {
   }
 
   getOrders(symbol = 'XBTUSD') {
-     return (this._CLIENT._data.order[symbol] || []).filter(item => ['Canceled', 'Filled'].indexOf(item.ordStatus) === -1)
+    return (this._CLIENT._data.order[symbol] || []).filter(item => ['Canceled', 'Filled'].indexOf(item.ordStatus) === -1)
   }
 
   hasOrder(symbol = 'XBTUSD') {
@@ -38,12 +38,20 @@ class AccountOrder {
     return this.getOrders(symbol).filter(o => o.side === (long ? 'Buy' : 'Sell'))
   }
   // 默认是触发后平仓的限价止损
-  getStopOrders(symbol = 'XBTUSD') {
-    return this.getOrders(symbol).filter(o => o.ordType === 'Stop' && o.execInst.indexOf('Close') > -1)
+  getStopOrders(symbol = 'XBTUSD', side) {
+    return this.getOrders(symbol).filter(o =>
+      o.ordType === 'Stop' &&
+      o.execInst.indexOf('Close') > -1 &&
+      (side ? o.side === side : true)
+    )
   }
   // 可以开仓的止损， 追涨杀跌使用
-  getStopOpenMarketOrders(symbol = 'XBTUSD') {
-    return this.getOrders(symbol).filter(o => o.ordType === 'Stop' && o.execInst.indexOf('Close') === -1)
+  getStopOpenMarketOrders(symbol = 'XBTUSD', side) {
+    return this.getOrders(symbol).filter(o =>
+      o.ordType === 'Stop' &&
+      o.execInst.indexOf('Close') === -1 &&
+      (side ? o.side === side : true)
+    )
   }
 
   getReduceOnlyOrders(symbol = 'XBTUSD') {

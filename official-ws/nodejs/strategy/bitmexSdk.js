@@ -2,9 +2,10 @@
 var httpClient = require('./httpClient')
 const querystring = require('querystring')
 var BASE_URL = 'https://www.bitmex.com/api/v1'
+var TESTNET_BASE_URL = 'https://testnet.bitmex.com/api/v1'
 
-function getUrl(path, query) {
-  return BASE_URL + path + (query ? `?${query}` : '')
+function getUrl(path, query, testnet) {
+  return (testnet ? TESTNET_BASE_URL : BASE_URL) + path + (query ? `?${query}` : '')
 }
 
 function formatGetParams(params, defaultParams) {
@@ -17,7 +18,7 @@ function formatGetParams(params, defaultParams) {
 
 const Bitmex = {}
 // 注意交易所返回的时间是 candle 结束的时间， 比如2018-07-17T16:00:00.000Z 实际上在tradingview 上显示的前1小时
-Bitmex.getTradeHistory = function(params) {
+Bitmex.getTradeHistory = function (params, testnet) {
   var path = '/trade/bucketed'
   var paramstr = formatGetParams(params, {
     symbol: 'XBTUSD',
@@ -26,7 +27,7 @@ Bitmex.getTradeHistory = function(params) {
     count: 30,
     reverse: true,
   })
-  var url = getUrl(path, paramstr)
+  var url = getUrl(path, paramstr, testnet)
   return httpClient.get(url)
 }
 

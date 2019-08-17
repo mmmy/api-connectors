@@ -58,7 +58,7 @@ class BitmexManager {
   }
 
   listenCandle({ binSize, count }, histCb, cb, symbol) {
-    bitmextSdk.getTradeHistory({ symbol: symbol || 'XBTUSD', binSize, count: count || 200 }).then(json => {
+    bitmextSdk.getTradeHistory({ symbol: symbol || 'XBTUSD', binSize, count: count || 200 }, this._options.testnet).then(json => {
       json = JSON.parse(json)
       const list = json.reverse()
       histCb(list)
@@ -119,37 +119,37 @@ class BitmexManager {
   }
   // data { indicativeSettlePrice指数价格, openInterest未平仓合约数, openValue未平仓合约价值 }
   listenInstrument(cb, symbol) {
-    this._client.addStream(symbol || 'XBTUSD', 'instrument', function(data, symbol, tableName) {
+    this._client.addStream(symbol || 'XBTUSD', 'instrument', function (data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
 
   listenPosition(cb, symbol) {
-    this._client.addStream(symbol || 'XBTUSD', 'position', function(data, symbol, tableName) {
+    this._client.addStream(symbol || 'XBTUSD', 'position', function (data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
 
   listenExecution(cb, symbol) {
-    this._client.addStream(symbol || 'XBTUSD', 'execution', function(data, symbol, tableName) {
+    this._client.addStream(symbol || 'XBTUSD', 'execution', function (data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
   // data {walletBalance, marginBalance} /1E8
   listenMargin(cb, symbol) {
-    this._client.addStream(symbol || 'XBTUSD', 'margin', function(data, symbol, tableName) {
+    this._client.addStream(symbol || 'XBTUSD', 'margin', function (data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
 
   listenOrder(cb, symbol) {
-    this._client.addStream(symbol || 'XBTUSD', 'order', function(data, symbol, tableName) {
+    this._client.addStream(symbol || 'XBTUSD', 'order', function (data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }
 
   listenQuote(cb, symbol) {
-    this._client.addStream(symbol || 'XBTUSD', 'quote', function(data, symbol, tableName) {
+    this._client.addStream(symbol || 'XBTUSD', 'quote', function (data, symbol, tableName) {
       cb(data, symbol, tableName)
     })
   }

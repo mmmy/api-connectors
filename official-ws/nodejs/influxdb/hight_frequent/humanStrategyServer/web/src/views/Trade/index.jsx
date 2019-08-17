@@ -327,7 +327,7 @@ export default class Trade extends React.Component {
                 <h5>
                   BOT&nbsp;&nbsp;
                   <label title="开启后 套保才是空仓">usdMode</label>
-                  <input type="checkbox" id="bot-rsi-divergence-checkbox-usdmode" onClick={this.handleCheckboxOption.bind(this, i, 'BotConfig.usdMode')} checked={options.BotConfig.usdMode}/>
+                  <input type="checkbox" id="bot-rsi-divergence-checkbox-usdmode" onClick={this.handleCheckboxOption.bind(this, i, 'BotConfig.usdMode')} checked={options.BotConfig.usdMode} />
                   &nbsp;&nbsp;&nbsp;&nbsp;
                   <label>currentPostionBotId-XBTUSD</label>
                   <select onChange={this.handleSelectPositonBotId.bind(this, i, 'BotConfig.currentPositionBotId.XBTUSD')} value={options.BotConfig.currentPositionBotId['XBTUSD']}>
@@ -337,8 +337,12 @@ export default class Trade extends React.Component {
                   </select>
                 </h5>
                 <div>
-                  <input type="checkbox" id="bot-rsi-divergence-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botRsiDivergence.on')} checked={options.botRsiDivergence.on}/>
+                  <input type="checkbox" id="bot-rsi-divergence-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botRsiDivergence.on')} checked={options.botRsiDivergence.on} />
                   <label>rsi divergence</label>
+                </div>
+                <div>
+                  <input type="checkbox" id="bot-breakcandle-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botBreakCandle.on')} checked={options.botBreakCandle.on} />
+                  <label>break candle</label>
                 </div>
               </div>
               {
