@@ -33,7 +33,8 @@ const data1d = HistoryData[symbol]['1d']
 manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
-  id: `${symbol}_breakcandle5m_48_0601`,
+  // id: `${symbol}_breakcandle5m_48_0601`,
+  id: `S2放量突破策略回测`,
   disableShort: true,
   highVol: false,
   useAdx: true,   // good
@@ -120,11 +121,11 @@ function testRange(orangeData, indexRange) {
 }
 
 let dataSeries = [
-  // symbol === 'XBTUSD' ? [400] : ["2018-09-01T10:00:00.000Z"]
+  symbol === 'XBTUSD' ? [400] : ["2018-09-01T10:00:00.000Z"]
   // ['2017-09-16T00:00:00.000Z', '2017-12-13T00:00:00.000Z'],
   // ["2017-10-01T00:00:00.000Z", "2017-11-10T00:00:00.000Z",],
   // ["2017-11-13T00:00:00.000Z", "2017-12-08T00:00:00.000Z",],
-  ["2019-07-02T00:00:00.000Z"]
+  // ["2019-07-02T00:00:00.000Z"]
 ]
 
 const seriesIndex = timeToSeries(data5m, dataSeries)

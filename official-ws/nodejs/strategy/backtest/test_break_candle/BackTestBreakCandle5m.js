@@ -132,6 +132,8 @@ class BackTestBreakCandle5m extends BackTest {
           this._waitingForOrderBreak.short = true
         }
       } else {
+        // 记录持仓K线数
+        this._accout.updateMinMax(bar)
         // close trade
         if (this._accout.getUnreleasedProfitPercent(bar.close) < 0.01) {
           const signal = this._strategy(bar, this._candles)
