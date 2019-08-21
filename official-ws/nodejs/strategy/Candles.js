@@ -245,6 +245,35 @@ Candles.prototype.isReversed = function (maySignal) {
   return { long, short }
 }
 
+Candles.prototype.macdSwingSignal = function (firstBar) {
+  const klines = this.getCandles(false)
+  const macds = signal.MacdSignal(klines)
+  let long = false,
+    short = false
+  if (macds.length > 5) {
+    const lastMacd = macds[macds.length - 1]
+    const lastMacd2 = macds[macds.length - 2]
+    // const lastMacd3 = macds[macds.length - 3]
+    // const lastMacd4 = macds[macds.length - 4]
+    if (firstBar) {
+      long = lastMacd.MACD > lastMacd.signal && lastMacd2.MACD <= lastMacd2.signal
+      short = lastMacd.MACD < lastMacd.signal && lastMacd2.MACD >= lastMacd2.signal
+    } else {
+      long = lastMacd.MACD > lastMacd.signal
+      short = lastMacd.MACD < lastMacd.signal
+    }
+    // && lastMacd2.MACD > lastMacd3.MACD
+    // && lastMacd3.MACD > lastMacd4.MACD
+    // && lastMacd2.MACD < lastMacd3.MACD
+    // && lastMacd3.MACD < lastMacd4.MACD
+  }
+
+  return {
+    long,
+    short
+  }
+}
+
 Candles.prototype.macdTrendSignal = function (realTime = true) {
   var klines = this.getCandles(realTime)
   const macds = signal.MacdSignal(klines)

@@ -42,13 +42,13 @@ exports.ADXSignal = function (kline, len = 14) {
     })
 }
 // [{MACD: ,histogram: , signal: }]
-exports.MacdSignal = function (kline) {
+exports.MacdSignal = function (kline, fastLen = 12, slowLen = 26, signalLen = 9) {
     const { C } = parseKline(kline)
     const result = MACD.calculate({
         values: C,
-        fastPeriod: 12,
-        slowPeriod: 26,
-        signalPeriod: 9,
+        fastPeriod: fastLen,
+        slowPeriod: slowLen,
+        signalPeriod: signalLen,
         SimpleMAOscillator: false,
         SimpleMASignal: false
     })
