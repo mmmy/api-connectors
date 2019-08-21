@@ -14,7 +14,7 @@ class BackTestSwing extends BackTest {
   initStrategy() {
     this.setStrategy((bar, candles) => {
 
-      const { lowVol, highBoDong, strongLongShort, len, highlowLen, divergenceLen, theshold_bottom, theshold_top } = this._options
+      const { lowVol, disableLong, disableShort } = this._options
 
       let long = false
       let short = false
@@ -23,13 +23,11 @@ class BackTestSwing extends BackTest {
       const _1dCandle = candles['1d']
       let mainCandle = _5mCandle
 
-      const rsiDivergenceSignal = mainCandle.rsiDivergenceSignal(false, len || 12, highlowLen || 50, divergenceLen || 50, theshold_bottom || 25, theshold_top || 75)
+      const swingSignal = _5mCandle.macdSwingSignal(true)
 
-      const disableShort = this._options.disableShort
-      const disableLong = this._options.disableLong
       if (
         !disableLong &&
-        rsiDivergenceSignal.long
+        swingSignal.long
       ) {
         const lowVolFilter = lowVol ? _5mCandle.isLowVol(50, 3) : true
         // const lowVolFilter = lowVol ? _5mCandle.isLatestLowVol(50, 12, 1) : true
@@ -51,12 +49,11 @@ class BackTestSwing extends BackTest {
         // }
       } else if (
         !disableShort &&
-        rsiDivergenceSignal.short
+        swingSignal.short
       ) {
         // const isLowVol = _5mCandle.isLowVol(50, 3)
         const lowVolFilter = lowVol ? _1hCandle.isLatestLowVol(50, 4, 1) && _5mCandle.isLowVol(50, 3) : true
         // const lowVolFilter = lowVol ? _5mCandle.isLatestLowVol(50, 12, 4) : true
-        const highBoDongFilter = highBoDong ? _1dCandle.isAdxHigh(14) : true
 
         // const isHighBoDong = _1dCandle.isAdxHigh(14)
         // const isStrongLong = _1dCandle.isStrongLong()
@@ -64,7 +61,7 @@ class BackTestSwing extends BackTest {
         // const filterS = this.getMacdDepartSignal('1h')
         // if (filterS.short) {
         // if (trendSignal.short) {
-        if (lowVolFilter && highBoDongFilter && !mainCandle.isCurrentHighestLowestClose(true, 300)) {
+        if (lowVolFilter && !mainCandle.isCurrentHighestLowestClose(true, 300)) {
 
           short = true
         }

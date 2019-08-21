@@ -835,4 +835,11 @@ Candles.prototype.isUpVol = function (slowLen, fastLen) {
   return volFastSmaResult.slice(-1)[0] > volSlowSmaResult.slice(-1)[0]
 }
 
+Candles.prototype.isDownVol = function (slowLen, fastLen) {
+  const klines = this.getCandles(false)
+  const volFastSmaResult = signal.VolSMA(klines, fastLen)
+  const volSlowSmaResult = signal.VolSMA(klines, slowLen)
+  return volFastSmaResult.slice(-1)[0] < volSlowSmaResult.slice(-1)[0]
+}
+
 module.exports = Candles
