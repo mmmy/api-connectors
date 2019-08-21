@@ -29,11 +29,12 @@ class BackTestSwing extends BackTest {
         !disableLong &&
         swingSignal.long
       ) {
-        const lowVolFilter = lowVol ? _5mCandle.isLowVol(50, 3) : true
+        const downVolFilter = _1hCandle.isDownVolEma(10, 5)
         // const lowVolFilter = lowVol ? _5mCandle.isLatestLowVol(50, 12, 1) : true
         // const lowVolFilter = lowVol ? _1hCandle.isLatestLowVol(50, 4, 1) && _5mCandle.isLowVol(50, 3) : true
-        const highBoDongFilter = highBoDong ? _1dCandle.isAdxHigh(14) : true
-        const strongShortFilter = strongLongShort ? !_1dCandle.isStrongShort() : true
+        const lowBoDongFilter = !_1dCandle.isAdxHigh(14)
+        const highestLowestRsi = _1hCandle.getHighestLowestRsi(10, 10)
+        const rsiFilter = highestLowestRsi.lowest > 31
         // console.log(bar.timestamp, bar.close)
         // const trendSignal = this.get1dMacdTrendSignal()
         // const filterS = this.getMacdDepartSignal('1h')
@@ -41,7 +42,7 @@ class BackTestSwing extends BackTest {
 
         // 这个很牛逼
         // if (isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
-        if (highBoDongFilter && lowVolFilter && strongShortFilter && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
+        if (lowBoDongFilter && downVolFilter && rsiFilter) {
           long = true
         }
         // if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
@@ -76,7 +77,7 @@ class BackTestSwing extends BackTest {
 
     this._closeSignal = () => {
       const candleManager5m = this.getCandleByPeriod('5m')
-      const rsiDivergenceSignal = candleManager5m.rsiDivergenceSignal(false, 10, 24, 24, 35, 69)
+      const rsiDivergenceSignal = candleManager5m.macdSwingSignal(false)
       return rsiDivergenceSignal
     }
 

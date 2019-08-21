@@ -3,6 +3,7 @@ var RSI = technicalindicators.RSI
 var BB = technicalindicators.BollingerBands
 var MACD = technicalindicators.MACD
 var SMA = technicalindicators.SMA
+var EMA = technicalindicators.EMA
 var PSAR = require('../lib/PSAR').PSAR
 var StochasticRsi = technicalindicators.StochasticRSI
 var Stochastic = technicalindicators.Stochastic
@@ -170,6 +171,13 @@ exports.VolSMA = function (kline, period) {
     kline = kline.slice(-period * 2)
     const { T, O, H, L, C, V } = parseKline(kline)
     const result = SMA.calculate({ period, values: V })
+    return result
+}
+
+exports.VolEMA = function (kline, period) {
+    kline = kline.slice(-period * 2)
+    const { T, O, H, L, C, V } = parseKline(kline)
+    const result = EMA.calculate({ period, values: V })
     return result
 }
 

@@ -150,6 +150,18 @@ Candles.prototype.bollSignal = function (realTime) {
   return bbSignal
 }
 
+Candles.prototype.getHighestLowestRsi = function(len, backLen) {
+  const klines = this.getCandles(false)
+  const rsis = signal.RSI(klines, len)
+  const backRsis = rsis.slice(-backLen)
+  const highest = Math.max.apply(null, backRsis)
+  const lowest = Math.min.apply(null, backRsis)
+  return {
+    highest,
+    lowest
+  }
+}
+
 Candles.prototype.rsiSignal = function (realTime, len) {
   var data = this.getCandles(realTime)
   var rsis = signal.RSI(data, len)
@@ -259,8 +271,8 @@ Candles.prototype.macdSwingSignal = function (firstBar) {
       long = lastMacd.MACD > lastMacd.signal && lastMacd2.MACD <= lastMacd2.signal
       short = lastMacd.MACD < lastMacd.signal && lastMacd2.MACD >= lastMacd2.signal
     } else {
-      long = lastMacd.MACD > lastMacd.signal
-      short = lastMacd.MACD < lastMacd.signal
+      long = lastMacd.MACD >= lastMacd.signal
+      short = lastMacd.MACD <= lastMacd.signal
     }
     // && lastMacd2.MACD > lastMacd3.MACD
     // && lastMacd3.MACD > lastMacd4.MACD
@@ -840,6 +852,13 @@ Candles.prototype.isDownVol = function (slowLen, fastLen) {
   const volFastSmaResult = signal.VolSMA(klines, fastLen)
   const volSlowSmaResult = signal.VolSMA(klines, slowLen)
   return volFastSmaResult.slice(-1)[0] < volSlowSmaResult.slice(-1)[0]
+}
+
+Candles.prototype.isDownVolEma = function (slowLen, fastLen) {
+  const klines = this.getCandles(false)
+  const volFastEmaResult = signal.VolEMA(klines, fastLen)
+  const volSlowEmaResult = signal.VolEMA(klines, slowLen)
+  return volFastEmaResult.slice(-1)[0] < volSlowEmaResult.slice(-1)[0]
 }
 
 module.exports = Candles

@@ -36,15 +36,6 @@ manager.addNewStrategy(new TestStrategy({
   // id: `${symbol}_rsi_divergence128080_300_5m_long_filter(lowVol+highBoDong)v4`,
   id: `S3swing`,
   disableShort: true,
-  lowVol: true,
-  highBoDong: true,
-  strongLongShort: false,
-  len: 12,
-  highlowLen: 80,
-  divergenceLen: 80,
-  // theshold_bottom: 25,
-  theshold_bottom: 25,
-  theshold_top: 80,
   disableLong: false,
 }))
 
@@ -126,11 +117,11 @@ function testRange(orangeData, indexRange) {
 }
 
 let dataSeries = [
-  symbol === 'XBTUSD' ? [400] : ["2018-09-01T10:00:00.000Z"]
+  // symbol === 'XBTUSD' ? [400] : ["2018-09-01T10:00:00.000Z"]
   // ['2017-09-16T00:00:00.000Z', '2017-12-13T00:00:00.000Z'],
   // ["2017-10-01T00:00:00.000Z", "2017-11-10T00:00:00.000Z",],
   // ["2017-11-13T00:00:00.000Z", "2017-12-08T00:00:00.000Z",],
-  // ["2019-06-29T00:00:00.000Z"]
+  ["2019-07-22T00:00:00.000Z"]
 ]
 
 const seriesIndex = timeToSeries(data5m, dataSeries)
