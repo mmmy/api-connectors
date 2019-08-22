@@ -286,6 +286,31 @@ Candles.prototype.macdSwingSignal = function (firstBar) {
   }
 }
 
+Candles.prototype.macdHistBarTrendSignal = function() {
+  var klines = this.getCandles(false)
+  const macds = signal.MacdSignal(klines)
+  let long = false,
+    short = false
+
+  if (macds.length > 5) {
+    const lastMacd = macds[macds.length - 1]
+    const lastMacd2 = macds[macds.length - 2]
+    const lastMacd3 = macds[macds.length - 3]
+    const lastMacd4 = macds[macds.length - 4]
+    long = lastMacd.histogram > lastMacd2.histogram
+    // && lastMacd2.MACD > lastMacd3.MACD
+    // && lastMacd3.MACD > lastMacd4.MACD
+    short = lastMacd.histogram < lastMacd2.histogram
+    // && lastMacd2.MACD < lastMacd3.MACD
+    // && lastMacd3.MACD < lastMacd4.MACD
+  }
+
+  return {
+    long,
+    short
+  }
+}
+
 Candles.prototype.macdTrendSignal = function (realTime = true) {
   var klines = this.getCandles(realTime)
   const macds = signal.MacdSignal(klines)
