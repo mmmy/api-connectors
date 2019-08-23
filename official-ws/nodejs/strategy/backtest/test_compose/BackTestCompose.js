@@ -78,6 +78,7 @@ class BackTestCompose extends BackTest {
     this._closeSignal = () => {
       const candleManager5m = this.getCandleByPeriod('5m')
       // const rsiDivergenceSignal = candleManager5m.macdSwingSignal(false)
+      // pinbar close
       return {
         long: false,
         short: candleManager5m.getLastRsi(12) > 70,
