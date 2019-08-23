@@ -150,7 +150,7 @@ Candles.prototype.bollSignal = function (realTime) {
   return bbSignal
 }
 
-Candles.prototype.getHighestLowestRsi = function(len, backLen) {
+Candles.prototype.getHighestLowestRsi = function (len, backLen) {
   const klines = this.getCandles(false)
   const rsis = signal.RSI(klines, len)
   const backRsis = rsis.slice(-backLen)
@@ -884,6 +884,37 @@ Candles.prototype.isDownVolEma = function (slowLen, fastLen) {
   const volFastEmaResult = signal.VolEMA(klines, fastLen)
   const volSlowEmaResult = signal.VolEMA(klines, slowLen)
   return volFastEmaResult.slice(-1)[0] < volSlowEmaResult.slice(-1)[0]
+}
+
+// ---------------------------------PA--------------------------------
+Candles.prototype.isInsideBar = function (len = 1) {
+  const klines = this.getCandles(false)
+  const bars = klines.slice(-len - 1)
+  for (let i = 1; i < bars.length; i++) {
+    const pre = bars[i - 1]
+    const bar = bars[i]
+    if (bar.high < pre.high || bar.low < pre.low) {
+      return false
+    }
+  }
+  return true
+}
+
+Candles.prototype.isPinBar = function (up) {
+  const lastBar = this.getHistoryCandle(1)
+  // const body = Math.abs(lastBar.close - lastBar.open)
+  const height = lastBar.high - lastBar.low
+  const top_whisker_percent = (lastBar.high - Math.max(lastBar.close, lastBar.open)) / height
+  const bottom_whisker_percent = (Math.min(lastBar.close, lastBar.open) - lastBar.low) / height
+  // 锤子
+  const up_pin = top_whisker_percent < 0.5 && bottom_whisker_percent > 0.4
+  // 墓碑
+  const down_pin = top_whisker_percent > 0.4 && bottom_whisker_percent < 0.5
+  if (up) {
+    return up_pin
+  } else {
+    return down_pin
+  }
 }
 
 module.exports = Candles
