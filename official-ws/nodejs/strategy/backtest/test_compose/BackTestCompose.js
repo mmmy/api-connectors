@@ -14,7 +14,7 @@ class BackTestCompose extends BackTest {
   initStrategy() {
     this.setStrategy((bar, candles) => {
 
-      const { lowVol, disableLong, disableShort } = this._options
+      const { downVol, disableLong, disableShort, lowDayBodong, rsi, high5mBodong } = this._options
 
       let long = false
       let short = false
@@ -23,18 +23,22 @@ class BackTestCompose extends BackTest {
       const _1dCandle = candles['1d']
       let mainCandle = _5mCandle
 
-      const swingSignal = _1hCandle.stochOverTradeSignal(9, 3, 30, 70)
+      // const swingSignal = _1hCandle.stochOverTradeSignal(9, 3, 30, 70)
+      const swingSignal = _1hCandle.pinBarOpenSignal(5)
+      // const swingSignal = _5mCandle.pinBarOpenSignal(20, true)
 
       if (
         !disableLong &&
         swingSignal.long
       ) {
-        const downVolFilter = _1hCandle.isDownVolEma(10, 5)
+        // const dayRsiFilter = _1dCandle.getLastRsi(12) < 60
+        const downVolFilter = downVol ? _1hCandle.isDownVolEma(10, 5) : true
         // const lowVolFilter = lowVol ? _5mCandle.isLatestLowVol(50, 12, 1) : true
         // const lowVolFilter = lowVol ? _1hCandle.isLatestLowVol(50, 4, 1) && _5mCandle.isLowVol(50, 3) : true
-        const lowBoDongFilter = !_1dCandle.isAdxHigh(14)
-        const highestLowestRsi = _1hCandle.getHighestLowestRsi(10, 10)
-        const rsiFilter = highestLowestRsi.lowest > 31
+        const lowBoDongFilter = lowDayBodong ? _1dCandle.isAdxHigh(14, true) : true
+        // const highestLowestRsi = _1hCandle.getHighestLowestRsi(10, 10)
+        const rsiFilter = rsi ? _1hCandle.getHighestLowestRsi(10, 10).lowest > 31 : true
+        const high5mBodongFilter = high5mBodong ? _5mCandle.bollWidthPercent() > 0.03 : true
         // console.log(bar.timestamp, bar.close)
         // const trendSignal = this.get1dMacdTrendSignal()
         // const filterS = this.getMacdDepartSignal('1h')
@@ -42,7 +46,7 @@ class BackTestCompose extends BackTest {
 
         // 这个很牛逼
         // if (isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
-        if (lowBoDongFilter && downVolFilter && rsiFilter) {
+        if (high5mBodongFilter && lowBoDongFilter && downVolFilter && rsiFilter) {
           long = true
         }
         // if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
@@ -79,9 +83,12 @@ class BackTestCompose extends BackTest {
       const candleManager5m = this.getCandleByPeriod('5m')
       // const rsiDivergenceSignal = candleManager5m.macdSwingSignal(false)
       // pinbar close
+      // const short = candleManager5m.isPaStrongTrendBar(true) || candleManager5m.getLastRsi(12) > 70// || candleManager5m.isLowestHighestPinBar(false, 5)
+      // const short = candleManager5m.isLowestHighestPinBar(false, 5)// || candleManager5m.getLastRsi(12) > 70,
+      const short = candleManager5m.getLastRsi(12) > 70
       return {
         long: false,
-        short: candleManager5m.getLastRsi(12) > 70,
+        short: short
       }
     }
 

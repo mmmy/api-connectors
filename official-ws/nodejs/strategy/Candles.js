@@ -150,6 +150,13 @@ Candles.prototype.bollSignal = function (realTime) {
   return bbSignal
 }
 
+Candles.prototype.bollWidthPercent = function () {
+  const klines = this.getCandles(false)
+  const result = signal.calcBB(klines)
+  const last = result[result.length - 1]
+  return (last.upper - last.lower) / last.middle
+}
+
 Candles.prototype.getHighestLowestRsi = function (len, backLen) {
   const klines = this.getCandles(false)
   const rsis = signal.RSI(klines, len)
@@ -790,11 +797,14 @@ Candles.prototype.adxSignal = function (len = 14, gaobodong = false) {
   }
 }
 
-Candles.prototype.isAdxHigh = function (len = 14) {
+Candles.prototype.isAdxHigh = function (len = 14, notLow = false) {
   const klines = this.getCandles(false)
   const result = signal.ADXSignal(klines, len)
   const d0 = result[result.length - 1]
   const { adx, mdi, pdi } = d0
+  if (notLow) {
+    return adx > mdi || adx > pdi
+  }
   return adx > mdi && adx > pdi
 }
 
@@ -922,35 +932,48 @@ Candles.prototype.isInsideBar = function (len = 1) {
 Candles.prototype.isReverseBar = function (up, offset) {
   const lastBar = this.getHistoryCandle(1 + offset)
 }
+// 组合K反转也是pinbar
+Candles.prototype.isPinBarLike = function (up, len = 1, offset = 0) {
+  const histories = this.getCandles(false)
+  const startIndex = histories.length - len - offset
+  const klines = histories.slice(startIndex, startIndex + len)
+  const composeBar = signal.composeBar(klines)
+  return signal.isPinBar(composeBar, up, false)
+}
+
+Candles.prototype.isPinBarLikeSearch = function (up, start = 1, length = 2, offset = 0) {
+  for (let len = start; len < start + length; len++) {
+    if (this.isPinBarLike(up, len, offset)) {
+      return true
+    }
+  }
+  return false
+}
 
 Candles.prototype.isPinBar = function (up, offset = 0) {
   const lastBar = this.getHistoryCandle(1 + offset)
-  // const body = Math.abs(lastBar.close - lastBar.open)
-  const height = lastBar.high - lastBar.low
-  const top_whisker_percent = (lastBar.high - Math.max(lastBar.close, lastBar.open)) / height
-  const bottom_whisker_percent = (Math.min(lastBar.close, lastBar.open) - lastBar.low) / height
-  // 锤子
-  const up_pin = bottom_whisker_percent > 0.6//top_whisker_percent < 0.5 && bottom_whisker_percent > 0.4
-  // 墓碑
-  const down_pin = top_whisker_percent > 0.6//top_whisker_percent > 0.4 && bottom_whisker_percent < 0.5
-  if (up) {
-    return up_pin
-  } else {
-    return down_pin
-  }
+  return signal.isPinBar(lastBar, up, false)
 }
 // pin bar 创局部新高或者新低, 作为平仓信号
 Candles.prototype.isLowestHighestPinBar = function (up, backLen = 5, offset = 0) {
   return this.isPinBar(up, offset) && this.isCurrentHighestLowest(backLen, !up, offset)
 }
 
-Candles.prototype.pinBarOpenSignal = function (backLen = 5) {
+Candles.prototype.isLowestHighestPinBarSearch = function (up, backLen = 10, offset = 0) {
+  return this.isPinBarLikeSearch(up, 1, 2, offset) && this.isCurrentHighestLowest(backLen, !up, offset)
+}
+
+Candles.prototype.pinBarOpenSignal = function (backLen = 5, likeSearch = false) {
   const lastBar = this.getHistoryCandle(1)
   const lastBar2 = this.getHistoryCandle(2)
   const up_bar = lastBar.close > lastBar.open && lastBar.high > lastBar2.high
   const down_bar = lastBar.close < lastBar.open && lastBar.low < lastBar2.low
 
-  const hasLongPinBar = Array(3).fill(1).some((v, i) => this.isLowestHighestPinBar(true, backLen, i))
+  const hasLongPinBar = Array(3).fill(1).some((v, i) => likeSearch ?
+    this.isLowestHighestPinBarSearch(true, backLen, i) :
+    this.isLowestHighestPinBar(true, backLen, i)
+  )
+
   const long = hasLongPinBar && up_bar
   // if (long) {
   //   return {
@@ -960,12 +983,41 @@ Candles.prototype.pinBarOpenSignal = function (backLen = 5) {
   // } else {
 
   // }
-  const hasShortPinBar = Array(3).fill(1).some((v, i) => this.isLowestHighestPinBar(false, backLen, i))
+  const hasShortPinBar = Array(3).fill(1).some((v, i) => likeSearch ?
+    this.isLowestHighestPinBarSearch(false, backLen, i) :
+    this.isLowestHighestPinBar(false, backLen, i)
+  )
   const short = hasShortPinBar && down_bar
   return {
     long,
     short,
   }
+}
+
+Candles.prototype.isPaStrongTrendBar = function (up, backLen = 20, offset = 0) {
+  // const lastBar2 = this.getHistoryCandle(2)
+  let histories = this.getCandles(false, offset)
+  const len = histories.length
+  if (len < backLen) {
+    return false
+  }
+  const breakPercent = 0.0005
+  const bodyPercent = 0.0005
+  const lastBar = histories[len - 1]
+
+  const { maxHigh, minLow } = signal.highestLowestHighLow(histories.slice(0, len - 1), len - 1)
+  if (up) {
+    return (lastBar.close / lastBar.open > (1 + bodyPercent)) && (lastBar.close / maxHigh) > (1 + breakPercent)
+  } else {
+    return (lastBar.close / lastBar.open < (1 - bodyPercent)) && (lastBar.close / minLow) < (1 - breakPercent)
+  }
+}
+// 平仓信号
+Candles.prototype.isPaTrendMayBack = function (up) {
+  const lastBar = this.getHistoryCandle(1)
+  const lastBar2 = this.getHistoryCandle(2)
+  const lastBar3 = this.getHistoryCandle(3)
+
 }
 
 module.exports = Candles

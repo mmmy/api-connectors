@@ -7,7 +7,6 @@ var EMA = technicalindicators.EMA
 var PSAR = require('../lib/PSAR').PSAR
 var StochasticRsi = technicalindicators.StochasticRSI
 var Stochastic = technicalindicators.Stochastic
-var EMA = technicalindicators.EMA
 var ADX = technicalindicators.ADX
 // var jStat = require('jStat')
 
@@ -55,6 +54,12 @@ exports.MacdSignal = function (kline, fastLen = 12, slowLen = 26, signalLen = 9)
     })
     var lastVs = result.slice(-200)
     return lastVs
+}
+
+exports.calcBB = function (kline, period = 20, stdDev = 2) {
+    const { T, O, H, L, C, V } = parseKline(kline)
+    const result = BB.calculate({ period, values: C, stdDev })
+    return result
 }
 
 exports.BBSignalSeries = function (kline) {
@@ -303,8 +308,7 @@ exports.highestLowestClose = function (kline, barsLen) {
         maxClose
     }
 }
-
-exports.highestLowestHighLow = function (kline, barsLen) {
+function highestLowestHighLow(kline, barsLen) {
     const len = kline.length
     const endIndex = len - barsLen
     let maxHigh = kline[len - 1].high
@@ -320,6 +324,7 @@ exports.highestLowestHighLow = function (kline, barsLen) {
         minLow
     }
 }
+exports.highestLowestHighLow = highestLowestHighLow
 // 弃用
 exports.canculateTopBottomPoints = function (kline, count) {
     const len = kline.length
@@ -353,5 +358,35 @@ exports.canculateTopBottomPoints = function (kline, count) {
         } else if (false) {
 
         }
+    }
+}
+
+exports.isPinBar = function (bar, up, exact) {
+    const lastBar = bar
+    // const body = Math.abs(lastBar.close - lastBar.open)
+    const height = lastBar.high - lastBar.low
+    const top_whisker_percent = (lastBar.high - Math.max(lastBar.close, lastBar.open)) / height
+    const bottom_whisker_percent = (Math.min(lastBar.close, lastBar.open) - lastBar.low) / height
+    // 锤子
+    const up_pin = bottom_whisker_percent > 0.6//top_whisker_percent < 0.5 && bottom_whisker_percent > 0.4
+    // 墓碑
+    const down_pin = top_whisker_percent > 0.6//top_whisker_percent > 0.4 && bottom_whisker_percent < 0.5
+    if (up) {
+        return up_pin && (exact ? lastBar.close > lastBar.open : true)
+    } else {
+        return down_pin && (exact ? lastBar.close < lastBar.open : true)
+    }
+}
+
+exports.composeBar = function (klines) {
+    const firstBar = klines[0]
+    const lastBar = klines[klines.length - 1]
+    const { maxHigh, minLow } = highestLowestHighLow(klines, klines.length)
+    return {
+        timestamp: firstBar.timestamp,
+        open: firstBar.open,
+        close: lastBar.close,
+        high: maxHigh,
+        low: minLow
     }
 }

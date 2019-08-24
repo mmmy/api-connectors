@@ -194,84 +194,84 @@ function createOptions(data, reportData) {
           }
         }
       }, {
-      name: '交易量',
-      type: 'bar',
-      xAxisIndex: 1,
-      yAxisIndex: 1,
-      itemStyle: {
-        normal: {
-          color: '#7fbe9e'
+        name: '交易量',
+        type: 'bar',
+        xAxisIndex: 1,
+        yAxisIndex: 1,
+        itemStyle: {
+          normal: {
+            color: '#7fbe9e'
+          },
+          emphasis: {
+            color: '#140'
+          }
         },
-        emphasis: {
-          color: '#140'
-        }
+        data: volumes
       },
-      data: volumes
-    },
-    {
-      type: 'line',
-      name: '复利收益曲线（%）',
-      data: pfData,
-      xAxisIndex: 2,
-      yAxisIndex: 2,
-      connectNulls: true,
-      itemStyle: {
-        normal: {
-          //https://www.echartsjs.com/option.html#series-line.itemStyle
-          borderWidth: 0,      // 拐点样式?
-          color: '14b143',
-          // color0: '#ef232a',
-          // borderColor: '#14b143',
-          // borderColor0: '#ef232a',
+      {
+        type: 'line',
+        name: '复利收益曲线（%）',
+        data: pfData,
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        connectNulls: true,
+        itemStyle: {
+          normal: {
+            //https://www.echartsjs.com/option.html#series-line.itemStyle
+            borderWidth: 0,      // 拐点样式?
+            color: '14b143',
+            // color0: '#ef232a',
+            // borderColor: '#14b143',
+            // borderColor0: '#ef232a',
+          },
         },
-      },
-      lineStyle: {
-        color: '#14b143'
-      },
-    },
-    {
-      type: 'bar',
-      name: '发生交易',
-      data: pfData,
-      xAxisIndex: 2,
-      yAxisIndex: 2,
-      connectNulls: true,
-      itemStyle: {
-        normal: {
-          //https://www.echartsjs.com/option.html#series-line.itemStyle
-          borderWidth: 1,      // 拐点样式?
-          color: '#444',
-          // color0: '#ef232a',
-          // borderColor: '#14b143',
-          // borderColor0: '#ef232a',
+        lineStyle: {
+          color: '#14b143'
         },
       },
-    },
-    {
-      type: 'line',
-      name: '回撤',
-      data: ppBackData,
-      xAxisIndex: 3,
-      yAxisIndex: 3,
-      connectNulls: true,
-      itemStyle: {
-        normal: {
-          //https://www.echartsjs.com/option.html#series-line.itemStyle
-          borderWidth: 0,      // 拐点样式?
+      {
+        type: 'bar',
+        name: '发生交易',
+        data: pfData,
+        xAxisIndex: 2,
+        yAxisIndex: 2,
+        connectNulls: true,
+        itemStyle: {
+          normal: {
+            //https://www.echartsjs.com/option.html#series-line.itemStyle
+            borderWidth: 1,      // 拐点样式?
+            color: '#444',
+            // color0: '#ef232a',
+            // borderColor: '#14b143',
+            // borderColor0: '#ef232a',
+          },
+        },
+      },
+      {
+        type: 'line',
+        name: '回撤',
+        data: ppBackData,
+        xAxisIndex: 3,
+        yAxisIndex: 3,
+        connectNulls: true,
+        itemStyle: {
+          normal: {
+            //https://www.echartsjs.com/option.html#series-line.itemStyle
+            borderWidth: 0,      // 拐点样式?
+            color: 'red',
+            // color0: '#ef232a',
+            // borderColor: '#14b143',
+            // borderColor0: '#ef232a',
+          },
+        },
+        lineStyle: {
+          lineWidth: 1,
           color: 'red',
-          // color0: '#ef232a',
-          // borderColor: '#14b143',
-          // borderColor0: '#ef232a',
         },
-      },
-      lineStyle: {
-        lineWidth: 1,
-        color: 'red',
-      },
-      areaStyle: {
-        color: 'red'
+        areaStyle: {
+          color: 'red'
+        }
       }
-    }
     ],
     animation: false
   };

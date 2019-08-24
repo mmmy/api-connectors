@@ -34,9 +34,13 @@ manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
   // id: `${symbol}_rsi_divergence128080_300_5m_long_filter(lowVol+highBoDong)v4`,
-  id: `S4compose`,
+  id: `S4compose_pinbar_rsiclose`,
   disableShort: true,
   disableLong: false,
+  // downVol: true,
+  lowDayBodong: false,
+  // rsi: true,
+  high5mBodong: false
 }))
 
 let DataIndex = {
@@ -145,7 +149,7 @@ allTrades.map((t, i) => {
     ...statistic,
     tradeEarnList: []
   })
-  const saveName = `${symbol}_swing_result_${id || (i + 1)}.csv`
+  const saveName = `${symbol}_compose_result_${id || (i + 1)}.csv`
   const savePath = path.join(__dirname, saveName)
   const dataToCsv = JSONtoCSV(statistic.tradeEarnList, ['st', 'pf', 'bk', 'pfp', 'margin'])
   fs.writeFileSync(savePath, dataToCsv)
