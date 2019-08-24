@@ -105,6 +105,8 @@ class BackTestCompose extends BackTest {
         if (this._highsToBuy.remains === 1) {
           // has bought
           this.orderMarketPrevHighLow('5m', bar, this._highsToBuy.amount)
+          // this.setPositionStop(true)
+
           this._highsToBuy.ordering = false
         } else {
           this._highsToBuy.remains = this._highsToBuy.remains - 1
@@ -201,6 +203,12 @@ class BackTestCompose extends BackTest {
     const candleManager = this._candles[period]
     const signal = candleManager.macdDepartSignal(false)
     return signal
+  }
+
+  setPositionStop(long) {
+    // const { len } = this._options
+    const { maxHigh, minLow } = this.getCandleByPeriod('5m').getMinMaxHighLow(48)
+    this._accout.setStopPrice(long ? minLow : maxHigh)
   }
 
   checkCandle() {
