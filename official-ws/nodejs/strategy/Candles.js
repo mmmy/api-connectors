@@ -286,7 +286,7 @@ Candles.prototype.macdSwingSignal = function (firstBar) {
   }
 }
 
-Candles.prototype.macdHistBarTrendSignal = function() {
+Candles.prototype.macdHistBarTrendSignal = function () {
   var klines = this.getCandles(false)
   const macds = signal.MacdSignal(klines)
   let long = false,
@@ -397,7 +397,7 @@ Candles.prototype.isCurrentHighestLowestClose = function (isHighest, backlen, of
   return true
 }
 
-Candles.prototype.isCurrentHighestLowest = function (backLen, isHighest, offset = 0) {
+Candles.prototype.isCurrentHighestLowest = function (backlen, isHighest, offset = 0) {
   let histories = this.getCandles(false, offset)
   const len = histories.length
   if (len < backlen) {
@@ -426,7 +426,7 @@ Candles.prototype.sarSignal = function (realTime) {
 // 计算快线sma 和 慢线sma的 各种指标
 Candles.prototype.smaSignal = function (realTime) {
   var klines = this.getCandles(realTime)
-  smaSignal = signal.SmaSignal(klines, this._options.smaFastLen, this._options.smaSlowLen)
+  const smaSignal = signal.SmaSignal(klines, this._options.smaFastLen, this._options.smaSlowLen)
   // 详见signal.js
   return smaSignal
 }

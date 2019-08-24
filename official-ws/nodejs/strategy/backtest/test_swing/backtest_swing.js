@@ -34,7 +34,7 @@ manager.addNewStrategy(new TestStrategy({
   // id: 'rsi_divergence_width_filter_not_highestlowest_300_5m_long_short',
   // id: 'rsi_divergence121025_gaobodong_width_filter_not_highestlowest_300_5m_long',
   // id: `${symbol}_rsi_divergence128080_300_5m_long_filter(lowVol+highBoDong)v4`,
-  id: `S3swing`,
+  id: `S3swing_pinbarclose`,
   disableShort: true,
   disableLong: false,
 }))

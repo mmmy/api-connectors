@@ -83,7 +83,7 @@ class BackTestSwing extends BackTest {
       const rsiDivergenceSignal = candleManager5m.macdSwingSignal(false)
       return {
         long: rsiDivergenceSignal.long,
-        short: rsiDivergenceSignal.short || candleManager5m.getLastRsi(12) > 70,
+        short: candleManager5m.isLowestHighestPinBar(false, 5)//rsiDivergenceSignal.short || candleManager5m.getLastRsi(12) > 70,
       }
     }
 
