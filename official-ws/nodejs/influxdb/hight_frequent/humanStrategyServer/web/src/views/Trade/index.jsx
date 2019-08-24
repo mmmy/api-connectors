@@ -344,6 +344,10 @@ export default class Trade extends React.Component {
                   <input type="checkbox" id="bot-breakcandle-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botBreakCandle.on')} checked={options.botBreakCandle.on} />
                   <label>break candle</label>
                 </div>
+                <div>
+                  <input type="checkbox" id="bot-pinbar-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botPinBar.on')} checked={options.botPinBar.on} />
+                  <label>hour pin bar</label>
+                </div>
               </div>
               {
                 pending && <div className="pending-container">fetching...</div>

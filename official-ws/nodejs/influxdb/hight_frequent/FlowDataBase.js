@@ -80,6 +80,13 @@ class FlowDataBase {
         upVol: true,
         useAdx: true,
       },
+      botPinBar: {
+        botId: '__pin_bar_bot',
+        symbols: ['XBTUSD'],
+        on: false,
+        enableLong: true,
+        enableShort: false,
+      }
     }, options)
 
     this._indicativeSettlePrice = 0
@@ -663,6 +670,7 @@ class FlowDataBase {
 
     this.runRsiDevergenceBot(symbol)
     this.runBreakCandleBot(symbol)
+    this.runPinBarBot(symbol)
   }
 
   updateAccountOrder(json, symbol) {
@@ -1109,6 +1117,35 @@ class FlowDataBase {
         }
       }
 
+    }
+  }
+
+  runPinBarBot(symbol) {
+    const {
+      on, botId, symbols, enableLong, enableShort
+    } = this._options.botPinBar
+
+    const { usdMode, currentPositionBotId } = this._options.BotConfig
+
+    if (!on) {
+      return
+    }
+    if (symbols.indexOf(symbol) === -1) {
+      return
+    }
+    // 如果该策略没有运行, 还有stopOpenOrder, 返回
+    // if (!currentPositionBotId[symbol] && this.hasStopOpenOrder(symbol)) {
+    //   return
+    // }
+    if (this.isAutoSignalRunding(botId)) {
+      return
+    }
+    if (!this.isRunningBot(botId, symbol)) {
+      return
+    }
+    const pinBarSingal = this._candles1h.pinBarOpenSignal(symbol, 5)
+    if ((new Date()).getMinutes() === 0 && pinBarSingal.long) {
+      notifyPhone('bot pin bar hour long')
     }
   }
 

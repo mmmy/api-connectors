@@ -91,6 +91,10 @@ class BitmexCandleManager {
   getMinMaxHighLow(symbol, len) {
     return this._candles[symbol].getMinMaxHighLow(len)
   }
+
+  pinBarOpenSignal(symbol, backLen) {
+    return this._candles[symbol].pinBarOpenSignal(backLen)
+  }
 }
 
 module.exports = BitmexCandleManager
