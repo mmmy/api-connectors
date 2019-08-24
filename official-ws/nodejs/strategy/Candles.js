@@ -372,6 +372,25 @@ Candles.prototype.isCurrentHighestLowestClose = function (isHighest, backlen, of
   return true
 }
 
+Candles.prototype.isCurrentHighestLowest = function (backLen, isHighest, offset = 0) {
+  let histories = this.getCandles(false, offset)
+  const len = histories.length
+  if (len < backlen) {
+    return false
+  }
+  const currentHigh = histories[len - 1].high
+  const currentLow = histories[len - 1].low
+  for (let i = 1; i < backlen; i++) {
+    const candle = histories[len - i - 1]
+    if (isHighest && candle.high > currentHigh) {
+      return false
+    } else if (!isHighest && candle.low < currentLow) {
+      return false
+    }
+  }
+  return true
+}
+
 // 抛物线转向计算
 Candles.prototype.sarSignal = function (realTime) {
   var klines = this.getCandles(realTime)
@@ -875,20 +894,52 @@ Candles.prototype.isInsideBar = function (len = 1) {
   return true
 }
 
-Candles.prototype.isPinBar = function (up) {
-  const lastBar = this.getHistoryCandle(1)
+Candles.prototype.isReverseBar = function (up, offset) {
+  const lastBar = this.getHistoryCandle(1 + offset)
+}
+
+Candles.prototype.isPinBar = function (up, offset = 0) {
+  const lastBar = this.getHistoryCandle(1 + offset)
   // const body = Math.abs(lastBar.close - lastBar.open)
   const height = lastBar.high - lastBar.low
   const top_whisker_percent = (lastBar.high - Math.max(lastBar.close, lastBar.open)) / height
   const bottom_whisker_percent = (Math.min(lastBar.close, lastBar.open) - lastBar.low) / height
   // 锤子
-  const up_pin = top_whisker_percent < 0.5 && bottom_whisker_percent > 0.4
+  const up_pin = bottom_whisker_percent > 0.6//top_whisker_percent < 0.5 && bottom_whisker_percent > 0.4
   // 墓碑
-  const down_pin = top_whisker_percent > 0.4 && bottom_whisker_percent < 0.5
+  const down_pin = top_whisker_percent > 0.6//top_whisker_percent > 0.4 && bottom_whisker_percent < 0.5
   if (up) {
     return up_pin
   } else {
     return down_pin
+  }
+}
+// pin bar 创局部新高或者新低, 作为平仓信号
+Candles.prototype.isLowestHighestPinBar = function (up, backLen = 5, offset = 0) {
+  return this.isPinBar(up, offset) && this.isCurrentHighestLowest(backLen, !up, offset)
+}
+
+Candles.prototype.pinBarOpenSignal = function (backLen = 5) {
+  const lastBar = this.getHistoryCandle(1)
+  const lastBar2 = this.getHistoryCandle(2)
+  const up_bar = lastBar.close > lastBar.open && lastBar.high > lastBar2.high
+  const down_bar = lastBar.close < lastBar.open && lastBar.low < lastBar2.low
+
+  const hasLongPinBar = Array(3).fill(1).some((v, i) => this.isLowestHighestPinBar(true, backLen, i))
+  const long = hasLongPinBar && up_bar
+  // if (long) {
+  //   return {
+  //     long,
+  //     short: false
+  //   }
+  // } else {
+
+  // }
+  const hasShortPinBar = Array(3).fill(1).some((v, i) => this.isLowestHighestPinBar(false, backLen, i))
+  const short = hasShortPinBar && down_bar
+  return {
+    long,
+    short,
   }
 }
 
