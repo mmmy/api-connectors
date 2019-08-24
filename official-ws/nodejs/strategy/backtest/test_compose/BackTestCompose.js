@@ -125,10 +125,10 @@ class BackTestCompose extends BackTest {
       if (!this._accout.hasPosition()) {
         const signal = this._strategy(bar, this._candles)
         if (signal.long) {
-          this.startBuyHigh(2, 1)
+          this.startBuyHigh(6, 1)
         }
         if (signal.short) {
-          this.startSellLow(2, -1)
+          this.startSellLow(6, -1)
         }
       } else {
         this._accout.updateMinMax(bar)
