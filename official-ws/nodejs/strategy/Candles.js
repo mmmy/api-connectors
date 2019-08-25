@@ -222,6 +222,44 @@ Candles.prototype.rsiDivergenceSignal = function (realTime, len = 8, highlowLen 
   }
 }
 
+// rsi divergence
+Candles.prototype.rsiDivergenceSignalLow = function (realTime, len = 8, highlowLen = 24, divergenceLen = 24, theshold_bottom = 20, theshold_top = 80) {
+  const data = this.getCandles(realTime)
+  const rsis = signal.RSI(data, len, params => params.L)
+  const rsisDivergence = rsis.slice(-divergenceLen - 1)
+  const lastRsi = rsisDivergence[rsisDivergence.length - 1]
+  const histRsis = rsisDivergence.slice(0, rsisDivergence.length - 1)
+
+  let long = false
+  let short = false
+  let isCurrentHighest = this.isCurrentHighestLowest(highlowLen, true, 0)
+  let isCurrentLowest = this.isCurrentHighestLowest(highlowLen, false, 0)
+  if (isCurrentHighest) {
+    // 其中含有了Rsi超高阈值
+    const isOverBoughtHappend = Math.max.apply(null, rsisDivergence) > theshold_top
+    if (isOverBoughtHappend) {
+      const isDivergenceShort = lastRsi < Math.max.apply(null, histRsis)
+      if (isDivergenceShort) {
+        short = true
+      }
+    }
+  }
+  if (isCurrentLowest) {
+    const isOverSoldHappend = Math.min.apply(null, rsisDivergence) < theshold_bottom
+    if (isOverSoldHappend) {
+      const isDivergenceLong = lastRsi > Math.min.apply(null, histRsis)
+      if (isDivergenceLong) {
+        long = true
+      }
+    }
+  }
+  // const { maxHigh, minLow } = signal.highestLowestHighLow(data, divergenceLen)
+  return {
+    long,
+    short
+  }
+}
+
 // 也许开始趋势反转, 这个根据历史数据
 Candles.prototype.mayTrendReverseSignal = function () {
   const bbSignal = this.bollSignal()
@@ -764,6 +802,45 @@ Candles.prototype.stochOverTradeSignal = function (len = 9, kLen = 3, theshold_b
   return {
     long: d < theshold_bottom, // over sold, should close short position
     short: d > theshold_top,   // over bought, should close long position
+  }
+}
+
+// stoch divergence
+Candles.prototype.stochDivergenceSignalLow = function (realTime, len = 9, highlowLen = 24, divergenceLen = 24, theshold_bottom = 20, theshold_top = 80) {
+  const data = this.getCandles(realTime)
+  const result = signal.StochKD(data, len, 3)
+  // d相当于tv中的k
+  const stochDivergence = result.slice(-divergenceLen - 1).map(r => r.d)
+  const lastStoch = stochDivergence[stochDivergence.length - 1]
+  const histStoch = stochDivergence.slice(0, stochDivergence.length - 1)
+
+  let long = false
+  let short = false
+  let isCurrentHighest = this.isCurrentHighestLowest(highlowLen, true, 0)
+  let isCurrentLowest = this.isCurrentHighestLowest(highlowLen, false, 0)
+  if (isCurrentHighest) {
+    // 其中含有了Rsi超高阈值
+    const isOverBoughtHappend = Math.max.apply(null, stochDivergence) > theshold_top
+    if (isOverBoughtHappend) {
+      const isDivergenceShort = lastStoch < Math.max.apply(null, histStoch)
+      if (isDivergenceShort) {
+        short = true
+      }
+    }
+  }
+  if (isCurrentLowest) {
+    const isOverSoldHappend = Math.min.apply(null, stochDivergence) < theshold_bottom
+    if (isOverSoldHappend) {
+      const isDivergenceLong = lastStoch > Math.min.apply(null, histStoch)
+      if (isDivergenceLong) {
+        long = true
+      }
+    }
+  }
+  // const { maxHigh, minLow } = signal.highestLowestHighLow(data, divergenceLen)
+  return {
+    long,
+    short
   }
 }
 

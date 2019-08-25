@@ -25,12 +25,17 @@ class BackTestCompose extends BackTest {
 
       // const swingSignal = _1hCandle.stochOverTradeSignal(9, 3, 30, 70)
       const swingSignal = _1hCandle.pinBarOpenSignal(5)
+      // const swingSignal = _1hCandle.stochDivergenceSignalLow(false, 9, 30, 30, 50, 60)
+
       // const swingSignal = _5mCandle.pinBarOpenSignal(20, true)
 
       if (
         !disableLong &&
         swingSignal.long
       ) {
+        // 效果不好
+        // const dayMacdFilter = _1dCandle.macdHistBarTrendSignal().long
+        const hourHighLowFilter = true// !_1hCandle.isCurrentHighestLowestClose(false, 5)
         // const dayRsiFilter = _1dCandle.getLastRsi(12) < 60
         const downVolFilter = downVol ? _1hCandle.isDownVolEma(10, 5) : true
         // const lowVolFilter = lowVol ? _5mCandle.isLatestLowVol(50, 12, 1) : true
@@ -46,7 +51,7 @@ class BackTestCompose extends BackTest {
 
         // 这个很牛逼
         // if (isHighBoDong && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
-        if (high5mBodongFilter && lowBoDongFilter && downVolFilter && rsiFilter) {
+        if (high5mBodongFilter && lowBoDongFilter && downVolFilter && rsiFilter && hourHighLowFilter) {
           long = true
         }
         // if (!_1hCandle.isCurrentHighestLowestClose(false, 48) && !mainCandle.isCurrentHighestLowestClose(false, 300)) {
@@ -81,11 +86,13 @@ class BackTestCompose extends BackTest {
 
     this._closeSignal = () => {
       const candleManager5m = this.getCandleByPeriod('5m')
+      const candleManager1h = this.getCandleByPeriod('1h')
       // const rsiDivergenceSignal = candleManager5m.macdSwingSignal(false)
       // pinbar close
       // const short = candleManager5m.isPaStrongTrendBar(true) || candleManager5m.getLastRsi(12) > 70// || candleManager5m.isLowestHighestPinBar(false, 5)
       // const short = candleManager5m.isLowestHighestPinBar(false, 5)// || candleManager5m.getLastRsi(12) > 70,
-      const short = candleManager5m.getLastRsi(12) > 70
+      // const short = candleManager5m.getLastRsi(12) > 70
+      const short = candleManager1h.stochOverTradeSignal(12, 4, 30, 70).short
       return {
         long: false,
         short: short

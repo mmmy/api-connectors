@@ -334,6 +334,7 @@ export default class Trade extends React.Component {
                     <option value="">无</option>
                     <option value="__rsi_divergence_bot">__rsi_divergence_bot</option>
                     <option value="__break_candle_bot">__break_candle_bot</option>
+                    <option value="__pin_bar_bot">__pin_bar_bot</option>
                   </select>
                 </h5>
                 <div>

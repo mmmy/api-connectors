@@ -579,6 +579,7 @@ class FlowDataBase {
     }
 
     this.caculateIndicatorAndCache(symbol, '1h')
+    this.runPinBarBot(symbol)
   }
 
   updateTradeBin5m(json, symbol) {
@@ -670,7 +671,6 @@ class FlowDataBase {
 
     this.runRsiDevergenceBot(symbol)
     this.runBreakCandleBot(symbol)
-    this.runPinBarBot(symbol)
   }
 
   updateAccountOrder(json, symbol) {
@@ -1133,19 +1133,82 @@ class FlowDataBase {
     if (symbols.indexOf(symbol) === -1) {
       return
     }
-    // 如果该策略没有运行, 还有stopOpenOrder, 返回
-    // if (!currentPositionBotId[symbol] && this.hasStopOpenOrder(symbol)) {
-    //   return
-    // }
+    // 有stopOpenOrder, 返回
+    if (!this.hasStopOpenOrder(symbol)) {
+      return
+    }
     if (this.isAutoSignalRunding(botId)) {
       return
     }
     if (!this.isRunningBot(botId, symbol)) {
       return
     }
-    const pinBarSingal = this._candles1h.pinBarOpenSignal(symbol, 5)
-    if ((new Date()).getMinutes() === 0 && pinBarSingal.long) {
-      notifyPhone('bot pin bar hour long')
+    // 注意：usdMode 下套保后才是空仓
+    let hasPosition = false
+    const positionQty = this._accountPosition.getCurrentQty(symbol)
+
+    if (usdMode) {
+      hasPosition = positionQty >= 0 //=0 相当于现货
+    } else {
+      hasPosition = this._accountPosition.hasPosition(symbol)
+    }
+
+    if (hasPosition) {
+      const longPosition = usdMode ?
+        positionQty >= 0 : positionQty > 0
+      // may close
+      // const currentQty = this._accountPosition.getCurrentQty(symbol)
+      const closeSignal = this._candles1h.stochOverTradeSignal(symbol, 12, 4, 30, 70)
+      // 超卖平空
+      if (closeSignal.long && !longPosition) {
+        if (!longPosition) {
+          notifyPhone('pin bar bot close short')
+        }
+        if (usdMode) {
+          // 暂时不做空
+        } else {
+          this.closeShortPositionIfHave(symbol)
+        }
+        // 重置id
+        this.setCurrentPositionBotId('', symbol)
+      }
+      // 超买平多
+      if (closeSignal.short && longPosition) {
+        if (longPosition) {
+          notifyPhone('pin bar bot close long' + (usdMode ? '套保' : ''))
+        }
+        if (usdMode) {
+          //开套保
+          const qty = this.getAccountFullAmount()
+          this.orderMarket(symbol, 'Sell', qty)
+        } else {
+          this.closeLongPostionIfHave(symbol)
+        }
+        // 重置id
+        this.setCurrentPositionBotId('', symbol)
+      }
+    } else {
+      const openSignal = this._candles1h.pinBarOpenSignal(symbol, 5)
+      if ((openSignal.long && enableLong) || (openSignal.short && enableShort)) {
+        notifyPhone('bot pin bar hour long: ', openSignal.long)
+        // 锁定为当前id
+        this.setCurrentPositionBotId(botId, symbol)
+        // high6 low6 to open
+        this.updateAutoSignalById(botId, {
+          symbol: symbol,
+          amount: usdMode ? Math.abs(positionQty) : this.getAccountFullAmount(),
+          min_interval: 1,// 重复触发至少间隔时间1小时, 关系不大
+          order_method: "stopMarket5m", // highlow1
+          remain_times: 1,
+          side: openSignal.long ? "Buy" : "Sell",
+          signal_name: "break5m",
+          signal_operator: openSignal.long ? "low1" : "high1",
+          signal_value: "",
+          values: {
+            times: 6
+          }
+        })
+      }
     }
   }
 
