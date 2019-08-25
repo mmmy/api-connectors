@@ -671,6 +671,7 @@ class FlowDataBase {
 
     this.runRsiDevergenceBot(symbol)
     this.runBreakCandleBot(symbol)
+    // this.runPinBarBot(symbol)
   }
 
   updateAccountOrder(json, symbol) {
@@ -1000,6 +1001,7 @@ class FlowDataBase {
       return
     }
     // 如果该策略没有运行, 还有stopOpenOrder, 返回
+    // 因为下面的usdMode下， 开止损仓位也是利用止损开仓， 所以与上面的策略不一样
     if (!currentPositionBotId[symbol] && this.hasStopOpenOrder(symbol)) {
       return
     }
@@ -1033,6 +1035,7 @@ class FlowDataBase {
         if (!this.hasStopOpenOrder(symbol, stopSide)) {
           console.log('usdMode and set stop')
           notifyPhone('usdMode and set stop')
+          // 追踪止损开仓的
           this._orderManager.getSignatureSDK().orderStop(symbol, qty, longPosition ? minLow : maxHigh, stopSide, false)
         }
         // 止盈
@@ -1134,7 +1137,7 @@ class FlowDataBase {
       return
     }
     // 有stopOpenOrder, 返回
-    if (!this.hasStopOpenOrder(symbol)) {
+    if (this.hasStopOpenOrder(symbol)) {
       return
     }
     if (this.isAutoSignalRunding(botId)) {
@@ -1189,8 +1192,10 @@ class FlowDataBase {
       }
     } else {
       const openSignal = this._candles1h.pinBarOpenSignal(symbol, 5)
+      // openSignal.long = true
       if ((openSignal.long && enableLong) || (openSignal.short && enableShort)) {
-        notifyPhone('bot pin bar hour long: ', openSignal.long)
+        notifyPhone(`bot pin bar hour long: ${openSignal.long}`)
+        console.log('bot pin bar hour long: ', openSignal.long)
         // 锁定为当前id
         this.setCurrentPositionBotId(botId, symbol)
         // high6 low6 to open

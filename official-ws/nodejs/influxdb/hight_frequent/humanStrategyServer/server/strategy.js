@@ -34,6 +34,12 @@ if (isProduction) {
     botRsiDivergence: {
       on: true
     },
+    botBreakCandle: {
+      on: true
+    },
+    botPinBar: {
+      on: true
+    },
     autoUpdateStopOpenMarketOrder: true,
     autoUpdateStopOpenMarketOrder1h: false,
   })
@@ -61,6 +67,12 @@ if (isProduction) {
     initCheckSystem: false,
     main: false,
     botRsiDivergence: {
+      on: true
+    },
+    botBreakCandle: {
+      on: true
+    },
+    botPinBar: {
       on: true
     },
     autoUpdateStopOpenMarketOrder: true,
