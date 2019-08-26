@@ -46,14 +46,14 @@ dataList.map((t, i) => {
     report,
     exchange: 'BITMEX',
     symbol: 'XBTUSD',
-    period: '5分钟',
+    period: '1小时',
     candleCount: candleCountMap['5m'],
     comments: [{
-      text: '基本原理：日线指标为上涨趋势，结合小时线放量，5分钟趋势K线突破高点，等待回撤后的高4点位',
+      text: '基本原理：pin bar, 中文为锤子线, 这种形态意味着底部的买压很大, 有的时候是主力扫止损的行为, 是很好的逆向减仓形态',
     },
-    { text: '优势：严格的止盈止损'},
+    { text: '优势：收益较高, 劣势: 熊市有较大的回撤' },
     { text: '交易方式：程序全自动化交易，亦可以辅助人工操作, 结合常见顶部形态可将策略关闭即可' },
     { text: '杠杆倍数：小于3' },
-  ]
+    ]
   }, htmlPath)
 })
