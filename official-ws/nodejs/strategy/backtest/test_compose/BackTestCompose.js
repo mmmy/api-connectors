@@ -138,6 +138,11 @@ class BackTestCompose extends BackTest {
           this.startSellLow(6, -1)
         }
       } else {
+        // const breakSignalLong = this.getCandleByPeriod('1h').isLastBarTrend(48).long &&
+        //   this.getCandleByPeriod('1d').adxSignal(14, false).long && this.getCandleByPeriod('1h').isUpVol(10, 3)
+        // if (breakSignalLong) {
+        //   console.log('--------------breakSignalLong----------------------')
+        // }
         this._accout.updateMinMax(bar)
         // close trade
         if (this._accout.getUnreleasedProfitPercent(bar.close) < 0.01) {
