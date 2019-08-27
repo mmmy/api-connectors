@@ -35,7 +35,7 @@ if (isProduction) {
       on: true
     },
     botBreakCandle: {
-      on: true
+      on: false
     },
     botPinBar: {
       on: true
@@ -70,7 +70,7 @@ if (isProduction) {
       on: true
     },
     botBreakCandle: {
-      on: true
+      on: false
     },
     botPinBar: {
       on: true
