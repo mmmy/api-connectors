@@ -975,7 +975,7 @@ class FlowDataBase {
             remain_times: 1,
             side: openSignal.long ? "Buy" : "Sell",
             signal_name: "break5m",
-            signal_operator: openSignal.long ? "low1" : "high1",
+            signal_operator: openSignal.long ? "high1" : "low1",
             signal_value: "",
             values: {
               times: 2
@@ -1084,10 +1084,10 @@ class FlowDataBase {
             remain_times: 1,
             side: stochOverSignal.long ? "Buy" : "Sell",
             signal_name: "break5m",
-            signal_operator: stochOverSignal.long ? "low1" : "high1",
+            signal_operator: stochOverSignal.long ? "high1" : "low1",
             signal_value: "",
             values: {
-              times: 4
+              times: 3
             }
           })
         }
@@ -1207,10 +1207,10 @@ class FlowDataBase {
           remain_times: 1,
           side: openSignal.long ? "Buy" : "Sell",
           signal_name: "break5m",
-          signal_operator: openSignal.long ? "low1" : "high1",
+          signal_operator: openSignal.long ? "high1" : "low1",
           signal_value: "",
           values: {
-            times: 6
+            times: 5
           }
         })
       }
