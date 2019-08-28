@@ -81,6 +81,7 @@ class Account {
       } else {
         const closeAmount = Math.min(Math.abs(this._amount), Math.abs(amount))
         let profit = 0
+        let openPrice = this._avgPrice
         // close short
         if (amount > 0) {
           profit = closeAmount * (this._avgPrice - price)
@@ -93,7 +94,7 @@ class Account {
         }
         const wined = profit > 0
         this._amount = nextAmount
-        console.log(this._openTime, timestamp, profit, amount)
+        console.log(this._openTime, timestamp, profit, amount, [openPrice, price])
         return {
           touched: true,
           wined,
