@@ -1022,6 +1022,9 @@ class FlowDataBase {
     }
 
     if (hasPosition) {
+      if (!isBotRunning) {
+        return
+      }
       // const longPosition = usdMode ?
       //   positionQty >= 0 : positionQty > 0
       // 设置了止盈止损
