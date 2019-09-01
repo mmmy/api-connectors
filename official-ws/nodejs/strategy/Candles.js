@@ -736,6 +736,25 @@ Candles.prototype.canculateTopBottomOffest = function (points = 4) {
 
 }
 
+Candles.prototype.stochRsiSwingSignal = function (rsiPeriod, stochasticPeriod, kPeriod, dPeriod, bottom = 20, top = 80) {
+  const result = signal.StochasticRsi(this.getCandles(false), rsiPeriod, stochasticPeriod, kPeriod, dPeriod)
+  const len = result.length
+
+  let long = false
+  let short = false
+
+  const r0 = result[len - 1]
+  if (r0.stochRSI < bottom) {
+    long = true
+  } else if (r0.stochRSI > top) {
+    short = true
+  }
+  return {
+    long,
+    short
+  }
+}
+
 Candles.prototype.calcStochRsiSignal = function (rsiPeriod, stochasticPeriod, kPeriod, dPeriod, timestamp) {
   //[{stochRSI, k, d}]
   const result = signal.StochasticRsi(this.getCandles(false), rsiPeriod, stochasticPeriod, kPeriod, dPeriod)
