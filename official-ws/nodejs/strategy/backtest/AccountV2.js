@@ -47,14 +47,15 @@ class Account {
   setStopPrice(price) {
     this._stopPrice = price
     if (this._amount > 0 && this._stopPrice > this._avgPrice) {
-      throw Error('long position stopPrice > avgPrice ?')
+      const msg = `long position stopPrice(${this._stopPrice}) > avgPrice(${this._avgPrice}) ?`
+      throw Error(msg)
     }
   }
 
   setProfitPrice(price) {
     this._profitPrice = price
     if (this._amount > 0 && this._profitPrice < this._avgPrice) {
-      throw Error('long position _profitPrice < _avgPrice ?')
+      throw Error(`long position _profitPrice(${this._profitPrice}) < _avgPrice(${this._avgPrice}) ?`)
     }
   }
 
