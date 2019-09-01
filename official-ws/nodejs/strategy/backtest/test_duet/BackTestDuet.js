@@ -18,14 +18,14 @@ module.exports = class BackTestDuet extends BackTestSymbol {
       const xbtsignal = this.getCandle('XBTUSD', '5m').isLastBarTrend(48)
       const ethsignal = this.getCandle('ETHUSD', '5m').isLastBarTrend(48)
       const signal = {
-        long: xbtsignal.long// && ethsignal.long
+        long: xbtsignal.long && ethsignal.long
       }
       if (!disableLong && signal.long) {
-        // const upVolFilter = this.getCandle('XBTUSD', '1h').isUpVol(10, 3)
-        // const useAdx = this.getCandle('XBTUSD', '1d').adxSignal(14, false).long
-        // if (upVolFilter && useAdx) {
-        long = true
-        // }
+        const upVolFilter = this.getCandle('ETHUSD', '1h').isUpVol(10, 3)
+        const useAdx = this.getCandle('ETHUSD', '1d').adxSignal(14, false).long
+        if (upVolFilter && useAdx) {
+          long = true
+        }
       }
 
       return {
