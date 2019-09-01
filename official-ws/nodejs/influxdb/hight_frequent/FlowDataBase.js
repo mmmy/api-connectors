@@ -67,7 +67,7 @@ class FlowDataBase {
         enableShort: false,
         open_size: 1,
         lowVol: true,
-        highBoDong: true,
+        highBoDong: false, // false for test
       },
       botBreakCandle: {
         botId: '__break_candle_bot',
@@ -77,7 +77,7 @@ class FlowDataBase {
         enableShort: false,
         _waitingForOrderBreak: { long: false, short: false },
         len: 48,
-        upVol: true,
+        upVol: false, //false for test
         useAdx: true,
       },
       botPinBar: {

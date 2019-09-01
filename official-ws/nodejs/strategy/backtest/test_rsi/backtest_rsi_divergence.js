@@ -37,7 +37,7 @@ manager.addNewStrategy(new TestStrategy({
   id: `S1背离反转策略回测`,
   disableShort: true,
   lowVol: true,
-  highBoDong: true,
+  highBoDong: false, // for test
   strongLongShort: false,
   len: 12,
   highlowLen: 80,
