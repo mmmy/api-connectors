@@ -1073,7 +1073,7 @@ class FlowDataBase {
       if (_waitingForOrderBreak.long || _waitingForOrderBreak.short) {
         const stochOverSignal = this._candles5m.stochOverTradeSignal(symbol, 9, 3, 30, 70)
         const toOpenPostion = (stochOverSignal.long && _waitingForOrderBreak.long) ||
-          (stochOverSignal.short && this._waitingForOrderBreak.short)
+          (stochOverSignal.short && _waitingForOrderBreak.short)
         if (toOpenPostion) {
           _waitingForOrderBreak.long = false
           _waitingForOrderBreak.short = false
