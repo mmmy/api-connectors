@@ -1079,7 +1079,7 @@ class FlowDataBase {
           _waitingForOrderBreak.short = false
           notifyPhone('break candle bot push auto signal! 可手动取消')
           // 高4, 低4
-          this.updateAutoOrderSignal(botId, {
+          this.updateAutoSignalById(botId, {
             symbol: symbol,
             amount: usdMode ? Math.abs(positionQty) : this.getAccountFullAmount(),
             min_interval: 1,// 重复触发至少间隔时间1小时, 关系不大
@@ -1096,11 +1096,12 @@ class FlowDataBase {
         }
       } else {
         // 平仓后重置botId
-        if (isBotRunning) {
-          this.setCurrentPositionBotId('', symbol)
-          // clear orders
-          this._orderManager.getSignatureSDK().deleteOrderAll()
-        }
+        // 有bug
+        // if (isBotRunning) {
+        //   this.setCurrentPositionBotId('', symbol)
+        //   // clear orders
+        //   this._orderManager.getSignatureSDK().deleteOrderAll()
+        // }
         const barTrendSignal = this._candles5m.isLastBarTrend(symbol, len)
         if ((barTrendSignal.long && enableLong) || (barTrendSignal.short && enableShort)) {
           const upVolFilter = upVol ? this._candles1h.isUpVol(symbol, 10, 3) : true
