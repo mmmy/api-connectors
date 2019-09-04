@@ -1096,12 +1096,15 @@ class FlowDataBase {
         }
       } else {
         // 平仓后重置botId
-        // 有bug
-        // if (isBotRunning) {
-        //   this.setCurrentPositionBotId('', symbol)
-        //   // clear orders
-        //   this._orderManager.getSignatureSDK().deleteOrderAll()
-        // }
+        setTimeout(() => {
+          if (!this.hasStopOpenOrder(symbol) && currentPositionBotId[symbol] === botId) {
+            console.log('clear break bot')
+            this.setCurrentPositionBotId('', symbol)
+            //   // clear orders
+            this._orderManager.getSignatureSDK().deleteOrderAll()
+          }
+        }, 1 * 60 * 1000)
+
         const barTrendSignal = this._candles5m.isLastBarTrend(symbol, len)
         if ((barTrendSignal.long && enableLong) || (barTrendSignal.short && enableShort)) {
           const upVolFilter = upVol ? this._candles1h.isUpVol(symbol, 10, 3) : true
