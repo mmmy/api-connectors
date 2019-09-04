@@ -1002,8 +1002,14 @@ class FlowDataBase {
     }
     // 如果该策略没有运行, 还有stopOpenOrder, 返回
     // 因为下面的usdMode下， 开止损仓位也是利用止损开仓， 所以与上面的策略不一样
-    if (!currentPositionBotId[symbol] && this.hasStopOpenOrder(symbol)) {
-      return
+    if (this.hasStopOpenOrder(symbol)) {
+      if (usdMode) {
+        if (!currentPositionBotId[symbol]) {
+          return
+        }
+      } else {
+        return
+      }
     }
     if (this.isAutoSignalRunding(botId)) {
       return
@@ -1072,6 +1078,7 @@ class FlowDataBase {
     } else {
       if (_waitingForOrderBreak.long || _waitingForOrderBreak.short) {
         const stochOverSignal = this._candles5m.stochOverTradeSignal(symbol, 9, 3, 30, 70)
+        // stochOverSignal.long = true
         const toOpenPostion = (stochOverSignal.long && _waitingForOrderBreak.long) ||
           (stochOverSignal.short && _waitingForOrderBreak.short)
         if (toOpenPostion) {
@@ -1097,8 +1104,14 @@ class FlowDataBase {
       } else {
         // 平仓后重置botId
         setTimeout(() => {
-          if (!this.hasStopOpenOrder(symbol) && currentPositionBotId[symbol] === botId) {
-            console.log('clear break bot')
+          if (
+            !this.hasStopOpenOrder(symbol) &&
+            currentPositionBotId[symbol] === botId &&
+            !this.isAutoSignalRunding(botId) &&
+            !_waitingForOrderBreak.long &&
+            !_waitingForOrderBreak.short
+          ) {
+            notifyPhone('clear break candle bot')
             this.setCurrentPositionBotId('', symbol)
             //   // clear orders
             this._orderManager.getSignatureSDK().deleteOrderAll()
@@ -1106,6 +1119,10 @@ class FlowDataBase {
         }, 1 * 60 * 1000)
 
         const barTrendSignal = this._candles5m.isLastBarTrend(symbol, len)
+        // if (!this.__init_test) {
+        //   barTrendSignal.long = true
+        //   this.__init_test = true
+        // }
         if ((barTrendSignal.long && enableLong) || (barTrendSignal.short && enableShort)) {
           const upVolFilter = upVol ? this._candles1h.isUpVol(symbol, 10, 3) : true
           let adxFilter = true

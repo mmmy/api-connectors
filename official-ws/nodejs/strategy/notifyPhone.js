@@ -1,12 +1,16 @@
 var exec = require('child_process').exec
 const moment = require('moment-timezone')
 
-const now = function() {
+const now = function () {
     return moment().tz('Asia/ShangHai').format('MM-DD hh:mm:ss')
 }
 
-exports.notifyPhone = function(msg, sound) {
+exports.notifyPhone = function (msg, sound) {
+    const isProd = process.env.NODE_ENV === 'production'
     // msg = `${now()}  ${msg}`
+    if (!isProd) {
+        msg = 'test ' + msg
+    }
     sound = sound || 'pushover'
     exec(`curl -s \
         --form-string "html=1" \
