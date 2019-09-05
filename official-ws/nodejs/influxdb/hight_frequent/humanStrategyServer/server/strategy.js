@@ -32,10 +32,12 @@ if (isProduction) {
     initCheckSystem: false,
     main: false,
     botRsiDivergence: {
-      on: true
+      on: true,
+      highBoDong: false, // for test
     },
     botBreakCandle: {
-      on: false
+      on: false,
+      upVol: false, // for test
     },
     botPinBar: {
       on: true
@@ -67,10 +69,12 @@ if (isProduction) {
     initCheckSystem: false,
     main: false,
     botRsiDivergence: {
-      on: true
+      on: true,
+      highBoDong: false, // for test
     },
     botBreakCandle: {
-      on: false
+      on: false,
+      upVol: false, // for test
     },
     botPinBar: {
       on: true

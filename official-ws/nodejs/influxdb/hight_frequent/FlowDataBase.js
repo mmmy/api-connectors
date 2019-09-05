@@ -67,7 +67,7 @@ class FlowDataBase {
         enableShort: false,
         open_size: 1,
         lowVol: true,
-        highBoDong: false, // false for test
+        highBoDong: true, // false for test
       },
       botBreakCandle: {
         botId: '__break_candle_bot',
