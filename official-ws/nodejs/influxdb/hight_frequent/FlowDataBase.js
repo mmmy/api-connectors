@@ -77,7 +77,7 @@ class FlowDataBase {
         enableShort: false,
         _waitingForOrderBreak: { long: false, short: false },
         len: 48,
-        upVol: false, //false for test
+        upVol: true, //false for test
         useAdx: true,
       },
       botPinBar: {
