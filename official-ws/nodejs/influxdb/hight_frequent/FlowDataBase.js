@@ -1117,7 +1117,7 @@ class FlowDataBase {
         // 平仓后重置botId
         setTimeout(() => {
           if (
-            !this.hasSymbolPosition() &&
+            !this.hasSymbolPosition(symbol) &&
             !this.hasStopOpenOrder(symbol) &&
             currentPositionBotId[symbol] === botId &&
             !this.isAutoSignalRunding(botId) &&
