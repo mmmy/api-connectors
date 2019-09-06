@@ -31,12 +31,15 @@ if (isProduction) {
     database: false,
     initCheckSystem: false,
     main: false,
+    BotConfig: {
+      usdMode: true,  // $本位
+    },
     botRsiDivergence: {
       on: true,
       highBoDong: false, // for test
     },
     botBreakCandle: {
-      on: false,
+      on: true,
       upVol: false, // for test
     },
     botPinBar: {
@@ -68,12 +71,15 @@ if (isProduction) {
     database: false,
     initCheckSystem: false,
     main: false,
+    BotConfig: {
+      usdMode: true,  // $本位
+    },
     botRsiDivergence: {
       on: true,
       highBoDong: false, // for test
     },
     botBreakCandle: {
-      on: false,
+      on: true,
       upVol: false, // for test
     },
     botPinBar: {
