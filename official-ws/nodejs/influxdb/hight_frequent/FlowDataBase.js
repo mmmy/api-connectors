@@ -67,7 +67,7 @@ class FlowDataBase {
         enableShort: false,
         open_size: 1,
         lowVol: true,
-        highBoDong: false, // false for test
+        highBoDong: true, // false for test
       },
       botBreakCandle: {
         botId: '__break_candle_bot',
@@ -77,7 +77,7 @@ class FlowDataBase {
         enableShort: false,
         _waitingForOrderBreak: { long: false, short: false },
         len: 48,
-        upVol: false, //false for test
+        upVol: true, //false for test
         useAdx: true,
       },
       botPinBar: {
@@ -986,6 +986,18 @@ class FlowDataBase {
     }
   }
 
+  hasSymbolPosition(symbol) {
+    const { usdMode } = this._options.BotConfig
+    let hasPosition = false
+    const positionQty = this._accountPosition.getCurrentQty(symbol)
+    if (usdMode) {
+      hasPosition = positionQty >= 0 //=0 相当于现货
+    } else {
+      hasPosition = this._accountPosition.hasPosition(symbol)
+    }
+    return hasPosition
+  }
+
   runBreakCandleBot(symbol) {
     const {
       on, botId, symbols, _waitingForOrderBreak, enableLong, enableShort,
@@ -1105,6 +1117,7 @@ class FlowDataBase {
         // 平仓后重置botId
         setTimeout(() => {
           if (
+            !this.hasSymbolPosition(symbol) &&
             !this.hasStopOpenOrder(symbol) &&
             currentPositionBotId[symbol] === botId &&
             !this.isAutoSignalRunding(botId) &&
