@@ -7,13 +7,16 @@ class AccountPosition {
 
     this._CLIENT = {
       _data: { position: {} },
-      _keys: {}
+      _keys: { position: ["account", "symbol", "currency"] },
     }
   }
 
   update(json, symbol) {
     symbol = symbol || 'XBTUSD'
     // 由于首次可能不是action=partial, 导致永远不能更新的bug
+    // if (json.action === 'partial') {
+    //   console.log(json)
+    // }
     if (!this._CLIENT._data.position[symbol]) {
       this._CLIENT._data.position[symbol] = []
     }

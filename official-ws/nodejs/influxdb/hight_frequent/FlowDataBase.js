@@ -854,10 +854,16 @@ class FlowDataBase {
   }
 
   getWalletBalanceUsd() {
-    const { walletBalance } = this.getAccountMargin()
-    const balance = walletBalance / 1E8
-    const xbtPirce = this._candles5m.getHistoryCandle('XBTUSD').close
-    return Math.floor(xbtPirce * balance)
+    // margin 有可能还没有初始化
+    const margin = this.getAccountMargin()
+    if (margin) {
+      const { walletBalance } = margin
+      const balance = walletBalance / 1E8
+      const xbtPirce = this._candles5m.getHistoryCandle('XBTUSD').close
+      return Math.floor(xbtPirce * balance)
+    }
+    notifyPhone('getAccountMargin 返回 空？')
+    return -1
   }
 
   getAccountFullAmount() {
