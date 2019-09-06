@@ -1,4 +1,5 @@
 const DeltaParse = require('../../libForBrowser')
+const notifyPhone  = require('../../strategy/notifyPhone').notifyPhone
 class AccountPosition {
   constructor(options) {
     this._options = {
@@ -13,14 +14,23 @@ class AccountPosition {
 
   update(json, symbol) {
     symbol = symbol || 'XBTUSD'
-    // 由于首次可能不是action=partial, 导致永远不能更新的bug
     // if (json.action === 'partial') {
-    //   console.log(json)
+    //   console.log('position action partial ---------------', json)
     // }
-    if (!this._CLIENT._data.position[symbol]) {
-      this._CLIENT._data.position[symbol] = []
+    // 由于首次可能不是action=partial, 导致永远不能更新的bug
+    try {
+      if (!this._CLIENT._data.position[symbol]) {
+        this._CLIENT._data.position[symbol] = []
+      }
+      let _data = DeltaParse.onAction(json.action, json.table, symbol, this._CLIENT, json)
+    } catch(e) {
+      console.log('------------update position error -----------', json)
+      console.log(e)
+      notifyPhone(`###update position error ${json.action} ${symbol} and reboot system!!`)
+      setTimeout(() => {
+        process.exit(0)
+      }, 5000)
     }
-    let _data = DeltaParse.onAction(json.action, json.table, symbol, this._CLIENT, json)
     // console.log('account position test', symbol, this.getCostPrice(symbol))
   }
 
