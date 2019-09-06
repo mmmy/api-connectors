@@ -358,7 +358,7 @@ export default class Trade extends React.Component {
         }
       </div>
       <div className="logs">
-        <h5>日志</h5>
+        <h5>日志{users.length > 0 && <button onClick={this.handleReboot.bind(this)}>重启</button>}</h5>
         <ul>
           {
             logs.map(log => <li>{JSON.stringify(log)}</li>)
@@ -794,5 +794,11 @@ export default class Trade extends React.Component {
       userData.pending = false
       this.pushLog(e)
     })
+  }
+
+  handleReboot() {
+    if (window.confirm('确认重启, 会影响别的用户使用, 请确认后, 再刷新页面!')) {
+      axios.post('api/sys/reboot', {})
+    }
   }
 }
