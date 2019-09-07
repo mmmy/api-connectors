@@ -1,4 +1,4 @@
-var { apiKey, apiSecret } = require('../test-secret.json')
+var { apiKey, apiSecret } = require('../apikey/test-secret.json')
 
 var Account = require('../Account')
 
@@ -13,12 +13,12 @@ var aa = new Account({
 })
 const d1 = new Date()
 // 大概会有1秒钟的时差
-aa.signatureSDK.orderLimit(100, 'Buy', 9000).then((json) => {
-  console.log('时间差', new Date(json.timestamp) - d1)
-  console.log(json)
-  // console.log(aa)
-})
-console.log(d1.toISOString())
+// aa.signatureSDK.orderLimit(100, 'Buy', 9000).then((json) => {
+//   console.log('时间差', new Date(json.timestamp) - d1)
+//   console.log(json)
+//   // console.log(aa)
+// })
+// console.log(d1.toISOString())
 
 // setTimeout(() => {
 //   console.log(aa)
@@ -34,3 +34,9 @@ console.log(d1.toISOString())
 // aa.signatureSDK.closePositionMarket().then(json => {
 //   console.log(json)
 // })
+
+aa.signatureSDK.getPosition('ETHUSD').then(json => {
+  console.log(json)
+}).catch(e => {
+  console.log(e)
+})

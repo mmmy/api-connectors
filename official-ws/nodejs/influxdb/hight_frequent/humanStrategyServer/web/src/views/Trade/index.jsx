@@ -326,7 +326,7 @@ export default class Trade extends React.Component {
               <div>
                 <h5>
                   BOT&nbsp;&nbsp;
-                  <label title="开启后 套保才是空仓">usdMode</label>
+                  <label title="开启后 套保才是空仓, 熊市或者顶部形态开启">usdMode</label>
                   <input type="checkbox" id="bot-rsi-divergence-checkbox-usdmode" onClick={this.handleCheckboxOption.bind(this, i, 'BotConfig.usdMode')} checked={options.BotConfig.usdMode} />
                   &nbsp;&nbsp;&nbsp;&nbsp;
                   <label>currentPostionBotId-XBTUSD</label>
@@ -337,17 +337,35 @@ export default class Trade extends React.Component {
                     <option value="__pin_bar_bot">__pin_bar_bot</option>
                   </select>
                 </h5>
-                <div>
-                  <input type="checkbox" id="bot-rsi-divergence-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botRsiDivergence.on')} checked={options.botRsiDivergence.on} />
-                  <label>rsi divergence</label>
+                <div className="bot-row">
+                  <div className="switch">
+                    <input type="checkbox" id="bot-rsi-divergence-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botRsiDivergence.on')} checked={options.botRsiDivergence.on} />
+                    <label>rsi divergence</label>
+                  </div>
+                  <div className="options">
+                    {
+                      this.renderBotOptionCheckbox(options, i, 'botRsiDivergence', 'lowVol')
+                    }
+                    {
+                      this.renderBotOptionCheckbox(options, i, 'botRsiDivergence', 'highBoDong')
+                    }
+                  </div>
                 </div>
-                <div>
-                  <input type="checkbox" id="bot-breakcandle-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botBreakCandle.on')} checked={options.botBreakCandle.on} />
-                  <label>break candle</label>
+                <div className="bot-row">
+                  <div className="switch">
+                    <input type="checkbox" id="bot-breakcandle-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botBreakCandle.on')} checked={options.botBreakCandle.on} />
+                    <label>break candle</label>
+                  </div>
+                  <div className="options">
+                    {this.renderBotOptionCheckbox(options, i, 'botBreakCandle', 'upVol')}
+                    {this.renderBotOptionCheckbox(options, i, 'botBreakCandle', 'useAdx')}
+                  </div>
                 </div>
-                <div>
-                  <input type="checkbox" id="bot-pinbar-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botPinBar.on')} checked={options.botPinBar.on} />
-                  <label>hour pin bar</label>
+                <div className="bot-row">
+                  <div className="switch">
+                    <input type="checkbox" id="bot-pinbar-checkbox" onClick={this.handleCheckboxOption.bind(this, i, 'botPinBar.on')} checked={options.botPinBar.on} />
+                    <label>hour pin bar</label>
+                  </div>
                 </div>
               </div>
               {
@@ -366,6 +384,14 @@ export default class Trade extends React.Component {
         </ul>
       </div>
     </div>
+  }
+
+  renderBotOptionCheckbox(options, i, botName, optionName) {
+    const path = `${botName}.${optionName}`
+    return <span className="bot-option">
+      <input type="checkbox" onChange={this.handleCheckboxOption.bind(this, i, path)} checked={options[botName][optionName]} />
+      <label>{optionName}</label>
+    </span>
   }
 
   fetchOrderbookDepth() {

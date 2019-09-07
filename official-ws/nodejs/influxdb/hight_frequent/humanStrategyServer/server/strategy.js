@@ -1,5 +1,6 @@
 
 // var daishu = require('../../../../strategy/daishu-secret.json')
+const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
 
 process.setMaxListeners(0)
@@ -61,6 +62,7 @@ if (isProduction) {
     database: false,
     initCheckSystem: true,
     main: true,
+    configFilePath: path.join(__dirname, 'yq.config.json')
   })
   list.push({
     user: 'yqhero',
@@ -87,6 +89,7 @@ if (isProduction) {
     },
     autoUpdateStopOpenMarketOrder: true,
     autoUpdateStopOpenMarketOrder1h: false,
+    configFilePath: path.join(__dirname, 'yqhero.config.json')
   })
 }
 

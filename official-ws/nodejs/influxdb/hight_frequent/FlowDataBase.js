@@ -1,5 +1,6 @@
 // 通用版本
 // const OrderBook = require('../../strategy/researchOrderbookL2/OrderBookL2Trade')
+const fs = require('fs')
 const AccountOrder = require('./AccountOrder')
 const AccountPosition = require('./AccountPosition')
 const AccountQuote = require('./AccountQuote')
@@ -24,6 +25,7 @@ const precisionMap = {
 class FlowDataBase {
   constructor(options) {
     this._options = _.merge({
+      configFilePath: '',
       test: true,
       database: false,
       maxCache: 200,
@@ -53,6 +55,9 @@ class FlowDataBase {
         currentPositionBotId: {
           'XBTUSD': '',  // 记录当前仓位的bot id
         },
+        // maxQty: {
+        //   'XBTUSD': 10000,
+        // },
       },
       botRsiDivergence: {
         botId: '__rsi_divergence_bot',
@@ -89,6 +94,8 @@ class FlowDataBase {
       }
     }, options)
 
+    this.mergeConfigFromFile()
+
     this._indicativeSettlePrice = 0
     this._ispList = []                    //[{timestamp, price}]
     this._accountOrder = new AccountOrder()
@@ -112,6 +119,8 @@ class FlowDataBase {
     if (this._options.initCheckSystem) {
       this.initCheckSystem()
     }
+
+    this.initCheckDataInterval()
     // if (this._options.database) {
     //   this.initOrdersFromDB()
     // }
@@ -134,6 +143,13 @@ class FlowDataBase {
       }
     ]
     this._indicatorCache = {}
+    this._checkDataState = {
+      position: {
+        'XBTUSD': {
+          valid: true, //通过判断本地websock数据 和 api数据的相同性确定
+        }
+      }
+    }
   }
 
   getOptions() {
@@ -147,11 +163,15 @@ class FlowDataBase {
 
   updateOptions(options) {
     this._options = _.merge(this._options, options)
+    // 保存到json
+    this.saveConfigToFile()
     return this.getOptions()
   }
 
   updateOption(path, value) {
     _.set(this._options, path, value)
+    // 保存到json
+    this.saveConfigToFile()
     return this.getOptions()
   }
 
@@ -355,6 +375,33 @@ class FlowDataBase {
       return `${symbol} 1d candle timestamp wrong ${gap1d / 3600000} 小时`
     }
     return false
+  }
+  // 监测程序的数据是否正常， 否则重启
+  initCheckDataInterval() {
+    this._checkDataInterval = setInterval(() => {
+      this.checkPositionValid('XBTUSD')
+    }, 2 * 60 * 1000)
+  }
+
+  checkPositionValid(symbol) {
+    this._orderManager.getSignatureSDK().getPosition(symbol).then(json => {
+      const currentQty = json[0] ? json[0].currentQty : 0
+      const localCurrentQty = this._accountPosition.getCurrentQty(symbol)
+      const isSameQty = currentQty === localCurrentQty
+      // 连续两次不相同，那么重启程序！
+      if (!this._checkDataState.position[symbol].valid && !isSameQty) {
+        const msg = `${symbol} position连续两次不同，重启程序！`
+        console.log(msg)
+        notifyPhone(msg)
+        setTimeout(() => {
+          process.exit(1)
+        }, 3000)
+      }
+      this._checkDataState.position[symbol].valid = isSameQty
+    }).catch(e => {
+      notifyPhone('checkPositionValid getPosition error!')
+      console.log('checkPositionValid getPosition error', e)
+    })
   }
 
   initCheckSystem() {
@@ -672,6 +719,8 @@ class FlowDataBase {
     this.runRsiDevergenceBot(symbol)
     this.runBreakCandleBot(symbol)
     // this.runPinBarBot(symbol)
+    
+    this.saveConfigToFile()
   }
 
   updateAccountOrder(json, symbol) {
@@ -1277,6 +1326,57 @@ class FlowDataBase {
         ...newOrder,
         id
       })
+    }
+  }
+
+  mergeConfigFromFile() {
+    const configFromFile = this.getConfigFromFile()
+    if (configFromFile) {
+      console.log(this._options.user, '读取到配置文件', this._options.configFilePath)
+      this._options = _.merge(this._options, configFromFile)
+    }
+    return this._options
+  }
+
+  getConfigFromFile() {
+    const { configFilePath } = this._options
+    if (configFilePath && fs.existsSync(configFilePath)) {
+      return JSON.parse(fs.readFileSync(configFilePath).toString())
+    }
+    return null
+  }
+
+  saveConfigToFile() {
+    const configToSave = {}
+    let paths = [
+      'autoUpdateStopOpenMarketOrder',
+      'autoUpdateStopOpenMarketOrder1h',
+
+      'autoCloseStochOverTrade_2575_5m',
+      'autoCloseRsiOverTrade5m',
+      'autoCloseRsiDivergence5m',
+      'autoCloseStochOverTrade_3070_1h',
+      'autoCloseStochOverTrade_2575_1h',
+      'autoCloseRsiOverTrade_3070_1h',
+      'autoCloseRsiOverTrade_2575_1h',
+      'autoCloseRsiOverTrade1h',
+      'autoCloseRsiDivergence_3070_1h',
+      'autoCloseRsiDivergence_2575_1h',
+      'autoCloseRsiDivergence1h',
+      'autoCloseStochOverTrade_3070_1d',
+
+      'BotConfig',
+      'botRsiDivergence',
+      'botBreakCandle',
+      'botPinBar',
+    ]
+    paths.forEach(path => {
+      _.set(configToSave, path, _.get(this._options, path))
+    })
+    const { configFilePath } = this._options
+    if (configFilePath) {
+      fs.writeFileSync(configFilePath, JSON.stringify(configToSave, null, 2))
+      // console.log(this._options.user, '保存配置到文件ok')
     }
   }
 }

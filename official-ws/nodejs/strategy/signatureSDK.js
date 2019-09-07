@@ -11,10 +11,16 @@ const DEFAULT_HEADERS = {
 function requestWidthHeader(url, params, headers, method) {
   return new Promise((resolve, reject) => {
     // console.log(url, params, headers)
-    httpClient[method](url, params, {
+    const options = {
       timeout: 10000,
       headers: headers
-    }).then(data => {
+    }
+
+    const request = method === 'get' ?
+      httpClient.get(url, options) :
+      httpClient[method](url, params, options)
+
+    request.then(data => {
       let json = JSON.parse(data)
       resolve(json)
     }).catch(error => {
@@ -37,7 +43,7 @@ class SignatureSDK {
 
   getHeaders(verb, path, data) {
     var expires = new Date().getTime() + (60 * 1000)
-    var postBody = JSON.stringify(data)
+    var postBody = typeof data === 'string' ? data : JSON.stringify(data)
     const { apiKey, apiSecret } = this._options
 
     var signature = crypto.createHmac('sha256', apiSecret).update(verb + path + expires + postBody).digest('hex')
@@ -123,15 +129,12 @@ class SignatureSDK {
   }
 
   getPosition(symbol) {
-    const path = '/api/v1/position'
+    const filterString = encodeURIComponent(`{"symbol":"${symbol}"}`)
+    const path = `/api/v1/position?filter=${filterString}`
     const url = this.getUrl(path)
-    const data = {
-      filter: {
-        symbol
-      }
-    }
+    const data = ''
     const headers = this.getHeaders('GET', path, data)
-    return requestWidthHeader(url, data, headers, 'get')
+    return requestWidthHeader(url, {}, headers, 'get')
   }
 
   closePositionMarket(symbol) {
