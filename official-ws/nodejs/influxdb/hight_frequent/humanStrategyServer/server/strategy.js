@@ -22,6 +22,7 @@ if (isProduction) {
     database: false,
     initCheckSystem: true,
     main: true,
+    configFilePath: path.join(__dirname, 'yq.config.json')
   })
   list.push({
     user: 'godice',
@@ -48,6 +49,7 @@ if (isProduction) {
     },
     autoUpdateStopOpenMarketOrder: true,
     autoUpdateStopOpenMarketOrder1h: false,
+    configFilePath: path.join(__dirname, 'godice.config.json')
   })
 
 } else {
