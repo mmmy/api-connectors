@@ -771,6 +771,16 @@ class FlowDataBase {
   }
 
   updateStopOpenOrderByLastCandle(symbol, candleManager) {
+    const { currentPositionBotId, usdMode } = this._options.BotConfig
+    // 在usdMode中， 当break candle 策略运行时，由于有止损开仓，不需要跟踪
+    if (
+      usdMode &&
+      currentPositionBotId[symbol] === this._options.botBreakCandle.botId &&
+      this.hasSymbolPosition(symbol)
+    ) {
+      return
+    }
+
     const precision = precisionMap[symbol]
     if (!precision) {
       return
