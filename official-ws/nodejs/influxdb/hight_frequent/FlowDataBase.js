@@ -13,7 +13,8 @@ const _ = require('lodash')
 const OrderManager = require('./OrderManager')
 const OrderManagerTest = require('./OrderManagerTest')
 const { StrageyDB } = require('../db')
-const notifyPhone = require('../../strategy/notifyPhone').notifyPhone
+// const notifyPhone = require('../../strategy/notifyPhone').notifyPhone
+const notifyPhoneUser = require('../../strategy/notifyPhone').notifyPhoneUser
 
 const watchSignal = require('./watchSignal')
 
@@ -26,6 +27,11 @@ class FlowDataBase {
   constructor(options) {
     this._options = _.merge({
       configFilePath: '',
+      notify: {
+        on: false,
+        token: '',
+        user: '',
+      },
       test: true,
       database: false,
       maxCache: 200,
@@ -338,10 +344,6 @@ class FlowDataBase {
     }
   }
 
-  notifyPhone(msg) {
-    notifyPhone(msg)
-  }
-
   writeOrder(order, error, type) {
     if (this._options.database) {
       StrageyDB.writeOrder(this._options, order, error, type)
@@ -379,6 +381,7 @@ class FlowDataBase {
   // 监测程序的数据是否正常， 否则重启
   initCheckDataInterval() {
     this._checkDataInterval = setInterval(() => {
+      // this._notifyPhone('test notifyPhone')
       this.checkPositionValid('XBTUSD')
     }, 2 * 60 * 1000)
   }
@@ -392,14 +395,14 @@ class FlowDataBase {
       if (!this._checkDataState.position[symbol].valid && !isSameQty) {
         const msg = `${symbol} position连续两次不同，重启程序！`
         console.log(msg)
-        notifyPhone(msg)
+        this._notifyPhone(msg, true)
         setTimeout(() => {
           process.exit(1)
         }, 3000)
       }
       this._checkDataState.position[symbol].valid = isSameQty
     }).catch(e => {
-      notifyPhone('checkPositionValid getPosition error!')
+      this._notifyPhone('checkPositionValid getPosition error!', true)
       console.log('checkPositionValid getPosition error', e)
     })
   }
@@ -407,7 +410,7 @@ class FlowDataBase {
   initCheckSystem() {
     this._interval = setInterval(() => {
       if (!this.checkAlive()) {
-        notifyPhone('data not flow error')
+        this._notifyPhone('data not flow error', true)
         setTimeout(() => {
           process.exit(1) // centos7 设置 systemctl 服务会自动重启
         }, 10 * 1000)
@@ -415,10 +418,10 @@ class FlowDataBase {
       const checkXBTCandleMsg = this.checkCandles('XBTUSD')
       const checkETHCandleMsg = this.checkCandles('ETHUSD')
       if (checkXBTCandleMsg) {
-        notifyPhone(checkXBTCandleMsg)
+        this._notifyPhone(checkXBTCandleMsg, true)
       }
       if (checkETHCandleMsg) {
-        notifyPhone(checkETHCandleMsg)
+        this._notifyPhone(checkETHCandleMsg, true)
       }
     }, 5 * 60 * 1000)
   }
@@ -439,10 +442,10 @@ class FlowDataBase {
     // high1 low1
     const highlow1Signal = candleManager.highlow1Signal(symbol)
     if (highlow1Signal.high1) {
-      notifyPhone(`${symbol} 1d high 1`)
+      this._notifyPhone(`${symbol} 1d high 1`)
       watchSignal(this, symbol, 'break1h', 'high1')
     } else if (highlow1Signal.low1) {
-      notifyPhone(`${symbol} 1d low 1`)
+      this._notifyPhone(`${symbol} 1d low 1`)
       watchSignal(this, symbol, 'break1h', 'low1')
     }
 
@@ -471,10 +474,10 @@ class FlowDataBase {
     // high1 low1
     const highlow1Signal = this._candles1h.highlow1Signal(symbol)
     if (highlow1Signal.high1) {
-      // notifyPhone(`${symbol} 1h high 1`)
+      // this._notifyPhone(`${symbol} 1h high 1`)
       watchSignal(this, symbol, 'break1h', 'high1')
     } else if (highlow1Signal.low1) {
-      // notifyPhone(`${symbol} 1h low 1`)
+      // this._notifyPhone(`${symbol} 1h low 1`)
       watchSignal(this, symbol, 'break1h', 'low1')
     }
     // RSI over trade signal
@@ -488,14 +491,14 @@ class FlowDataBase {
       }
       watchSignal(this, symbol, 'rsiOverTrade1h', 'long')
 
-      // notifyPhone(`${symbol} 1h rsiOverTradeSignal Long`)
+      // this._notifyPhone(`${symbol} 1h rsiOverTradeSignal Long`)
     } else if (rsiOverTradeSignal.short) {
       if (this._options.autoCloseRsiOverTrade1h) {
         this.closeLongPostionIfHave(symbol)
       }
       watchSignal(this, symbol, 'rsiOverTrade1h', 'short')
 
-      // notifyPhone(`${symbol} 1h rsiOverTradeSignal Short`)
+      // this._notifyPhone(`${symbol} 1h rsiOverTradeSignal Short`)
     }
     if (rsiOverTradeSignal_2575.long) {
       if (this._options.autoCloseRsiOverTrade_2575_1h) {
@@ -503,14 +506,14 @@ class FlowDataBase {
       }
       watchSignal(this, symbol, 'rsiOverTrade_2575_1h', 'long')
 
-      // notifyPhone(`${symbol} 1h rsiOverTradeSignal_2575 Long`)
+      // this._notifyPhone(`${symbol} 1h rsiOverTradeSignal_2575 Long`)
     } else if (rsiOverTradeSignal_2575.short) {
       if (this._options.autoCloseRsiOverTrade_2575_1h) {
         this.closeLongPostionIfHave(symbol)
       }
       watchSignal(this, symbol, 'rsiOverTrade_2575_1h', 'short')
 
-      // notifyPhone(`${symbol} 1h rsiOverTradeSignal_2575 Short`)
+      // this._notifyPhone(`${symbol} 1h rsiOverTradeSignal_2575 Short`)
     }
     if (rsiOverTradeSignal_3070.long) {
       if (this._options.autoCloseRsiOverTrade_3070_1h) {
@@ -518,14 +521,14 @@ class FlowDataBase {
       }
       watchSignal(this, symbol, 'rsiOverTrade_3070_1h', 'long')
 
-      // notifyPhone(`${symbol} 1h rsiOverTradeSignal_3070 Long`)
+      // this._notifyPhone(`${symbol} 1h rsiOverTradeSignal_3070 Long`)
     } else if (rsiOverTradeSignal_3070.short) {
       if (this._options.autoCloseRsiOverTrade_3070_1h) {
         this.closeLongPostionIfHave(symbol)
       }
       watchSignal(this, symbol, 'rsiOverTrade_3070_1h', 'short')
 
-      // notifyPhone(`${symbol} 1h rsiOverTradeSignal_3070 Short`)
+      // this._notifyPhone(`${symbol} 1h rsiOverTradeSignal_3070 Short`)
     }
 
     // RSI divergence signal
@@ -538,14 +541,14 @@ class FlowDataBase {
       }
       watchSignal(this, symbol, 'rsiDivergence1h', 'long')
 
-      // notifyPhone(`${symbol} 1h rsiDivergenceSignal Long`)
+      // this._notifyPhone(`${symbol} 1h rsiDivergenceSignal Long`)
     } else if (rsiDivergenceSignal.short) {
       if (this._options.autoCloseRsiDivergence1h) {
         this.closeLongPostionIfHave(symbol)
       }
       watchSignal(this, symbol, 'rsiDivergence1h', 'short')
 
-      // notifyPhone(`${symbol} 1h rsiDivergenceSignal short`)
+      // this._notifyPhone(`${symbol} 1h rsiDivergenceSignal short`)
     }
     if (rsiDivergenceSignal_2575.long) {
       if (this._options.autoCloseRsiDivergence_2575_1h) {
@@ -553,14 +556,14 @@ class FlowDataBase {
       }
       watchSignal(this, symbol, 'rsiDivergence_2575_1h', 'long')
 
-      // notifyPhone(`${symbol} 1h rsiDivergenceSignal_2575 Long`)
+      // this._notifyPhone(`${symbol} 1h rsiDivergenceSignal_2575 Long`)
     } else if (rsiDivergenceSignal_2575.short) {
       if (this._options.autoCloseRsiDivergence_2575_1h) {
         this.closeLongPostionIfHave(symbol)
       }
       watchSignal(this, symbol, 'rsiDivergence_2575_1h', 'short')
 
-      // notifyPhone(`${symbol} 1h rsiDivergenceSignal_2575 short`)
+      // this._notifyPhone(`${symbol} 1h rsiDivergenceSignal_2575 short`)
     }
     if (rsiDivergenceSignal_3070.long) {
       if (this._options.autoCloseRsiDivergence_3070_1h) {
@@ -568,34 +571,34 @@ class FlowDataBase {
       }
       watchSignal(this, symbol, 'rsiDivergence_3070_1h', 'long')
 
-      // notifyPhone(`${symbol} 1h rsiDivergenceSignal_3070 Long`)
+      // this._notifyPhone(`${symbol} 1h rsiDivergenceSignal_3070 Long`)
     } else if (rsiDivergenceSignal_3070.short) {
       if (this._options.autoCloseRsiDivergence_3070_1h) {
         this.closeLongPostionIfHave(symbol)
       }
       watchSignal(this, symbol, 'rsiDivergence_3070_1h', 'short')
 
-      // notifyPhone(`${symbol} 1h rsiDivergenceSignal_3070 short`)
+      // this._notifyPhone(`${symbol} 1h rsiDivergenceSignal_3070 short`)
     }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
     const signal = this._candles1h.calcMacdDepartSignal(symbol, 90)
     // const candle = this._candles1h.getHistoryCandle(symbol)
-    // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
+    // this._notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long) {
       if (this._options.autoCloseMacdDivergence1h) {
         this.closeShortPositionIfHave(symbol)
       }
       watchSignal(this, symbol, 'macdDivergence1h', 'long')
 
-      // notifyPhone(`${symbol} 1h MacdDepartSignal Long`)
+      // this._notifyPhone(`${symbol} 1h MacdDepartSignal Long`)
     } else if (signal.short) {
       if (this._options.autoCloseMacdDivergence1h) {
         this.closeLongPostionIfHave(symbol)
       }
       watchSignal(this, symbol, 'macdDivergence1h', 'short')
 
-      // notifyPhone(`${symbol} 1h MacdDepartSignal Short`)
+      // this._notifyPhone(`${symbol} 1h MacdDepartSignal Short`)
     }
 
     // stoch
@@ -637,11 +640,11 @@ class FlowDataBase {
     // high1 low1
     const highlow1Signal = this._candles5m.highlow1Signal(symbol)
     if (highlow1Signal.high1) {
-      // notifyPhone(`${symbol} 5m high 1`)
+      // this._notifyPhone(`${symbol} 5m high 1`)
       watchSignal(this, symbol, 'break5m', 'high1')
 
     } else if (highlow1Signal.low1) {
-      // notifyPhone(`${symbol} 5m low 1`)
+      // this._notifyPhone(`${symbol} 5m low 1`)
       watchSignal(this, symbol, 'break5m', 'low1')
 
     }
@@ -653,14 +656,14 @@ class FlowDataBase {
       }
       watchSignal(this, symbol, 'rsiOverTrade5m', 'long')
 
-      // notifyPhone(`${symbol} 5m rsiOverTradeSignal Long`)
+      // this._notifyPhone(`${symbol} 5m rsiOverTradeSignal Long`)
     } else if (rsiOverTradeSignal.short) {
       if (this._options.autoCloseRsiOverTrade5m) {
         this.closeLongPostionIfHave(symbol)
       }
       watchSignal(this, symbol, 'rsiOverTrade5m', 'short')
 
-      // notifyPhone(`${symbol} 5m rsiOverTradeSignal Short`)
+      // this._notifyPhone(`${symbol} 5m rsiOverTradeSignal Short`)
     }
     // RSI divergence signal
     const rsiDivergenceSignal = this._candles5m.rsiDivergenceSignal(symbol, 8, 24, 24)
@@ -670,34 +673,34 @@ class FlowDataBase {
       }
       watchSignal(this, symbol, 'rsiDivergence5m', 'long')
 
-      // notifyPhone(`${symbol} 5m rsiDivergenceSignal Long`)
+      // this._notifyPhone(`${symbol} 5m rsiDivergenceSignal Long`)
     } else if (rsiDivergenceSignal.short) {
       if (this._options.autoCloseRsiDivergence5m) {
         this.closeLongPostionIfHave(symbol)
       }
       watchSignal(this, symbol, 'rsiDivergence5m', 'short')
 
-      // notifyPhone(`${symbol} 5m rsiDivergenceSignal short`)
+      // this._notifyPhone(`${symbol} 5m rsiDivergenceSignal short`)
     }
     // const {rsiPeriod, stochasticPeriod, kPeriod, dPeriod} = this._options.stochRsi
     // this._candles1m.calcStochRsiSignal(rsiPeriod, stochasticPeriod, kPeriod, dPeriod, this._systemTime)
     const signal = this._candles5m.calcMacdDepartSignal(symbol, 144)
     const signal1 = this._candles5m.calcMacdDepartSignal(symbol, 144, 1)
-    // notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
+    // this._notifyPhone(`${symbol} ${candle.timestamp} ${candle.close}`)
     if (signal.long && signal1.long) {
       if (this._options.autoCloseMacdDivergence5m) {
         this.closeShortPositionIfHave(symbol)
       }
       watchSignal(this, symbol, 'macdDivergence5m', 'long')
 
-      // notifyPhone(`${symbol} 5m MacdDepartSignal Long`)
+      // this._notifyPhone(`${symbol} 5m MacdDepartSignal Long`)
     } else if (signal.short && signal1.short) {
       if (this._options.autoCloseMacdDivergence5m) {
         this.closeLongPostionIfHave(symbol)
       }
       watchSignal(this, symbol, 'macdDivergence5m', 'short')
 
-      // notifyPhone(`${symbol} 5m MacdDepartSignal Short`)
+      // this._notifyPhone(`${symbol} 5m MacdDepartSignal Short`)
     }
 
     // stoch
@@ -719,7 +722,7 @@ class FlowDataBase {
     this.runRsiDevergenceBot(symbol)
     this.runBreakCandleBot(symbol)
     // this.runPinBarBot(symbol)
-    
+
     this.saveConfigToFile()
   }
 
@@ -921,7 +924,7 @@ class FlowDataBase {
       const xbtPirce = this._candles5m.getHistoryCandle('XBTUSD').close
       return Math.floor(xbtPirce * balance)
     }
-    notifyPhone('getAccountMargin 返回 空？')
+    this._notifyPhone('getAccountMargin 返回 空？')
     return -1
   }
 
@@ -994,7 +997,7 @@ class FlowDataBase {
       // 超卖平空
       if (closeSignal.long && !longPosition) {
         if (!longPosition) {
-          notifyPhone('rsiDivergenceSignal bot close short')
+          this._notifyPhone('rsiDivergenceSignal bot close short')
         }
         if (usdMode) {
           // 暂时不做空
@@ -1007,7 +1010,7 @@ class FlowDataBase {
       // 超买平多
       if (closeSignal.short && longPosition) {
         if (longPosition) {
-          notifyPhone('rsiDivergenceSignal bot close long' + (usdMode ? '套保' : ''))
+          this._notifyPhone('rsiDivergenceSignal bot close long' + (usdMode ? '套保' : ''))
         }
         if (usdMode) {
           //开套保
@@ -1026,9 +1029,9 @@ class FlowDataBase {
         const isNotLH = !this._candles5m.isCurrentHighestLowestClose(symbol, 300)
         const lowVolFilter = lowVol ? this._candles5m.isLowVol(symbol, 50, 3) : true
         const highBoDongFilter = highBoDong ? this._candles1d.isAdxHigh(symbol, 14) : true
-        notifyPhone(`rsi divergence bot long! ${isNotLH} ${lowVolFilter} ${highBoDongFilter}`)
+        this._notifyPhone(`rsi divergence bot long! ${isNotLH} ${lowVolFilter} ${highBoDongFilter}`)
         if (isNotLH && lowVolFilter && highBoDongFilter) {
-          notifyPhone('rsi divergence bot open!')
+          this._notifyPhone('rsi divergence bot open!')
           // 锁定为当前id
           this.setCurrentPositionBotId(botId, symbol)
           // high2 low2 to open
@@ -1120,14 +1123,14 @@ class FlowDataBase {
         // 止损
         if (!this.hasStopOpenOrder(symbol, stopSide)) {
           console.log('usdMode and set stop')
-          notifyPhone('usdMode and set stop')
+          this._notifyPhone('usdMode and set stop')
           // 追踪止损开仓的
           this._orderManager.getSignatureSDK().orderStop(symbol, qty, longPosition ? minLow : maxHigh, stopSide, false)
         }
         // 止盈
         if (!this.hasLimitOrder(!longPosition, symbol)) {
           console.log('usdMode and set limit profit')
-          notifyPhone('usdMode and set limit profit')
+          this._notifyPhone('usdMode and set limit profit')
           const { high, low } = this._candles5m.getHistoryCandle(symbol, 2)
           let profit = (maxHigh - minLow) * 1
           profit = Math.round(profit * 2) / 2
@@ -1139,13 +1142,13 @@ class FlowDataBase {
         if (!this.hasStopOrder(symbol, stopSide)) {
           // 止损
           console.log('btc mode and set stop')
-          notifyPhone('btc mode and set stop')
+          this._notifyPhone('btc mode and set stop')
           this._orderManager.getSignatureSDK().orderStop(symbol, Math.abs(positionQty), longPosition ? minLow : maxHigh, stopSide, true)
         }
         if (!this.hasReduceOnlyOrder(symbol)) {
           // 止盈
           console.log('btc mode and set profit limit')
-          notifyPhone('btc mode and set profit limit')
+          this._notifyPhone('btc mode and set profit limit')
           const { high, low } = this._candles5m.getHistoryCandle(symbol, 2)
           let profit = (maxHigh - minLow) * 1
           profit = Math.round(profit * 2) / 2
@@ -1161,7 +1164,7 @@ class FlowDataBase {
         if (toOpenPostion) {
           _waitingForOrderBreak.long = false
           _waitingForOrderBreak.short = false
-          notifyPhone('break candle bot push auto signal! 可手动取消')
+          this._notifyPhone('break candle bot push auto signal! 可手动取消')
           // 高4, 低4
           this.updateAutoSignalById(botId, {
             symbol: symbol,
@@ -1189,7 +1192,7 @@ class FlowDataBase {
             !_waitingForOrderBreak.long &&
             !_waitingForOrderBreak.short
           ) {
-            notifyPhone('clear break candle bot')
+            this._notifyPhone('clear break candle bot')
             this.setCurrentPositionBotId('', symbol)
             //   // clear orders
             this._orderManager.getSignatureSDK().deleteOrderAll()
@@ -1209,7 +1212,7 @@ class FlowDataBase {
             const adxSignal = this._candles1d.adxSignal(symbol, 14)
             adxFilter = (adxSignal.long && barTrendSignal.long) || (adxSignal.short && barTrendSignal.short)
           }
-          notifyPhone(`break candle bot signal! ${barTrendSignal.long ? 'long' : 'short'} upVolFilter${upVolFilter} adxFilter${adxFilter}`)
+          this._notifyPhone(`break candle bot signal! ${barTrendSignal.long ? 'long' : 'short'} upVolFilter${upVolFilter} adxFilter${adxFilter}`)
           if (upVolFilter && adxFilter) {
             // 锁定为当前id
             this.setCurrentPositionBotId(botId, symbol)
@@ -1267,7 +1270,7 @@ class FlowDataBase {
       // 超卖平空
       if (closeSignal.long && !longPosition) {
         if (!longPosition) {
-          notifyPhone('pin bar bot close short')
+          this._notifyPhone('pin bar bot close short')
         }
         if (usdMode) {
           // 暂时不做空
@@ -1280,7 +1283,7 @@ class FlowDataBase {
       // 超买平多
       if (closeSignal.short && longPosition) {
         if (longPosition) {
-          notifyPhone('pin bar bot close long' + (usdMode ? '套保' : ''))
+          this._notifyPhone('pin bar bot close long' + (usdMode ? '套保' : ''))
         }
         if (usdMode) {
           //开套保
@@ -1296,7 +1299,7 @@ class FlowDataBase {
       const openSignal = this._candles1h.pinBarOpenSignal(symbol, 5)
       // openSignal.long = true
       if ((openSignal.long && enableLong) || (openSignal.short && enableShort)) {
-        notifyPhone(`bot pin bar hour long: ${openSignal.long}`)
+        this._notifyPhone(`bot pin bar hour long: ${openSignal.long}`)
         console.log('bot pin bar hour long: ', openSignal.long)
         // 锁定为当前id
         this.setCurrentPositionBotId(botId, symbol)
@@ -1359,6 +1362,7 @@ class FlowDataBase {
   saveConfigToFile() {
     const configToSave = {}
     let paths = [
+      'notify',
       'autoUpdateStopOpenMarketOrder',
       'autoUpdateStopOpenMarketOrder1h',
 
@@ -1387,6 +1391,13 @@ class FlowDataBase {
     if (configFilePath) {
       fs.writeFileSync(configFilePath, JSON.stringify(configToSave, null, 2))
       // console.log(this._options.user, '保存配置到文件ok')
+    }
+  }
+
+  _notifyPhone(msg, force) {
+    const { on, token, user } = this._options.notify
+    if ((on || force) && token && user) {
+      notifyPhoneUser(`[${this._options.user}]${msg}`, token, user)
     }
   }
 }

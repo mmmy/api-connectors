@@ -8,6 +8,12 @@ const BitmexManager = require('../../../../strategy/researchStrategy/BitmexManag
 const StrategyUserManager = require('../StrategyUserManager')
 const manager = new StrategyUserManager()
 
+const yqNotify = {
+  on: true,
+  token: 'aiee6nmcgz678kbouuoujsmf4wko96',
+  user: 'gdz6nj653847v5e65px71bcstdsicv',
+}
+
 const list = []
 if (isProduction) {
   var qq = require('../../../../strategy/apikey/qq_secret.json')
@@ -15,6 +21,7 @@ if (isProduction) {
   // 注意，要有个main: true, 这个用来接收orderbook等信息。
   list.push({
     user: 'yq',
+    notify: yqNotify,
     test: false,
     testnet: false,
     apiKey: qq.apiKey,
@@ -26,6 +33,7 @@ if (isProduction) {
   })
   list.push({
     user: 'godice',
+    notify: yqNotify,
     test: false,
     testnet: false,
     apiKey: godice.apiKey,
@@ -57,6 +65,7 @@ if (isProduction) {
   var yqheroTest = require('../../../../strategy/apikey/test-secret-yqhero.json')
   list.push({
     user: 'yq',
+    notify: yqNotify,
     test: false,
     testnet: true,
     apiKey: qqTest.apiKey,
@@ -68,6 +77,7 @@ if (isProduction) {
   })
   list.push({
     user: 'yqhero',
+    notify: yqNotify,
     test: false,
     testnet: true,
     apiKey: yqheroTest.apiKey,

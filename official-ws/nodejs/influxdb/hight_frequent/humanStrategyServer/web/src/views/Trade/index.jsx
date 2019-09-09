@@ -336,6 +336,9 @@ export default class Trade extends React.Component {
                     <option value="__break_candle_bot">__break_candle_bot</option>
                     <option value="__pin_bar_bot">__pin_bar_bot</option>
                   </select>
+                  &nbsp;&nbsp;&nbsp;&nbsp;
+                  <label title="开启通知">notify</label>
+                  <input type="checkbox" id="bot-rsi-divergence-checkbox-notify" onClick={this.handleCheckboxOption.bind(this, i, 'notify.on')} checked={options.notify.on} />
                 </h5>
                 <div className="bot-row">
                   <div className="switch">
