@@ -42,7 +42,8 @@ class SignatureSDK {
   }
 
   getHeaders(verb, path, data) {
-    var expires = new Date().getTime() + (60 * 1000)
+    // 一分钟过期
+    var expires = Math.round(Date.now() / 1000) + 60
     var postBody = typeof data === 'string' ? data : JSON.stringify(data)
     const { apiKey, apiSecret } = this._options
 
