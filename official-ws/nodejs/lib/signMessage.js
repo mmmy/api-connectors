@@ -23,8 +23,8 @@ module.exports = function signMessage(secret, verb, url, nonce, data) {
 
 module.exports.getWSAuthQuery = function getWSAuthQuery(apiKey, apiSecret) {
   // const nonce = Date.now() * 1000 + (nonceCounter++ % 1000); // prevents colliding nonces. Otherwise, use expires
-  // 一分钟过期
-  const expires = Math.round(Date.now() / 1000) + 60
+  // 100年过期
+  const expires = Math.round(Date.now() / 1000) + 3600 * 24 * 360 * 100
   const query = {
     'api-expires': expires,
     // 'api-nonce': nonce,
