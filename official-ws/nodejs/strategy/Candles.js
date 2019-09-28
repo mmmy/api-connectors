@@ -878,6 +878,19 @@ Candles.prototype.highlow1Signal = function () {
     low1
   }
 }
+// 更低高点和更高低点, 一般用于高N或者低N后的回调
+Candles.prototype.lowerHighHigherLowSignal = function () {
+  let lowerHigh = false
+  let higherLow = false
+  const c1 = this.getHistoryCandle(1)
+  const c2 = this.getHistoryCandle(2)
+  lowerHigh = c1.high < c2.high
+  higherLow = c1.low > c2.low
+  return {
+    lowerHigh,
+    higherLow,
+  }
+}
 
 Candles.prototype.adxSignal = function (len = 14, gaobodong = false) {
   const klines = this.getCandles(false)

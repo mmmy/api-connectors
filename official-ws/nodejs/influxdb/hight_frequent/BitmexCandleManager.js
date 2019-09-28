@@ -48,6 +48,10 @@ class BitmexCandleManager {
     return this._candles[symbol].highlow1Signal()
   }
 
+  lowerHighHigherLowSignal(symbol) {
+    return this._candles[symbol].lowerHighHigherLowSignal()
+  }
+
   getLastStochKD(symbol, len, kLen) {
     return this._candles[symbol].getLastStochKD(len, kLen)
   }

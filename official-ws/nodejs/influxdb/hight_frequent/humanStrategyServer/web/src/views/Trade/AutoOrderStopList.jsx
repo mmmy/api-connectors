@@ -40,8 +40,8 @@ const SIGNALS = {
   // 'stochDivergence5m': { operators: ['long', 'short'] },
   // 'stochDivergence1h': { operators: ['long', 'short'] },
   'stochOverTrade_3070_1d': { operators: ['long', 'short'] },
-  'break1h': { operators: ['high1', 'low1'], values: [{ key: 'times', defaultValue: 1 }] },
-  'break5m': { operators: ['high1', 'low1'], values: [{ key: 'times', defaultValue: 1 }] },
+  'break1h': { operators: ['high1', 'low1'], values: [{ key: 'times', defaultValue: 1 }, { key: 'after', defaultValue: '' }] },
+  'break5m': { operators: ['high1', 'low1'], values: [{ key: 'times', defaultValue: 1 }, { key: 'after', defaultValue: '' }] },
 }
 
 const signalKeys = Object.keys(SIGNALS)
@@ -100,7 +100,19 @@ export default class AutoOrderStopList extends React.Component {
           values && values.map(({ key, defaultValue }) => {
             let val = this.state[key]
             val = val === undefined ? defaultValue : val
-            return <span><label>{key}</label><input type="number" style={{ width: '50px' }} value={val} onChange={this.handleChangeForm.bind(this, key)} /></span>
+            return <span>
+              <label>{key}</label>
+              {
+                key === 'times' && <input type="number" style={{ width: '50px' }} value={val} onChange={this.handleChangeForm.bind(this, key)} />
+              }
+              {
+                key === 'after' && <select value={val} onChange={this.handleChangeForm.bind(this, key)}>
+                  <option value=""></option>
+                  <option value="lowerHigh">lowerHigh</option>
+                  <option value="higherLow">higherLow</option>
+                </select>
+              }
+            </span>
           })
         }
         {/* <input value={remain_times} type='number' min="0" step='1' onChange={this.handleChangeForm.bind(this, 'remain_times')} style={{ width: '50px' }} title="剩余次数"/> */}
@@ -329,12 +341,15 @@ export default class AutoOrderStopList extends React.Component {
   handleChangeOperatorValue(index, key) {
     const { list } = this.state
     const autoOrder = list[index]
-    const newV = window.prompt(key, autoOrder.values[key])
+    let newV = window.prompt(key, autoOrder.values[key])
+    if (key === 'times') {
+      newV = +newV
+    }
     if (newV !== null) {
       const newOrder = {
         values: {
           ...autoOrder.values,
-          [key]: +newV
+          [key]: newV
         }
       }
       this.updateAutoOrder(index, newOrder)

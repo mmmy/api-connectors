@@ -443,10 +443,10 @@ class FlowDataBase {
     const highlow1Signal = candleManager.highlow1Signal(symbol)
     if (highlow1Signal.high1) {
       this._notifyPhone(`${symbol} 1d high 1`)
-      watchSignal(this, symbol, 'break1h', 'high1')
+      watchSignal(this, symbol, 'break1d', 'high1')
     } else if (highlow1Signal.low1) {
       this._notifyPhone(`${symbol} 1d low 1`)
-      watchSignal(this, symbol, 'break1h', 'low1')
+      watchSignal(this, symbol, 'break1d', 'low1')
     }
 
     // stoch
@@ -479,6 +479,14 @@ class FlowDataBase {
     } else if (highlow1Signal.low1) {
       // this._notifyPhone(`${symbol} 1h low 1`)
       watchSignal(this, symbol, 'break1h', 'low1')
+    }
+    // 高点回调 或者 低点回调
+    const lowerHighHigherLowSignal = this._candles1h.lowerHighHigherLowSignal(symbol)
+    if (lowerHighHigherLowSignal.lowerHigh) {
+      watchSignal(this, symbol, 'break1h', 'high1', 'lowerHigh')
+    }
+    if (lowerHighHigherLowSignal.higherLow) {
+      watchSignal(this, symbol, 'break1h', 'low1', 'higherLow')
     }
     // RSI over trade signal
     const rsiOverTradeSignal = this._candles1h.rsiOverTradeSignal(symbol, 8, 20, 80)
@@ -647,6 +655,14 @@ class FlowDataBase {
       // this._notifyPhone(`${symbol} 5m low 1`)
       watchSignal(this, symbol, 'break5m', 'low1')
 
+    }
+    // 高点回调 或者 低点回调
+    const lowerHighHigherLowSignal = this._candles5m.lowerHighHigherLowSignal(symbol)
+    if (lowerHighHigherLowSignal.lowerHigh) {
+      watchSignal(this, symbol, 'break5m', 'high1', 'lowerHigh')
+    }
+    if (lowerHighHigherLowSignal.higherLow) {
+      watchSignal(this, symbol, 'break5m', 'low1', 'higherLow')
     }
     // RSI over trade signal
     const rsiOverTradeSignal = this._candles5m.rsiOverTradeSignal(symbol, 8)
@@ -1046,7 +1062,8 @@ class FlowDataBase {
             signal_operator: openSignal.long ? "high1" : "low1",
             signal_value: "",
             values: {
-              times: 2
+              times: 2,
+              after: openSignal.long ? 'lowerHigh' : 'higherLow',
             }
           })
         }
@@ -1177,7 +1194,8 @@ class FlowDataBase {
             signal_operator: stochOverSignal.long ? "high1" : "low1",
             signal_value: "",
             values: {
-              times: 3
+              times: 3,
+              after: stochOverSignal.long ? 'lowerHigh' : 'higherLow',
             }
           })
         }
@@ -1315,7 +1333,8 @@ class FlowDataBase {
           signal_operator: openSignal.long ? "high1" : "low1",
           signal_value: "",
           values: {
-            times: 5
+            times: 5,
+            after: openSignal.long ? 'lowerHigh' : 'higherLow',
           }
         })
       }

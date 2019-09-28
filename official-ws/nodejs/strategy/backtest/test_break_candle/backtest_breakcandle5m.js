@@ -38,7 +38,7 @@ manager.addNewStrategy(new TestStrategy({
   disableShort: true,
   highVol: false,
   useAdx: true,   // good
-  upVol: false,
+  upVol: true,
   len: 48,
   // disableLong: true
 }))

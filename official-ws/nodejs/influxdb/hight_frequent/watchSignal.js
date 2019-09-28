@@ -49,12 +49,28 @@ function watchSignal(strategy, symbol, signal_name, signal_operator, signal_valu
     if (last_exec_time && (now - new Date(last_exec_time) < min_interval * 3600 * 1000)) {
       return
     }
-    // 如果是highlow, 先判断次数
+    // 如果是highlow
     if (autoOrder.signal_name === 'break1h' || autoOrder.signal_name === 'break5m') {
       const values = autoOrder.values
-      if (values.times > 1) {
-        values.times = values.times - 1
-        return
+      if (!signal_value) {
+        // 判断次数
+        if (values.times > 1) {
+          values.times = values.times - 1
+          return
+        } else if (values.after) {
+          return
+        }
+      } else {
+        // 如果不是最后一次
+        if (values.times > 1) {
+          return
+        }
+        if (!values.after) {
+          return
+        }
+        if (values.after && values.after !== signal_value) {
+          return
+        }
       }
     }
     //执行
