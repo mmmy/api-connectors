@@ -56,6 +56,7 @@ function watchSignal(strategy, symbol, signal_name, signal_operator, signal_valu
         // 判断次数
         if (values.times > 1) {
           values.times = values.times - 1
+          notifyPhone(`WW ${autoOrder.symbol} times --: ${values.times}`)
           return
         } else if (values.after) {
           return
@@ -73,6 +74,7 @@ function watchSignal(strategy, symbol, signal_name, signal_operator, signal_valu
         }
       }
     }
+    notifyPhone(`WW ${autoOrder.symbol} order! signal_value: ${signal_value}`)
     //执行
     autoOrder.last_exec_time = now
     autoOrder.remain_times = autoOrder.remain_times - 1
