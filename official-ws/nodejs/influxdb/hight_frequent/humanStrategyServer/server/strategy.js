@@ -18,6 +18,7 @@ const list = []
 if (isProduction) {
   var qq = require('../../../../strategy/apikey/qq_secret.json')
   var godice = require('../../../../strategy/apikey/godice_secret.json')
+  var yqhero = require('../../../../strategy/apikey/yqhero-secret.json')
   // 注意，要有个main: true, 这个用来接收orderbook等信息。
   list.push({
     user: 'yq',
@@ -31,6 +32,20 @@ if (isProduction) {
     main: true,
     configFilePath: path.join(__dirname, 'yq.config.json')
   })
+
+  list.push({
+    user: 'lixihuan',
+    notify: yqNotify,
+    test: false,
+    testnet: false,
+    apiKey: yqhero.apiKey,
+    apiSecret: yqhero.apiSecret,
+    database: false,
+    initCheckSystem: false,
+    main: false,
+    configFilePath: path.join(__dirname, 'yqhero.config.json')
+  })
+
   list.push({
     user: 'godice',
     notify: yqNotify,
