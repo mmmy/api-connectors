@@ -2,6 +2,7 @@ import React from 'react'
 import axios from 'axios'
 import AutoOrderStopList from './AutoOrderStopList'
 import IndicatorValues from './IndicatorValues'
+import TradingView from './TradingView'
 
 import './index.css'
 
@@ -280,7 +281,7 @@ export default class Trade extends React.Component {
                 </div>
                 <div></div>
               </div>
-              <div>
+              <div style={{ display: 'none' }}>
                 <h5>Config</h5>
                 <table>
                   <thead>
@@ -378,6 +379,7 @@ export default class Trade extends React.Component {
           })
         }
       </div>
+      <TradingView />
       <div className="logs">
         <h5>日志{users.length > 0 && <button onClick={this.handleReboot.bind(this)}>重启</button>}</h5>
         <ul>
