@@ -17,7 +17,7 @@ const { StrageyDB } = require('../db')
 const notifyPhoneUser = require('../../strategy/notifyPhone').notifyPhoneUser
 
 const watchSignal = require('./watchSignal')
-
+const { JSONtoCSV } = require('../util')
 const precisionMap = {
   'XBTUSD': 0.5,
   'ETHUSD': 0.05,
@@ -27,6 +27,7 @@ class FlowDataBase {
   constructor(options) {
     this._options = _.merge({
       configFilePath: '',
+      marginFilePath: '',  // 记录账户价值
       notify: {
         on: false,
         token: '',
@@ -156,6 +157,9 @@ class FlowDataBase {
         }
       }
     }
+    this._marginHistory = this.getHistoryMarginFromFile()  // 每天记录的账户价值
+    this._recordRunLastTime = new Date()
+    this.initRecordMarginInterval()
   }
 
   getOptions() {
@@ -1411,6 +1415,60 @@ class FlowDataBase {
       fs.writeFileSync(configFilePath, JSON.stringify(configToSave, null, 2))
       // console.log(this._options.user, '保存配置到文件ok')
     }
+  }
+
+  getHistoryMarginFromFile() {
+    const { marginFilePath } = this._options
+    if (marginFilePath && fs.existsSync(marginFilePath)) {
+      const fileContent = fs.readFileSync(marginFilePath).toString()
+      const csvList = fileContent.split('\n')
+      return csvList.map(row => {
+        const splitList = row.split(',')
+        return {
+          timestamp: splitList[0],
+          btc: splitList[1],
+          dollar: splitList[2],
+        }
+      })
+    }
+    return []
+  }
+
+  saveHistoryMarginToFile() {
+    const { marginFilePath } = this._options
+    if (marginFilePath) {
+      const dataToCsv = JSONtoCSV(this._marginHistory, ['timestamp', 'btc', 'dollar'])
+      fs.writeFileSync(marginFilePath, dataToCsv)
+    }
+  }
+
+  initRecordMarginInterval() {
+    this._recordMarginInterval = setInterval(() => {
+      const now = new Date()
+      const hour = now.getUTCHours()
+      const minute = now.getUTCMinutes()
+      // if (hour === 0 && minute <= 5) {
+      if (minute % 2 === 0) {
+        this._notifyPhone('早上8点hao', true)
+        const margin = this.getAccountMargin()
+        if (margin) {
+          const { walletBalance } = margin
+          const balance = walletBalance / 1E8
+          const xbtPirce = this._candles5m.getHistoryCandle('XBTUSD').close
+          const item = {
+            timestamp: now.toISOString(),
+            btc: balance,
+            dollar: Math.floor(xbtPirce * balance),
+          }
+          this._marginHistory.push(item)
+          this.saveHistoryMarginToFile()
+        }
+      }
+    }, 1 * 60 * 1000)
+  }
+
+  getMarginHistory() {
+    return this._marginHistory
   }
 
   _notifyPhone(msg, force) {

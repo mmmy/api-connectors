@@ -30,7 +30,8 @@ if (isProduction) {
     database: false,
     initCheckSystem: true,
     main: true,
-    configFilePath: path.join(__dirname, 'yq.config.json')
+    configFilePath: path.join(__dirname, 'yq.config.json'),
+    marginFilePath: path.join(__dirname, 'yq.marigin.csv'),
   })
 
   list.push({
@@ -43,7 +44,8 @@ if (isProduction) {
     database: false,
     initCheckSystem: false,
     main: false,
-    configFilePath: path.join(__dirname, 'yqhero.config.json')
+    configFilePath: path.join(__dirname, 'yqhero.config.json'),
+    marginFilePath: path.join(__dirname, 'yqhero.marigin.csv'),
   })
 
   list.push({
@@ -72,7 +74,8 @@ if (isProduction) {
     },
     autoUpdateStopOpenMarketOrder: true,
     autoUpdateStopOpenMarketOrder1h: false,
-    configFilePath: path.join(__dirname, 'godice.config.json')
+    configFilePath: path.join(__dirname, 'godice.config.json'),
+    marginFilePath: path.join(__dirname, 'godice.marigin.csv'),
   })
 
 } else {
@@ -88,7 +91,8 @@ if (isProduction) {
     database: false,
     initCheckSystem: true,
     main: true,
-    configFilePath: path.join(__dirname, 'yq.config.json')
+    configFilePath: path.join(__dirname, 'yq.config.json'),
+    marginFilePath: path.join(__dirname, 'yq.marigin.csv'),
   })
   list.push({
     user: 'yqhero',
@@ -116,7 +120,8 @@ if (isProduction) {
     },
     autoUpdateStopOpenMarketOrder: true,
     autoUpdateStopOpenMarketOrder1h: false,
-    configFilePath: path.join(__dirname, 'yqhero.config.json')
+    configFilePath: path.join(__dirname, 'yqhero.config.json'),
+    marginFilePath: path.join(__dirname, 'yqhero.marigin.csv'),
   })
 }
 

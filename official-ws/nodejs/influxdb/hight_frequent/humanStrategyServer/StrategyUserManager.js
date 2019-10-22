@@ -72,11 +72,13 @@ module.exports = class StrategyUserManager {
       const orders = strategy.getAccountAllOrders()
       const positions = strategy.getAccountAllPositions()
       const margin = strategy.getAccountMargin()
+      const marginHistory = strategy.getMarginHistory()
       return {
         options,
         orders,
         margin,
         positions,
+        marginHistory,
       }
     })
     return users
