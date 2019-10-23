@@ -1447,9 +1447,9 @@ class FlowDataBase {
       const now = new Date()
       const hour = now.getUTCHours()
       const minute = now.getUTCMinutes()
-      // if (hour === 0 && minute <= 5) {
-      if (minute % 2 === 0) {
-        this._notifyPhone('早上8点hao', true)
+      if (hour === 0 && minute <= 5) {
+        // if (minute % 2 === 0) {
+        // this._notifyPhone('Morning 8:00', true)
         const margin = this.getAccountMargin()
         if (margin) {
           const { walletBalance } = margin
@@ -1464,7 +1464,7 @@ class FlowDataBase {
           this.saveHistoryMarginToFile()
         }
       }
-    }, 1 * 60 * 1000)
+    }, 5 * 60 * 1000)
   }
 
   getMarginHistory() {

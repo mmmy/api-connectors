@@ -3,6 +3,7 @@ import axios from 'axios'
 import AutoOrderStopList from './AutoOrderStopList'
 import IndicatorValues from './IndicatorValues'
 import TradingView from './TradingView'
+import MarginHistoryChart from './MarginHistoryChart'
 
 import './index.css'
 
@@ -80,7 +81,7 @@ export default class Trade extends React.Component {
       <div>
         {
           users.map((user, i) => {
-            const { options, positions, margin, orders, form, pending } = user
+            const { options, positions, margin, orders, form, pending, marginHistory } = user
             const { walletBalance, availableMargin } = margin || {}
             const totalRPnl = positions.reduce((pre, cur) => pre + cur.unrealisedPnl, 0) / 1E8
             // 检查止损是否设置正常
@@ -371,6 +372,9 @@ export default class Trade extends React.Component {
                     <label>hour pin bar</label>
                   </div>
                 </div>
+              </div>
+              <div>
+                <MarginHistoryChart data={marginHistory || []} />
               </div>
               {
                 pending && <div className="pending-container">fetching...</div>

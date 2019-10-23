@@ -37,7 +37,11 @@ export default class TradingView extends React.Component {
   componentDidMount() {
     this.state.chartList.forEach(c => {
       const option = Object.assign({}, defaultOptions, c)
-      new window.TradingView.widget(option)
+      try {
+        new window.TradingView.widget(option)
+      } catch (e) {
+        console.error(e)
+      }
     })
   }
 
