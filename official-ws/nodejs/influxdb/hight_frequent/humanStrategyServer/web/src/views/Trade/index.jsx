@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios'
 import AutoOrderStopList from './AutoOrderStopList'
 import IndicatorValues from './IndicatorValues'
-import TradingView from './TradingView'
+// import TradingView from './TradingView'
 import MarginHistoryChart from './MarginHistoryChart'
 
 import './index.css'
@@ -383,7 +383,7 @@ export default class Trade extends React.Component {
           })
         }
       </div>
-      <TradingView />
+      {/* <TradingView /> */}
       <div className="logs">
         <h5>日志{users.length > 0 && <button onClick={this.handleReboot.bind(this)}>重启</button>}</h5>
         <ul>
