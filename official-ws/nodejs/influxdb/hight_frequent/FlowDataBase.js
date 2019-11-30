@@ -122,6 +122,7 @@ class FlowDataBase {
     this._candles1d = new BitmexCandleManager()
     this._candles1h = new BitmexCandleManager()
     this._candles5m = new BitmexCandleManager()
+    this._candles4h = new BitmexCandleManager({ is4H: true })
 
     if (this._options.initCheckSystem) {
       this.initCheckSystem()
@@ -215,6 +216,7 @@ class FlowDataBase {
         break
       case 'tradeBin1h':
         this.updateTradeBin1h(json, symbol)
+        this.updateTradeBin4h(json, symbol)
         break
       case 'tradeBin1d':
         this.updateTradeBin1d(json, symbol)
@@ -430,7 +432,7 @@ class FlowDataBase {
     }, 5 * 60 * 1000)
   }
 
-  // period : 1d 1h 5m
+  // period : 1d 1h 5m 4h
   setCandlesHistory(list, symbol, period) {
     const candleManager = this.getCandleManager(period)
     candleManager.setHistoryData(list, symbol)
@@ -468,6 +470,11 @@ class FlowDataBase {
     }
 
     this.caculateIndicatorAndCache(symbol, '1d')
+  }
+
+  updateTradeBin4h(json, symbol) {
+    this._candles4h.update(json.data[0], symbol)
+    console.log(this._candles4h.getCandleManager(symbol), 565656565)
   }
 
   updateTradeBin1h(json, symbol) {
@@ -835,6 +842,8 @@ class FlowDataBase {
         return this._candles1h
       case '1d':
         return this._candles1d
+      case '4h':
+        return this._candles4h
       default:
         break
     }

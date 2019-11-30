@@ -1,11 +1,18 @@
 // bitmex kline manager like AccountOrder
 const Candles = require('../../strategy/Candles')
+const Candles4H = require('../../strategy/Candles4H')
+
 class BitmexCandleManager {
   constructor(options) {
     this._options = {
+      is4H: false,  // 4小时
       ...options
     }
     this._candles = {}
+  }
+
+  getCandleManager(symbol) {
+    return this._candles[symbol]
   }
 
   update(candle, symbol) {
@@ -24,7 +31,7 @@ class BitmexCandleManager {
 
   initManagerIfNeed(symbol) {
     if (!this._candles[symbol]) {
-      this._candles[symbol] = new Candles()
+      this._candles[symbol] = this._options.is4H ? new Candles4H() : new Candles()
     }
   }
 

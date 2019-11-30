@@ -161,6 +161,7 @@ symbols1h.forEach(symbol => {
   // 1小时K线
   bitmexPublic.listenCandle({ binSize: '1h', count: 200 }, list => {
     manager.setCandlesHistory(list, symbol, '1h')
+    manager.setCandlesHistory(list, symbol, '4h')
   }, dataCb, symbol)
 })
 
