@@ -8,6 +8,9 @@ const INDICATORS = [
     period: '1d',
     indicators: ['stoch_k', 'rsi', 'ema'],
   }, {
+    period: '4h',
+    indicators: ['stoch_k', 'rsi', 'ema'],
+  }, {
     period: '1h',
     indicators: ['stoch_k', 'rsi', 'ema'],
   }, {
