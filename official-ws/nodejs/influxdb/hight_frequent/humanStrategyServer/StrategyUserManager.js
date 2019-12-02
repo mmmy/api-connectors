@@ -284,8 +284,26 @@ module.exports = class StrategyUserManager {
     return Promise.resolve(strategy.deleteAutoOrderSignal(index))
   }
 
+  orderLimitWithStop(user, data) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)      
+    }
+    return strategy.orderLimitWithStop(data)
+  }
+
   getAllIndicatorValues() {
     const mainStrategy = this.getMainStrategy()
     return Promise.resolve(mainStrategy.getAllIndicatorValues())
+  }
+
+  getCandleData(symbol, period, offset=0) {
+    const mainStrategy = this.getMainStrategy()
+    const data = mainStrategy.getCandleData(symbol, period, offset)
+    if (data) {
+      return Promise.resolve(data)
+    } else {
+      return Promise.reject(null)
+    }
   }
 }

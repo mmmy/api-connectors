@@ -410,6 +410,29 @@ router.post('/add_auto_order_signal', function (req, res) {
   })
 })
 
+router.post('/order_limit_with_stop', function(req, res, next) {
+  const { user } = req.body
+  const valideKeys = ['user', 'symbol', 'side', 'amount', 'price', 'stopPx']
+  if (valideKeys.some(key => !req.body[key])) {
+    req.send({
+      result: false,
+      info: `${valideKeys} some missed value`
+    })
+    return
+  }
+  manager.orderLimitWithStop(user, req.body).then(() => {
+    res.render({
+      result: true,
+      data: null
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
+    })
+  })
+})
+
 router.post('/update_auto_order_signal', function (req, res) {
   const { user, index, auto_order } = req.body
   if (!user || index === undefined) {
@@ -464,6 +487,21 @@ router.get('/all_indicator_values', function (req, res, next) {
     res.send({
       result: false,
       info: e
+    })
+  })
+})
+
+router.get('/candle_data', function(req, res, next) {
+  const { symbol, period, offset } = req.query
+  manager.getCandleData(symbol, period, offset).then(data => {
+    res.send({
+      result: true,
+      data,
+    })
+  }).catch(() => {
+    res.send({
+      result: false,
+      info: '未找到'
     })
   })
 })

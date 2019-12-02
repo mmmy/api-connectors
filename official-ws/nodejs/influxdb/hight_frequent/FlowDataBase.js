@@ -861,6 +861,16 @@ class FlowDataBase {
     return this._orderManager.getSignatureSDK().orderStop(symbol, qty, stopPx, side, false)
   }
 
+  
+  orderLimitWithStop(data) {
+    const { symbol, side, amount, price, stopPx } = data
+    const sdk = this._orderManager.getSignatureSDK()
+    return Promise.all([
+      sdk.orderStop(symbol, amount, stopPx, side === 'Buy' ? 'Sell' : 'Buy', true),
+      sdk.orderLimit(symbol, amount, side, price)
+    ])
+  }
+
   closeLongPostionIfHave(symbol) {
     if (this._accountPosition.getCurrentQty(symbol) > 0) {
       this.closePosition(symbol)
@@ -1484,6 +1494,13 @@ class FlowDataBase {
     const { on, token, user } = this._options.notify
     if ((on || force) && token && user) {
       notifyPhoneUser(`[${this._options.user}]${msg}`, token, user)
+    }
+  }
+
+  getCandleData(symbol, period, offset) {
+    const candleManager = this.getCandleManager(period)
+    if (candleManager) {
+      return candleManager.getHistoryCandle(symbol, offset + 1)
     }
   }
 }
