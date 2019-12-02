@@ -299,7 +299,7 @@ module.exports = class StrategyUserManager {
 
   getCandleData(symbol, period, offset=0) {
     const mainStrategy = this.getMainStrategy()
-    const data = mainStrategy.getCandleData(symbol, period, offset)
+    const data = mainStrategy.getCandleData(symbol, period, +offset)
     if (data) {
       return Promise.resolve(data)
     } else {
