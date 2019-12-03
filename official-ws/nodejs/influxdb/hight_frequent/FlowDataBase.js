@@ -98,6 +98,24 @@ class FlowDataBase {
         on: false,
         enableLong: true,
         enableShort: false,
+      },
+      limitStopProfit: { // 半自动化配置
+        shortMode: false, // 空头市场，总是xbt套保
+        autoOrderProfit: true, // reduceOnly limit
+        symbol: 'XBTUSD',
+        side: 'Buy',
+        risk: 100, //$100
+        period: '4h',
+        defaultProfitRate: 2,
+        symbolConfig: {
+          'XBTUSD': {
+            profitPx: 0,
+          },
+          'ETHUSD': {
+            profitPx: 0,
+          },
+        },
+        kRateForPrice: 0.5, // or 0.618
       }
     }, options)
 
@@ -474,7 +492,7 @@ class FlowDataBase {
 
   updateTradeBin4h(json, symbol) {
     this._candles4h.update(json.data[0], symbol)
-    console.log(this._candles4h.getCandleManager(symbol), 565656565)
+    // console.log(this._candles4h.getCandleManager(symbol), 565656565)
   }
 
   updateTradeBin1h(json, symbol) {

@@ -421,7 +421,7 @@ router.post('/order_limit_with_stop', function(req, res, next) {
     return
   }
   manager.orderLimitWithStop(user, req.body).then(() => {
-    res.render({
+    res.send({
       result: true,
       data: null
     })

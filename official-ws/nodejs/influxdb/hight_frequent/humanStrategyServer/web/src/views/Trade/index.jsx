@@ -4,6 +4,7 @@ import AutoOrderStopList from './AutoOrderStopList'
 import IndicatorValues from './IndicatorValues'
 // import TradingView from './TradingView'
 import MarginHistoryChart from './MarginHistoryChart'
+import OrderLimitWithStop from './OrderLimitWithStop'
 
 import './index.css'
 
@@ -131,6 +132,13 @@ export default class Trade extends React.Component {
                   </tbody>
                 </table>
               </div>
+              <hr/>
+              <OrderLimitWithStop
+                index={i}
+                options={options}
+                onChangeOption={this.fetchChangeUserOption}
+                onFetchUserList={this.fetchUserList}
+              />
               <hr />
               <div className="title">Orders</div>
               <div className="orders-container">
@@ -440,7 +448,7 @@ export default class Trade extends React.Component {
     }
   }
 
-  fetchUserList() {
+  fetchUserList = () => {
     this.setState({
       list_pending: true
     })
@@ -811,7 +819,7 @@ export default class Trade extends React.Component {
     this.fetchChangeUserOption(index, key, e.target.checked)
   }
 
-  fetchChangeUserOption(index, path, value) {
+  fetchChangeUserOption = (index, path, value) => {
     var userData = this.state.users[index]
     const { user } = userData.options
     userData.pending = true
