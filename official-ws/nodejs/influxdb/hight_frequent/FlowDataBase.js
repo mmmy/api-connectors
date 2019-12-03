@@ -143,8 +143,10 @@ class FlowDataBase {
     this._candles4h = new BitmexCandleManager({ is4H: true })
 
     if (this._options.initCheckSystem) {
-      this.initCheckSystem()
+      // this.initCheckSystem()
     }
+
+    this.initAutoOrderProfitOrderInterval()
 
     this.initCheckDataInterval()
     // if (this._options.database) {
@@ -408,6 +410,15 @@ class FlowDataBase {
       // this._notifyPhone('test notifyPhone')
       this.checkPositionValid('XBTUSD')
     }, 2 * 60 * 1000)
+  }
+
+  initAutoOrderProfitOrderInterval() {
+    this._checkAutoOrderProfitOrderInterval = setInterval(() => {
+      const { autoOrderProfit } = this._options.limitStopProfit
+      if (autoOrderProfit) {
+        this.setProfitReduceOnlyLimitOrder()
+      }
+    }, 1 * 60 * 1000)
   }
 
   checkPositionValid(symbol) {
@@ -1520,6 +1531,24 @@ class FlowDataBase {
     if (candleManager) {
       return candleManager.getHistoryCandle(symbol, offset + 1)
     }
+  }
+
+  setProfitReduceOnlyLimitOrder() {
+    const { defaultProfitRate, shortMode } = this._options.limitStopProfit
+    // xbt
+    // 1 if has postion
+    const symbol = 'XBTUSD'
+    let hasPosition = false
+    const positionQty = this._accountPosition.getCurrentQty(symbol)
+    if (shortMode) {
+      // hasPosition = positionQty >= 0
+    } else {
+      hasPosition = this._accountPosition.hasPosition(symbol)
+    }
+
+    // 2 get stop close order
+    // 3 get reduceOnly order
+    // 4 check if have reduceOnlu order and amount if is safe
   }
 }
 
