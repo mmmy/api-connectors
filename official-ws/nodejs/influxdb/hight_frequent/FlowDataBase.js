@@ -110,9 +110,15 @@ class FlowDataBase {
         symbolConfig: {
           'XBTUSD': {
             profitPx: 0,
+            price: 0,
+            side: 'Buy',
+            stopPx: 0,
           },
           'ETHUSD': {
             profitPx: 0,
+            price: 0,
+            side: 'Buy',
+            stopPx: 0,
           },
         },
         kRateForPrice: 0.5, // or 0.618
@@ -143,7 +149,7 @@ class FlowDataBase {
     this._candles4h = new BitmexCandleManager({ is4H: true })
 
     if (this._options.initCheckSystem) {
-      // this.initCheckSystem()
+      this.initCheckSystem()
     }
 
     this.initAutoOrderProfitOrderInterval()
@@ -418,7 +424,7 @@ class FlowDataBase {
       if (autoOrderProfit) {
         this.setProfitReduceOnlyLimitOrder()
       }
-    }, 1 * 60 * 1000)
+    }, 2 * 60 * 1000)
   }
 
   checkPositionValid(symbol) {
@@ -1534,19 +1540,57 @@ class FlowDataBase {
   }
 
   setProfitReduceOnlyLimitOrder() {
-    const { defaultProfitRate, shortMode } = this._options.limitStopProfit
+    const { defaultProfitRate, shortMode, symbolConfig } = this._options.limitStopProfit
     // xbt
     // 1 if has postion
     const symbol = 'XBTUSD'
+    const xbtConfig = symbolConfig[symbol]
+    const isConfigLong = xbtConfig.side === 'Buy'
     let hasPosition = false
     const positionQty = this._accountPosition.getCurrentQty(symbol)
+    const absPositionQty = Math.abs(positionQty)
+    // 暂时不支持shortMode
     if (shortMode) {
-      // hasPosition = positionQty >= 0
+      hasPosition = positionQty >= 0 // 需要优化，不正确
     } else {
       hasPosition = this._accountPosition.hasPosition(symbol)
     }
 
-    // 2 get stop close order
+    if (hasPosition) {
+      const longPosition = shortMode ?
+      positionQty >= 0 : positionQty > 0
+      // 同向
+      const isSameSide = (isConfigLong && longPosition) || (!isConfigLong && !longPosition)
+      // 2 get stop close order
+      const stopOrder = this._accountOrder.getStopOrders(symbol, longPosition ? 'Sell' : 'Buy')[0]
+      if (stopOrder) {
+        const { orderQty, stopPx } = stopOrder
+        // 吻合
+        if (isSameSide && stopPx === xbtConfig.stopPx) {
+          const reduceOnlyOrder = this._accountOrder.getReduceOnlyOrders(symbol)[0]
+          if (!reduceOnlyOrder) {
+            // start order
+            const msg = 'postion & stop orders, but no reduce only order and order it'
+            console.log(msg)
+            this._notifyPhone(msg, true)
+            this._orderManager.getSignatureSDK().orderReduceOnlyLimit(symbol, orderQty, longPosition ? 'Sell' : 'Buy', xbtConfig.profitPx)
+          } else {
+            // 可能 amount 不对
+            if (reduceOnlyOrder.orderQty < absPositionQty) {
+              const msg = 'reduce only qty is less, to add more'
+              console.log(msg)
+              this._notifyPhone(msg, true)
+
+              this._orderManager.getSignatureSDK().updateOrder({
+                ...reduceOnlyOrder,
+                orderQty: absPositionQty,
+              })
+            }
+          }
+        }
+      }
+    }
+
     // 3 get reduceOnly order
     // 4 check if have reduceOnlu order and amount if is safe
   }

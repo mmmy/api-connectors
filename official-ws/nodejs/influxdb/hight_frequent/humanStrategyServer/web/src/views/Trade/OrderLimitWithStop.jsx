@@ -43,6 +43,7 @@ export default class OrderLimitWithStop extends React.Component {
 
     return <div className="order-limit-withstop-container">
       <div className="row">
+        <div>{JSON.stringify(options.limitStopProfit.symbolConfig)}</div>
         <select value={side} onChange={this.handleChangeValue.bind(this, 'side')}>
           <option value="Buy">Buy</option>
           <option value="Sell">Sell</option>
@@ -68,6 +69,7 @@ export default class OrderLimitWithStop extends React.Component {
         <span>
           <label>shortMode</label>
           <input type="checkbox"
+            disabled
             checked={shortMode}
             onChange={this.handleCheckboxOption.bind(this, 'shortMode')}
           />
@@ -241,7 +243,7 @@ export default class OrderLimitWithStop extends React.Component {
     const {
       shortMode, symbol, side, risk,
       period, defaultProfitRate, profitPx,
-      kRateForPrice,
+      kRateForPrice, price, stopPx,
     } = this.state
     const { user } = this.props.options
     const options = {
@@ -254,7 +256,10 @@ export default class OrderLimitWithStop extends React.Component {
         defaultProfitRate,
         symbolConfig: {
           [symbol]: {
-            profitPx
+            profitPx,
+            price,
+            side,
+            stopPx,
           }
         },
         kRateForPrice,
