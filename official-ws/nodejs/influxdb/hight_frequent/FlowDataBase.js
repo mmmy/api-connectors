@@ -1583,8 +1583,10 @@ class FlowDataBase {
               this._notifyPhone(msg, true)
 
               this._orderManager.getSignatureSDK().updateOrder({
-                ...reduceOnlyOrder,
+                orderID: reduceOnlyOrder.orderID,
                 orderQty: absPositionQty,
+              }).catch(e => {
+                console.log(e)
               })
             }
           }
