@@ -896,7 +896,7 @@ class FlowDataBase {
     return this._orderManager.getSignatureSDK().orderStop(symbol, qty, stopPx, side, false)
   }
 
-  
+
   orderLimitWithStop(data) {
     const { symbol, side, amount, price, stopPx } = data
     const sdk = this._orderManager.getSignatureSDK()
@@ -1460,6 +1460,7 @@ class FlowDataBase {
       'botRsiDivergence',
       'botBreakCandle',
       'botPinBar',
+      'limitStopProfit',
     ]
     paths.forEach(path => {
       _.set(configToSave, path, _.get(this._options, path))
@@ -1558,7 +1559,7 @@ class FlowDataBase {
 
     if (hasPosition) {
       const longPosition = shortMode ?
-      positionQty >= 0 : positionQty > 0
+        positionQty >= 0 : positionQty > 0
       // 同向
       const isSameSide = (isConfigLong && longPosition) || (!isConfigLong && !longPosition)
       // 2 get stop close order

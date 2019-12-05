@@ -184,7 +184,7 @@ export default class OrderLimitWithStop extends React.Component {
     const { defaultProfitRate, price, stopPx, side } = this.state
     const diffP = Math.abs(stopPx - price)
     const profitDiffP = Math.round(defaultProfitRate * diffP)
-    const profitPx = side === 'Buy' ? (price + profitDiffP) : (price - profitDiffP)
+    const profitPx = side === 'Buy' ? (+price + profitDiffP) : (+price - profitDiffP)
     this.setState({
       profitPx
     })
@@ -284,7 +284,7 @@ export default class OrderLimitWithStop extends React.Component {
     })
     axios.post('api/coin/change_option', { user, path, value }).then(({ status, data }) => {
       if (status === 200 && data.result) {
-        
+
       } else {
         alert('error', data.info)
       }
