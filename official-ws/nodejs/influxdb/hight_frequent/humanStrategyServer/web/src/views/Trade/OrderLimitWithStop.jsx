@@ -132,7 +132,7 @@ export default class OrderLimitWithStop extends React.Component {
     this.setState({
       [key]: e.target.value
     }, () => {
-      if (key === 'stopPx') {
+      if (key === 'stopPx' || key === 'price') {
         this.updateAmount()
       }
     })
