@@ -905,6 +905,7 @@ class FlowDataBase {
     const sdk = this._orderManager.getSignatureSDK()
     const isOpenStop = openMethod === 'stop'
     if (isOpenStop) {
+      // todo: 处理 price 立即成交的bug, 应该返回错误
       // stop open 可能比止损后触发，这个问题很大
       this._options.limitStopProfit.symbolConfig[symbol]['needCheckStopIfHasPosition'] = true
       this.saveConfigToFile()
