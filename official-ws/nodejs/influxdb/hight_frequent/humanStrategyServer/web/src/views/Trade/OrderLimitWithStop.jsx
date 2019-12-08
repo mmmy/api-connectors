@@ -35,7 +35,8 @@ export default class OrderLimitWithStop extends React.Component {
     const {
       side, symbol, risk, shortMode, profitPx,
       stopPx, price, amount, offset, pending,
-      kRateForPrice, defaultProfitRate, autoOrderProfit
+      kRateForPrice, defaultProfitRate, autoOrderProfit,
+      openMethod,
     } = this.state
     const isBuy = side === 'Buy'
     const resetProfitPxBtn = <button onClick={this.resetProfitPx}>reset default</button>
@@ -86,6 +87,13 @@ export default class OrderLimitWithStop extends React.Component {
       </div>
       <div className="prices-section">
         <div className="row">
+          <label>openMethod</label>
+          <select value={openMethod} onChange={this.handleChangeValue.bind(this, 'openMethod')}>
+            <option value="limit">limit</option>
+            <option value="stop">stop</option>
+          </select>
+        </div>
+        <div className="row">
           <label style={{ color: isBuy ? 'green' : 'red' }}>{isBuy ? 'profitPx' : 'stopPx'}</label>
           <input step={unit} type="number" value={isBuy ? profitPx : stopPx} onChange={this.handleChangeValue.bind(this, isBuy ? 'profitPx' : 'stopPx')} />
           {
@@ -95,11 +103,6 @@ export default class OrderLimitWithStop extends React.Component {
         <div className="row">
           <label>price</label>
           <input step={unit} type="number" value={price} onChange={this.handleChangeValue.bind(this, 'price')} />
-          &nbsp;
-          &nbsp;
-          <label>amount</label>
-          <input type="number" value={amount} disabled />
-          <button onClick={this.updateAmount}>update</button>
         </div>
         <div className="row">
           <label style={{ color: isBuy ? 'red' : 'green' }}>{isBuy ? 'stopPx' : 'profitPx'}</label>
@@ -107,6 +110,11 @@ export default class OrderLimitWithStop extends React.Component {
           {
             !isBuy && resetProfitPxBtn
           }
+        </div>
+        <div className="row">
+          <label>amount</label>
+          <input type="number" value={amount} disabled />
+          <button onClick={this.updateAmount}>update</button>
         </div>
       </div>
       <div><button onClick={this.handleSubmit}>submit</button></div>
@@ -244,6 +252,7 @@ export default class OrderLimitWithStop extends React.Component {
       shortMode, symbol, side, risk,
       period, defaultProfitRate, profitPx,
       kRateForPrice, price, stopPx,
+      openMethod,
     } = this.state
     const { user } = this.props.options
     const options = {
@@ -254,12 +263,14 @@ export default class OrderLimitWithStop extends React.Component {
         risk,
         period,
         defaultProfitRate,
+        openMethod,
         symbolConfig: {
           [symbol]: {
             profitPx,
             price,
             side,
             stopPx,
+            openMethod,
           }
         },
         kRateForPrice,

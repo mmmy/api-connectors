@@ -106,6 +106,7 @@ class FlowDataBase {
         side: 'Buy',
         risk: 100, //$100
         period: '4h',
+        openMethod: 'limit',   // limit or stop
         defaultProfitRate: 2,
         symbolConfig: {
           'XBTUSD': {
@@ -113,12 +114,14 @@ class FlowDataBase {
             price: 0,
             side: 'Buy',
             stopPx: 0,
+            openMethod: '',
           },
           'ETHUSD': {
             profitPx: 0,
             price: 0,
             side: 'Buy',
             stopPx: 0,
+            openMethod: '',
           },
         },
         kRateForPrice: 0.5, // or 0.618
@@ -898,11 +901,14 @@ class FlowDataBase {
 
 
   orderLimitWithStop(data) {
-    const { symbol, side, amount, price, stopPx } = data
+    const { symbol, side, amount, price, stopPx, openMethod } = data
     const sdk = this._orderManager.getSignatureSDK()
     return Promise.all([
       sdk.orderStop(symbol, amount, stopPx, side === 'Buy' ? 'Sell' : 'Buy', true),
-      sdk.orderLimit(symbol, amount, side, price)
+      openMethod === 'stop' ?
+        sdk.orderStop(symbol, amount, price, side, false)
+        :
+        sdk.orderLimit(symbol, amount, side, price)
     ])
   }
 

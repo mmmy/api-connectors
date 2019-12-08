@@ -412,7 +412,7 @@ router.post('/add_auto_order_signal', function (req, res) {
 
 router.post('/order_limit_with_stop', function(req, res, next) {
   const { user } = req.body
-  const valideKeys = ['user', 'symbol', 'side', 'amount', 'price', 'stopPx']
+  const valideKeys = ['user', 'symbol', 'side', 'amount', 'price', 'stopPx', 'openMethod']
   if (valideKeys.some(key => !req.body[key])) {
     req.send({
       result: false,
