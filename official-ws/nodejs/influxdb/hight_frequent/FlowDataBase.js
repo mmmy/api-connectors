@@ -907,6 +907,16 @@ class FlowDataBase {
     if (isOpenStop) {
       // todo: 处理 price 立即成交的bug, 应该返回错误
       // stop open 可能比止损后触发，这个问题很大
+      const quto = this.getLatestQuote(symbol)
+      if (side === 'Buy') {
+        if (+price <= quto.bidPrice) {
+          return Promise.reject(`price error ${price} <=bidPrice ${quto.bidPrice}`)
+        }
+      } else {
+        if (+price >= quto.askPrice) {
+          return Promise.reject(`price error ${price} >=askPrice ${quto.askPrice}`)
+        }
+      }
       this._options.limitStopProfit.symbolConfig[symbol]['needCheckStopIfHasPosition'] = true
       this.saveConfigToFile()
     }
@@ -1585,7 +1595,7 @@ class FlowDataBase {
             const msg = `${symbol} postion & stop orders, but no reduce only order and order it`
             console.log(msg)
             this._notifyPhone(msg, true)
-            this._orderManager.getSignatureSDK().orderReduceOnlyLimit(symbol, orderQty, longPosition ? 'Sell' : 'Buy', currentConfig.profitPx)
+            this._orderManager.getSignatureSDK().orderReduceOnlyLimit(symbol, absPositionQty, longPosition ? 'Sell' : 'Buy', currentConfig.profitPx)
           } else {
             // 可能 amount 不对
             if (reduceOnlyOrder.orderQty < absPositionQty) {

@@ -171,7 +171,7 @@ export default class OrderLimitWithStop extends React.Component {
             this.resetProfitPx()
           })
         } else {
-          alert('error', data)
+          alert(`error ${data.info}`)
         }
         this.setState({
           pending: false
@@ -211,7 +211,7 @@ export default class OrderLimitWithStop extends React.Component {
       })
 
       const errorCb = (e) => {
-        alert('error', e)
+        alert(`error ${e}`)
         console.log('error', e)
         this.setState({
           pending: false
