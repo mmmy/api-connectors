@@ -77,6 +77,7 @@ export default class OrderLimitWithStop extends React.Component {
         </span>
       </div>
       <div className="row">
+        <button onClick={this.handleFetchCandleAndApply.bind(this, '1d')}>auto 1d K</button>
         <button onClick={this.handleFetchCandleAndApply.bind(this, '4h')}>auto 4h K</button>
         <button onClick={this.handleFetchCandleAndApply.bind(this, '1h')}>auto 1h K</button>
         &nbsp;
