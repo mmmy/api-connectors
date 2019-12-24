@@ -190,9 +190,9 @@ export default class OrderLimitWithStop extends React.Component {
   }
 
   resetProfitPx = () => {
-    const { defaultProfitRate, price, stopPx, side } = this.state
+    const { defaultProfitRate, price, stopPx, symbol, side } = this.state
     const diffP = Math.abs(stopPx - price)
-    const profitDiffP = Math.round(defaultProfitRate * diffP)
+    const profitDiffP = transformPrice(symbol, defaultProfitRate * diffP)
     const profitPx = side === 'Buy' ? (+price + profitDiffP) : (+price - profitDiffP)
     this.setState({
       profitPx
