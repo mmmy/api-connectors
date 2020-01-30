@@ -1,0 +1,1 @@
+curl -H 'Content-Type: application/json; charset=utf-8' -d '{"symbol": "ETHUSD", "name": "A0", "interval":"1h", "long":true}' -X POST http://localhost:3000/api/sys/wh

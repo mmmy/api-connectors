@@ -23,6 +23,12 @@ const precisionMap = {
   'ETHUSD': 0.05,
 }
 
+function transformPrice(symbol, price) {
+  const unit = precisionMap[symbol]
+  const rate = 1 / unit
+  return Math.round(price * rate) / rate
+}
+
 class FlowDataBase {
   constructor(options) {
     this._options = _.merge({
@@ -122,6 +128,26 @@ class FlowDataBase {
             side: 'Buy',
             stopPx: 0,
             openMethod: '',
+          },
+        },
+        tvAlertConfig: {
+          'XBTUSD': {
+            minStop: 40,
+            maxStop: 150,
+            risk: 100, // $
+            maxAmount: 30000,
+            profitRate: 2,
+            enableLong: false,
+            enableShort: false,
+          },
+          'ETHUSD': {
+            minStop: 1,
+            maxStop: 3,
+            risk: 100, //$
+            maxAmount: 15000,
+            profitRate: 2,
+            enableLong: false,
+            enableShort: false,
           },
         },
         kRateForPrice: 0.5, // or 0.618
@@ -1126,7 +1152,7 @@ class FlowDataBase {
         const isNotLH = !this._candles5m.isCurrentHighestLowestClose(symbol, 300)
         const lowVolFilter = lowVol ? this._candles5m.isLowVol(symbol, 50, 3) : true
         const highBoDongFilter = highBoDong ? this._candles1d.isAdxHigh(symbol, 14) : true
-        this._notifyPhone(`rsi divergence bot long! ${isNotLH} ${lowVolFilter} ${highBoDongFilter}`)
+        // this._notifyPhone(`rsi divergence bot long! ${isNotLH} ${lowVolFilter} ${highBoDongFilter}`)
         if (isNotLH && lowVolFilter && highBoDongFilter) {
           this._notifyPhone('rsi divergence bot open!')
           // 锁定为当前id
@@ -1311,7 +1337,7 @@ class FlowDataBase {
             const adxSignal = this._candles1d.adxSignal(symbol, 14)
             adxFilter = (adxSignal.long && barTrendSignal.long) || (adxSignal.short && barTrendSignal.short)
           }
-          this._notifyPhone(`break candle bot signal! ${barTrendSignal.long ? 'long' : 'short'} upVolFilter${upVolFilter} adxFilter${adxFilter}`)
+          // this._notifyPhone(`break candle bot signal! ${barTrendSignal.long ? 'long' : 'short'} upVolFilter${upVolFilter} adxFilter${adxFilter}`)
           if (upVolFilter && adxFilter) {
             // 锁定为当前id
             this.setCurrentPositionBotId(botId, symbol)
@@ -1584,28 +1610,32 @@ class FlowDataBase {
       // 同向
       const isSameSide = (isConfigLong && longPosition) || (!isConfigLong && !longPosition)
       // 2 get stop close order
-      const stopOrder = this._accountOrder.getStopOrders(symbol, longPosition ? 'Sell' : 'Buy')[0]
-      if (stopOrder) {
-        const { orderQty, stopPx } = stopOrder
+      const stopOrders = this._accountOrder.getStopOrders(symbol, longPosition ? 'Sell' : 'Buy')
+      const matchStopOrder = stopOrders.filter(o => o.stopPx === +currentConfig.stopPx)[0]
+      if (matchStopOrder) {
         // 吻合
-        if (isSameSide && stopPx === +currentConfig.stopPx) {
-          const reduceOnlyOrder = this._accountOrder.getReduceOnlyOrders(symbol)[0]
-          if (!reduceOnlyOrder) {
-            // start order
-            const msg = `${symbol} postion & stop orders, but no reduce only order and order it`
-            console.log(msg)
-            this._notifyPhone(msg, true)
-            this._orderManager.getSignatureSDK().orderReduceOnlyLimit(symbol, absPositionQty, longPosition ? 'Sell' : 'Buy', currentConfig.profitPx)
-          } else {
-            // 可能 amount 不对
-            if (reduceOnlyOrder.orderQty < absPositionQty) {
+        if (isSameSide) {
+          const reduceOnlyOrders = this._accountOrder.getReduceOnlyOrders(symbol)
+          const matchReduceOnlyOrder = reduceOnlyOrders.filter(o => o.price === +currentConfig.profitPx)[0]
+          const totalReduceQty = reduceOnlyOrders.reduce((sum, o) => sum + o.orderQty, 0)
+          const lessQty = absPositionQty - totalReduceQty
+          // const reduceOnlyOrder = this._accountOrder.getReduceOnlyOrders(symbol)[0]
+          if (lessQty > 0) {
+            if (!matchReduceOnlyOrder) {
+              // start order
+              const msg = `${symbol} postion & stop orders, but no reduce only order and order it`
+              console.log(msg)
+              this._notifyPhone(msg, true)
+              this._orderManager.getSignatureSDK().orderReduceOnlyLimit(symbol, absPositionQty, longPosition ? 'Sell' : 'Buy', currentConfig.profitPx)
+            } else {
+              // 可能 amount 不对
               const msg = `${symbol} reduce only qty is less, to add more`
               console.log(msg)
               this._notifyPhone(msg, true)
 
               this._orderManager.getSignatureSDK().updateOrder({
-                orderID: reduceOnlyOrder.orderID,
-                orderQty: absPositionQty,
+                orderID: matchReduceOnlyOrder.orderID,
+                orderQty: matchReduceOnlyOrder.orderQty + lessQty,
               }).catch(e => {
                 console.log(e)
               })
@@ -1627,6 +1657,166 @@ class FlowDataBase {
 
   setProfitReduceOnlyLimitOrder() {
     ['XBTUSD', 'ETHUSD'].forEach(symbol => this.checkOrderLimitStopProfitStaus(symbol))
+  }
+  // 处理tradingview alert
+  watchTvAlert(params) {
+    try {
+      const { symbol, name, interval, long } = params
+      const requiredKeys = ['symbol', 'name', 'interval', 'long']
+      if (requiredKeys.some(k => params[k] === undefined)) {
+        const msg = `${requiredKeys.toString()} is required in tv alert params`
+        console.log(msg)
+        throw msg
+      }
+      this.orderLimitStopProfitByParam(params)
+    } catch(e) {
+      return Promise.reject(e)
+    }
+    return Promise.resolve()
+  }
+
+  waitCandleAndOrderLimitStop(params) {
+    const { symbol, name, interval, long } = params
+    const symbolTvConfig = this._options.limitStopProfit.tvAlertConfig[symbol]
+    this.waitForLastestCandle(symbol, interval).then(() => {
+      if (interval === '1h' && name === 'A0') {
+        //TODO: amount price, stopPx, profitPx
+        const { minStop, maxStop, risk, maxAmount, profitRate } = symbolTvConfig
+        const candleManager1h = this.getCandleManager('1h')
+        const lastCandle = candleManager1h.getHistoryCandle(symbol)
+        const { maxHigh, minLow } = candleManager1h.getMinMaxHighLow(symbol, 5)
+        const precision = precisionMap[symbol]
+        const quto = this.getLatestQuote(symbol)
+        let middlePrice = (lastCandle.high + lastCandle.low) / 2
+        middlePrice = transformPrice(symbol, middlePrice)
+
+        let price, stopPx, profitPx, amount = 0
+
+        if (long) {
+          price = Math.min(middlePrice, quto.askPrice - precision)
+          stopPx = minLow - precision
+          const lowestStopPx = price - maxStop
+          const highestStopPx = price - minStop
+          // 止损价格需要在指定范围内
+          if (stopPx > highestStopPx) {
+            stopPx = highestStopPx
+          } else if (stopPx < lowestStopPx) {
+            stopPx = lowestStopPx
+          }
+          stopPx = transformPrice(symbol, stopPx)
+          const risks = price - stopPx
+          profitPx = price + (risks * profitRate)
+        } else {
+          price = Math.max(middlePrice, quto.bidPrice + precision)
+          stopPx = maxHigh + precision
+          const highestStopPx = price + maxStop
+          const lowestStopPx = price + minStop
+          if (stopPx > highestStopPx) {
+            stopPx = highestStopPx
+          } else if (stopPx < lowestStopPx) {
+            stopPx = lowestStopPx
+          }
+          stopPx = transformPrice(symbol, stopPx)
+          const risks = stopPx - price
+          profitPx = price - (risks * profitRate)
+        }
+
+        profitPx = transformPrice(symbol, profitPx)
+        const diffP = Math.abs(stopPx - price)
+        amount = Math.round((risk / diffP) * price)
+        amount = Math.min(amount, maxAmount)
+
+        const side = long ? 'Buy' : 'Sell'
+        const openMethod = 'limit'
+        const data = {
+          symbol,
+          side,
+          openMethod,
+          price,
+          stopPx,
+          profitPx,
+          amount,
+        }
+
+        console.log('tv auto open position!', data)
+        this._notifyPhone(`[${symbol}] tv auto open position!`)
+
+        this.orderLimitWithStop(data)
+        // save config
+        const curSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
+        curSymbolConfig.price = price
+        curSymbolConfig.side = side
+        curSymbolConfig.profitPx = profitPx
+        curSymbolConfig.stopPx = stopPx
+        curSymbolConfig.openMethod = openMethod
+        this.saveConfigToFile()
+      }
+    }).catch((errorMsg) => {
+      console.log('waitForLastestCandle error:', errorMsg)
+    })
+  }
+
+  waitForLastestCandle(symbol, period) {
+    const candleManager = this.getCandleManager(period)
+    if (!candleManager) {
+      return Promise.reject(`${period} not support`)
+    }
+    const startTime = new Date()
+    const maxTimeout = 2 * 60 * 1000
+    return new Promise((resolve, reject) => {
+      const interval = setInterval(() => {
+        const now = new Date()
+        if (now - startTime > maxTimeout) {
+          clearInterval(interval)
+          reject('waitForLastestCandle time out')
+          return
+        }
+        const lastCandle = candleManager.getHistoryCandle(symbol)
+        if (!lastCandle) {
+          clearInterval(interval)
+          reject(`${symbol} s lastCandle not found!`)
+          return
+        }
+        const candleTime = new Date(lastCandle.timestamp)
+        const timePassed = now - candleTime
+        const maxTime = 5 * 60 * 1000
+        if (timePassed > 0 && timePassed < maxTime) {
+          clearInterval(interval)
+          resolve()
+          return
+        }
+        if (timePassed >= maxTime) {
+          clearInterval(interval)
+          reject('信号过时了, 取消运行')
+          return
+        }
+      }, 3000)
+    })
+  }
+
+  orderLimitStopProfitByParam(params) {
+    const { symbol, name, interval, long } = params
+    const symbolTvAlertConfig = this._options.limitStopProfit.tvAlertConfig[symbol]
+    const msg = `tv ${symbol} ${name} ${interval} ${long}`
+    console.log(msg)
+    this._notifyPhone(msg)
+    if (symbolTvAlertConfig) {
+      // enableLong enableShort 目前只支持手动开启
+      if (long && !symbolTvAlertConfig.enableLong || (!long && !symbolTvAlertConfig.enableShort)) {
+        console.log(`tv ${long ? 'long' : 'short'} is not enable`)
+        return
+      }
+      this.waitCandleAndOrderLimitStop(params)
+      // 重置开关, 需要手动打开, 为了安全
+      if (long) {
+        symbolTvAlertConfig.enableLong = false
+      } else {
+        symbolTvAlertConfig.enableShort = false
+      }
+      this.saveConfigToFile()
+    }
+    // const { symbol, side, amount, price, stopPx, openMethod } = data
+    // const sdk = this._orderManager.getSignatureSDK()
   }
 }
 

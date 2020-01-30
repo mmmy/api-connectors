@@ -1,6 +1,8 @@
 import React from 'react'
 import axios from 'axios'
 
+const tvConfigKeys = ['minStop', 'maxStop', 'risk', 'maxAmount', 'profitRate']
+
 const PirceUnitMap = {
   'XBTUSD': 0.5,
   'ETHUSD': 0.05,
@@ -41,6 +43,8 @@ export default class OrderLimitWithStop extends React.Component {
     const isBuy = side === 'Buy'
     const resetProfitPxBtn = <button onClick={this.resetProfitPx}>reset default</button>
     const unit = PirceUnitMap[symbol]
+
+    const { tvAlertConfig } = options.limitStopProfit
 
     return <div className="order-limit-withstop-container">
       <div className="row">
@@ -119,6 +123,33 @@ export default class OrderLimitWithStop extends React.Component {
         </div>
       </div>
       <div><button onClick={this.handleSubmit}>submit</button></div>
+      <br/>
+      <div>
+        <div>tv alert config</div>
+        <table>
+          <thead><tr>
+            <th>symbol</th>
+            {tvConfigKeys.map(k => <th>{k}</th>)}
+            <th></th>
+          </tr></thead>
+          <tbody>
+            {
+              Object.getOwnPropertyNames(tvAlertConfig).map(s => {
+                let rows = [<td>{s}</td>]
+                rows = rows.concat(tvConfigKeys.map(k =>
+                  <td><div onClick={this.handleTvConfig.bind(this, s, k)}>{tvAlertConfig[s][k]}</div></td>
+                ))
+                const switchTd = <td>
+                  <input checked={tvAlertConfig[s]['enableLong']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableLong')}/>多&nbsp;
+                  <input checked={tvAlertConfig[s]['enableShort']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableShort')}/>空
+                </td>
+                rows.push(switchTd)
+                return <tr>{rows}</tr>
+              })
+            }
+          </tbody>
+        </table>
+      </div>
       {
         pending && <div className="pending">pending ...</div>
       }
@@ -228,6 +259,25 @@ export default class OrderLimitWithStop extends React.Component {
         }).catch(errorCb)
       }).catch(errorCb)
     }
+  }
+
+  handleTvConfig = (symbol, key) => {
+    const { options, index, onChangeOption } = this.props
+    const { tvAlertConfig } = options.limitStopProfit
+    const oldValue = tvAlertConfig[symbol][key]
+    const newVal = window.prompt(`update tv config ${symbol} ${key}`, oldValue)
+    if (newVal !== null) {
+      const path = `limitStopProfit.tvAlertConfig.${symbol}.${key}`
+      onChangeOption(index, path, +newVal)
+    }
+  }
+
+  onChangeTvConfigCheckbox = (symbol, key, e) => {
+    const { options, index, onChangeOption } = this.props
+    // const { tvAlertConfig } = options.limitStopProfit
+    const newVal = e.target.checked
+    const path = `limitStopProfit.tvAlertConfig.${symbol}.${key}`
+    onChangeOption(index, path, +newVal)
   }
 
   fetchOrder = () => {

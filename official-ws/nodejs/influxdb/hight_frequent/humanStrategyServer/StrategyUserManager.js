@@ -306,4 +306,9 @@ module.exports = class StrategyUserManager {
       return Promise.reject(null)
     }
   }
+
+  watchTvAlert(params) {
+    this._list.forEach(item =>  item.watchTvAlert(params))
+    return Promise.resolve()
+  }
 }
