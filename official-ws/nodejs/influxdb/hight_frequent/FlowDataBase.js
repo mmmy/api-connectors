@@ -1761,7 +1761,18 @@ class FlowDataBase {
     if (!candleManager) {
       return Promise.reject(`${period} not support`)
     }
+    // const oneHour = 3600 * 1000
+    // const milSecMap = {
+    //   '1h': oneHour,
+    //   '4h': 24 * oneHour,
+    // }
+    // const milSec = milSecMap[period]
+    // if (!milSec) {
+    //   return Promise.reject(`${period} period not support`)
+    // }
+
     const startTime = new Date()
+    // 两分钟超时
     const maxTimeout = 2 * 60 * 1000
     return new Promise((resolve, reject) => {
       const interval = setInterval(() => {
@@ -1779,17 +1790,21 @@ class FlowDataBase {
         }
         const candleTime = new Date(lastCandle.timestamp)
         const timePassed = now - candleTime
+        // 
+        // if (timePassed > milSec) {
+        //   timePassed = timePassed - milSec
+        // }
         const maxTime = 5 * 60 * 1000
         if (timePassed > 0 && timePassed < maxTime) {
           clearInterval(interval)
           resolve()
           return
         }
-        if (timePassed >= maxTime) {
-          clearInterval(interval)
-          reject('信号过时了, 取消运行')
-          return
-        }
+        // if (timePassed >= maxTime) {
+        //   clearInterval(interval)
+        //   reject('信号过时了, 取消运行')
+        //   return
+        // }
       }, 3000)
     })
   }
