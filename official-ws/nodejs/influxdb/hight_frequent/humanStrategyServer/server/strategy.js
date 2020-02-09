@@ -78,7 +78,7 @@ if (isProduction) {
     marginFilePath: path.join(__dirname, 'godice.marigin.csv'),
   })
 
-} else {
+} else if (false) {
   var qqTest = require('../../../../strategy/apikey/test-secret.json')
   var yqheroTest = require('../../../../strategy/apikey/test-secret-yqhero.json')
   list.push({

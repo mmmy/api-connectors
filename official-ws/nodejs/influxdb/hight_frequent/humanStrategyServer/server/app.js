@@ -10,6 +10,7 @@ var logger = require('morgan');
 // var indexRouter = require('./routes/index');
 // var usersRouter = require('./routes/users');
 var coinRouter = require('./routes/coin');
+var binanceRouter = require('./routes/binance');
 var sysRouter = require('./routes/sys');
 
 var app = express();
@@ -32,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.use('/', indexRouter);
 // app.use('/users', usersRouter);
 app.use('/api/coin', coinRouter);
+app.use('/api/bn', binanceRouter);
 app.use('/api/sys', sysRouter);
 
 // catch 404 and forward to error handler

@@ -122,7 +122,9 @@ WebSocketClient.prototype.send = function(data, option) {
 }
 
 WebSocketClient.prototype.close = function() {
-  this.instance.close(CLOSE_NORMAL)
+  if (this.instance) {
+    this.instance.close(CLOSE_NORMAL)
+  }
 }
 
 WebSocketClient.prototype.reconnect = function(_code) {
