@@ -1662,13 +1662,15 @@ class FlowDataBase {
   watchTvAlert(params) {
     try {
       const { symbol, name, interval, long } = params
-      const requiredKeys = ['symbol', 'name', 'interval', 'long']
+      const requiredKeys = ['symbol', 'name', 'interval', 'long', 'exchange']
       if (requiredKeys.some(k => params[k] === undefined)) {
         const msg = `${requiredKeys.toString()} is required in tv alert params`
         console.log(msg)
         throw msg
       }
-      this.orderLimitStopProfitByParam(params)
+      if (params.exchange === 'BITMEX') {
+        this.orderLimitStopProfitByParam(params)
+      }
     } catch(e) {
       return Promise.reject(e)
     }
@@ -1812,7 +1814,7 @@ class FlowDataBase {
   orderLimitStopProfitByParam(params) {
     const { symbol, name, interval, long } = params
     const symbolTvAlertConfig = this._options.limitStopProfit.tvAlertConfig[symbol]
-    const msg = `tv ${symbol} ${name} ${interval} ${long}`
+    const msg = `tv bitmex ${symbol} ${name} ${interval} ${long}`
     console.log(msg)
     this._notifyPhone(msg)
     if (symbolTvAlertConfig) {

@@ -90,4 +90,9 @@ module.exports = class StrategyManager {
     }
     return strategy.orderLimitWithStop(data)
   }
+
+  watchTvAlert(params) {
+    this._list.forEach(item =>  item.watchTvAlert(params))
+    return Promise.resolve()
+  }
 }

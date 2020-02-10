@@ -30,7 +30,7 @@ class BinanceManager {
     exchangeInfoManager.fetchExchangeInfo()
     exchangeInfoManager.startIntervalToGetInfo(this._options.testnet)
 
-    console.log('BinanceManager options', {...this._options, apiKey: '', apiSecret: '' })
+    console.log('BinanceManager options', { ...this._options, apiKey: '', apiSecret: '' })
   }
 
   getOptions() {
@@ -107,9 +107,9 @@ class BinanceManager {
       Promise.all([
         sdk.orderStop(symbol, newParams.quantity, stopPx, closeSide, true),
         isOpenStop ?
-        Promise.reject('stop open 暂不支持')
-        :
-        sdk.orderLimit(symbol, newParams.quantity, side, newParams.price),
+          Promise.reject('stop open 暂不支持')
+          :
+          sdk.orderLimit(symbol, newParams.quantity, side, newParams.price),
         sdk.orderReduceOnlyLimitProfit(symbol, newParams.quantity, closeSide, profitPx, profitPx)
       ]).then(resolve).catch((e) => {
         console.log('binance manager orderLimitWithStop error', e)
@@ -153,6 +153,97 @@ class BinanceManager {
     const { on, token, user } = this._options.notify
     if ((on || force) && token && user) {
       notifyPhoneUser(`[${this._options.user}]${msg}`, token, user)
+    }
+  }
+
+  // 处理tradingview alert
+  watchTvAlert(params) {
+    try {
+      // const { symbol, name, interval, long } = params
+      const requiredKeys = ['symbol', 'name', 'interval', 'long', 'exchange', 'middlePrice', 'longStop']
+      if (requiredKeys.some(k => params[k] === undefined)) {
+        const msg = `${requiredKeys.toString()} is required in tv alert params`
+        console.log(msg)
+        throw msg
+      }
+      const newParams = {
+        ...params,
+        symbol: params.symbol.replace('PERP', '') // 请查看tradingview
+      }
+      if (params.exchange === 'BINANCE') {
+        this.checkTVParamAndOrder(newParams)
+      }
+    } catch (e) {
+      console.log(e)
+      return Promise.reject(e)
+    }
+    return Promise.resolve()
+  }
+
+  checkTVParamAndOrder(params) {
+    const { symbol, name, interval, long } = params
+    const symbolTvAlertConfig = this._options.limitStopProfit.symbolConfig[symbol].tvAlertConfig
+    const msg = `tv binance ${symbol} ${name} ${interval} ${long}`
+    console.log(msg)
+    this._notifyPhone(msg)
+    if (symbolTvAlertConfig) {
+      // enableLong enableShort 目前只支持手动开启
+      if (long && !symbolTvAlertConfig.enableLong || (!long && !symbolTvAlertConfig.enableShort)) {
+        console.log(`tv ${long ? 'long' : 'short'} is not enable`)
+        return
+      }
+      this.orderLimitStopProfitByTVParam(params)
+      // 重置开关, 需要手动打开, 为了安全
+      if (long) {
+        symbolTvAlertConfig.enableLong = false
+      } else {
+        symbolTvAlertConfig.enableShort = false
+      }
+      this.saveConfigToFile()
+    }
+    // const { symbol, side, amount, price, stopPx, openMethod } = data
+    // const sdk = this._orderManager.getSignatureSDK()
+  }
+
+  orderLimitStopProfitByTVParam(params) {
+    const { symbol, name, interval, long, middlePrice, longStop } = params
+    const symbolTvAlertConfig = this._options.limitStopProfit.symbolConfig[symbol].tvAlertConfig
+    if (interval === '1h' && name === 'A0') {
+      const { minStop, maxStop, risk, maxAmount, profitRate } = symbolTvAlertConfig
+      let price, stopPx, profitPx, amount = 0
+      if (long) {
+        price = exchangeInfoManager.transformPrice(symbol, middlePrice)
+        stopPx = longStop
+        const lowestStopPx = price - maxStop
+        const highestStopPx = price - minStop
+        // 止损价格需要在指定范围内
+        if (stopPx > highestStopPx) {
+          stopPx = highestStopPx
+        } else if (stopPx < lowestStopPx) {
+          stopPx = lowestStopPx
+        }
+        stopPx = exchangeInfoManager.transformPrice(symbol, stopPx)
+        const risks = price - stopPx
+        profitPx = price + (risks * profitRate)
+        profitPx = exchangeInfoManager.transformPrice(symbol, profitPx)
+        const diffP = Math.abs(stopPx - price)
+        amount = Math.round((risk / diffP) * price)
+        amount = Math.min(amount, maxAmount)
+        const side = long ? 'BUY' : 'SELL'
+        const openMethod = 'limit'
+        const data = {
+          symbol,
+          side,
+          openMethod,
+          price,
+          stopPx,
+          profitPx,
+          amount,
+        }
+        this._notifyPhone(`binance [${symbol}] tv auto open position!`)
+        this.orderLimitWithStop(data)
+      }
+      // todo: short
     }
   }
 }

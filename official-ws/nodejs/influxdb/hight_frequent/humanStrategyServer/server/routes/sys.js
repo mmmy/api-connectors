@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const manager = require('../strategy')
+const binanceManager = require('../binance_strategy')
 
 router.post('/reboot', function (req, res, next) {
   const { pwd } = req.body
@@ -15,6 +16,7 @@ router.post('/reboot', function (req, res, next) {
 router.post('/wh', function (req, res) {
   // const { symbol, name, interval } = req.body
   manager.watchTvAlert(req.body)
+  binanceManager.watchTvAlert(req.body)
   res.send({
     result: true
   })

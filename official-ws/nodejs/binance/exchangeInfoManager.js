@@ -83,9 +83,16 @@ function adjustOrderParam(symbol, price, usdt, isMarket) {
   }
 }
 
+function transformPrice(symbol, price) {
+  const symbolInfo = getSymbolConfig(symbol)
+  price = Math.round(price / symbolInfo.priceStepSize) * symbolInfo.priceStepSize
+  return price
+}
+
 exports.getSymbolPriceStepSize = getSymbolPriceStepSize
 exports.getSymbolQuantityStepSize = getSymbolQuantityStepSize
 exports.getSymbolMarketQuantityStepSize = getSymbolMarketQuantityStepSize
 exports.getSymbolConfig = getSymbolConfig
 exports.getExchangeInfo = () => data
 exports.adjustOrderParam = adjustOrderParam
+exports.transformPrice = transformPrice
