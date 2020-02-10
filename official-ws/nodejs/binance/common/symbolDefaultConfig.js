@@ -21,12 +21,17 @@ exports.symbolConfigDefault = {
     },
     uiConfig: {
       risk: 100, //$100
-      openMethod: 'limit',   // limit or stop
       defaultProfitRate: 2,
-      side: 'BUY',
-      price: 0,
-      stopPx: 0,
-      profitPx: 0,
+      BUY: {
+        price: 0,
+        stopPx: 0,
+        profitPx: 0,
+      },
+      SELL: {
+        price: 0,
+        stopPx: 0,
+        profitPx: 0,
+      }
     }
   },
   'ETHUSDT': {
@@ -49,12 +54,17 @@ exports.symbolConfigDefault = {
     },
     uiConfig: {
       risk: 100, //$100
-      openMethod: 'limit',   // limit or stop
       defaultProfitRate: 2,
-      side: 'BUY',
-      price: 0,
-      stopPx: 0,
-      profitPx: 0,
+      BUY: {
+        price: 0,
+        stopPx: 0,
+        profitPx: 0,
+      },
+      SELL: {
+        price: 0,
+        stopPx: 0,
+        profitPx: 0,
+      }
     }
   },
 }

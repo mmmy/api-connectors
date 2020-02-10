@@ -43,7 +43,7 @@ function getSymbolQuantityPrecision(symbol) {
 function getSymbolPriceStepSize(symbol) {
   const info = getSymbolData(symbol)
   if (info) {
-    return info.filters.find(f => f.filterType === 'PRICE_FILTER').stepSize
+    return info.filters.find(f => f.filterType === 'PRICE_FILTER').tickSize
   }
 }
 // 限价最小数量的基数

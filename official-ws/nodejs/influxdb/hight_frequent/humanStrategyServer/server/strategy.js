@@ -128,7 +128,7 @@ if (isProduction) {
 list.forEach(option => {
   manager.addStrategy(option)
 })
-
+/*
 const bitmexPublic = new BitmexManager({
   testnet: !isProduction,
   // apiKeyID: options.apiKey,
@@ -172,6 +172,7 @@ symbols5m.forEach(symbol => {
     manager.setCandlesHistory(list, symbol, '5m')
   }, dataCb, symbol)
 })
+*/
 
 // manager.addStrategy({
 //   user: 'bot',

@@ -1,5 +1,6 @@
 import React from 'react'
 import axios from 'axios'
+import StopLimitProfit from './StopLimitProfit'
 
 const assetKeys = {
   asset: 'asset',
@@ -52,7 +53,10 @@ export default class BinanceMainPage extends React.Component {
   }
 
   render() {
-    const { logs, pending } = this.state
+    const { logs, pending, data } = this.state
+    if (!data) {
+      return 'waiting'
+    }
     return <div className="trade-container">
       <div>
         {this.renderMargin()}
@@ -60,6 +64,13 @@ export default class BinanceMainPage extends React.Component {
         {this.renderPostions()}
         <br />
         {this.renderOrders()}
+        <br />
+        <StopLimitProfit
+          options={data.options}
+          onChangeOption={this.fetchChangeUserOption}
+          onFetchUserData={this.fetchUserData}
+          exchangeInfo={data.exchangeInfo}
+        />
       </div>
       <div className="logs">
         <h5>日志</h5>
@@ -287,5 +298,28 @@ export default class BinanceMainPage extends React.Component {
         this.pushLog(e)
       })
     }
+  }
+
+  fetchChangeUserOption = (path, value) => {
+    var userData = this.state.data
+    const { user } = userData.options
+    this.startPending()
+    return new Promise((resolve, reject) => {
+      axios.post('/api/bn/change_option', { user, path, value }).then(({ status, data }) => {
+        this.stopPending()
+        if (status === 200 && data.result) {
+          alert('修改成功')
+          this.fetchUserData()
+          resolve()
+        } else {
+          this.pushLog(data.info)
+          reject()
+        }
+      }).catch(e => {
+        this.stopPending()
+        this.pushLog(e)
+        reject()
+      })
+    })
   }
 }

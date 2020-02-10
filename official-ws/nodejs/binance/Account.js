@@ -242,7 +242,7 @@ class Account {
       return
     }
     this._accountDataManager.listenData(data)
-    console.log(this._accountDataManager.getData())
+    // console.log(this._accountDataManager.getData())
     // console.log(data)
   }
 

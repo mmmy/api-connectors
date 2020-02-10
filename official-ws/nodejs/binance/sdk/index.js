@@ -121,6 +121,19 @@ class BinanceSDK {
     }
     return this.order(data)
   }
+  // 限价止盈，因为可以空仓设置，所以设置这个不错
+  orderReduceOnlyLimitProfit(symbol, quantity, side, price, stopPrice) {
+    const data = {
+      symbol,
+      quantity,
+      side,
+      price,
+      stopPrice,
+      type: 'TAKE_PROFIT',
+      reduceOnly: true,
+    }
+    return this.order(data)
+  }
 
   deleteOrder(symbol, orderId) {
     const url = this.getUrl('/fapi/v1/order')

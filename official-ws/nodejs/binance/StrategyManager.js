@@ -64,4 +64,30 @@ module.exports = class StrategyManager {
     }
     return strategy.getSignatureSDK().deleteOrder(symbol, orderID)
   }
+
+  updateOption(user, path, value) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    strategy.updateOption(path, value)
+    return Promise.resolve(strategy.getOptions())
+  }
+
+  updateOptions(user, options) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    strategy.updateOptions(options)
+    return Promise.resolve(strategy.getOptions())
+  }
+
+  orderLimitWithStop(user, data) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)      
+    }
+    return strategy.orderLimitWithStop(data)
+  }
 }
