@@ -8,6 +8,8 @@ const PirceUnitMap = {
   'ETHUSD': 0.05,
 }
 
+const Intervals = ['4h', '1h', '30']
+
 function transformPrice(symbol, price) {
   const unit = PirceUnitMap[symbol]
   const rate = 1 / unit
@@ -131,6 +133,7 @@ export default class OrderLimitWithStop extends React.Component {
             <th>symbol</th>
             {tvConfigKeys.map(k => <th>{k}</th>)}
             <th></th>
+            <th>support intervals</th>
           </tr></thead>
           <tbody>
             {
@@ -144,6 +147,18 @@ export default class OrderLimitWithStop extends React.Component {
                   <input checked={tvAlertConfig[s]['enableShort']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableShort')}/>空
                 </td>
                 rows.push(switchTd)
+                const intervalsTd = <td>
+                  {
+                    Intervals.map(inter => <span>
+                      <input
+                        checked={tvAlertConfig[s]['supportIntervals'].indexOf(inter) > -1}
+                        type="checkbox"
+                        onChange={this.onChangeTvConfigInterval.bind(this, s, inter)}
+                    />{inter}&nbsp;&nbsp;
+                    </span>)
+                  }
+                </td>
+                rows.push(intervalsTd)
                 return <tr>{rows}</tr>
               })
             }
@@ -278,6 +293,19 @@ export default class OrderLimitWithStop extends React.Component {
     const newVal = e.target.checked
     const path = `limitStopProfit.tvAlertConfig.${symbol}.${key}`
     onChangeOption(index, path, +newVal)
+  }
+
+  onChangeTvConfigInterval(symbol, interval) {
+    const { options, index, onChangeOption } = this.props
+    const { tvAlertConfig } = options.limitStopProfit
+    let supportIntervals = tvAlertConfig[symbol].supportIntervals
+    if (supportIntervals.indexOf(interval) > -1) {
+      supportIntervals = supportIntervals.filter(t => t !== interval)
+    } else {
+      supportIntervals.push(interval)
+    }
+    const path = `limitStopProfit.tvAlertConfig.${symbol}.supportIntervals`
+    onChangeOption(index, path, supportIntervals)
   }
 
   fetchOrder = () => {

@@ -78,7 +78,7 @@ if (isProduction) {
     marginFilePath: path.join(__dirname, 'godice.marigin.csv'),
   })
 
-} else if (false) {
+} else {
   var qqTest = require('../../../../strategy/apikey/test-secret.json')
   var yqheroTest = require('../../../../strategy/apikey/test-secret-yqhero.json')
   list.push({
@@ -128,7 +128,7 @@ if (isProduction) {
 list.forEach(option => {
   manager.addStrategy(option)
 })
-/*
+
 const bitmexPublic = new BitmexManager({
   testnet: !isProduction,
   // apiKeyID: options.apiKey,
@@ -172,7 +172,7 @@ symbols5m.forEach(symbol => {
     manager.setCandlesHistory(list, symbol, '5m')
   }, dataCb, symbol)
 })
-*/
+
 
 // manager.addStrategy({
 //   user: 'bot',

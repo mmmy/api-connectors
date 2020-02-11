@@ -160,6 +160,9 @@ class BinanceManager {
   watchTvAlert(params) {
     try {
       // const { symbol, name, interval, long } = params
+      if (params.exchange !== 'BINANCE') {
+        return
+      }
       const requiredKeys = ['symbol', 'name', 'interval', 'long', 'exchange', 'middlePrice', 'longStop']
       if (requiredKeys.some(k => params[k] === undefined)) {
         const msg = `${requiredKeys.toString()} is required in tv alert params`
@@ -170,9 +173,7 @@ class BinanceManager {
         ...params,
         symbol: params.symbol.replace('PERP', '') // 请查看tradingview
       }
-      if (params.exchange === 'BINANCE') {
-        this.checkTVParamAndOrder(newParams)
-      }
+      this.checkTVParamAndOrder(newParams)
     } catch (e) {
       console.log(e)
       return Promise.reject(e)

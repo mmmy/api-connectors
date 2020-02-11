@@ -139,6 +139,7 @@ class FlowDataBase {
             profitRate: 2,
             enableLong: false,
             enableShort: false,
+            supportIntervals: ['1h'],
           },
           'ETHUSD': {
             minStop: 1,
@@ -148,6 +149,7 @@ class FlowDataBase {
             profitRate: 2,
             enableLong: false,
             enableShort: false,
+            supportIntervals: ['1h'],
           },
         },
         kRateForPrice: 0.5, // or 0.618
@@ -1677,84 +1679,111 @@ class FlowDataBase {
     return Promise.resolve()
   }
 
+  promiseGetPrices(params) {
+    const { symbol, name, interval, long, middlePrice, longStop, shortStop } = params
+    if (middlePrice && ((long && longStop) || (!long && shortStop))) {
+      return Promise.resolve({
+        middlePrice,
+        longStop,
+        shortStop
+      })
+    }
+    return new Promise((resolve, reject) => {
+      this.waitForLastestCandle(symbol, interval).then(() => {
+        const candleManager = this.getCandleManager(interval)
+        const lastCandle = candleManager.getHistoryCandle(symbol)
+        const { maxHigh, minLow } = candleManager.getMinMaxHighLow(symbol, 5)
+        const precision = precisionMap[symbol]
+        // const quto = this.getLatestQuote(symbol)
+        let middlePrice = (lastCandle.high + lastCandle.low) / 2
+        middlePrice = transformPrice(symbol, middlePrice)
+        const longStop = minLow - precision
+        const shortStop = maxHigh + precision
+        resolve({
+          middlePrice,
+          longStop,
+          shortStop
+        })
+      }).catch(reject)
+    })
+  }
+
   waitCandleAndOrderLimitStop(params) {
     const { symbol, name, interval, long } = params
     const symbolTvConfig = this._options.limitStopProfit.tvAlertConfig[symbol]
-    this.waitForLastestCandle(symbol, interval).then(() => {
-      if (interval === '1h' && name === 'A0') {
-        //TODO: amount price, stopPx, profitPx
-        const { minStop, maxStop, risk, maxAmount, profitRate } = symbolTvConfig
-        const candleManager1h = this.getCandleManager('1h')
-        const lastCandle = candleManager1h.getHistoryCandle(symbol)
-        const { maxHigh, minLow } = candleManager1h.getMinMaxHighLow(symbol, 5)
-        const precision = precisionMap[symbol]
-        const quto = this.getLatestQuote(symbol)
-        let middlePrice = (lastCandle.high + lastCandle.low) / 2
-        middlePrice = transformPrice(symbol, middlePrice)
-
-        let price, stopPx, profitPx, amount = 0
-
-        if (long) {
-          price = Math.min(middlePrice, quto.askPrice - precision)
-          stopPx = minLow - precision
-          const lowestStopPx = price - maxStop
-          const highestStopPx = price - minStop
-          // 止损价格需要在指定范围内
-          if (stopPx > highestStopPx) {
-            stopPx = highestStopPx
-          } else if (stopPx < lowestStopPx) {
-            stopPx = lowestStopPx
+    return new Promise((resolve, reject) => {
+      this.promiseGetPrices(params).then((prices) => {
+        const { minStop, maxStop, risk, maxAmount, profitRate, supportIntervals } = symbolTvConfig
+        if (name === 'A0') {
+          const quto = this.getLatestQuote(symbol)
+          const precision = precisionMap[symbol]
+          const { middlePrice, longStop, shortStop } = prices
+          let price, stopPx, profitPx, amount = 0
+          
+          if (long) {
+            price = Math.min(middlePrice, quto.askPrice - precision)
+            stopPx = longStop
+            const lowestStopPx = price - maxStop
+            const highestStopPx = price - minStop
+            // 止损价格需要在指定范围内
+            if (stopPx > highestStopPx) {
+              stopPx = highestStopPx
+            } else if (stopPx < lowestStopPx) {
+              stopPx = lowestStopPx
+            }
+            stopPx = transformPrice(symbol, stopPx)
+            const risks = price - stopPx
+            profitPx = price + (risks * profitRate)
+          } else {
+            price = Math.max(middlePrice, quto.bidPrice + precision)
+            stopPx = shortStop
+            const highestStopPx = price + maxStop
+            const lowestStopPx = price + minStop
+            if (stopPx > highestStopPx) {
+              stopPx = highestStopPx
+            } else if (stopPx < lowestStopPx) {
+              stopPx = lowestStopPx
+            }
+            stopPx = transformPrice(symbol, stopPx)
+            const risks = stopPx - price
+            profitPx = price - (risks * profitRate)
           }
-          stopPx = transformPrice(symbol, stopPx)
-          const risks = price - stopPx
-          profitPx = price + (risks * profitRate)
-        } else {
-          price = Math.max(middlePrice, quto.bidPrice + precision)
-          stopPx = maxHigh + precision
-          const highestStopPx = price + maxStop
-          const lowestStopPx = price + minStop
-          if (stopPx > highestStopPx) {
-            stopPx = highestStopPx
-          } else if (stopPx < lowestStopPx) {
-            stopPx = lowestStopPx
+  
+          profitPx = transformPrice(symbol, profitPx)
+          const diffP = Math.abs(stopPx - price)
+          amount = Math.round((risk / diffP) * price)
+          amount = Math.min(amount, maxAmount)
+  
+          const side = long ? 'Buy' : 'Sell'
+          const openMethod = 'limit'
+          const data = {
+            symbol,
+            side,
+            openMethod,
+            price,
+            stopPx,
+            profitPx,
+            amount,
           }
-          stopPx = transformPrice(symbol, stopPx)
-          const risks = stopPx - price
-          profitPx = price - (risks * profitRate)
+  
+          console.log('tv auto open position!', data)
+          this._notifyPhone(`[${symbol}] tv auto open position!`)
+  
+          this.orderLimitWithStop(data)
+          // save config
+          const curSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
+          curSymbolConfig.price = price
+          curSymbolConfig.side = side
+          curSymbolConfig.profitPx = profitPx
+          curSymbolConfig.stopPx = stopPx
+          curSymbolConfig.openMethod = openMethod
+          this.saveConfigToFile()
+          resolve()
         }
-
-        profitPx = transformPrice(symbol, profitPx)
-        const diffP = Math.abs(stopPx - price)
-        amount = Math.round((risk / diffP) * price)
-        amount = Math.min(amount, maxAmount)
-
-        const side = long ? 'Buy' : 'Sell'
-        const openMethod = 'limit'
-        const data = {
-          symbol,
-          side,
-          openMethod,
-          price,
-          stopPx,
-          profitPx,
-          amount,
-        }
-
-        console.log('tv auto open position!', data)
-        this._notifyPhone(`[${symbol}] tv auto open position!`)
-
-        this.orderLimitWithStop(data)
-        // save config
-        const curSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
-        curSymbolConfig.price = price
-        curSymbolConfig.side = side
-        curSymbolConfig.profitPx = profitPx
-        curSymbolConfig.stopPx = stopPx
-        curSymbolConfig.openMethod = openMethod
-        this.saveConfigToFile()
-      }
-    }).catch((errorMsg) => {
-      console.log('waitForLastestCandle error:', errorMsg)
+      }).catch((errorMsg) => {
+        console.log('waitForLastestCandle error:', errorMsg)
+        reject()
+      })
     })
   }
 
@@ -1812,25 +1841,28 @@ class FlowDataBase {
   }
 
   orderLimitStopProfitByParam(params) {
-    const { symbol, name, interval, long } = params
+    const { symbol, name, interval, long, middlePrice, longStop, shortStop } = params
     const symbolTvAlertConfig = this._options.limitStopProfit.tvAlertConfig[symbol]
     const msg = `tv bitmex ${symbol} ${name} ${interval} ${long}`
-    console.log(msg)
-    this._notifyPhone(msg)
+    // console.log(msg)
+    // this._notifyPhone(msg)
     if (symbolTvAlertConfig) {
       // enableLong enableShort 目前只支持手动开启
       if (long && !symbolTvAlertConfig.enableLong || (!long && !symbolTvAlertConfig.enableShort)) {
-        console.log(`tv ${long ? 'long' : 'short'} is not enable`)
+        // console.log(`tv ${long ? 'long' : 'short'} is not enable`)
         return
       }
-      this.waitCandleAndOrderLimitStop(params)
-      // 重置开关, 需要手动打开, 为了安全
-      if (long) {
-        symbolTvAlertConfig.enableLong = false
-      } else {
-        symbolTvAlertConfig.enableShort = false
+      if (symbolTvAlertConfig.supportIntervals.indexOf(interval) > -1) {
+        this.waitCandleAndOrderLimitStop(params).then(() => {
+          // 重置开关, 需要手动打开, 为了安全
+          if (long) {
+            symbolTvAlertConfig.enableLong = false
+          } else {
+            symbolTvAlertConfig.enableShort = false
+          }
+          this.saveConfigToFile()
+        })
       }
-      this.saveConfigToFile()
     }
     // const { symbol, side, amount, price, stopPx, openMethod } = data
     // const sdk = this._orderManager.getSignatureSDK()
