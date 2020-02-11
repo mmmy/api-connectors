@@ -16,7 +16,7 @@ npm-debug.log
 **/temp
 official-ws/nodejs/strategy/data/*.json
 official-ws/nodejs/influxdb/hight_frequent/bitmexDataSignal/web/build.zip
-official-ws/nodejs/strategy/apikey/test-secret-yqhero.json
+official-ws/nodejs/strategy/apikey/*.json
 official-ws/nodejs/strategy/backtest/test_rsi/report/*.html
 official-ws/nodejs/strategy/backtest/**/*.pdf
 official-ws/nodejs/influxdb/hight_frequent/humanStrategyServer/server/*.config.json

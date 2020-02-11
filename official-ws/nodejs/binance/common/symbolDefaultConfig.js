@@ -18,6 +18,7 @@ exports.symbolConfigDefault = {
       profitRate: 2,
       enableLong: false,
       enableShort: false,
+      supportIntervals: ['1h'],
     },
     uiConfig: {
       risk: 100, //$100
@@ -51,6 +52,7 @@ exports.symbolConfigDefault = {
       profitRate: 2,
       enableLong: false,
       enableShort: false,
+      supportIntervals: ['1h'],
     },
     uiConfig: {
       risk: 100, //$100

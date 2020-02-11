@@ -2,7 +2,7 @@ import React from 'react'
 import axios from 'axios'
 
 const tvConfigKeys = ['minStop', 'maxStop', 'risk', 'maxAmount', 'profitRate']
-
+const Intervals = ['4h', '1h', '30']
 
 export default class StopLimitProfit extends React.Component {
   constructor(props) {
@@ -113,6 +113,7 @@ export default class StopLimitProfit extends React.Component {
           <th>symbol</th>
           {tvConfigKeys.map(k => <th>{k}</th>)}
           <th></th>
+          <th>support intervals</th>
         </tr></thead>
         <tbody>
           {
@@ -127,6 +128,18 @@ export default class StopLimitProfit extends React.Component {
                   <input checked={tvAlertConfig['enableShort']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableShort')} />空
                 </td>
               rows.push(switchTd)
+              const intervalsTd = <td>
+                {
+                  Intervals.map(inter => <span>
+                    <input
+                      checked={tvAlertConfig['supportIntervals'].indexOf(inter) > -1}
+                      type="checkbox"
+                      onChange={this.onChangeTvConfigInterval.bind(this, s, inter)}
+                    />{inter}&nbsp;&nbsp;
+                </span>)
+                }
+              </td>
+              rows.push(intervalsTd)
               return <tr>{rows}</tr>
             })
           }
@@ -162,6 +175,19 @@ export default class StopLimitProfit extends React.Component {
     const newVal = e.target.checked
     const path = `limitStopProfit.symbolConfig.${symbol}.tvAlertConfig.${key}`
     onChangeOption(path, newVal)
+  }
+
+  onChangeTvConfigInterval(symbol, interval) {
+    const { options, onChangeOption } = this.props
+    const { tvAlertConfig } = options.limitStopProfit.symbolConfig[symbol]
+    let supportIntervals = tvAlertConfig.supportIntervals
+    if (supportIntervals.indexOf(interval) > -1) {
+      supportIntervals = supportIntervals.filter(t => t !== interval)
+    } else {
+      supportIntervals.push(interval)
+    }
+    const path = `limitStopProfit.symbolConfig.${symbol}.tvAlertConfig.supportIntervals`
+    onChangeOption(path, supportIntervals)
   }
 
   handleChangeValue(key, e) {
