@@ -183,7 +183,8 @@ class BinanceManager {
 
   checkTVParamAndOrder(params) {
     const { symbol, name, interval, long } = params
-    const symbolTvAlertConfig = this._options.limitStopProfit.symbolConfig[symbol].tvAlertConfig
+    const currentSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
+    const symbolTvAlertConfig = currentSymbolConfig && currentSymbolConfig.tvAlertConfig
     const msg = `tv binance ${symbol} ${name} ${interval} ${long}`
     if (symbolTvAlertConfig) {
       // enableLong enableShort 目前只支持手动开启
