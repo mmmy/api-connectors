@@ -159,6 +159,12 @@ export default class OrderLimitWithStop extends React.Component {
                   }
                 </td>
                 rows.push(intervalsTd)
+                const autoStopTd = <td>
+                  <span>{tvAlertConfig[s].profitRateForUpdateStop}</span>
+                  <input checked={tvAlertConfig[s]['autoUpdateStop']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'autoUpdateStop')}/>
+                  自动保本
+                </td>
+                rows.push(autoStopTd)
                 return <tr>{rows}</tr>
               })
             }

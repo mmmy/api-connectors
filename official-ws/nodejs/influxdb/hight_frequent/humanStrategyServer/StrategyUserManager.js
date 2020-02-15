@@ -276,6 +276,14 @@ module.exports = class StrategyUserManager {
     return Promise.resolve(strategy.updateAutoOrderSignal(index, auto_order))
   }
 
+  setStopAtCostPrice(user, symbol) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return strategy.setStopAtCostPrice(symbol)
+  }
+
   deleteAutoOrderSignal(user, index) {
     const strategy = this.findStrategyByUser(user)
     if (!strategy) {

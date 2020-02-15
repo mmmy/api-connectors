@@ -140,6 +140,8 @@ class FlowDataBase {
             enableLong: false,
             enableShort: false,
             supportIntervals: ['1h'],
+            autoUpdateStop: true,       // 当盈利达到1：1.5后将止损移动到成本位
+            profitRateForUpdateStop: 1.5,
           },
           'ETHUSD': {
             minStop: 1,
@@ -150,6 +152,8 @@ class FlowDataBase {
             enableLong: false,
             enableShort: false,
             supportIntervals: ['1h'],
+            autoUpdateStop: true,
+            profitRateForUpdateStop: 1.5,
           },
         },
         kRateForPrice: 0.5, // or 0.618
@@ -319,6 +323,37 @@ class FlowDataBase {
 
   updateQuote(json, symbol) {
     this._accountQuote.update(json, symbol)
+    this.watchQuoteUpdate(symbol)
+  }
+
+  watchQuoteUpdate(symbol) {
+    const quto = this.getLatestQuote(symbol)
+    const positionQty = this._accountPosition.getCurrentQty(symbol)
+    const absPositionQty = Math.abs(positionQty)
+    const { symbolConfig, tvAlertConfig } = this._options.limitStopProfit
+    const currentConfig = symbolConfig[symbol]
+    const currentTvConfig = tvAlertConfig[symbol]
+    // 自动更新止损，放到止损位
+    if (absPositionQty > 0 && currentTvConfig && currentTvConfig.autoUpdateStop) {
+
+      const longPosition = positionQty > 0
+      const isConfigLong = currentConfig.side === 'Buy'
+      const isSameSide = (isConfigLong && longPosition) || (!isConfigLong && !longPosition)
+      //检查是否是相同的止损，否则不设置
+      const stopOrders = this._accountOrder.getStopOrders(symbol, longPosition ? 'Sell' : 'Buy')
+      const matchStopOrder = stopOrders.filter(o => o.stopPx === +currentConfig.stopPx)[0]
+      if (isSameSide && matchStopOrder) {
+        const profitAutoPrice = this.getShouldSetProfitPrice(symbol)
+        // long
+        if (longPosition && quto.bidPrice > profitAutoPrice) {
+          this.setStopAtCostPrice(symbol)
+        }
+        // short
+        if (!longPosition && quto.bidPrice < profitAutoPrice) {
+          this.setStopAtCostPrice(symbol)
+        }
+      }
+    }
   }
 
   updateMargin(json) {
@@ -1589,6 +1624,56 @@ class FlowDataBase {
     if (candleManager) {
       return candleManager.getHistoryCandle(symbol, offset + 1)
     }
+  }
+
+  setStopAtCostPrice(symbol) {
+    const positionQty = this._accountPosition.getCurrentQty(symbol)
+  
+    const urPnlProfit = this._accountPosition.getUrPnlProfit(symbol)
+    const absPositionQty = Math.abs(positionQty)
+    // const unit = precisionMap[symbol]
+    return new Promise((resolve, reject) => {
+      if (absPositionQty > 0) {
+        if (urPnlProfit < 0) {
+          reject('亏损中，不能设置保本止损')
+        }
+        const costPrice = this._accountPosition.getCostPrice(symbol)
+        const isLongPosition = positionQty > 0
+        const priceOffset = costPrice * 0.00075
+        let stopPrice = isLongPosition ? (costPrice + priceOffset) : (costPrice - priceOffset)
+        stopPrice = transformPrice(symbol, stopPrice)
+        const stopOrders = this._accountOrder.getStopOrders(symbol, isLongPosition ? 'Sell' : 'Buy')
+        const matchStopOrder = stopOrders.filter(o => o.stopPx === +stopPrice)[0]
+        if (matchStopOrder) {
+          const qty = matchStopOrder.orderQty
+          const lessQty = absPositionQty - qty
+          if (lessQty > 0) {
+            this._orderManager.getSignatureSDK().updateOrder({
+              orderID: matchStopOrder.orderID,
+              orderQty: matchStopOrder.orderQty + lessQty,
+            }).then(resolve).catch(reject)
+          } else {
+            resolve('已经存在保本止损') 
+          }
+        } else {
+          this._orderManager.getSignatureSDK().orderStop(symbol, absPositionQty, stopPrice, isLongPosition ? 'Sell' : 'Buy', true).then(resolve).catch(reject)
+        }
+      } else {
+        resolve('没有仓位无需设置保本止损')
+      }
+    })
+  }
+
+  getShouldSetProfitPrice(symbol) {
+    const { symbolConfig, tvAlertConfig } = this._options.limitStopProfit
+    const currentConfig = symbolConfig[symbol]
+    const currentTvConfig = tvAlertConfig[symbol]
+    const { profitRateForUpdateStop } = currentTvConfig
+    const isConfigLong = currentConfig.side === 'Buy'
+    const stopGap = Math.abs(currentConfig.stopPx - currentConfig.price)
+    const profitGap = profitRateForUpdateStop * stopGap
+    let updatePrice = +currentConfig.price + (isConfigLong ? profitGap : -profitGap)
+    return transformPrice(symbol, updatePrice) 
   }
 
   checkOrderLimitStopProfitStaus(symbol) {

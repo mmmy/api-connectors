@@ -99,7 +99,9 @@ export default class Trade extends React.Component {
                 <table style={{ fontSize: '12px' }}>
                   <thead>
                     <tr>
-                      {[<th></th>].concat(positionKeys.map(key => <th>{positionKeyText[key] || key}</th>))}
+                      {[<th></th>].concat(positionKeys.map(key => <th>{positionKeyText[key] || key}</th>)).concat(
+                        <th></th>
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -124,7 +126,9 @@ export default class Trade extends React.Component {
                                 }
                               }
                               return <td className={cn} onClick={this.handlePositionCellClick.bind(this, i, position, key)}>{format}</td>
-                            }))}
+                            })).concat(
+                              <td><button onClick={this.handleSetCostStop.bind(this,i, position.symbol)}>cost stop</button></td>
+                            )}
                         </tr>
                       })
                     }
@@ -842,6 +846,28 @@ export default class Trade extends React.Component {
   handleReboot() {
     if (window.confirm('确认重启, 会影响别的用户使用, 请确认后, 再刷新页面!')) {
       axios.post('api/sys/reboot', {})
+    }
+  }
+
+  handleSetCostStop(index, symbol) {
+    var userData = this.state.users[index]
+    const { user } = userData.options
+    if (window.confirm(`${symbol} 设置保本止损？`)) {
+      userData.pending = true
+      this.setState({})
+      axios.post('/api/coin/set_stop_at_const_pirce', { user, symbol }).then(({ status, data }) => {
+        userData.pending = false
+        if (status === 200 && data.result) {
+          alert(`修改成功:${data.data}`)
+          this.fetchUserList()
+        } else {
+          alert(data.info)
+          this.pushLog(data.info)
+        }
+      }).catch(e => {
+        userData.pending = false
+        this.pushLog(e)
+      })
     }
   }
 }

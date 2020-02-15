@@ -455,6 +455,28 @@ router.post('/update_auto_order_signal', function (req, res) {
   })
 })
 
+router.post('/set_stop_at_const_pirce', function (req, res) {
+  const { user, symbol } = req.body
+  if (!user || symbol === undefined) {
+    res.send({
+      result: false,
+      info: '缺少user, symbol参数'
+    })
+    return
+  }
+  manager.setStopAtCostPrice(user, symbol).then(json => {
+    res.send({
+      result: true,
+      data: json
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
+    })
+  })
+})
+
 router.post('/delete_auto_order_signal', function (req, res) {
   const { user, index } = req.body
   if (!user || index === undefined) {

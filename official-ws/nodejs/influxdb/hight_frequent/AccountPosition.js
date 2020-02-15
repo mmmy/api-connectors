@@ -48,6 +48,10 @@ class AccountPosition {
     return this.getPositionData(symbol) || {}
   }
 
+  getUrPnlProfit(symbol) {
+    return this.getPositionData(symbol).unrealisedPnl || 0
+  }
+
   getCurrentQty(symbol = 'XBTUSD') {
     return this.getPosition(symbol).currentQty || 0
   }
