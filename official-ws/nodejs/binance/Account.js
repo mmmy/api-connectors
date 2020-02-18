@@ -3,6 +3,8 @@ const BinanceSDK = require('./sdk')
 const WebSocketClient = require('../lib/ReconnectingSocket')
 const utils = require('./common/utils')
 
+const NOT_STATUS = ['FILLED', 'CANCELED', 'STOPPED', 'REJECTED', 'EXPIRED']
+
 const OrderKeyMap = {
   s: 'symbol',
   c: 'clientOrderId',
@@ -101,14 +103,14 @@ class AccountDataManager {
   }
 
   setOrders(orders) {
-    this._ordersData = orders
+    this._ordersData = orders || []
   }
 
   updateOrdersData(data) {
     const order = transformOrderData(data.o)
     this._ordersData = this._ordersData.filter(o => o.symbol !== order.symbol || o.orderId !== order.orderId)
     this._ordersData.push(order)
-    if (['FILLED', 'CANCELED', 'STOPPED', 'REJECTED', 'EXPIRED'].indexOf(order.status) > -1) {
+    if (NOT_STATUS.indexOf(order.status) > -1) {
       // 一天后过滤掉没有用的
       setTimeout(() => {
         this._filterOrder(order)
@@ -125,6 +127,26 @@ class AccountDataManager {
       account: this._accountData,
       orders: this._ordersData,
     }
+  }
+
+  getValidOrders() {
+    return this._ordersData.filter(o => NOT_STATUS.indexOf(o.status) === -1)
+  }
+
+  getStopOrders(symbol, side) {
+    return this.getValidOrders().filter(o => 
+      o.type === 'STOP_MARKET' &&
+      o.symbol === symbol &&
+      o.side === side
+    )
+  }
+
+  getProfitOrders(symbol, side) {
+    return this.getValidOrders().filter(o => 
+      o.type === 'TAKE_PROFIT' &&
+      o.symbol === symbol &&
+      o.side === side
+    )
   }
 }
 
@@ -279,6 +301,14 @@ class Account {
 
   getSignatureSDK() {
     return this._userSdk
+  }
+
+  getStopOrders(symbol, side) {
+    return this._accountDataManager.getStopOrders(symbol, side)
+  }
+
+  getProfitOrders(symbol, side) {
+    return this._accountDataManager.getProfitOrders(symbol, side)
   }
 }
 

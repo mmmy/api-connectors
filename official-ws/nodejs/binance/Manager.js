@@ -30,6 +30,8 @@ class BinanceManager {
     exchangeInfoManager.fetchExchangeInfo()
     exchangeInfoManager.startIntervalToGetInfo(this._options.testnet)
 
+    this.initAutoOrderProfitOrderInterval()
+
     console.log('BinanceManager options', { ...this._options, apiKey: '', apiSecret: '' })
   }
 
@@ -104,16 +106,28 @@ class BinanceManager {
     }
     const closeSide = side === 'BUY' ? 'SELL' : 'BUY'
     return new Promise((resolve, reject) => {
-      Promise.all([
-        sdk.orderStop(symbol, newParams.quantity, stopPx, closeSide, true),
+      sdk.orderStop(symbol, newParams.quantity, stopPx, closeSide, true).then(() => {
         isOpenStop ?
-          Promise.reject('stop open 暂不支持')
+          reject('stop open 暂不支持')
           :
-          sdk.orderLimit(symbol, newParams.quantity, side, newParams.price),
-        sdk.orderReduceOnlyLimitProfit(symbol, newParams.quantity, closeSide, profitPx, profitPx)
-      ]).then(resolve).catch((e) => {
-        console.log('binance manager orderLimitWithStop error', e)
-        this._notifyPhone('binance manager orderLimitWithStop error', true)
+          sdk.orderLimit(symbol, newParams.quantity, side, newParams.price).then((result) => {
+            sdk.orderReduceOnlyLimitProfit(symbol, newParams.quantity, closeSide, profitPx, profitPx)
+            // 保存数据，用来自动设置止盈止损用
+            const curSymbolOrderConfig = this._options.limitStopProfit.symbolConfig[symbol].orderConfig
+            curSymbolOrderConfig.price = price
+            curSymbolOrderConfig.side = side
+            curSymbolOrderConfig.profitPx = profitPx
+            curSymbolOrderConfig.stopPx = stopPx
+            curSymbolOrderConfig.openMethod = openMethod
+            this.saveConfigToFile()
+            resolve(result)
+          }).catch(e => {
+            console.log('binance manager orderLimitWithStop:orderLimit error', e)
+            this._notifyPhone('binance manager orderLimitWithStop:orderLimit error', true)
+          })
+      }).catch(e => {
+        console.log('binance manager orderLimitWithStop:orderStop error', e)
+        this._notifyPhone('binance manager orderLimitWithStop:orderStop error', true)
         reject(e)
       })
     })
@@ -255,6 +269,60 @@ class BinanceManager {
         // todo: short
       }
     })
+  }
+
+  initAutoOrderProfitOrderInterval() {
+    this._checkAutoOrderProfitOrderInterval = setInterval(() => {
+      this.setProfitReduceOnlyLimitOrder()
+    }, 30 * 1000)
+  }
+
+  setProfitReduceOnlyLimitOrder() {
+    exchangeInfoManager.getAllSymbols().forEach(symbol => this.checkOrderLimitStopProfitStaus(symbol))
+  }
+
+  checkOrderLimitStopProfitStaus(symbol) {
+    const curSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
+    if (!curSymbolConfig) {
+      return
+    }
+    const { tvAlertConfig, orderConfig } = curSymbolConfig
+    // 开关没开启
+    if (!tvAlertConfig.autoOrderProfit) {
+      return
+    }
+    const pData = this.accoutManager.findPostion(symbol)
+    if (!pData || !pData.pa) {
+      return
+    }
+
+    const positionQty = pData.pa
+    const absPositionQty = Math.abs(positionQty)
+    if (!absPositionQty) {
+      return
+    }
+    const isConfigLong = orderConfig.side === 'BUY'
+    const longPosition = positionQty > 0
+    const isSameSide = (isConfigLong && longPosition) || (!isConfigLong && !longPosition)
+    if (isSameSide) {
+      const closeSide = longPosition ? 'SELL' : 'BUY'
+      const stopOrders = this.accoutManager.getStopOrders(symbol, closeSide)
+      const matchStopOrder = stopOrders.filter(o => +o.stopPrice === +orderConfig.stopPx)[0]
+      if (matchStopOrder) {
+        const profitOrders = this.accoutManager.getProfitOrders(symbol, closeSide)
+        // const matchProfitOrder = profitOrders.filter(o => +o.stopPrice === +orderConfig.profitPx)[0]
+        const totalProfitQty = profitOrders.reduce((sum, o) => sum + (+o.origQty), 0)
+        const lessQty = absPositionQty - totalProfitQty
+        if (lessQty > 0) {
+          const msg = `BIANACE ${symbol} postion & stop orders, but profit order is less ${lessQty}`
+          this._notifyPhone(msg, true)
+          this.getSignatureSDK().orderReduceOnlyLimitProfit(symbol, lessQty, closeSide, orderConfig.profitPx, orderConfig.profitPx)
+        }
+      }
+    } else {
+      // check stopOrder
+    }
+
   }
 }
 

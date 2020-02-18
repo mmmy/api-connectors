@@ -19,6 +19,7 @@ exports.symbolConfigDefault = {
       enableLong: false,
       enableShort: false,
       supportIntervals: ['1h'],
+      autoOrderProfit: true,
     },
     uiConfig: {
       risk: 100, //$100
@@ -53,6 +54,7 @@ exports.symbolConfigDefault = {
       enableLong: false,
       enableShort: false,
       supportIntervals: ['1h'],
+      autoOrderProfit: true,
     },
     uiConfig: {
       risk: 100, //$100
@@ -87,6 +89,7 @@ exports.symbolConfigDefault = {
       enableLong: false,
       enableShort: false,
       supportIntervals: ['1h'],
+      autoOrderProfit: true,
     },
     uiConfig: {
       risk: 100, //$100
@@ -121,6 +124,7 @@ exports.symbolConfigDefault = {
       enableLong: false,
       enableShort: false,
       supportIntervals: ['1h'],
+      autoOrderProfit: true,
     },
     uiConfig: {
       risk: 100, //$100

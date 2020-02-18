@@ -121,6 +121,7 @@ class FlowDataBase {
             side: 'Buy',
             stopPx: 0,
             openMethod: '',
+            lastUpdateCostStop: 0,  // 记录上次设置保本止损单的时间，不能频繁
           },
           'ETHUSD': {
             profitPx: 0,
@@ -128,6 +129,7 @@ class FlowDataBase {
             side: 'Buy',
             stopPx: 0,
             openMethod: '',
+            lastUpdateCostStop: 0,
           },
         },
         tvAlertConfig: {
@@ -335,7 +337,12 @@ class FlowDataBase {
     const currentTvConfig = tvAlertConfig[symbol]
     // 自动更新止损，放到止损位
     if (absPositionQty > 0 && currentTvConfig && currentTvConfig.autoUpdateStop) {
-
+      const lastUpdateCostStopTime = new Date(currentConfig.lastUpdateCostStop)
+      const now = new Date()
+      // 最少10秒一次
+      if (now - lastUpdateCostStopTime < 10 * 1000) {
+        return
+      }
       const longPosition = positionQty > 0
       const isConfigLong = currentConfig.side === 'Buy'
       const isSameSide = (isConfigLong && longPosition) || (!isConfigLong && !longPosition)
@@ -347,10 +354,13 @@ class FlowDataBase {
         // long
         if (longPosition && quto.bidPrice > profitAutoPrice) {
           this.setStopAtCostPrice(symbol)
+          currentConfig.lastUpdateCostStop = +now
+          console.log('ssssset confi............')
         }
         // short
         if (!longPosition && quto.bidPrice < profitAutoPrice) {
           this.setStopAtCostPrice(symbol)
+          currentConfig.lastUpdateCostStop = +now
         }
       }
     }
@@ -478,6 +488,7 @@ class FlowDataBase {
   }
   // 监测程序的数据是否正常， 否则重启
   initCheckDataInterval() {
+    return
     this._checkDataInterval = setInterval(() => {
       // this._notifyPhone('test notifyPhone')
       this.checkPositionValid('XBTUSD')
@@ -983,13 +994,17 @@ class FlowDataBase {
       this._options.limitStopProfit.symbolConfig[symbol]['needCheckStopIfHasPosition'] = true
       this.saveConfigToFile()
     }
-    return Promise.all([
-      sdk.orderStop(symbol, amount, stopPx, side === 'Buy' ? 'Sell' : 'Buy', true),
-      isOpenStop ?
-        sdk.orderStop(symbol, amount, price, side, false)
+    return new Promise((resolve, reject) => {
+      // orderStop 成功后才orderlimit
+      sdk.orderStop(symbol, amount, stopPx, side === 'Buy' ? 'Sell' : 'Buy', true).then(() => {
+        isOpenStop ?
+        sdk.orderStop(symbol, amount, price, side, false).then(resolve).catch(reject)
         :
-        sdk.orderLimit(symbol, amount, side, price)
-    ])
+        sdk.orderLimit(symbol, amount, side, price).then(resolve).catch(reject)
+      }).catch(e => {
+        reject(e)
+      })
+    })
   }
 
   closeLongPostionIfHave(symbol) {
@@ -1737,6 +1752,8 @@ class FlowDataBase {
           this._orderManager.getSignatureSDK().orderStop(symbol, absPositionQty, currentConfig.stopPx, longPosition ? 'Sell' : 'Buy', true).then(() => {
             currentConfig.needCheckStopIfHasPosition = false
           })
+        } else {
+          // todo: check stopOrder
         }
       }
     }

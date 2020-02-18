@@ -26,6 +26,13 @@ function getSymbolData(symbol) {
   return data.symbols.find(s => s.symbol === symbol)
 }
 
+function getAllSymbols() {
+  if (!data) {
+    return []
+  }
+  return data.symbols.map(s => s.symbol)
+}
+
 function getSymbolPricePrecision(symbol) {
   const info = getSymbolData(symbol)
   if (info) {
@@ -96,3 +103,4 @@ exports.getSymbolConfig = getSymbolConfig
 exports.getExchangeInfo = () => data
 exports.adjustOrderParam = adjustOrderParam
 exports.transformPrice = transformPrice
+exports.getAllSymbols = getAllSymbols
