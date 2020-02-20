@@ -1,5 +1,6 @@
 const path = require('path')
 const isProduction = process.env.NODE_ENV === 'production'
+const MarketManager = require('../../../../binance/MarketManager')
 
 process.setMaxListeners(0)
 
@@ -13,6 +14,10 @@ const yqNotify = {
 }
 
 const list = []
+
+const BnMarkerManager = new MarketManager({
+  testnet: !isProduction
+})
 
 if (isProduction) {
   var qq = require('../../../../strategy/apikey/qq_secret_binance.json')
@@ -46,7 +51,8 @@ if (isProduction) {
 }
 
 list.forEach(option => {
-  bManager.addStrategy(option)
+  const userManager = bManager.addStrategy(option)
+  userManager.initMarketManager(BnMarkerManager)
 })
 
 module.exports = bManager

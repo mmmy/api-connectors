@@ -1,5 +1,4 @@
 
-
 exports.symbolConfigDefault = {
   'BTCUSDT': {
     orderConfig: {
@@ -8,7 +7,7 @@ exports.symbolConfigDefault = {
       side: 'BUY',
       stopPx: 0,
       openMethod: '',
-      autoOrderProfit: true, // reduceOnly limit
+      lastUpdateCostStop: 0,  // 记录上次设置保本止损单的时间，不能频繁
     },
     tvAlertConfig: {
       minStop: 40,
@@ -19,7 +18,9 @@ exports.symbolConfigDefault = {
       enableLong: false,
       enableShort: false,
       supportIntervals: ['1h'],
-      autoOrderProfit: true,
+      autoOrderProfit: true, // 自动检测设置止盈单
+      autoUpdateStop: true,       // 当盈利达到1：1.5后将止损移动到成本位
+      profitRateForUpdateStop: 1.5,
     },
     uiConfig: {
       risk: 100, //$100
@@ -43,7 +44,7 @@ exports.symbolConfigDefault = {
       side: 'BUY',
       stopPx: 0,
       openMethod: '',
-      autoOrderProfit: true, // reduceOnly limit
+      lastUpdateCostStop: 0
     },
     tvAlertConfig: {
       minStop: 1,
@@ -55,6 +56,8 @@ exports.symbolConfigDefault = {
       enableShort: false,
       supportIntervals: ['1h'],
       autoOrderProfit: true,
+      autoUpdateStop: true,       // 当盈利达到1：1.5后将止损移动到成本位
+      profitRateForUpdateStop: 1.5,
     },
     uiConfig: {
       risk: 100, //$100
@@ -78,7 +81,7 @@ exports.symbolConfigDefault = {
       side: 'BUY',
       stopPx: 0,
       openMethod: '',
-      autoOrderProfit: true, // reduceOnly limit
+      lastUpdateCostStop: 0
     },
     tvAlertConfig: {
       minStop: 0.04,
@@ -90,6 +93,8 @@ exports.symbolConfigDefault = {
       enableShort: false,
       supportIntervals: ['1h'],
       autoOrderProfit: true,
+      autoUpdateStop: true,       // 当盈利达到1：1.5后将止损移动到成本位
+      profitRateForUpdateStop: 1.5,
     },
     uiConfig: {
       risk: 100, //$100
@@ -113,7 +118,7 @@ exports.symbolConfigDefault = {
       side: 'BUY',
       stopPx: 0,
       openMethod: '',
-      autoOrderProfit: true, // reduceOnly limit
+      lastUpdateCostStop: 0
     },
     tvAlertConfig: {
       minStop: 0.4,
@@ -125,6 +130,8 @@ exports.symbolConfigDefault = {
       enableShort: false,
       supportIntervals: ['1h'],
       autoOrderProfit: true,
+      autoUpdateStop: true,       // 当盈利达到1：1.5后将止损移动到成本位
+      profitRateForUpdateStop: 1.5,
     },
     uiConfig: {
       risk: 100, //$100

@@ -2,6 +2,7 @@ const BinanceSDK = require('./sdk')
 const _ = require('lodash')
 const args = require('../strategy/argv')
 const Account = require('./Account')
+const MarketManager = require('./MarketManager')
 const fs = require('fs')
 const exchangeInfoManager = require('./exchangeInfoManager')
 const defaultConfig = require('./common/symbolDefaultConfig')
@@ -33,6 +34,68 @@ class BinanceManager {
     this.initAutoOrderProfitOrderInterval()
 
     console.log('BinanceManager options', { ...this._options, apiKey: '', apiSecret: '' })
+  }
+
+  initMarketManager(manager) {
+    this._marketManager = manager || new MarketManager(manager)
+    this._marketManager.addAbserver(this)
+  }
+
+  listenMarketData(eventName, data, marketManager) {
+    switch (eventName) {
+      case '24hrMiniTicker':
+        this._watchSymbolTickerUpdate(data)
+      default:
+        break
+    }
+    console.log('------------------------')
+    console.log(data)
+  }
+  // 与bm的Quote update类似
+  _watchSymbolTickerUpdate(data) {
+    const symbol = data.s
+    const price = +data.c
+    // 自动更新止损，放到止损位
+    const curSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
+    if (curSymbolConfig) {
+      const { tvAlertConfig, orderConfig } = curSymbolConfig
+      if (tvAlertConfig && tvAlertConfig.autoUpdateStop) {
+        const pData = this.accoutManager.findPostion(symbol)
+        if (pData && pData.pa) {
+          const positionQty = +pData.pa
+          const absPositionQty = Math.abs(positionQty)
+          if (absPositionQty > 0) {
+            const lastUpdateCostStopTime = new Date(orderConfig.lastUpdateCostStop || 0)
+            const now = new Date()
+            // 最少10秒一次
+            if (now - lastUpdateCostStopTime > 10 * 1000) {
+              const longPosition = positionQty > 0
+              const isConfigLong = orderConfig.side === 'Buy'
+              const isSameSide = (isConfigLong && longPosition) || (!isConfigLong && !longPosition)
+              //检查是否是相同的止损，否则不设置
+              const closeSide = longPosition ? 'SELL' : 'BUY'
+              const stopOrders = this.accoutManager.getStopOrders(symbol, closeSide)
+              const matchStopOrder = stopOrders.filter(o => +o.stopPrice === +orderConfig.stopPx)[0]
+              if (isSameSide && matchStopOrder) {
+                const profitAutoPrice = this.getShouldSetProfitPrice(symbol)
+                // long
+                if (longPosition && price > profitAutoPrice) {
+                  this.setStopAtCostPrice(symbol)
+                  orderConfig.lastUpdateCostStop = +now
+                  this._notifyPhone('Binance set stop at cost long')
+                }
+                // short
+                if (!longPosition && price < profitAutoPrice) {
+                  this.setStopAtCostPrice(symbol)
+                  orderConfig.lastUpdateCostStop = +now
+                  this._notifyPhone('Binance set stop at cost short')
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   getOptions() {
@@ -323,6 +386,65 @@ class BinanceManager {
       // check stopOrder
     }
 
+  }
+
+  getShouldSetProfitPrice(symbol) {
+    const currentSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
+    if (currentSymbolConfig) {
+      const { orderConfig, tvAlertConfig } = currentSymbolConfig
+      const { profitRateForUpdateStop } = tvAlertConfig
+      const isConfigLong = orderConfig.side === 'Buy'
+      const stopGap = Math.abs(orderConfig.stopPx - orderConfig.price)
+      const profitGap = profitRateForUpdateStop * stopGap
+      let updatePrice = +orderConfig.price + (isConfigLong ? profitGap : -profitGap)
+      return exchangeInfoManager.transformPrice(symbol, updatePrice)
+    } else {
+      return -1
+    }
+  }
+
+  setStopAtCostPrice(symbol) {
+    const pData = this.accoutManager.findPostion(symbol)
+    if (!pData || !pData.pa) {
+      return Promise.reject(`binance ${symbol} setStopAtCostPrice positionQty not found`)
+    }
+
+    const positionQty = +pData.pa
+    const costPrice = +pData.entryPrice
+    const absPositionQty = Math.abs(positionQty)
+    if (!costPrice) {
+      return Promise.reject(`binance ${symbol} setStopAtCostPrice entryPrice not found`)
+    }
+    const isLongPosition = positionQty > 0
+
+    return new Promise((resolve, reject) => {
+      if (absPositionQty > 0) {
+        // 判断没有目前是不是优势
+        const currentPrice = this._marketManager.getCurrentPrice(symbol)
+        if (currentPrice > 0) {
+          if ((isLongPosition && currentPrice < costPrice) || (!isLongPosition && currentPrice > costPrice)) {
+            reject('亏损中，不能设置保本止损')
+          }
+        }
+        const priceOffset = costPrice * 0.00075
+        let stopPrice = isLongPosition ? (costPrice + priceOffset) : (costPrice - priceOffset)
+        stopPrice = exchangeInfoManager.transformPrice(symbol, stopPrice)
+        const closeSide = isLongPosition ? 'SELL' : 'BUY'
+        const stopOrders = this.accoutManager.getStopOrders(symbol, closeSide)
+        const matchStopOrders = stopOrders.filter(o => +o.stopPrice === +stopPrice)
+        const totalStopQty = matchStopOrders.reduce((sum, o) => sum + (+o.origQty), 0)
+        if (matchStopOrders.length > 0) {
+          const lessQty = absPositionQty - totalStopQty
+          if (lessQty > 0) {
+            this.getSignatureSDK().orderStop(symbol, lessQty, stopPrice, closeSide, true).then(resolve).catch(reject)
+          }
+        } else {
+          resolve('已经存在保本止损')
+        }
+      } else {
+        resolve('没有仓位无需设置保本止损')
+      }
+    })
   }
 }
 

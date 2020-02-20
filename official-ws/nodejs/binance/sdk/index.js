@@ -85,7 +85,7 @@ class BinanceSDK {
     return this.order(data)
   }
   // 市价止损
-  orderStop(symbol, quantity, stopPrice, side, reduceOnly) {
+  orderStop(symbol, quantity, stopPrice, side, reduceOnly=true) {
     const data = {
       symbol,
       quantity,
