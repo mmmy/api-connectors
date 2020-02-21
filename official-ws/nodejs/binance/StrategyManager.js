@@ -95,4 +95,20 @@ module.exports = class StrategyManager {
     this._list.forEach(item =>  item.watchTvAlert(params))
     return Promise.resolve()
   }
+
+  setStopAtCostPrice(user, symbol) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return strategy.setStopAtCostPrice(symbol)
+  }
+
+  refreshAccountWsData(user) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)
+    }
+    return strategy.refreshAccountWsData()
+  }
 }

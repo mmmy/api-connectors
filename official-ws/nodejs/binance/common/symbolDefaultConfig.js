@@ -19,7 +19,7 @@ exports.symbolConfigDefault = {
       enableShort: false,
       supportIntervals: ['1h'],
       autoOrderProfit: true, // 自动检测设置止盈单
-      autoUpdateStop: true,       // 当盈利达到1：1.5后将止损移动到成本位
+      autoUpdateStop: false,       // 当盈利达到1：1.5后将止损移动到成本位
       profitRateForUpdateStop: 1.5,
     },
     uiConfig: {
@@ -56,7 +56,7 @@ exports.symbolConfigDefault = {
       enableShort: false,
       supportIntervals: ['1h'],
       autoOrderProfit: true,
-      autoUpdateStop: true,       // 当盈利达到1：1.5后将止损移动到成本位
+      autoUpdateStop: false,       // 当盈利达到1：1.5后将止损移动到成本位
       profitRateForUpdateStop: 1.5,
     },
     uiConfig: {
@@ -93,7 +93,7 @@ exports.symbolConfigDefault = {
       enableShort: false,
       supportIntervals: ['1h'],
       autoOrderProfit: true,
-      autoUpdateStop: true,       // 当盈利达到1：1.5后将止损移动到成本位
+      autoUpdateStop: false,       // 当盈利达到1：1.5后将止损移动到成本位
       profitRateForUpdateStop: 1.5,
     },
     uiConfig: {
@@ -130,7 +130,7 @@ exports.symbolConfigDefault = {
       enableShort: false,
       supportIntervals: ['1h'],
       autoOrderProfit: true,
-      autoUpdateStop: true,       // 当盈利达到1：1.5后将止损移动到成本位
+      autoUpdateStop: false,       // 当盈利达到1：1.5后将止损移动到成本位
       profitRateForUpdateStop: 1.5,
     },
     uiConfig: {

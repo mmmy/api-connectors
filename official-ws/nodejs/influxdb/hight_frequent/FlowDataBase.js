@@ -355,12 +355,14 @@ class FlowDataBase {
         if (longPosition && quto.bidPrice > profitAutoPrice) {
           this.setStopAtCostPrice(symbol)
           currentConfig.lastUpdateCostStop = +now
-          console.log('ssssset confi............')
+          // console.log('ssssset confi............')
+          this._notifyPhone('bitmex set stop at cost long')
         }
         // short
         if (!longPosition && quto.bidPrice < profitAutoPrice) {
           this.setStopAtCostPrice(symbol)
           currentConfig.lastUpdateCostStop = +now
+          this._notifyPhone('bitmex set stop at cost short')
         }
       }
     }

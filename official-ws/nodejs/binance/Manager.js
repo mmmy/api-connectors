@@ -48,8 +48,8 @@ class BinanceManager {
       default:
         break
     }
-    console.log('------------------------')
-    console.log(data)
+    // console.log('------------------------')
+    // console.log(data)
   }
   // 与bm的Quote update类似
   _watchSymbolTickerUpdate(data) {
@@ -426,18 +426,17 @@ class BinanceManager {
             reject('亏损中，不能设置保本止损')
           }
         }
-        const priceOffset = costPrice * 0.00075
+        // 手续费参考 https://www.binance.com/cn/fee/futureFee
+        const priceOffset = costPrice * 0.0004
         let stopPrice = isLongPosition ? (costPrice + priceOffset) : (costPrice - priceOffset)
         stopPrice = exchangeInfoManager.transformPrice(symbol, stopPrice)
         const closeSide = isLongPosition ? 'SELL' : 'BUY'
         const stopOrders = this.accoutManager.getStopOrders(symbol, closeSide)
         const matchStopOrders = stopOrders.filter(o => +o.stopPrice === +stopPrice)
         const totalStopQty = matchStopOrders.reduce((sum, o) => sum + (+o.origQty), 0)
-        if (matchStopOrders.length > 0) {
-          const lessQty = absPositionQty - totalStopQty
-          if (lessQty > 0) {
-            this.getSignatureSDK().orderStop(symbol, lessQty, stopPrice, closeSide, true).then(resolve).catch(reject)
-          }
+        const lessQty = absPositionQty - totalStopQty
+        if (lessQty > 0) {
+          this.getSignatureSDK().orderStop(symbol, lessQty, stopPrice, closeSide, true).then(resolve).catch(reject)
         } else {
           resolve('已经存在保本止损')
         }
@@ -445,6 +444,10 @@ class BinanceManager {
         resolve('没有仓位无需设置保本止损')
       }
     })
+  }
+
+  refreshAccountWsData() {
+    return this.accoutManager.refreshWsData()
   }
 }
 

@@ -114,7 +114,7 @@ export default class StopLimitProfit extends React.Component {
           {tvConfigKeys.map(k => <th>{k}</th>)}
           <th></th>
           <th>support intervals</th>
-          
+
         </tr></thead>
         <tbody>
           {
@@ -145,6 +145,12 @@ export default class StopLimitProfit extends React.Component {
                 <input checked={tvAlertConfig['autoOrderProfit']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'autoOrderProfit')} />autoOrderProfit
               </td>
               rows.push(autoProfitTd)
+              const autoStopTd = <td>
+                <span>{tvAlertConfig.profitRateForUpdateStop}</span>
+                <input checked={tvAlertConfig['autoUpdateStop']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'autoUpdateStop')} />
+                自动protect
+              </td>
+              rows.push(autoStopTd)
               return <tr>{rows}</tr>
             })
           }

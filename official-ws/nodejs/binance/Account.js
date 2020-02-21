@@ -134,7 +134,7 @@ class AccountDataManager {
   }
 
   getStopOrders(symbol, side) {
-    return this.getValidOrders().filter(o => 
+    return this.getValidOrders().filter(o =>
       o.type === 'STOP_MARKET' &&
       o.symbol === symbol &&
       o.side === side
@@ -142,7 +142,7 @@ class AccountDataManager {
   }
 
   getProfitOrders(symbol, side) {
-    return this.getValidOrders().filter(o => 
+    return this.getValidOrders().filter(o =>
       o.type === 'TAKE_PROFIT' &&
       o.symbol === symbol &&
       o.side === side
@@ -176,6 +176,21 @@ class Account {
       this.initUpdateListenKey()
       this.initUpdateAccountInterval()
     }
+  }
+  // 手动更新下数据
+  refreshWsData() {
+    return new Promise((resolve, reject) => {
+      this._userSdk.orderReduceOnlyLimitProfit(
+        'BTCUSDT', 1, 'BUY', 1000, 1000
+      ).then(json => {
+        this._userSdk.deleteOrder('BTCUSDT', json.orderId).then(json => {
+          console.log('account delete ok', json)
+        }).catch(e => {
+          console.log('account delete order error', e)
+        })
+        resolve(json)
+      }).catch(reject)
+    })
   }
 
   initAccountData() {

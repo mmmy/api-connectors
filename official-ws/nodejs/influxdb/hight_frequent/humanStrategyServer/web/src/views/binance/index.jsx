@@ -130,7 +130,9 @@ export default class BinanceMainPage extends React.Component {
       <table style={{ fontSize: '12px' }}>
         <thead>
           <tr>
-            {[<th></th>].concat(positionKeys.map(key => <th>{positionKeyText[key] || key}</th>))}
+            {[<th>
+              <th><button onClick={this.handleRefreshAccount}>refresh</button></th>
+            </th>].concat(positionKeys.map(key => <th>{positionKeyText[key] || key}</th>))}
           </tr>
         </thead>
         <tbody>
@@ -156,7 +158,9 @@ export default class BinanceMainPage extends React.Component {
                       }
                     }
                     return <td className={cn} onClick={this.handlePositionCellClick.bind(this, position, key)}>{format}</td>
-                  }))
+                  })).concat(
+                    <td><button onClick={this.handleSetCostStop.bind(this, position.symbol)}>cost stop</button></td>
+                  )
                 }
               </tr>
             })
@@ -193,14 +197,18 @@ export default class BinanceMainPage extends React.Component {
                     keys.map(key => {
                       const val = order[key]
                       let format = val
+                      const style={}
                       if (key === 'reduceOnly') {
                         format = val ? 'Y' : ''
+                        if (val) {
+                          style.background = 'rgba(0,0,0,0.1)'
+                        }
                       }
                       let cn = ''
                       if (key === 'side') {
                         cn = val === 'BUY' ? 'green' : 'red'
                       }
-                      return <td className={cn}>{format}</td>
+                      return <td className={cn} style={style}>{format}</td>
                     })
                   )
                 }
@@ -241,7 +249,7 @@ export default class BinanceMainPage extends React.Component {
   handleClosePosition(positionData) {
     if (window.confirm(`close ${positionData.symbol}`)) {
       this.startPending()
-      axios.post('/api/bn/close_position', {user: this.state.name, symbol: positionData.symbol}).then(({ status, data }) => {
+      axios.post('/api/bn/close_position', { user: this.state.name, symbol: positionData.symbol }).then(({ status, data }) => {
         if (status === 200 && data.result) {
           alert('close postion success')
           this.fetchUserData()
@@ -320,6 +328,42 @@ export default class BinanceMainPage extends React.Component {
         this.pushLog(e)
         reject()
       })
+    })
+  }
+
+  handleSetCostStop(symbol) {
+    var userData = this.state.data
+    const { user } = userData.options
+    if (window.confirm(`${symbol} 设置保本止损？`)) {
+      this.startPending()
+      axios.post('/api/bn/set_stop_at_const_pirce', { user, symbol }).then(({ status, data }) => {
+        this.stopPending()
+        if (status === 200 && data.result) {
+          alert(`修改成功:${data.data}`)
+          this.fetchUserData()
+        } else {
+          alert(data.info)
+          this.pushLog(data.info)
+        }
+      }).catch(e => {
+        this.stopPending()
+        this.pushLog(e)
+      })
+    }
+  }
+
+  handleRefreshAccount = () => {
+    const {user} = this.state.data.options
+    axios.post('/api/bn/refresh_account_ws_data', { user }).then(({ status, data }) => {
+      if (status === 200 && data.result) {
+        alert(`refresh成功:${data.data}`)
+        this.fetchUserData()
+      } else {
+        alert(data.info)
+        this.pushLog(data.info)
+      }
+    }).catch(e => {
+      this.pushLog(e)
     })
   }
 }
