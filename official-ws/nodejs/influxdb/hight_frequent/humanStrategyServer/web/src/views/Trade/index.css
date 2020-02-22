@@ -94,3 +94,9 @@ th, td {
   text-align: center;
   font-size: 24px;
 }
+
+.cb:hover {
+  cursor: pointer;
+  color: #0759cb;
+  font-weight: bolder;
+}

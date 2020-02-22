@@ -79,11 +79,13 @@ function getSymbolConfig(symbol) {
 function adjustOrderParam(symbol, price, usdt, isMarket) {
   const symbolInfo = getSymbolConfig(symbol)
   // 将价格调整为基准的整数倍
-  price = Math.round(price / symbolInfo.priceStepSize) * symbolInfo.priceStepSize
+  const priceR = 1 / symbolInfo.priceStepSize
+  price = Math.round(price * priceR) / priceR
   let quantity = usdt / price
   // 将数量调整为基准的整数倍
-  const quantityStep = isMarket ? symbolInfo.marketQuantityStepSize : symbolInfo.quantityStepSize
-  quantity = Math.round(quantity / quantityStep) * quantityStep
+  const quantityStep = isMarket ? +symbolInfo.marketQuantityStepSize : +symbolInfo.quantityStepSize
+  const quantityR = 1 / quantityStep
+  quantity = Math.round(quantity * quantityR) / quantityR
   return {
     price,
     quantity

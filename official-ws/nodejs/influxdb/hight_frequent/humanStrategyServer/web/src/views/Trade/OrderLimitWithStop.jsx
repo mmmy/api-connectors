@@ -125,7 +125,7 @@ export default class OrderLimitWithStop extends React.Component {
         </div>
       </div>
       <div><button onClick={this.handleSubmit}>submit</button></div>
-      <br/>
+      <br />
       <div>
         <div>tv alert config</div>
         <table>
@@ -140,11 +140,11 @@ export default class OrderLimitWithStop extends React.Component {
               Object.getOwnPropertyNames(tvAlertConfig).map(s => {
                 let rows = [<td>{s}</td>]
                 rows = rows.concat(tvConfigKeys.map(k =>
-                  <td><div onClick={this.handleTvConfig.bind(this, s, k)}>{tvAlertConfig[s][k]}</div></td>
+                  <td><div className="cb" style={{ cursor: 'pointer' }} onClick={this.handleTvConfig.bind(this, s, k)}>{tvAlertConfig[s][k]}</div></td>
                 ))
                 const switchTd = <td>
-                  <input checked={tvAlertConfig[s]['enableLong']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableLong')}/>多&nbsp;
-                  <input checked={tvAlertConfig[s]['enableShort']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableShort')}/>空
+                  <input checked={tvAlertConfig[s]['enableLong']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableLong')} />多&nbsp;
+                  <input checked={tvAlertConfig[s]['enableShort']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableShort')} />空
                 </td>
                 rows.push(switchTd)
                 const intervalsTd = <td>
@@ -154,15 +154,22 @@ export default class OrderLimitWithStop extends React.Component {
                         checked={tvAlertConfig[s]['supportIntervals'].indexOf(inter) > -1}
                         type="checkbox"
                         onChange={this.onChangeTvConfigInterval.bind(this, s, inter)}
-                    />{inter}&nbsp;&nbsp;
+                      />{inter}&nbsp;&nbsp;
                     </span>)
                   }
                 </td>
                 rows.push(intervalsTd)
                 const autoStopTd = <td>
-                  <span>{tvAlertConfig[s].profitRateForUpdateStop}</span>
-                  <input checked={tvAlertConfig[s]['autoUpdateStop']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'autoUpdateStop')}/>
-                  自动保本
+                  <input checked={tvAlertConfig[s]['autoUpdateStop']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'autoUpdateStop')} />
+                  自动protect @&nbsp;
+                  <span
+                    className="cb"
+                    style={{ width: 30, cursor: 'pointer', display: 'inline-block', fontWeight: 'bold' }}
+                    title="当达到该盈亏比自动设置保本止损"
+                    onClick={this.handleTvConfig.bind(this, s, 'profitRateForUpdateStop')}
+                  >
+                    {tvAlertConfig[s].profitRateForUpdateStop}
+                  </span>
                 </td>
                 rows.push(autoStopTd)
                 return <tr>{rows}</tr>
@@ -288,8 +295,13 @@ export default class OrderLimitWithStop extends React.Component {
     const oldValue = tvAlertConfig[symbol][key]
     const newVal = window.prompt(`update tv config ${symbol} ${key}`, oldValue)
     if (newVal !== null) {
+      const val = +newVal
+      if (val < 0) {
+        window.alert('需要>0')
+        return
+      }
       const path = `limitStopProfit.tvAlertConfig.${symbol}.${key}`
-      onChangeOption(index, path, +newVal)
+      onChangeOption(index, path, val)
     }
   }
 

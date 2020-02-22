@@ -70,7 +70,7 @@ class BinanceManager {
             // 最少10秒一次
             if (now - lastUpdateCostStopTime > 10 * 1000) {
               const longPosition = positionQty > 0
-              const isConfigLong = orderConfig.side === 'Buy'
+              const isConfigLong = orderConfig.side === 'BUY'
               const isSameSide = (isConfigLong && longPosition) || (!isConfigLong && !longPosition)
               //检查是否是相同的止损，否则不设置
               const closeSide = longPosition ? 'SELL' : 'BUY'
@@ -393,7 +393,7 @@ class BinanceManager {
     if (currentSymbolConfig) {
       const { orderConfig, tvAlertConfig } = currentSymbolConfig
       const { profitRateForUpdateStop } = tvAlertConfig
-      const isConfigLong = orderConfig.side === 'Buy'
+      const isConfigLong = orderConfig.side === 'BUY'
       const stopGap = Math.abs(orderConfig.stopPx - orderConfig.price)
       const profitGap = profitRateForUpdateStop * stopGap
       let updatePrice = +orderConfig.price + (isConfigLong ? profitGap : -profitGap)

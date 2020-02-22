@@ -26,7 +26,7 @@ export default class StopLimitProfit extends React.Component {
   }
 
   componentWillReceiveProps(newProps, newState) {
-    console.log('commmmmmmmmmmm')
+    // console.log('commmmmmmmmmmm')
   }
 
   render() {
@@ -122,17 +122,18 @@ export default class StopLimitProfit extends React.Component {
               let rows = [<td>{s}</td>]
               const { tvAlertConfig } = symbolConfig[s]
               rows = rows.concat(tvConfigKeys.map(k =>
-                <td><div onClick={this.handleTvConfig.bind(this, s, k)}>{tvAlertConfig[k]}</div></td>
+                <td><div className="cb" onClick={this.handleTvConfig.bind(this, s, k)}>{tvAlertConfig[k]}</div></td>
               ))
               const switchTd = <td>
-                <input checked={tvAlertConfig['enableLong']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableLong')} />多&nbsp;
-                  <input checked={tvAlertConfig['enableShort']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableShort')} />空
+                <input className="cb" checked={tvAlertConfig['enableLong']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableLong')} />多&nbsp;
+                <input className="cb" checked={tvAlertConfig['enableShort']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableShort')} />空
                 </td>
               rows.push(switchTd)
               const intervalsTd = <td>
                 {
                   Intervals.map(inter => <span>
                     <input
+                      className="cb"
                       checked={tvAlertConfig['supportIntervals'].indexOf(inter) > -1}
                       type="checkbox"
                       onChange={this.onChangeTvConfigInterval.bind(this, s, inter)}
@@ -142,13 +143,17 @@ export default class StopLimitProfit extends React.Component {
               </td>
               rows.push(intervalsTd)
               const autoProfitTd = <td>
-                <input checked={tvAlertConfig['autoOrderProfit']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'autoOrderProfit')} />autoOrderProfit
+                <input className='cb' checked={tvAlertConfig['autoOrderProfit']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'autoOrderProfit')} />autoOrderProfit
               </td>
               rows.push(autoProfitTd)
               const autoStopTd = <td>
-                <span>{tvAlertConfig.profitRateForUpdateStop}</span>
-                <input checked={tvAlertConfig['autoUpdateStop']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'autoUpdateStop')} />
-                自动protect
+                <input className="cb" checked={tvAlertConfig['autoUpdateStop']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'autoUpdateStop')} />
+                自动protect @&nbsp;
+                <span
+                  style={{ width: 30, cursor: 'pointer', display: 'inline-block', fontWeight: 'bold' }}
+                  title="当达到该盈亏比自动设置保本止损"
+                  onClick={this.handleTvConfig.bind(this, s, 'profitRateForUpdateStop')}
+                >{tvAlertConfig.profitRateForUpdateStop}</span>
               </td>
               rows.push(autoStopTd)
               return <tr>{rows}</tr>
@@ -165,8 +170,13 @@ export default class StopLimitProfit extends React.Component {
     const oldValue = tvAlertConfig[key]
     const newVal = window.prompt(`update tv config ${symbol} ${key}`, oldValue)
     if (newVal !== null) {
+      const val = +newVal
+      if (val < 0) {
+        window.alert('需要>0')
+        return
+      }
       const path = `limitStopProfit.symbolConfig.${symbol}.tvAlertConfig.${key}`
-      onChangeOption(path, +newVal)
+      onChangeOption(path, val)
     }
   }
 
