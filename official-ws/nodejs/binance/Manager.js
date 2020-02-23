@@ -82,13 +82,11 @@ class BinanceManager {
                 if (longPosition && price > profitAutoPrice) {
                   this.setStopAtCostPrice(symbol)
                   orderConfig.lastUpdateCostStop = +now
-                  this._notifyPhone('Binance set stop at cost long')
                 }
                 // short
                 if (!longPosition && price < profitAutoPrice) {
                   this.setStopAtCostPrice(symbol)
                   orderConfig.lastUpdateCostStop = +now
-                  this._notifyPhone('Binance set stop at cost short')
                 }
               }
             }
@@ -437,6 +435,7 @@ class BinanceManager {
         const lessQty = absPositionQty - totalStopQty
         if (lessQty > 0) {
           this.getSignatureSDK().orderStop(symbol, lessQty, stopPrice, closeSide, true).then(resolve).catch(reject)
+          this._notifyPhone(`Binance ${symbol}  ${isLongPosition} set stop at cost`)
         } else {
           resolve('已经存在保本止损')
         }
