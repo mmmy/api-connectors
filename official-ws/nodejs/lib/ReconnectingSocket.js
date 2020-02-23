@@ -3,6 +3,8 @@ const WebSocket = require('ws');
 var SocksProxyAgent = require('socks-proxy-agent');
 var agent = new SocksProxyAgent('socks://127.0.0.1:1080');
 // const debug = require('debug')('BitMEX:realtime-api:socket:internal');
+// 里面含有noProxy参数
+const args = require('../strategy/argv')
 
 const CLOSE_NORMAL = 1000;
 const CLOSE_UNEXPECTED = 1011;
@@ -14,7 +16,8 @@ function WebSocketClient(options){
   this.maxAutoReconnectInterval = 60000; // maximum wait between reconnect retrys
   this.logConnection = true;
   this._options = {
-    ...options
+    ...args,
+    ...options,
   }
 }
 WebSocketClient.prototype.open = function(url){
