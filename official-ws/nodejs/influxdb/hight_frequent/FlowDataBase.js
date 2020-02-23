@@ -356,13 +356,11 @@ class FlowDataBase {
           this.setStopAtCostPrice(symbol)
           currentConfig.lastUpdateCostStop = +now
           // console.log('ssssset confi............')
-          this._notifyPhone('bitmex set stop at cost long')
         }
         // short
         if (!longPosition && quto.bidPrice < profitAutoPrice) {
           this.setStopAtCostPrice(symbol)
           currentConfig.lastUpdateCostStop = +now
-          this._notifyPhone('bitmex set stop at cost short')
         }
       }
     }
@@ -1000,9 +998,9 @@ class FlowDataBase {
       // orderStop 成功后才orderlimit
       sdk.orderStop(symbol, amount, stopPx, side === 'Buy' ? 'Sell' : 'Buy', true).then(() => {
         isOpenStop ?
-        sdk.orderStop(symbol, amount, price, side, false).then(resolve).catch(reject)
-        :
-        sdk.orderLimit(symbol, amount, side, price).then(resolve).catch(reject)
+          sdk.orderStop(symbol, amount, price, side, false).then(resolve).catch(reject)
+          :
+          sdk.orderLimit(symbol, amount, side, price).then(resolve).catch(reject)
       }).catch(e => {
         reject(e)
       })
@@ -1645,7 +1643,7 @@ class FlowDataBase {
 
   setStopAtCostPrice(symbol) {
     const positionQty = this._accountPosition.getCurrentQty(symbol)
-  
+
     const urPnlProfit = this._accountPosition.getUrPnlProfit(symbol)
     const absPositionQty = Math.abs(positionQty)
     // const unit = precisionMap[symbol]
@@ -1669,8 +1667,9 @@ class FlowDataBase {
               orderID: matchStopOrder.orderID,
               orderQty: matchStopOrder.orderQty + lessQty,
             }).then(resolve).catch(reject)
+            this._notifyPhone(`bitmex ${symbol} ${isLongPosition} set stop at cost`)
           } else {
-            resolve('已经存在保本止损') 
+            resolve('已经存在保本止损')
           }
         } else {
           this._orderManager.getSignatureSDK().orderStop(symbol, absPositionQty, stopPrice, isLongPosition ? 'Sell' : 'Buy', true).then(resolve).catch(reject)
@@ -1690,7 +1689,7 @@ class FlowDataBase {
     const stopGap = Math.abs(currentConfig.stopPx - currentConfig.price)
     const profitGap = profitRateForUpdateStop * stopGap
     let updatePrice = +currentConfig.price + (isConfigLong ? profitGap : -profitGap)
-    return transformPrice(symbol, updatePrice) 
+    return transformPrice(symbol, updatePrice)
   }
 
   checkOrderLimitStopProfitStaus(symbol) {
@@ -1777,7 +1776,7 @@ class FlowDataBase {
       if (params.exchange === 'BITMEX') {
         this.orderLimitStopProfitByParam(params)
       }
-    } catch(e) {
+    } catch (e) {
       return Promise.reject(e)
     }
     return Promise.resolve()
@@ -1823,7 +1822,7 @@ class FlowDataBase {
           const precision = precisionMap[symbol]
           const { middlePrice, longStop, shortStop } = prices
           let price, stopPx, profitPx, amount = 0
-          
+
           if (long) {
             price = Math.min(middlePrice, quto.askPrice - precision)
             stopPx = longStop
@@ -1852,12 +1851,12 @@ class FlowDataBase {
             const risks = stopPx - price
             profitPx = price - (risks * profitRate)
           }
-  
+
           profitPx = transformPrice(symbol, profitPx)
           const diffP = Math.abs(stopPx - price)
           amount = Math.round((risk / diffP) * price)
           amount = Math.min(amount, maxAmount)
-  
+
           const side = long ? 'Buy' : 'Sell'
           const openMethod = 'limit'
           const data = {
@@ -1869,10 +1868,10 @@ class FlowDataBase {
             profitPx,
             amount,
           }
-  
+
           console.log('tv auto open position!', data)
           this._notifyPhone(`[${symbol}] tv auto open position!`)
-  
+
           this.orderLimitWithStop(data)
           // save config
           const curSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
