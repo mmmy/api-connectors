@@ -560,10 +560,10 @@ class FlowDataBase {
     // high1 low1
     const highlow1Signal = candleManager.highlow1Signal(symbol)
     if (highlow1Signal.high1) {
-      this._notifyPhone(`${symbol} 1d high 1`)
+      // this._notifyPhone(`${symbol} 1d high 1`)
       watchSignal(this, symbol, 'break1d', 'high1')
     } else if (highlow1Signal.low1) {
-      this._notifyPhone(`${symbol} 1d low 1`)
+      // this._notifyPhone(`${symbol} 1d low 1`)
       watchSignal(this, symbol, 'break1d', 'low1')
     }
 
@@ -1667,12 +1667,13 @@ class FlowDataBase {
               orderID: matchStopOrder.orderID,
               orderQty: matchStopOrder.orderQty + lessQty,
             }).then(resolve).catch(reject)
-            this._notifyPhone(`bitmex ${symbol} ${isLongPosition} set stop at cost`)
+            this._notifyPhone(`bitmex ${symbol} ${isLongPosition} update stop at cost lessQty ${lessQty}`)
           } else {
             resolve('已经存在保本止损')
           }
         } else {
           this._orderManager.getSignatureSDK().orderStop(symbol, absPositionQty, stopPrice, isLongPosition ? 'Sell' : 'Buy', true).then(resolve).catch(reject)
+          this._notifyPhone(`bitmex ${symbol} ${isLongPosition} set stop at cost`)
         }
       } else {
         resolve('没有仓位无需设置保本止损')
@@ -1726,10 +1727,10 @@ class FlowDataBase {
           if (lessQty > 0) {
             if (!matchReduceOnlyOrder) {
               // start order
-              const msg = `${symbol} postion & stop orders, but no reduce only order and order it`
+              this._orderManager.getSignatureSDK().orderReduceOnlyLimit(symbol, lessQty, longPosition ? 'Sell' : 'Buy', currentConfig.profitPx)
+              const msg = `${symbol} postion & stop orders, but no reduce only order and order it ${lessQty}`
               console.log(msg)
               this._notifyPhone(msg, true)
-              this._orderManager.getSignatureSDK().orderReduceOnlyLimit(symbol, absPositionQty, longPosition ? 'Sell' : 'Buy', currentConfig.profitPx)
             } else {
               // 可能 amount 不对
               const msg = `${symbol} reduce only qty is less, to add more`
