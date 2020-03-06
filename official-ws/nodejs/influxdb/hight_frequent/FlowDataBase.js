@@ -1722,7 +1722,8 @@ class FlowDataBase {
           const reduceOnlyOrders = this._accountOrder.getReduceOnlyOrders(symbol)
           const matchReduceOnlyOrder = reduceOnlyOrders.filter(o => o.price === +currentConfig.profitPx)[0]
           const totalReduceQty = reduceOnlyOrders.reduce((sum, o) => sum + o.orderQty, 0)
-          const lessQty = absPositionQty - totalReduceQty
+          // const lessQty = absPositionQty - totalReduceQty
+          let lessQty = Math.min(matchStopOrder.orderQty - totalReduceQty, absPositionQty - totalReduceQty)
           // const reduceOnlyOrder = this._accountOrder.getReduceOnlyOrders(symbol)[0]
           if (lessQty > 0) {
             if (!matchReduceOnlyOrder) {
