@@ -1,2 +1,2 @@
-# curl -H 'Content-Type: application/json; charset=utf-8' -d '{"symbol": "ETHUSD", "name": "A0", "interval":"30", "long":false, "exchange": "BITMEX", "middlePrice": 230, "shortStop": 230.2}' -X POST http://localhost:3000/api/sys/wh
-curl -H 'Content-Type: application/json; charset=utf-8' -d '{"symbol": "EOSUSDT", "name": "A0", "interval":"30", "long":true, "middlePrice": 4.022, "longStop": 3.966, "exchange": "BINANCE" }' -X POST http://localhost:3000/api/sys/wh
+curl -H 'Content-Type: application/json; charset=utf-8' -d '{"symbol": "ETHUSD", "name": "A0", "interval":"1h", "long":true, "exchange": "BITMEX", "longStop": 188, "middlePrice": 194 }' -X POST http://localhost:3000/api/sys/wh
+# curl -H 'Content-Type: application/json; charset=utf-8' -d '{"symbol": "EOSUSDT", "name": "A0", "interval":"30", "long":true, "middlePrice": 4.022, "longStop": 3.966, "exchange": "BINANCE" }' -X POST http://localhost:3000/api/sys/wh

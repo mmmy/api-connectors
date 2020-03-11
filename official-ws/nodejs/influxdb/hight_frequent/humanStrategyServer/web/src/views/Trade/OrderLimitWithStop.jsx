@@ -133,7 +133,9 @@ export default class OrderLimitWithStop extends React.Component {
             <th>symbol</th>
             {tvConfigKeys.map(k => <th>{k}</th>)}
             <th></th>
+            <th>filters</th>
             <th>support intervals</th>
+            <th>protect</th>
           </tr></thead>
           <tbody>
             {
@@ -145,8 +147,15 @@ export default class OrderLimitWithStop extends React.Component {
                 const switchTd = <td>
                   <input checked={tvAlertConfig[s]['enableLong']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableLong')} />多&nbsp;
                   <input checked={tvAlertConfig[s]['enableShort']} type="checkbox" onChange={this.onChangeTvConfigCheckbox.bind(this, s, 'enableShort')} />空
+                  <br />
+                  <div title="entryOffset">eo: <span className="cb" onClick={this.handleTvConfig.bind(this, s, 'entryOffset')}>{tvAlertConfig[s].entryOffset}</span></div>
                 </td>
                 rows.push(switchTd)
+                const filtersTd = <td>
+                  <div title="最大入场价格">maxp: <span className="cb" onClick={this.handleTvConfig.bind(this, s, 'entryMaxPrice')}>{tvAlertConfig[s].entryMaxPrice}</span></div>
+                  <div title="最小入场价格">minp: <span className="cb" onClick={this.handleTvConfig.bind(this, s, 'entryMinPrice')}>{tvAlertConfig[s].entryMinPrice}</span></div>
+                </td>
+                rows.push(filtersTd)
                 const intervalsTd = <td>
                   {
                     Intervals.map(inter => <span>

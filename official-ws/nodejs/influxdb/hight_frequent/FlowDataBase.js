@@ -144,6 +144,9 @@ class FlowDataBase {
             supportIntervals: ['1h'],
             autoUpdateStop: true,       // 当盈利达到1：1.5后将止损移动到成本位
             profitRateForUpdateStop: 1.5,
+            entryOffset: 0, // 入场偏移量, 比如熊市底部做多, 牛市顶部做空
+            entryMaxPrice: 0, // 入场价格过滤器区间上
+            entryMinPrice: 0, // 入场价格过滤器区间下
           },
           'ETHUSD': {
             minStop: 1,
@@ -156,6 +159,9 @@ class FlowDataBase {
             supportIntervals: ['1h'],
             autoUpdateStop: true,
             profitRateForUpdateStop: 1.5,
+            entryOffset: 0,
+            entryMaxPrice: 0, // 入场价格过滤器区间上
+            entryMinPrice: 0, // 入场价格过滤器区间下
           },
         },
         kRateForPrice: 0.5, // or 0.618
@@ -1772,7 +1778,7 @@ class FlowDataBase {
       const requiredKeys = ['symbol', 'name', 'interval', 'long', 'exchange']
       if (requiredKeys.some(k => params[k] === undefined)) {
         const msg = `${requiredKeys.toString()} is required in tv alert params`
-        console.log(msg)
+        // console.log(msg)
         throw msg
       }
       if (params.exchange === 'BITMEX') {
@@ -1818,7 +1824,9 @@ class FlowDataBase {
     const symbolTvConfig = this._options.limitStopProfit.tvAlertConfig[symbol]
     return new Promise((resolve, reject) => {
       this.promiseGetPrices(params).then((prices) => {
-        const { minStop, maxStop, risk, maxAmount, profitRate, supportIntervals } = symbolTvConfig
+        const { minStop, maxStop, risk, maxAmount, profitRate, entryOffset, entryMinPrice, entryMaxPrice } = symbolTvConfig
+        const priceOffset = Math.max(+entryOffset, 0)
+
         if (name === 'A0') {
           const quto = this.getLatestQuote(symbol)
           const precision = precisionMap[symbol]
@@ -1826,7 +1834,7 @@ class FlowDataBase {
           let price, stopPx, profitPx, amount = 0
 
           if (long) {
-            price = Math.min(middlePrice, quto.askPrice - precision)
+            price = Math.min(middlePrice, quto.askPrice - precision) - priceOffset
             stopPx = longStop
             const lowestStopPx = price - maxStop
             const highestStopPx = price - minStop
@@ -1840,7 +1848,7 @@ class FlowDataBase {
             const risks = price - stopPx
             profitPx = price + (risks * profitRate)
           } else {
-            price = Math.max(middlePrice, quto.bidPrice + precision)
+            price = Math.max(middlePrice, quto.bidPrice + precision) + priceOffset
             stopPx = shortStop
             const highestStopPx = price + maxStop
             const lowestStopPx = price + minStop
@@ -1871,19 +1879,27 @@ class FlowDataBase {
             amount,
           }
 
-          console.log('tv auto open position!', data)
-          this._notifyPhone(`[${symbol}] tv auto open position!`)
-
-          this.orderLimitWithStop(data)
-          // save config
-          const curSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
-          curSymbolConfig.price = price
-          curSymbolConfig.side = side
-          curSymbolConfig.profitPx = profitPx
-          curSymbolConfig.stopPx = stopPx
-          curSymbolConfig.openMethod = openMethod
-          this.saveConfigToFile()
-          resolve()
+          if (entryMinPrice > 0 && price < entryMinPrice) {
+            this._notifyPhone(`[${symbol}] tv auto open but price(${price}) < entryMinPrice(${entryMinPrice})`)
+            reject()
+          } else if (entryMaxPrice > 0 && price > entryMaxPrice) {
+            this._notifyPhone(`[${symbol}] tv auto open but price(${price}) > entryMaxPrice(${entryMaxPrice})`)
+            reject()
+          } else {
+            console.log('tv auto open position!', data)
+            this._notifyPhone(`[${symbol}] tv auto open position!`)
+  
+            this.orderLimitWithStop(data)
+            // save config
+            const curSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
+            curSymbolConfig.price = price
+            curSymbolConfig.side = side
+            curSymbolConfig.profitPx = profitPx
+            curSymbolConfig.stopPx = stopPx
+            curSymbolConfig.openMethod = openMethod
+            this.saveConfigToFile()
+            resolve()
+          }
         }
       }).catch((errorMsg) => {
         console.log('waitForLastestCandle error:', errorMsg)

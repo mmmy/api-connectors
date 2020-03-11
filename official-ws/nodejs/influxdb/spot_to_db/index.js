@@ -2,7 +2,7 @@
 const args = require('../../strategy/argv')
 const _ = require('lodash')
 var SocksProxyAgent = require('socks-proxy-agent');
-var agent = new SocksProxyAgent('socks://127.0.0.1:1080');
+var agent = new SocksProxyAgent('socks://127.0.0.1:7891');
 const BFX = require('bitfinex-api-node')
 const { createOkSpotClient, createBinanceClient, createHuobiClient, createCoinbaseClient, createOkFutureClient } = require('./client')
 const { SpotDB } = require('../db')

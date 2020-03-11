@@ -5,7 +5,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 var SocksProxyAgent = require('socks-proxy-agent');
 
-var agent = isProduction ? null : new SocksProxyAgent('socks://127.0.0.1:1080');
+var agent = isProduction ? null : new SocksProxyAgent('socks://127.0.0.1:7891');
 const bot = new Telegraf("753812904:AAFp6-Upva0MOo-T9QgiOc7Rs3qNOpJ7wRw", {
   telegram: {
     agent: agent

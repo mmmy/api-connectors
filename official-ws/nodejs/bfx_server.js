@@ -1,7 +1,7 @@
 const _ = require('lodash')
 const WebSocket = require('ws');
 var SocksProxyAgent = require('socks-proxy-agent');
-var agent = new SocksProxyAgent('socks://127.0.0.1:1080');
+var agent = new SocksProxyAgent('socks://127.0.0.1:7891');
 const BFX = require('bitfinex-api-node')
 
 function slow(func, wait) {
