@@ -184,11 +184,11 @@ class BinanceManager {
             resolve(result)
           }).catch(e => {
             console.log('binance manager orderLimitWithStop:orderLimit error', e)
-            this._notifyPhone('binance manager orderLimitWithStop:orderLimit error', true)
+            this._notifyPhone('binance manager orderLimitWithStop:orderLimit error' + e, true)
           })
       }).catch(e => {
         console.log('binance manager orderLimitWithStop:orderStop error', e)
-        this._notifyPhone('binance manager orderLimitWithStop:orderStop error', true)
+        this._notifyPhone('binance manager orderLimitWithStop:orderStop error' + e, true)
         reject(e)
       })
     })
@@ -268,8 +268,8 @@ class BinanceManager {
         return
       }
       if (symbolTvAlertConfig.supportIntervals.indexOf(interval) > -1) {
-        console.log(msg)
-        this._notifyPhone(msg)
+        // console.log(msg)
+        // this._notifyPhone(msg)
         this.orderLimitStopProfitByTVParam(params).then(() => {
           // 重置开关, 需要手动打开, 为了安全
           if (long) {
@@ -290,10 +290,12 @@ class BinanceManager {
     const symbolTvAlertConfig = this._options.limitStopProfit.symbolConfig[symbol].tvAlertConfig
     return new Promise((resolve, reject) => {
       if (name === 'A0') {
-        const { minStop, maxStop, risk, maxAmount, profitRate } = symbolTvAlertConfig
+        const { minStop, maxStop, risk, maxAmount, profitRate, entryOffset, entryMinPrice, entryMaxPrice } = symbolTvAlertConfig
         let price, stopPx, profitPx, amount = 0
+        const priceOffset = Math.max(+entryOffset, 0)
+
         if (long) {
-          price = exchangeInfoManager.transformPrice(symbol, middlePrice)
+          price = exchangeInfoManager.transformPrice(symbol, middlePrice - priceOffset)
           stopPx = longStop
           const lowestStopPx = price - maxStop
           const highestStopPx = price - minStop
@@ -321,9 +323,17 @@ class BinanceManager {
             profitPx,
             amount,
           }
-          this._notifyPhone(`binance [${symbol}] tv auto open position!`)
-          this.orderLimitWithStop(data)
-          resolve()
+          if (entryMinPrice > 0 && price < entryMinPrice) {
+            this._notifyPhone(`BN[${symbol}] tv auto open but price(${price}) < entryMinPrice(${entryMinPrice})`)
+            reject()
+          } else if (entryMaxPrice > 0 && price > entryMaxPrice) {
+            this._notifyPhone(`BN[${symbol}] tv auto open but price(${price}) > entryMaxPrice(${entryMaxPrice})`)
+            reject()
+          } else {
+            this._notifyPhone(`BN [${symbol}] tv auto open position! ${price} ${stopPx} ${profitPx} open ${amount}`)
+            this.orderLimitWithStop(data)
+            resolve()
+          }
         } else {
           reject('short not support!')
         }

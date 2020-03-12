@@ -1,6 +1,7 @@
 let data = null
 let interval = null
 const sdkCommon = require('./sdk/common')
+const Decimal = require('decimal.js')
 
 function fetchExchangeInfo(testnet) {
   // 暂时不优化次数
@@ -79,13 +80,16 @@ function getSymbolConfig(symbol) {
 function adjustOrderParam(symbol, price, usdt, isMarket) {
   const symbolInfo = getSymbolConfig(symbol)
   // 将价格调整为基准的整数倍
-  const priceR = 1 / symbolInfo.priceStepSize
-  price = Math.round(price * priceR) / priceR
+  const step = new Decimal(symbolInfo.priceStepSize)
+  // const priceR = 1 / symbolInfo.priceStepSize
+  // price = Math.round(price * priceR) / priceR
+  price = (new Decimal(price)).div(step).round().mul(step).toNumber()
   let quantity = usdt / price
   // 将数量调整为基准的整数倍
-  const quantityStep = isMarket ? +symbolInfo.marketQuantityStepSize : +symbolInfo.quantityStepSize
-  const quantityR = 1 / quantityStep
-  quantity = Math.round(quantity * quantityR) / quantityR
+  const quantityStep = new Decimal(isMarket ? +symbolInfo.marketQuantityStepSize : +symbolInfo.quantityStepSize)
+  // const quantityR = 1 / quantityStep
+  // quantity = Math.round(quantity * quantityR) / quantityR
+  quantity = (new Decimal(quantity)).div(quantityStep).round().mul(quantityStep).toNumber()
   return {
     price,
     quantity
@@ -94,7 +98,8 @@ function adjustOrderParam(symbol, price, usdt, isMarket) {
 
 function transformPrice(symbol, price) {
   const symbolInfo = getSymbolConfig(symbol)
-  price = Math.round(price / symbolInfo.priceStepSize) * symbolInfo.priceStepSize
+  const step = new Decimal(symbolInfo.priceStepSize)
+  price = (new Decimal(price)).div(step).round().mul(step).toNumber()
   return price
 }
 

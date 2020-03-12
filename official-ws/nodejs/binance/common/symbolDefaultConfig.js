@@ -21,6 +21,9 @@ exports.symbolConfigDefault = {
       autoOrderProfit: true,
       autoUpdateStop: false,       // 当盈利达到1：1.5后将止损移动到成本位
       profitRateForUpdateStop: 1.5,
+      entryOffset: 0, // 入场偏移量, 比如熊市底部做多, 牛市顶部做空
+      entryMaxPrice: 0, // 入场价格过滤器区间上
+      entryMinPrice: 0, // 入场价格过滤器区间下
     },
     uiConfig: {
       risk: 100, //$100
@@ -58,6 +61,9 @@ exports.symbolConfigDefault = {
       autoOrderProfit: true,
       autoUpdateStop: false,       // 当盈利达到1：1.5后将止损移动到成本位
       profitRateForUpdateStop: 2,
+      entryOffset: 0,
+      entryMaxPrice: 0,
+      entryMinPrice: 0,
     },
     uiConfig: {
       risk: 100, //$100
@@ -95,6 +101,9 @@ exports.symbolConfigDefault = {
       autoOrderProfit: true,
       autoUpdateStop: false,       // 当盈利达到1：1.5后将止损移动到成本位
       profitRateForUpdateStop: 2,
+      entryOffset: 0,
+      entryMaxPrice: 0,
+      entryMinPrice: 0,
     },
     uiConfig: {
       risk: 100, //$100
@@ -132,6 +141,9 @@ exports.symbolConfigDefault = {
       autoOrderProfit: true,
       autoUpdateStop: false,       // 当盈利达到1：1.5后将止损移动到成本位
       profitRateForUpdateStop: 3,
+      entryOffset: 0,
+      entryMaxPrice: 0,
+      entryMinPrice: 0,
     },
     uiConfig: {
       risk: 100, //$100
@@ -169,6 +181,9 @@ exports.symbolConfigDefault = {
       autoOrderProfit: true, // 自动检测设置止盈单
       autoUpdateStop: false,       // 当盈利达到1：1.5后将止损移动到成本位
       profitRateForUpdateStop: 1.5,
+      entryOffset: 0,
+      entryMaxPrice: 0,
+      entryMinPrice: 0,
     },
     uiConfig: {
       risk: 100, //$100
@@ -206,6 +221,9 @@ exports.symbolConfigDefault = {
       autoOrderProfit: true,
       autoUpdateStop: false,       // 当盈利达到1：1.5后将止损移动到成本位
       profitRateForUpdateStop: 1.5,
+      entryOffset: 0,
+      entryMaxPrice: 0,
+      entryMinPrice: 0,
     },
     uiConfig: {
       risk: 100, //$100
@@ -244,6 +262,9 @@ exports.symbolConfigDefault = {
   //     autoOrderProfit: true,
   //     autoUpdateStop: false,       // 当盈利达到1：1.5后将止损移动到成本位
   //     profitRateForUpdateStop: 1.5,
+          // entryOffset: 0,
+          // entryMaxPrice: 0,
+          // entryMinPrice: 0,
   //   },
   //   uiConfig: {
   //     risk: 100, //$100
