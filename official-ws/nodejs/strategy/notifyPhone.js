@@ -23,7 +23,6 @@ function notifyPhoneUser(msg, token, user, sound) {
         --form-string "user=${user}" \
         --form-string "sound=${sound}" \
         --form-string "message=${msg}" \
-        --form-string "title=this is a title" \
         https://api.pushover.net/1/messages.json`, (error, stdout, stderr) => {
             console.log(error, stdout, stderr)
         })
@@ -40,7 +39,8 @@ function notifyGlances(msg, token, user, sound) {
     exec(`curl -s \
         --form-string "token=${token}" \
         --form-string "user=${user}" \
-        --form-string "title=${msg}" \
+        --form-string "title=title" \
+        --form-string "text=${msg}" \
         https://api.pushover.net/1/glances.json`, (error, stdout, stderr) => {
             console.log(error, stdout, stderr)
         })
