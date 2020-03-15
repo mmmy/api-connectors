@@ -10,8 +10,8 @@ const manager = new StrategyUserManager()
 
 const yqNotify = {
   on: true,
-  token: 'aiee6nmcgz678kbouuoujsmf4wko96',
-  user: 'gdz6nj653847v5e65px71bcstdsicv',
+  token: 'ayuuekzm61f2nm72qes1wkaofyhxp3',
+  user: 'uzxi5bsqjf8a58be5kvxzze4m1agwy',
 }
 
 const list = []
