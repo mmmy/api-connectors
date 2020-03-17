@@ -211,7 +211,7 @@ class BinanceManager {
   saveConfigToFile() {
     const configToSave = {}
     let paths = [
-      'notify',
+      'notify.on',
       'limitStopProfit',
     ]
     paths.forEach(path => {

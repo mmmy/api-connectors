@@ -1546,7 +1546,7 @@ class FlowDataBase {
   saveConfigToFile() {
     const configToSave = {}
     let paths = [
-      'notify',
+      'notify.on',
       'autoUpdateStopOpenMarketOrder',
       'autoUpdateStopOpenMarketOrder1h',
 
@@ -1888,7 +1888,7 @@ class FlowDataBase {
           } else {
             console.log('tv auto open position!', data)
             this._notifyPhone(`[${symbol}] tv auto open position!`)
-  
+
             this.orderLimitWithStop(data)
             // save config
             const curSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
