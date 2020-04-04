@@ -94,7 +94,7 @@ export default class Trade extends React.Component {
             const rpnBalanceUsd = xbtBidPrice ? (rpnBalance * xbtBidPrice).toFixed(0) : null
 
             return <div className="user-row">
-              <div>user: {options.user} ({(availableMargin / 1E8).toFixed(3)}/{balance.toFixed(3)})({balaceUsd})&nbsp;close:{rpnBalanceUsd}</div>
+              <div>user: {options.user} ({(availableMargin / 1E8).toFixed(3)}/{balance.toFixed(3)})({balaceUsd})&nbsp;close:{rpnBalanceUsd}&nbsp;<button onClick={this.handleDeleteAll.bind(this, i)}>delete all orders</button></div>
               <div className="account clearfix">
                 <table style={{ fontSize: '12px' }}>
                   <thead>
@@ -144,7 +144,7 @@ export default class Trade extends React.Component {
                 onFetchUserList={this.fetchUserList}
               />
               <hr />
-              <div className="title">Orders</div>
+              <div className="title outstand">Orders</div>
               <div className="orders-container">
                 <table>
                   <thead><tr>
@@ -161,7 +161,7 @@ export default class Trade extends React.Component {
                     {
                       orders.filter(o => o.ordType !== 'Stop').map((order, j) => {
                         const isBuy = order.side === 'Buy'
-                        return <tr>
+                        return <tr style={{border: '4px dashed rgb(255, 176, 0)'}}>
                           <td><button onClick={this.handleDelOrder.bind(this, i, order)}>Del</button></td>
                           <td>{order.symbol}</td>
                           <td style={{ cursor: 'pointer' }} title="点击修改" className={isBuy ? 'green' : 'red'} onClick={this.handleUpdateOrder.bind(this, i, order, 'orderQty')}>{order.orderQty * (isBuy ? 1 : -1)}</td>
@@ -216,7 +216,9 @@ export default class Trade extends React.Component {
               </div>
               <hr />
               <div className="title">
-                Stop Orders
+                <span className="outstand">
+                  Stop Orders
+                </span>
                 <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder} onChange={this.handleChangeZZSD.bind(this, i)} /> 5m自动追涨杀跌
                 <input type="checkbox" checked={options.autoUpdateStopOpenMarketOrder1h} onChange={this.handleChangeZZSD1h.bind(this, i)} /> 1h自动追涨杀跌
                 {
@@ -241,7 +243,8 @@ export default class Trade extends React.Component {
                     {
                       orders.filter(o => o.ordType === 'Stop' || o.ordType === 'MarketIfTouched').map(order => {
                         const isBuy = order.side === 'Buy'
-                        return <tr>
+                        const isClose = order.execInst.indexOf('Close') > -1
+                        return <tr style={{border: isClose ? '4px dashed rgb(12, 143, 255)' : '4px dashed rgb(255, 176, 0)'}}>
                           <td><button onClick={this.handleDelOrder.bind(this, i, order)}>Del</button></td>
                           <td>{order.symbol}</td>
                           <td style={{ cursor: 'pointer' }} title="点击修改" className={order.side == 'Buy' ? 'green' : 'red'} onClick={this.handleUpdateOrder.bind(this, i, order, 'orderQty')}>{order.orderQty * (isBuy ? 1 : -1)}</td>
