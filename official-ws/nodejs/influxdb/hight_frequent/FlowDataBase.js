@@ -1657,6 +1657,7 @@ class FlowDataBase {
       if (absPositionQty > 0) {
         if (urPnlProfit < 0) {
           reject('亏损中，不能设置保本止损')
+          return
         }
         const costPrice = this._accountPosition.getCostPrice(symbol)
         const isLongPosition = positionQty > 0
