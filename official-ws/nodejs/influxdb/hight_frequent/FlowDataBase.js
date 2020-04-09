@@ -107,6 +107,7 @@ class FlowDataBase {
       },
       limitStopProfit: { // 半自动化配置
         shortMode: false, // 空头市场，总是xbt套保
+        shortBaseAmount: 0, // 大于零表示做空注意有套保
         autoOrderProfit: true, // reduceOnly limit
         symbol: 'XBTUSD',
         side: 'Buy',
@@ -336,9 +337,17 @@ class FlowDataBase {
 
   watchQuoteUpdate(symbol) {
     const quto = this.getLatestQuote(symbol)
-    const positionQty = this._accountPosition.getCurrentQty(symbol)
-    const absPositionQty = Math.abs(positionQty)
-    const { symbolConfig, tvAlertConfig } = this._options.limitStopProfit
+    let positionQty = this._accountPosition.getCurrentQty(symbol)
+    const { symbolConfig, tvAlertConfig, shortBaseAmount } = this._options.limitStopProfit
+    if (positionQty < 0) {
+      const safeQty = positionQty + Math.abs(shortBaseAmount)  // 出去套保的仓位
+      if (safeQty < 0) {
+        positionQty = safeQty
+      } else {
+        positionQty = 0
+      }
+    }
+    let absPositionQty = Math.abs(positionQty)
     const currentConfig = symbolConfig[symbol]
     const currentTvConfig = tvAlertConfig[symbol]
     // 自动更新止损，放到止损位
@@ -1648,7 +1657,12 @@ class FlowDataBase {
   }
 
   setStopAtCostPrice(symbol) {
-    const positionQty = this._accountPosition.getCurrentQty(symbol)
+    const { shortBaseAmount } = this._options.limitStopProfit
+    let positionQty = this._accountPosition.getCurrentQty(symbol)
+    if (positionQty < 0) {
+      const safeQty = positionQty + Math.abs(shortBaseAmount)  //去掉套保仓位
+      positionQty = Math.min(0, safeQty)
+    }
 
     const urPnlProfit = this._accountPosition.getUrPnlProfit(symbol)
     const absPositionQty = Math.abs(positionQty)
@@ -1701,19 +1715,31 @@ class FlowDataBase {
   }
 
   checkOrderLimitStopProfitStaus(symbol) {
-    const { shortMode, symbolConfig } = this._options.limitStopProfit
+    const { shortMode, symbolConfig, shortBaseAmount } = this._options.limitStopProfit
 
     const currentConfig = symbolConfig[symbol]
     const isConfigLong = currentConfig.side === 'Buy'
     let hasPosition = false
-    const positionQty = this._accountPosition.getCurrentQty(symbol)
-    const absPositionQty = Math.abs(positionQty)
-    // 暂时不支持shortMode
+    let positionQty = this._accountPosition.getCurrentQty(symbol)
+    // 暂时不支持shortMode, 使用shortBaseAmount代替
     if (shortMode) {
       hasPosition = positionQty >= 0 // 需要优化，不正确
     } else {
-      hasPosition = this._accountPosition.hasPosition(symbol)
+      if (positionQty > 0) {
+        hasPosition = true
+      } else if (positionQty < 0) {
+        const safeQty = positionQty + Math.abs(shortBaseAmount)
+        if (safeQty < 0) {  // 说明除了套保的仓位还有多余空仓
+          hasPosition = true
+          positionQty = safeQty
+        } else {
+          positionQty = 0
+        }
+      }
+      // hasPosition = longQty ? true : this._accountPosition.hasPosition(symbol)
     }
+
+    const absPositionQty = Math.abs(positionQty)
 
     if (hasPosition) {
       const longPosition = shortMode ?

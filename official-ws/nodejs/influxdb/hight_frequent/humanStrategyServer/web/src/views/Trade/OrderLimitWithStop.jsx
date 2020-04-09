@@ -39,7 +39,7 @@ export default class OrderLimitWithStop extends React.Component {
     const {
       side, symbol, risk, shortMode, profitPx,
       stopPx, price, amount, offset, pending,
-      kRateForPrice, defaultProfitRate, autoOrderProfit,
+      kRateForPrice, defaultProfitRate, autoOrderProfit, shortBaseAmount,
       openMethod,
     } = this.state
     const isBuy = side === 'Buy'
@@ -81,6 +81,16 @@ export default class OrderLimitWithStop extends React.Component {
             onChange={this.handleCheckboxOption.bind(this, 'shortMode')}
           />
         </span>
+        <span>
+          <label>shortBaseAmount</label>
+          <span
+            onClick={this.handleChangeValueAndSave.bind(this, 'shortBaseAmount')}
+            style={{color: shortBaseAmount < 0 ? 'rgba(255, 0, 0, 0.6)' : ''}}
+          >
+          {shortBaseAmount}
+          </span>
+        </span>
+        
       </div>
       <div className="row">
         <button onClick={this.handleFetchCandleAndApply.bind(this, '1d')}>auto 1d K</button>
@@ -205,6 +215,23 @@ export default class OrderLimitWithStop extends React.Component {
         this.updateAmount()
       }
     })
+  }
+
+  handleChangeValueAndSave = (key) => {
+    const { index, onChangeOption } = this.props
+
+    const oldV = this.state[key]
+    let newV = window.prompt(`change ${key}`, oldV)
+    if (newV !== null) {
+      newV = +newV
+      if (newV > 0) {
+        window.alert('需要<=0')
+      } else {
+        const path = `limitStopProfit.${key}`
+        onChangeOption(index, path, newV)
+        this.setState({[key]: newV})
+      }
+    }
   }
 
   handleCheckboxOption = (key, e) => {
