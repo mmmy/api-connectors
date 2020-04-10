@@ -105,6 +105,29 @@ class FlowDataBase {
         enableLong: true,
         enableShort: false,
       },
+      scalping: {
+        symbol: 'XBTUSD',
+        config: {
+          'XBTUSD': {
+            risk: 10,
+            stopDistance: 10,
+            side: 'Sell',
+            openMethod: 'limit_auto', // or stop or market or limit or stop_auto
+            openPrice: 0, // limit or stop price
+            autoOffset: 0, // auto的偏移
+            profitRate: 2,
+          },
+          'ETHUSD': {
+            risk: 10,
+            stopDistance: 1,
+            side: 'Sell',
+            openMethod: 'limit_auto', // or stop or market or limit or stop_auto
+            openPrice: 0, // limit or stop price
+            autoOffset: 0, // auto的偏移
+            profitRate: 2,
+          }
+        }
+      },
       limitStopProfit: { // 半自动化配置
         shortMode: false, // 空头市场，总是xbt套保
         shortBaseAmount: 0, // 大于零表示做空注意有套保
@@ -992,7 +1015,7 @@ class FlowDataBase {
   orderLimitWithStop(data) {
     const { symbol, side, amount, price, stopPx, openMethod } = data
     const sdk = this._orderManager.getSignatureSDK()
-    const isOpenStop = openMethod === 'stop'
+    const isOpenStop = openMethod === 'stop' || openMethod === 'stop_auto'
     if (isOpenStop) {
       // todo: 处理 price 立即成交的bug, 应该返回错误
       // stop open 可能比止损后触发，这个问题很大
@@ -1577,6 +1600,7 @@ class FlowDataBase {
       'botBreakCandle',
       'botPinBar',
       'limitStopProfit',
+      'scalping',
     ]
     paths.forEach(path => {
       _.set(configToSave, path, _.get(this._options, path))
@@ -2014,6 +2038,94 @@ class FlowDataBase {
     }
     // const { symbol, side, amount, price, stopPx, openMethod } = data
     // const sdk = this._orderManager.getSignatureSDK()
+  }
+  
+  orderScalping(data) {
+    let { symbol, risk, side, openMethod, openPrice, autoOffset, profitRate, stopDistance } = data
+    risk = +risk
+    openPrice = +openPrice
+    autoOffset = +autoOffset
+    profitRate = +profitRate
+    stopDistance = +stopDistance
+    
+    const scalpingConfig = this._options.scalping.config[symbol]
+
+    this._options.scalping.config[symbol] = {
+      ...scalpingConfig,
+      risk, side, openMethod, openPrice, autoOffset, profitRate, stopDistance
+    }
+
+    this.saveConfigToFile()
+
+    const quote = this.getLatestQuote(symbol)
+    const isLong = side === 'Buy'
+    let price, stopPx, profitPx, amount
+    switch(openMethod) {
+      case 'limit': // 限价
+        if (isLong && openPrice > quote.bidPrice || (!isLong && openPrice < quote.askPrice)) {
+          return Promise.reject(`limit open price不合理 ${side} ${openPrice} [${quote.bidPrice}, ${quote.askPrice}]`)
+        }
+        price = openPrice
+        break
+      case 'limit_auto': // 价距限价
+        price = isLong ? (quote.bidPrice - autoOffset) : (quote.askPrice + autoOffset)
+        break
+      case 'market': // 市价
+        // 这个price不一定是成交价, 只是要计算stopPx
+        price = isLong ? quote.askPrice : quote.bidPrice
+        break
+      case 'stop': // 指定价格止损开仓
+        if (isLong && openPrice < quote.askPrice || (!isLong && openPrice > quote.bidPrice)) {
+          return Promise.reject(`stop open price不合理 ${side} ${openPrice} [${quote.bidPrice}, ${quote.askPrice}]`)
+        }
+        price = openPrice
+        break
+      case 'stop_auto': // 价距止损开仓
+        // 这个price不一定是成交价, 只是要计算stopPx
+        price = isLong ? (quote.askPrice + autoOffset) : (quote.bidPrice - autoOffset)
+        break
+      default:
+        return Promise.reject(`${openMethod}不支持`)
+    }
+    price = transformPrice(symbol, price)
+    stopPx = isLong ? (price - stopDistance) : (price + stopDistance)
+    profitPx = price + (isLong ? 1 : -1) * stopDistance * profitRate
+    
+    stopPx = transformPrice(symbol, stopPx)
+    profitPx = transformPrice(symbol, profitPx)
+
+    amount = Math.round((risk / stopDistance) * price)
+    // save config
+    const curSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
+    curSymbolConfig.price = price
+    curSymbolConfig.side = side
+    curSymbolConfig.profitPx = profitPx
+    curSymbolConfig.stopPx = stopPx
+    curSymbolConfig.openMethod = openMethod
+    this.saveConfigToFile()
+
+    if (['limit', 'limit_auto', 'stop', 'stop_auto'].indexOf(openMethod) > -1) {
+      return this.orderLimitWithStop({
+        symbol, side, amount, price, stopPx, openMethod, profitPx
+      })
+    }
+
+    const sdk = this._orderManager.getSignatureSDK()
+
+    // 市价
+    if (openMethod === 'market') {
+
+      return new Promise((resolve, reject) => {
+        // orderStop 成功后才ordermarket
+        sdk.orderStop(symbol, amount, stopPx, side === 'Buy' ? 'Sell' : 'Buy', true).then(() => {
+          sdk.orderMarket(symbol, amount, side).then(resolve).catch(reject)
+        }).catch(e => {
+          reject(e)
+        })
+      })
+    }
+    
+    return Promise.reject('未开仓, 不支持的openMethod')
   }
 }
 

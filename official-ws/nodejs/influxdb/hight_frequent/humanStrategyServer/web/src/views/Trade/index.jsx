@@ -5,6 +5,7 @@ import IndicatorValues from './IndicatorValues'
 // import TradingView from './TradingView'
 import MarginHistoryChart from './MarginHistoryChart'
 import OrderLimitWithStop from './OrderLimitWithStop'
+import Scalping from './Scalping'
 
 import './index.css'
 
@@ -136,6 +137,13 @@ export default class Trade extends React.Component {
                   </tbody>
                 </table>
               </div>
+              <hr />
+              <Scalping
+                index={i}
+                options={options}
+                onChangeOption={this.fetchChangeUserOption}
+                onFetchUserList={this.fetchUserList}
+              />
               <hr/>
               <OrderLimitWithStop
                 index={i}

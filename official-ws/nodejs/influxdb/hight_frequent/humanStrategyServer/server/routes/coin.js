@@ -433,6 +433,29 @@ router.post('/order_limit_with_stop', function(req, res, next) {
   })
 })
 
+router.post('/order_scalping', function(req, res, next) {
+  const { user } = req.body
+  const valideKeys = ['user', 'symbol', 'side', 'profitRate', 'openPrice', 'autoOffset', 'openMethod', 'stopDistance']
+  if (valideKeys.some(key => req.body[key] === undefined)) {
+    req.send({
+      result: false,
+      info: `${valideKeys} some missed value`
+    })
+    return
+  }
+  manager.orderScalping(user, req.body).then(() => {
+    res.send({
+      result: true,
+      data: null
+    })
+  }).catch(e => {
+    res.send({
+      result: false,
+      info: e
+    })
+  })
+})
+
 router.post('/update_auto_order_signal', function (req, res) {
   const { user, index, auto_order } = req.body
   if (!user || index === undefined) {

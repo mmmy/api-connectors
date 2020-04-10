@@ -1,12 +1,9 @@
 import React from 'react'
 import axios from 'axios'
 
-const tvConfigKeys = ['minStop', 'maxStop', 'risk', 'maxAmount', 'profitRate']
+import { PirceUnitMap } from '../../constant'
 
-const PirceUnitMap = {
-  'XBTUSD': 0.5,
-  'ETHUSD': 0.05,
-}
+const tvConfigKeys = ['minStop', 'maxStop', 'risk', 'maxAmount', 'profitRate']
 
 const Intervals = ['4h', '1h', '30']
 
@@ -21,7 +18,7 @@ export default class OrderLimitWithStop extends React.Component {
     super(props)
     this.state = {
       symbol: 'XBTUSD',
-      side: 'Buy',
+      side: 'Sell',
       defaultProfitRate: 2,
       risk: 100,
       offset: 0,

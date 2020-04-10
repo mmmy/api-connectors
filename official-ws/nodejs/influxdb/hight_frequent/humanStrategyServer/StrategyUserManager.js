@@ -300,6 +300,14 @@ module.exports = class StrategyUserManager {
     return strategy.orderLimitWithStop(data)
   }
 
+  orderScalping(user, data) {
+    const strategy = this.findStrategyByUser(user)
+    if (!strategy) {
+      return Promise.reject(`${user} strategy not exist`)      
+    }
+    return strategy.orderScalping(data)
+  }
+
   getAllIndicatorValues() {
     const mainStrategy = this.getMainStrategy()
     return Promise.resolve(mainStrategy.getAllIndicatorValues())
