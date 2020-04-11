@@ -23,6 +23,8 @@ const precisionMap = {
   'ETHUSD': 0.05,
 }
 
+const BASE_CURRENCY = 'XBTUSD'
+
 function transformPrice(symbol, price) {
   const unit = precisionMap[symbol]
   const rate = 1 / unit
@@ -370,7 +372,7 @@ class FlowDataBase {
     const quto = this.getLatestQuote(symbol)
     let positionQty = this._accountPosition.getCurrentQty(symbol)
     const { symbolConfig, tvAlertConfig, shortBaseAmount } = this._options.limitStopProfit
-    if (positionQty < 0) {
+    if (symbol === BASE_CURRENCY && positionQty < 0) {
       const safeQty = positionQty + Math.abs(shortBaseAmount)  // 出去套保的仓位
       if (safeQty < 0) {
         positionQty = safeQty
@@ -1691,7 +1693,7 @@ class FlowDataBase {
   setStopAtCostPrice(symbol) {
     const { shortBaseAmount } = this._options.limitStopProfit
     let positionQty = this._accountPosition.getCurrentQty(symbol)
-    if (positionQty < 0) {
+    if (symbol === BASE_CURRENCY && positionQty < 0) {
       const safeQty = positionQty + Math.abs(shortBaseAmount)  //去掉套保仓位
       positionQty = Math.min(0, safeQty)
     }
@@ -1760,12 +1762,16 @@ class FlowDataBase {
       if (positionQty > 0) {
         hasPosition = true
       } else if (positionQty < 0) {
-        const safeQty = positionQty + Math.abs(shortBaseAmount)
-        if (safeQty < 0) {  // 说明除了套保的仓位还有多余空仓
-          hasPosition = true
-          positionQty = safeQty
-        } else {
-          positionQty = 0
+        hasPosition = true
+        if (symbol === BASE_CURRENCY) {
+          const safeQty = positionQty + Math.abs(shortBaseAmount)
+          if (safeQty < 0) {  // 说明除了套保的仓位还有多余空仓
+            hasPosition = true
+            positionQty = safeQty
+          } else {
+            hasPosition = false
+            positionQty = 0
+          }
         }
       }
       // hasPosition = longQty ? true : this._accountPosition.hasPosition(symbol)
