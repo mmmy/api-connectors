@@ -109,28 +109,36 @@ class FlowDataBase {
         symbol: 'XBTUSD',
         config: {
           'XBTUSD': {
-            risk: 10,
+            risk: 10, // 暂时无用
+            amount: 0, // 仓位, 根据凯里公式计算, 前端计算
             stopDistance: 10,
             side: 'Sell',
             openMethod: 'limit_auto', // or stop or market or limit or stop_auto
             openPrice: 0, // limit or stop price
             autoOffset: 0, // auto的偏移
             profitRate: 2,
+            winRate: 0.5, // 胜率 0 - 1
+            leverage: 1,
           },
           'ETHUSD': {
-            risk: 10,
+            risk: 10, // 暂时无用
+            amount: 0, // 仓位, 根据凯里公式计算, 前端计算
             stopDistance: 1,
             side: 'Sell',
             openMethod: 'limit_auto', // or stop or market or limit or stop_auto
             openPrice: 0, // limit or stop price
             autoOffset: 0, // auto的偏移
             profitRate: 2,
+            winRate: 0.5, // 胜率 0 - 1
+            leverage: 1, // 杠杆, 目前只是用于存储, 给前端计算amount使用
           }
         }
       },
       limitStopProfit: { // 半自动化配置
         shortMode: false, // 空头市场，总是xbt套保
         shortBaseAmount: 0, // 大于零表示做空注意有套保
+        kellyP: 0.5, // 只用作前端辅助计算套保仓位用, 凯里公式中的p 和 r
+        kellyR: 2, 
         autoOrderProfit: true, // reduceOnly limit
         symbol: 'XBTUSD',
         side: 'Buy',
@@ -2041,25 +2049,30 @@ class FlowDataBase {
   }
   
   orderScalping(data) {
-    let { symbol, risk, side, openMethod, openPrice, autoOffset, profitRate, stopDistance } = data
+    let { symbol, risk, amount, side, openMethod, openPrice, autoOffset, profitRate, stopDistance, leverage, order } = data
     risk = +risk
     openPrice = +openPrice
     autoOffset = +autoOffset
     profitRate = +profitRate
     stopDistance = +stopDistance
-    
+    leverage = +leverage
+
     const scalpingConfig = this._options.scalping.config[symbol]
 
     this._options.scalping.config[symbol] = {
       ...scalpingConfig,
-      risk, side, openMethod, openPrice, autoOffset, profitRate, stopDistance
+      risk, side, openMethod, openPrice, autoOffset, profitRate, stopDistance, leverage
     }
 
     this.saveConfigToFile()
 
+    if (!order) {
+      return Promise.resolve('保存成功')
+    }
+
     const quote = this.getLatestQuote(symbol)
     const isLong = side === 'Buy'
-    let price, stopPx, profitPx, amount
+    let price, stopPx, profitPx //,amount
     switch(openMethod) {
       case 'limit': // 限价
         if (isLong && openPrice > quote.bidPrice || (!isLong && openPrice < quote.askPrice)) {
@@ -2094,7 +2107,7 @@ class FlowDataBase {
     stopPx = transformPrice(symbol, stopPx)
     profitPx = transformPrice(symbol, profitPx)
 
-    amount = Math.round((risk / stopDistance) * price)
+    // amount = Math.round((risk / stopDistance) * price)
     // save config
     const curSymbolConfig = this._options.limitStopProfit.symbolConfig[symbol]
     curSymbolConfig.price = price

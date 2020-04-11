@@ -1,7 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 
-import { PirceUnitMap } from '../../constant'
+import { PirceUnitMap, getAmountKelly } from '../../constant'
 
 const tvConfigKeys = ['minStop', 'maxStop', 'risk', 'maxAmount', 'profitRate']
 
@@ -28,15 +28,19 @@ export default class OrderLimitWithStop extends React.Component {
       amount: 0,
       pending: false,
       kRateForPrice: 0.5,
+      shortBaseAmount: 0,
+      kellyP: 0.5,
+      kellyR: 2,
       ...props.options.limitStopProfit,
     }
   }
   render() {
-    const { options, index } = this.props
+    const { options, index, totalUsd } = this.props
     const {
       side, symbol, risk, shortMode, profitPx,
       stopPx, price, amount, offset, pending,
-      kRateForPrice, defaultProfitRate, autoOrderProfit, shortBaseAmount,
+      kRateForPrice, defaultProfitRate, autoOrderProfit,
+      shortBaseAmount, kellyP, kellyR, // > 1
       openMethod,
     } = this.state
     const isBuy = side === 'Buy'
@@ -44,6 +48,9 @@ export default class OrderLimitWithStop extends React.Component {
     const unit = PirceUnitMap[symbol]
 
     const { tvAlertConfig } = options.limitStopProfit
+
+    const kellyAmount = getAmountKelly(totalUsd, +kellyP, +kellyR)
+    const bestAmount = kellyAmount - totalUsd
 
     return <div className="order-limit-withstop-container">
       <div className="row">
@@ -78,16 +85,42 @@ export default class OrderLimitWithStop extends React.Component {
             onChange={this.handleCheckboxOption.bind(this, 'shortMode')}
           />
         </span>
-        <span>
+        &nbsp;
+        <span className="bordered">
           <label>shortBaseAmount</label>
           <span
             onClick={this.handleChangeValueAndSave.bind(this, 'shortBaseAmount')}
-            style={{color: shortBaseAmount < 0 ? 'rgba(255, 0, 0, 0.6)' : ''}}
+            style={{ color: shortBaseAmount < 0 ? 'rgba(255, 0, 0, 0.6)' : '', padding: 3 }}
+            className="cb"
           >
-          {shortBaseAmount}
+            {shortBaseAmount}
+          </span>
+          <span title="根据kelly公式计算的最优值">
+            ({bestAmount})
           </span>
         </span>
-        
+        &nbsp;
+        <span className="bordered" title="凯里公式中的p, 红色表示凯里为负">
+          <label>kellyP</label>
+          <span
+            onClick={this.handleChangeValueAndSave.bind(this, 'kellyP')}
+            style={{ padding: 3, color: kellyAmount === 0 ? 'red' : '' }}
+            className="cb"
+          >
+            {kellyP}
+          </span>
+        </span>
+        &nbsp;
+        <span className="bordered" title="凯里公式中的r">
+          <label>kellyR</label>
+          <span
+            onClick={this.handleChangeValueAndSave.bind(this, 'kellyR')}
+            style={{ padding: 3, color: kellyAmount === 0 ? 'red' : '' }}
+            className="cb"
+          >
+            {kellyR}
+          </span>
+        </span>
       </div>
       <div className="row">
         <button onClick={this.handleFetchCandleAndApply.bind(this, '1d')}>auto 1d K</button>
@@ -221,12 +254,12 @@ export default class OrderLimitWithStop extends React.Component {
     let newV = window.prompt(`change ${key}`, oldV)
     if (newV !== null) {
       newV = +newV
-      if (newV > 0) {
+      if (['shortBaseAmount'].indexOf(key) > -1 && newV > 0) {
         window.alert('需要<=0')
       } else {
         const path = `limitStopProfit.${key}`
         onChangeOption(index, path, newV)
-        this.setState({[key]: newV})
+        this.setState({ [key]: newV })
       }
     }
   }

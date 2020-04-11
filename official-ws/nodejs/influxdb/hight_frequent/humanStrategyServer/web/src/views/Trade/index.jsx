@@ -143,6 +143,7 @@ export default class Trade extends React.Component {
                 options={options}
                 onChangeOption={this.fetchChangeUserOption}
                 onFetchUserList={this.fetchUserList}
+                totalUsd={rpnBalanceUsd}
               />
               <hr/>
               <OrderLimitWithStop
@@ -150,6 +151,7 @@ export default class Trade extends React.Component {
                 options={options}
                 onChangeOption={this.fetchChangeUserOption}
                 onFetchUserList={this.fetchUserList}
+                totalUsd={rpnBalanceUsd}
               />
               <hr />
               <div className="title outstand">Orders</div>

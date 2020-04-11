@@ -106,3 +106,7 @@ th, td {
   font-weight: bold;
   color: #a5b4ff;
 }
+
+.bordered {
+  border: 1px dotted #aaa;
+}
