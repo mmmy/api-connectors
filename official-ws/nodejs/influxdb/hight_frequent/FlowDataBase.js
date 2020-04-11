@@ -2055,19 +2055,20 @@ class FlowDataBase {
   }
   
   orderScalping(data) {
-    let { symbol, risk, amount, side, openMethod, openPrice, autoOffset, profitRate, stopDistance, leverage, order } = data
+    let { symbol, risk, amount, side, openMethod, openPrice, autoOffset, profitRate, winRate, stopDistance, leverage, order } = data
     risk = +risk
     openPrice = +openPrice
     autoOffset = +autoOffset
     profitRate = +profitRate
     stopDistance = +stopDistance
     leverage = +leverage
+    winRate = +winRate
 
     const scalpingConfig = this._options.scalping.config[symbol]
 
     this._options.scalping.config[symbol] = {
       ...scalpingConfig,
-      risk, side, openMethod, openPrice, autoOffset, profitRate, stopDistance, leverage
+      risk, side, openMethod, openPrice, autoOffset, profitRate, stopDistance, leverage, winRate
     }
 
     this.saveConfigToFile()

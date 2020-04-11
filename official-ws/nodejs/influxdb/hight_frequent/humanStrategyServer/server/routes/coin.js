@@ -435,7 +435,7 @@ router.post('/order_limit_with_stop', function(req, res, next) {
 
 router.post('/order_scalping', function(req, res, next) {
   const { user } = req.body
-  const valideKeys = ['user', 'symbol', 'side', 'profitRate', 'openPrice', 'autoOffset', 'openMethod', 'stopDistance', 'leverage', 'order']
+  const valideKeys = ['user', 'symbol', 'side', 'profitRate', 'openPrice', 'autoOffset', 'openMethod', 'stopDistance', 'winRate', 'leverage', 'order']
   if (valideKeys.some(key => req.body[key] === undefined)) {
     req.send({
       result: false,
