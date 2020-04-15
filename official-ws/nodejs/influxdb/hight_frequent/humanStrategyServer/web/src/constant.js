@@ -4,6 +4,6 @@ export const PirceUnitMap = {
 }
 
 export const getAmountKelly = (maxUsd, winRate, profitRate, leverage=1) => { // 凯里公式
-  const amount = Math.round(maxUsd * (winRate - (1 - winRate) / profitRate)) * leverage
+  const amount = Math.round(maxUsd * leverage * (winRate - (1 - winRate) / profitRate))
   return Math.max(amount, 0)
 }

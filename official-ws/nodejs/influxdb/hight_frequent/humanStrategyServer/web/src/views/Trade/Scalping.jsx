@@ -78,7 +78,7 @@ export default class Scalping extends React.Component {
         &nbsp;
         <span>
         <span>L</span>
-        <input min="1" max="10" style={{ width: 30 }} type="number" step="1" onChange={this.handleChangeValue.bind(this, 'leverage')} value={leverage} />
+        <input min="1" max="10" style={{ width: 50 }} type="number" step="0.5" onChange={this.handleChangeValue.bind(this, 'leverage')} value={leverage} />
         </span>
       </div>
     </div>
